@@ -7,7 +7,7 @@ html {
 
 body {
 	text-align: left;
-	width: 960px;
+	width: 1024px; /*960px;*/
 	margin: 0 auto;
 	padding: 0;
 	font-size: 12px;
@@ -109,6 +109,7 @@ ul#mainmenu li.loginlogout a:hover
 #loginform
 {
     text-align: center;
+    margin-top: 180px;
 }
 
 form.loginfields
@@ -316,4 +317,41 @@ font-weight:bold;
 }
 div.clearingdiv {
 clear:both;
+}
+
+.sp_header {
+	background-color: gray;
+	color: white;
+	height: 100px;
+	margin-top: 20px;
+}
+
+.sp_middle {
+	background-color: ltgray;
+	/*color: orange;*/
+	height: 600px;
+	border: 1px solid darkgray;
+	background-image: url('/images/sapns.gif');
+	background-repeat: no-repeat;
+}
+
+.sp_footer {
+	background-color: gray;
+	color: white;
+	height: 80px;
+	text-align: right;
+}
+
+.sp_app_title {
+	font-size: 30px;
+	text-align: left;
+	margin-left: 10px;
+	color: orange;
+}
+
+.sp_app_subtitle {
+	font-size: 12px;
+	text-align: left;
+	color: yellow;
+	margin-left: 10px;
 }

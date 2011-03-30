@@ -8,7 +8,7 @@
 # and generally should not be modified by end users.
 
 [DEFAULT]
-debug = false
+debug = true
 # Uncomment and replace with the address which should receive any error reports
 #email_to = you@yourdomain.com
 smtp_server = localhost
@@ -39,9 +39,8 @@ beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
 # pick the form for your database
 # %(here) may include a ':' character on Windows environments; this can
 # invalidate the URI when specifying a SQLite db via path name
-# sqlalchemy.url=postgres://username:password@hostname:port/databasename
-# sqlalchemy.url=mysql://username:password@hostname:port/databasename
-
+# sqlalchemy.url=postgresql://username:password@hostname:port/databasename
+sqlalchemy.url=postgresql://postgres:pswd@localhost/sapns
 
 # If you have sqlite, here's a simple default to get you started
 # in development

@@ -1,17 +1,10 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:py="http://genshi.edgewall.org/"
-      xmlns:xi="http://www.w3.org/2001/XInclude">
+{% extends 'base.html' %}
 
-  <xi:include href="master.html" />
+{% block head %}
+    <title>Sapns: Information about TG and WSGI</title>
+{% endblock %}
 
-<head>
-  <meta content="text/html; charset=UTF-8" http-equiv="content-type" py:replace="''"/>
-  <title>Learning TurboGears 2.1: Information about TG and WSGI</title>
-</head>
-
-<body>
+{% block middle %}
     <h2>The WSGI nature of the framework</h2>
     <p>In this page you can see all the WSGI variables your request object has,
        the ones in capital letters are required by the spec, then a sorted by
@@ -19,14 +12,13 @@
        the "wsgi." namespace with very useful information about your WSGI Server</p>
     <p>The keys in the environment are:
     <table>
-        <py:for each="key in sorted(environment)">
+        {% for key in environment %}
         <tr>
-            <td>${key}</td>
-            <td>${str(environment[key])}</td>
+            <td style="font-weight: bold;">{{key}}</td>
+            <td style="color: white;">{{environment[key]}}</td>
         </tr>
-        </py:for>
+        {% endfor %}
     </table>
 
     </p>
-</body>
-</html>
+{% endblock %}

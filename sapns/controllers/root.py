@@ -37,28 +37,16 @@ class RootController(BaseController):
 
     error = ErrorController()
 
-    @expose('sapns.templates.index')
+    @expose('index.html')
     def index(self):
-        """Handle the front-page."""
         return dict(page='index')
 
-    @expose('sapns.templates.about')
-    def about(self):
-        """Handle the 'about' page."""
-        return dict(page='about')
-
-    @expose('sapns.templates.environ')
+    @expose('environ.html')
     def environ(self):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ)
 
-    @expose('sapns.templates.data')
-    @expose('json')
-    def data(self, **kw):
-        """This method showcases how you can use the same controller for a data page and a display page"""
-        return dict(params=kw)
-
-    @expose('sapns.templates.authentication')
+    @expose('authentication.html')
     def auth(self):
         """Display some information about auth* on this application."""
         return dict(page='auth')
@@ -75,7 +63,7 @@ class RootController(BaseController):
         """Illustrate how a page exclusive for the editor works."""
         return dict(page='editor stuff')
 
-    @expose('sapns.templates.login')
+    @expose('login.html')
     def login(self, came_from=url('/')):
         """Start the user login."""
         login_counter = request.environ['repoze.who.logins']
@@ -107,3 +95,18 @@ class RootController(BaseController):
         """
         flash(_('We hope to see you soon!'))
         redirect(came_from)
+
+    @expose('')
+    @expose('json')
+    def search(self, cls='', q='', rp=10, pag=1):
+        pass
+    
+    def data(self, cls='', id=None):
+        pass
+    
+    def save(self, cls='', id=None):
+        pass
+    
+    def delete(self, cls='', id=None):
+        pass
+        
