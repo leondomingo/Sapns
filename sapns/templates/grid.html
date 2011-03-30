@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+<div class="sp_search">
+<input class="sp_search_txt" type="text"/>
+<input class="sp_search_btn" type="button" value="Search..."/>
+</div>
+<table>
+    <thead>
+    <td/>
+    {% for c in cols %}
+    <td class="sp_col_title" style="width: {{c.width}}px; ">{{c.title}}</td>
+    {% endfor %}
+    
+    {% for row in data %}
+        <tr>
+        <td><input type="checkbox"/></td>
+        {% for cell in row %}
+        <td class="sp_grid_cell">{{cell}}</td>
+        {% endfor %}
+        <tr>
+    {% endfor %}
+    </thead>
+</table>
+{% endblock %}

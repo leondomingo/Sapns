@@ -96,10 +96,27 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         redirect(came_from)
 
-    @expose('')
-    @expose('json')
+    @expose('grid.html')
     def search(self, cls='', q='', rp=10, pag=1):
-        pass
+        
+        cols= [dict(title='Nombre',
+                    width=150,
+                    ),
+               dict(title=u'Dirección',
+                    width=300,
+                    ),
+               dict(title=u'Teléfono',
+                    width=100,
+                    )
+              ]
+        
+        data = [[u'Groucho Marx', u'c/ Alcalá 100, 1ºA', '91 123 123'],
+                [u'Albert Einstein', u'c/ Gran Vía, 3º dcha', '91 123 123'],
+                [u'Francis Ford Coppola', u'Pso. de la Castellana, 199', '91 123 123'],
+                [u'Alfred Hitchcock', u'Pso. de Recoletos 200', '91 123 123'],
+                ]
+        
+        return dict(page='search', cols=cols, data=data)
     
     def data(self, cls='', id=None):
         pass

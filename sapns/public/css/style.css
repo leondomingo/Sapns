@@ -355,3 +355,13 @@ clear:both;
 	color: yellow;
 	margin-left: 10px;
 }
+
+.sp_col_title {
+	background-color: gray;
+	font-weight: bold;
+}
+
+.sp_grid_cell {
+	background-color: white;
+	font-family: Arial;
+}
