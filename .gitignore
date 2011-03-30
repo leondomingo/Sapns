@@ -1,2 +1,5 @@
 development.ini
 production.ini
+.project
+.pydevproject
+.settings/
