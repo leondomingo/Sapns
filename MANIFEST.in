@@ -1,0 +1,4 @@
+recursive-include sapns/public *
+include sapns/public/favicon.ico
+recursive-include sapns/i18n *
+recursive-include sapns/templates *
