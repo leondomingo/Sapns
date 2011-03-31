@@ -1,5 +1,10 @@
 {% extends 'base.html' %}
 
+{% block head %}
+<!-- JQuery 1.5.1 -->
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+{% endblock %}
+
 {% block middle %}
     {{super()}}
     {% include 'grid.html' %}

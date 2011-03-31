@@ -117,10 +117,10 @@ class RootController(BaseController):
                     )
               ]
         
-        data = [[u'Groucho Marx', u'c/ Alcalá 100, 1ºA', '91 123 123', 'Madrid'],
-                [u'Albert Einstein', u'c/ Gran Vía, 3º dcha', '91 123 123', 'Madrid'],
-                [u'Francis Ford Coppola', u'Pso. de la Castellana, 199', '91 123 123', 'Madrid'],
-                [u'Alfred Hitchcock', u'Pso. de Recoletos 200', '91 123 123', 'Madrid'],
+        data = [[1, u'Groucho Marx', u'c/ Alcalá 100, 1ºA', '91 123 123', 'Madrid'],
+                [2, u'Albert Einstein', u'c/ Gran Vía, 3º dcha', '91 123 123', 'Madrid'],
+                [3, u'Francis Ford Coppola', u'Pso. de la Castellana, 199', '91 123 123', 'Madrid'],
+                [4, u'Alfred Hitchcock', u'Pso. de Recoletos 200', '91 123 123', 'Madrid'],
                 ]
         
         actions = [dict(title='Nuevo', url=url('/clientes/nuevo'),),
@@ -129,8 +129,11 @@ class RootController(BaseController):
                    dict(title='Fusionar', url=url('/clientes/fusionar'),),                   
                    ]
         
-        return dict(page='search', 
-                    grid=dict(caption='Clientes', cols=cols, data=data, 
+        return dict(page='search',
+                    q=q,
+                    grid=dict(caption='Clientes', name='clientes',
+                              search_url=url('/search'), 
+                              cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, total=len(data)))
     
     def data(self, cls='', id=None):

@@ -309,6 +309,9 @@ clear:both;
 	text-align: center;
 }
 
+.sp_grid_row_id {
+}
+
 .sp_grid_row {
 	background-color: white;
 	border: 2px solid black;

@@ -1,32 +1,97 @@
+<script type="text/javascript">
+    $(document).ready(function() {
+    	// Clicking on search button
+    	$('.sp_search_btn').click(function() {
+    		
+    		// parent grid of this search
+    		var grid_name = $(this).parent().parent().attr('id');
+    		
+    		// build params string
+    		var params = '';
+    		
+    		// query (of this grid)
+    		var q = $('#' + grid_name + ' .sp_search_txt').val();
+    		
+    		if (q != '') {
+    			params += '?q=' + q;
+    		}
+    		
+    		// results per page (of this grid)
+    		var rp = $('#' + grid_name + ' .sp_grid_rp').val();
+    		if (params == '') {
+    			params += '?';
+    		}
+    		else {
+    			params += '&';
+    		}
+    		
+    		params += 'rp=' + rp;
+    		
+    		// go to that location
+    		window.location = '{{url_search}}' + params;
+    	});
+    	
+    	// Clicking on an action
+    	$('.sp_grid_action').click(function() {
+    		
+    		// parent grid of this action
+    		var grid_name = $(this).parent().parent().attr('id');
+    		
+    		// get the id of the selected row
+    		var id_selected = null;
+    		$('#' + grid_name + ' .sp_grid_row_id').each(function() {
+    			if ($(this).attr('checked') == true) {
+    				id_selected = $(this).attr('id_row');
+    			}
+    		});
+    		
+    		// if there's a selected row, go to the corresponding location
+    		if (id_selected != null) {
+    			window.location = $(this).attr('url') + '?id=' + id_selected;
+    		}
+    	});
+    });
+</script>
+
+<!-- Grid -->
+<div id="{{grid.name}}">
 <div class="sp_search">
 <div class="sp_grid_caption">{{grid.caption}}</div>
-<input class="sp_search_txt" type="text"/>
+<input class="sp_search_txt" type="text" value="{{q}}"/>
 <input class="sp_search_btn" type="button" value="Search..."/>
 </div>
 <table class="sp_grid">
-    <thead>
+    <tr>
     <td/>
-    {% for c in grid.cols %}
-    <td class="sp_col_title" style="width: {{c.width}}px; ">{{c.title}}</td>
+    <!-- Column titles -->
+    {% for col in grid.cols %}
+    <td class="sp_col_title" style="width: {{col.width}}px; ">{{col.title}}</td>
     {% endfor %}
-    </thead>
+    </tr>
     
+    <!-- Data rows -->
     {% for row in grid.data %}
         <tr class="sp_grid_row">
-        <td><input type="checkbox"/></td>
-        {% for cell in row %}
+        <td><input class="sp_grid_row_id" type="checkbox" id_row="{{row[0]}}"/></td>
+        {% for cell in row[1:] %}
         <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};">{{cell}}</td>
         {% endfor %}
         </tr>
     {% endfor %}
 </table>
+<!-- Grid pager -->
 <div class="sp_grid_pager">
+    <select class="sp_grid_rp">
+        <option value="10"  {% if grid.rp == '10' %}selected="selected"{% endif %}>10</option>
+        <option value="50"  {% if grid.rp == '50' %}selected="selected"{% endif %}>50</option>
+        <option value="100" {% if grid.rp == '100' %}selected="selected"{% endif %}>100</option>
+    </select>
 </div>
+<!-- Grid actions -->
 <div class="sp_grid_actions">
     <div class="sp_grid_actions_title">Actions:</div>
     {% for act in grid.actions %}
-    <div class="sp_grid_action">
-        <a href="{{act.url}}">{{act.title}}</a>
-    </div>
+    <input class="sp_grid_action" type="button" value="{{act.title}}" url="{{act.url}}"/>
     {% endfor %}
+</div>
 </div>
