@@ -3,3 +3,4 @@ production.ini
 .project
 .pydevproject
 .settings/
+.pyc
