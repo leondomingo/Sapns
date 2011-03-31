@@ -11,6 +11,7 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession, metadata
 from sapns import model
 from sapns.controllers.secure import SecureController
+import sapns.lib.util as util
 
 from sapns.controllers.error import ErrorController
 
@@ -99,29 +100,21 @@ class RootController(BaseController):
     @expose('listof.html')
     def search(self, cls='', q='', rp=10, pag_n=1):
         
-        cols= [dict(title='Nombre',
-                    width=150,
-                    align='center',
-                    ),
-               dict(title=u'Dirección',
-                    width=300,
-                    align='left',
-                    ),
-               dict(title=u'Teléfono',
-                    width=100,
-                    align='right',
-                    ),
-               dict(title=u'Ciudad',
-                    width=110,
-                    align='center',
-                    )
-              ]
+        pos = (int(pag_n)-1) * int(rp)
+        ds = util.search(cls, q=q, rp=int(rp), offset=pos)
         
-        data = [[1, u'Groucho Marx', u'c/ Alcalá 100, 1ºA', '91 123 123', 'Madrid'],
-                [2, u'Albert Einstein', u'c/ Gran Vía, 3º dcha', '91 123 123', 'Madrid'],
-                [3, u'Francis Ford Coppola', u'Pso. de la Castellana, 199', '91 123 123', 'Madrid'],
-                [4, u'Alfred Hitchcock', u'Pso. de Recoletos 200', '91 123 123', 'Madrid'],
-                ]
+        ds.date_fmt = '%m/%d/%Y'
+        data = ds.to_data()
+        
+        cols = []
+        for col in ds.cols:
+            w = 120
+            if col == 'id':
+                w = 60
+                
+            cols.append(dict(title=col,
+                             width=w,
+                             align='center'))
         
         actions = [dict(title='Nuevo', url=url('/clientes/nuevo'),),
                    dict(title='Editar', url=url('/clientes/editar'),),
@@ -132,9 +125,10 @@ class RootController(BaseController):
         return dict(page='search',
                     q=q,
                     grid=dict(caption='Clientes', name='clientes',
+                              cls=cls,
                               search_url=url('/search'), 
                               cols=cols, data=data, 
-                              actions=actions, pag_n=pag_n, rp=rp, total=len(data)))
+                              actions=actions, pag_n=pag_n, rp=rp, total=len(ds)))
     
     def data(self, cls='', id=None):
         pass

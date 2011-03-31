@@ -5,27 +5,21 @@
     		
     		// parent grid of this search
     		var grid_name = $(this).parent().parent().attr('id');
+    		var grid_cls = $(this).parent().parent().attr('cls');
     		
     		// build params string
-    		var params = '';
+    		var params = '?cls=' + grid_cls;
     		
     		// query (of this grid)
     		var q = $('#' + grid_name + ' .sp_search_txt').val();
     		
     		if (q != '') {
-    			params += '?q=' + q;
+    			params += '&q=' + q;
     		}
     		
     		// results per page (of this grid)
     		var rp = $('#' + grid_name + ' .sp_grid_rp').val();
-    		if (params == '') {
-    			params += '?';
-    		}
-    		else {
-    			params += '&';
-    		}
-    		
-    		params += 'rp=' + rp;
+    		params += '&rp=' + rp;
     		
     		// go to that location
     		window.location = '{{url_search}}' + params;
@@ -54,7 +48,7 @@
 </script>
 
 <!-- Grid -->
-<div id="{{grid.name}}">
+<div id="{{grid.name}}" cls="{{grid.cls}}">
 <div class="sp_search">
 <div class="sp_grid_caption">{{grid.caption}}</div>
 <input class="sp_search_txt" type="text" value="{{q}}"/>
@@ -72,8 +66,8 @@
     <!-- Data rows -->
     {% for row in grid.data %}
         <tr class="sp_grid_row">
-        <td><input class="sp_grid_row_id" type="checkbox" id_row="{{row[0]}}"/></td>
-        {% for cell in row[1:] %}
+        <td><input class="sp_grid_row_id" type="checkbox" id_row="{{row[0]}}" title="{{row[0]}}"/></td>
+        {% for cell in row %}
         <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};">{{cell}}</td>
         {% endfor %}
         </tr>
