@@ -16,81 +16,7 @@ body {
 
 a {
 	color: #286571;
-}
-
-#header {
-	height: 132px;
-	margin: 10px 10px 0 10px;
-	background: url('../images/headerbg.png') top left no-repeat;
-}
-
-#header h1 {
-	padding: 0;
-	margin: 0;
-	padding-top: 30px;
-	padding-left: 180px;
-	color: #fff;
-	position: relative;
-	font-size: 36px;
-}
-
-#header h1 .subtitle {
-	font-size: 60%;
-	position: absolute;
-	left: 240px;
-	top: 70px;
-}
-
-ul#mainmenu {
-	margin: 0;
-	padding: 0 10px;
-	background: url('../images/menubg.png') top left no-repeat;
-	height: 38px;
-}
-
-ul#mainmenu li {
-	list-style-type: none;
-	margin: 0;
-	padding: 0;
-	position: relative;
-	display: inline;
-	float: left;
-}
-
-ul#mainmenu li a {
-	color: #fff;
-	float: left;
-	height: 31px;
-	display: block;
-	line-height: 30px;
-	vertical-align: middle;
-	padding: 0 10px;
-	font-size: 12px;
 	text-decoration: none;
-	background: url('../images/menu-item-border.png') left top no-repeat;
-}
-
-ul#mainmenu li a:hover, ul#mainmenu li a.active {
-	background: url('../images/menu-item-actibg.png') left top no-repeat;
-}
-
-ul#mainmenu li.first a {
-	background: none;
-}
-
-ul#mainmenu li.first a:hover, ul#mainmenu li.first a.active {
-	background: url('../images/menu-item-actibg-first.png') left top no-repeat;
-}
-
-ul#mainmenu li.loginlogout
-{
-    float: right;
-    right: 10px;
-}
-
-ul#mainmenu li.loginlogout a:hover
-{
-    background: url('../images/menu-item-border.png') left top no-repeat;
 }
 
 #content {
@@ -356,12 +282,68 @@ clear:both;
 	margin-left: 10px;
 }
 
+.sp_grid {
+	margin-top: 10px;
+	background-color: gray;
+}
+
+.sp_grid_caption {
+	font-size: 18px;
+	margin-left: 10px;
+	width: 100px;
+}
+
+.sp_search_txt {
+	border: 1px solid gray;
+	width: 200px;
+}
+
+.sp_search_btn {
+	border: 1px solid gray;
+	float: none;
+}
+
 .sp_col_title {
 	background-color: gray;
 	font-weight: bold;
+	text-align: center;
+}
+
+.sp_grid_row {
+	background-color: white;
+	border: 2px solid black;
 }
 
 .sp_grid_cell {
-	background-color: white;
+	/*background-color: white;*/
 	font-family: Arial;
+}
+
+.sp_grid_pager {
+	border: 1px solid gray;
+	height: 20px;
+}
+
+.sp_grid_actions {
+	border: 1px solid gray;
+}
+
+.sp_grid_actions_title {
+	border: 1px dotted white;
+	width: 60px;
+	text-align: center;
+}
+
+.sp_grid_action {
+	font-size: 11px;
+    float: left;
+    width: 60px;
+    text-align: center;
+    border: 1px solid gray;
+    margin: 2px;
+}
+
+.sp_grid_action:hover {
+	background-color: white;
+	color: gray;
 }

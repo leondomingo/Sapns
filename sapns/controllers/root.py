@@ -96,27 +96,42 @@ class RootController(BaseController):
         flash(_('We hope to see you soon!'))
         redirect(came_from)
 
-    @expose('grid.html')
-    def search(self, cls='', q='', rp=10, pag=1):
+    @expose('listof.html')
+    def search(self, cls='', q='', rp=10, pag_n=1):
         
         cols= [dict(title='Nombre',
                     width=150,
+                    align='center',
                     ),
                dict(title=u'Dirección',
                     width=300,
+                    align='left',
                     ),
                dict(title=u'Teléfono',
                     width=100,
+                    align='right',
+                    ),
+               dict(title=u'Ciudad',
+                    width=110,
+                    align='center',
                     )
               ]
         
-        data = [[u'Groucho Marx', u'c/ Alcalá 100, 1ºA', '91 123 123'],
-                [u'Albert Einstein', u'c/ Gran Vía, 3º dcha', '91 123 123'],
-                [u'Francis Ford Coppola', u'Pso. de la Castellana, 199', '91 123 123'],
-                [u'Alfred Hitchcock', u'Pso. de Recoletos 200', '91 123 123'],
+        data = [[u'Groucho Marx', u'c/ Alcalá 100, 1ºA', '91 123 123', 'Madrid'],
+                [u'Albert Einstein', u'c/ Gran Vía, 3º dcha', '91 123 123', 'Madrid'],
+                [u'Francis Ford Coppola', u'Pso. de la Castellana, 199', '91 123 123', 'Madrid'],
+                [u'Alfred Hitchcock', u'Pso. de Recoletos 200', '91 123 123', 'Madrid'],
                 ]
         
-        return dict(page='search', cols=cols, data=data)
+        actions = [dict(title='Nuevo', url=url('/clientes/nuevo'),),
+                   dict(title='Editar', url=url('/clientes/editar'),),
+                   dict(title='Borrar', url=url('/clientes/borrar'),),
+                   dict(title='Fusionar', url=url('/clientes/fusionar'),),                   
+                   ]
+        
+        return dict(page='search', 
+                    grid=dict(caption='Clientes', cols=cols, data=data, 
+                              actions=actions, pag_n=pag_n, rp=rp, total=len(data)))
     
     def data(self, cls='', id=None):
         pass
