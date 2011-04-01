@@ -1,28 +1,31 @@
 <script type="text/javascript">
     $(document).ready(function() {
+    	
+    	// Link auto-submit with "Search..." button
+    	$('.sp_search_form').keypress(function(event) {
+    		if (event.which == '13') {
+    			var grid_name = $(this).parent().parent().attr('id');
+    			$('#' + grid_name + ' .sp_search_btn').click();
+    		}
+    	});
+    	
     	// Clicking on search button
-    	$('.sp_search_btn').click(function() {
+    	$('.sp_search_form .sp_search_btn').click(function() {
     		
     		// parent grid of this search
     		var grid_name = $(this).parent().parent().attr('id');
-    		var grid_cls = $(this).parent().parent().attr('cls');
-    		
-    		// build params string
-    		var params = '?cls=' + grid_cls;
-    		
-    		// query (of this grid)
-    		var q = $('#' + grid_name + ' .sp_search_txt').val();
-    		
-    		if (q != '') {
-    			params += '&q=' + q;
-    		}
-    		
-    		// results per page (of this grid)
+
+    		// results per page
     		var rp = $('#' + grid_name + ' .sp_grid_rp').val();
-    		params += '&rp=' + rp;
     		
-    		// go to that location
-    		window.location = '{{url_search}}' + params;
+    		// Add params to the form
+    		var params = 
+    			'<input name="rp" type="hidden" value="' + rp + '"/>';
+    			
+    		$('#' + grid_name + ' .sp_search_form').append(params);
+    		
+    		// submit the search
+    		$('#' + grid_name + ' .sp_search_form').submit();
     	});
     	
     	// Clicking on an action
@@ -31,7 +34,7 @@
     		if ($(this).attr('require_id') == 'true') {
         		
         		// parent grid of this action
-        		var grid_name = $(this).parent().parent().attr('id');
+        		var grid_name = $(this).parent().parent().parent().attr('id');
         		
         		// get the id of the selected row
         		var id_selected = null;
@@ -43,7 +46,13 @@
         		
         		// if there's a selected row, go to the corresponding location
         		if (id_selected != null) {
-        			window.location = $(this).attr('url') + '?id=' + id_selected;
+        			
+        			var id_param = 
+        				'<input type="hidden" name="id" value="' + id_selected + '"/>';
+        				
+        			$(this).parent().append(id_param);        			
+        			$(this).parent().submit();
+        			//window.location = $(this).attr('url') + '?id=' + id_selected;
         		}
         		else {
         			alert('You must select a row before click on this action')
@@ -58,11 +67,14 @@
 
 <!-- Grid -->
 <div id="{{grid.name}}" cls="{{grid.cls}}">
-<div class="sp_search">
-{% if grid.caption %}<div class="sp_grid_caption">{{grid.caption}}</div>{% endif %}
-<input class="sp_search_txt" type="text" value="{{q}}"/>
-<input class="sp_search_btn" type="button" value="Search..."/>
-</div>
+{% if grid.caption %}
+<div class="sp_grid_caption">{{grid.caption}}</div>
+{% endif %}
+<form class="sp_search_form" method="post" action="{{grid.search_url}}">
+    <input type="hidden" name="cls" value="{{grid.cls}}"/>
+    <input class="sp_search_txt" name="q" type="text" value="{{q}}"/>
+    <input class="sp_search_btn" type="button" value="Search..."/>
+</form>
 <table class="sp_grid">
     <tr>
     <td/>
@@ -94,8 +106,10 @@
 <div class="sp_grid_actions">
     <div class="sp_grid_actions_title">Actions:</div>
     {% for act in grid.actions %}
-    <input class="sp_grid_action" type="button" value="{{act.title}}" url="{{act.url}}"
-        require_id="{%if act.require_id%}true{%else%}false{%endif%}"/>
+    <form method="post" action="{{act.url}}">
+        <input class="sp_grid_action" type="button" value="{{act.title}}" url="{{act.url}}"
+            require_id="{%if act.require_id%}true{%else%}false{%endif%}"/>
+    </form>
     {% endfor %}
 </div>
 </div>

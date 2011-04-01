@@ -11,7 +11,8 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession
 from sapns import model
 from sapns.controllers.secure import SecureController
-import sapns.lib.util as util
+
+from neptuno.postgres.search import search as np_search 
 
 from sapns.controllers.error import ErrorController
 
@@ -101,7 +102,7 @@ class RootController(BaseController):
     def search(self, cls='', q='', rp=10, pag_n=1):
         
         pos = (int(pag_n)-1) * int(rp)
-        ds = util.search(cls, q=q, rp=int(rp), offset=pos)
+        ds = np_search(DBSession, cls, q=q, rp=int(rp), offset=pos)
         
         ds.date_fmt = '%m/%d/%Y'
         data = ds.to_data()

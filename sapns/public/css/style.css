@@ -293,9 +293,12 @@ clear:both;
 	width: 100px;
 }
 
+.sp_search_form {
+}
+
 .sp_search_txt {
 	border: 1px solid gray;
-	width: 200px;
+	width: 450px;
 }
 
 .sp_search_btn {
