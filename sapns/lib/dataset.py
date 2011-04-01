@@ -9,7 +9,7 @@ from libpy.util import default_fmt_float
 from sapns.model import DBSession
 
 COLUMNAS = 'columnas'
-NUM_RESULTADOS = 'numero_resultados'
+COUNT = 'count'
 LIMITE_RESULTADOS = 'limite_resultados'
 DATOS = 'datos'
 TOTALES = 'totales'
@@ -35,7 +35,7 @@ def tojson(func):
     
     return __tojson
 
-def quitar_especiales(texto):
+def remove_specials(texto):
     return re.sub(r'[^a-zA-Z0-9\-_\s]', '_', texto)
 
 class DataSetRowIterator(object):
@@ -68,17 +68,17 @@ class DataSetRow(object):
         self.attr = kw
         
     def __str__(self):
-        resultado = []
+        result = []
         for k, v in self.attr.iteritems():
-            resultado.append('%s=%s' % (k, v))
+            result.append('%s=%s' % (k, v))
             
-        return ', '.join(resultado)
+        return ', '.join(result)
         
     def __getattr__(self, name):
         if self.attr.has_key(name):
             return self.attr[name]
         else:
-            raise Exception('<DataSet>: miembro "%s" no existe' % name)
+            raise Exception('<DataSet>: member "%s" does not exist' % name)
         
     def __iter__(self):                
         return DataSetRowIterator(self)
@@ -136,7 +136,7 @@ class DataSet(object):
 
         self.limite_resultados = limite
         self.datos = []
-        self.numero_resultados = 0
+        self.count = 0
         self.float_fmt = default_fmt_float
         self.totales = totales
         
@@ -403,7 +403,7 @@ class DataSet(object):
         
         datos = {
                  COLUMNAS: self.labels,
-                 NUM_RESULTADOS: (self.numero_resultados or len(self)),
+                 COUNT: (self.count or len(self)),
                  LIMITE_RESULTADOS: len(self),
                  DATOS: [],
                  TOTALES: None
@@ -541,7 +541,7 @@ class DataSet(object):
 #                label = label.encode('utf-8')
 #                
 #            if not c.startswith('id') or mostrar_ids:
-#                columnas.append(quitar_especiales(self.cols[item]))
+#                columnas.append(remove_specials(self.cols[item]))
 #                labels.append(label)
 #        
 #        fichero_csv.add(labels)
@@ -624,12 +624,12 @@ class DataSet(object):
         cols = []
         for c in query.columns:
             if not c.name.startswith('id_'):
-                cols.append((quitar_especiales(c.name),
+                cols.append((remove_specials(c.name),
                              c.name.encode('utf-8'),
                              '',))
                     
         ds = DataSet(cols)
-        ds.numero_resultados = DBSession.execute(query).rowcount
+        ds.count = DBSession.execute(query).rowcount
         
         for fila in DBSession.execute(query.limit(limite_resultados).offset(pos)):
             row = []

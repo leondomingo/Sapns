@@ -28,20 +28,29 @@
     	// Clicking on an action
     	$('.sp_grid_action').click(function() {
     		
-    		// parent grid of this action
-    		var grid_name = $(this).parent().parent().attr('id');
-    		
-    		// get the id of the selected row
-    		var id_selected = null;
-    		$('#' + grid_name + ' .sp_grid_row_id').each(function() {
-    			if ($(this).attr('checked') == true) {
-    				id_selected = $(this).attr('id_row');
-    			}
-    		});
-    		
-    		// if there's a selected row, go to the corresponding location
-    		if (id_selected != null) {
-    			window.location = $(this).attr('url') + '?id=' + id_selected;
+    		if ($(this).attr('require_id') == 'true') {
+        		
+        		// parent grid of this action
+        		var grid_name = $(this).parent().parent().attr('id');
+        		
+        		// get the id of the selected row
+        		var id_selected = null;
+        		$('#' + grid_name + ' .sp_grid_row_id').each(function() {
+        			if ($(this).attr('checked') == true) {
+        				id_selected = $(this).attr('id_row');
+        			}
+        		});
+        		
+        		// if there's a selected row, go to the corresponding location
+        		if (id_selected != null) {
+        			window.location = $(this).attr('url') + '?id=' + id_selected;
+        		}
+        		else {
+        			alert('You must select a row before click on this action')
+        		}
+    		}
+    		else {
+    			window.location = $(this).attr('url');
     		}
     	});
     });
@@ -50,7 +59,7 @@
 <!-- Grid -->
 <div id="{{grid.name}}" cls="{{grid.cls}}">
 <div class="sp_search">
-<div class="sp_grid_caption">{{grid.caption}}</div>
+{% if grid.caption %}<div class="sp_grid_caption">{{grid.caption}}</div>{% endif %}
 <input class="sp_search_txt" type="text" value="{{q}}"/>
 <input class="sp_search_btn" type="button" value="Search..."/>
 </div>
@@ -85,7 +94,8 @@
 <div class="sp_grid_actions">
     <div class="sp_grid_actions_title">Actions:</div>
     {% for act in grid.actions %}
-    <input class="sp_grid_action" type="button" value="{{act.title}}" url="{{act.url}}"/>
+    <input class="sp_grid_action" type="button" value="{{act.title}}" url="{{act.url}}"
+        require_id="{%if act.require_id%}true{%else%}false{%endif%}"/>
     {% endfor %}
 </div>
 </div>

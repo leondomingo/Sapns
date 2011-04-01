@@ -8,7 +8,7 @@ from tgext.admin.controller import AdminController
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
-from sapns.model import DBSession, metadata
+from sapns.model import DBSession
 from sapns import model
 from sapns.controllers.secure import SecureController
 import sapns.lib.util as util
@@ -116,19 +116,19 @@ class RootController(BaseController):
                              width=w,
                              align='center'))
         
-        actions = [dict(title='Nuevo', url=url('/clientes/nuevo'),),
-                   dict(title='Editar', url=url('/clientes/editar'),),
-                   dict(title='Borrar', url=url('/clientes/borrar'),),
-                   dict(title='Fusionar', url=url('/clientes/fusionar'),),                   
+        actions = [dict(title='New', url=url('/clientes/nuevo'), require_id=False),
+                   dict(title='Edit', url=url('/clientes/editar'), require_id=True),
+                   dict(title='Delete', url=url('/clientes/borrar'), require_id=True),
+                   dict(title='Merge', url=url('/clientes/fusionar'), require_id=True),                   
                    ]
         
         return dict(page='search',
                     q=q,
-                    grid=dict(caption='Clientes', name='clientes',
+                    grid=dict(caption='', name='clientes',
                               cls=cls,
                               search_url=url('/search'), 
                               cols=cols, data=data, 
-                              actions=actions, pag_n=pag_n, rp=rp, total=len(ds)))
+                              actions=actions, pag_n=pag_n, rp=rp, total=ds.count))
     
     def data(self, cls='', id=None):
         pass
