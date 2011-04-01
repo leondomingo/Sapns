@@ -15,7 +15,8 @@ body {
 }
 
 a {
-	color: #286571;
+	color: white; /*#286571;*/
+	font-weight: bold;
 	text-decoration: none;
 }
 
@@ -257,8 +258,8 @@ clear:both;
 	/*color: orange;*/
 	min-height: 600px;
 	border: 1px solid darkgray;
-	background-image: url('/images/sapns.gif');
-	background-repeat: no-repeat;
+	/*background-image: url('/images/sapns.gif');
+	background-repeat: no-repeat;*/
 }
 
 .sp_footer {
@@ -327,7 +328,33 @@ clear:both;
 
 .sp_grid_pager {
 	border: 1px solid gray;
-	height: 20px;
+	height: 30px;
+}
+
+.sp_grid_pager_desc {
+	color: white;
+	font-family: arial;
+	/*background-color: gray;*/
+	width: 350px;
+	text-align: center;
+	float: left;
+	height: 30px;
+	vertical-align: center;
+}
+
+.sp_grid_current_page {
+	width: 40px;
+	color: gray; 
+	font-weight: bold;
+	float: left;
+}
+
+.sp_grid_rp {
+	float: left;
+}
+
+.sp_grid_pag_back {
+	float: left;
 }
 
 .sp_grid_actions {

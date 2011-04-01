@@ -1,0 +1,7 @@
+{% macro search(url, submit_title, cls) %}
+    <form method="post" action="{{url}}">
+        <input type="hidden" name="cls" value="{{cls}}"/>
+        <input type="hidden" name="caption" value="{{submit_title}}"/>
+        <input type="submit" value="{{submit_title}}"/>
+    </form>
+{% endmacro %}

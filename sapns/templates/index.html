@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'util.html' as util %}
 
 <!-- Uncomment the next section and override the "html_head" block if you want to -->
 <!-- 
@@ -8,18 +9,31 @@
 -->
 
 <!-- Uncomment the next section and override the "header" block if you want to -->
-<!-- 
+<!--
 {% block header %}
     {{ super() }}
 {% endblock %}
 -->
 
 <!-- Uncomment the next section and override the "middle" block if you want to -->
-<!-- 
 {% block middle %}
     {{ super() }}
+    
+    <!-- Alumnos -->
+    {{util.search('/search', 'Alumnos', 'vista_busqueda_alumnos')}}
+    
+    <!-- Clientes -->
+    {{util.search('/search', 'Clientes', 'vista_busqueda_clientes')}}
+    
+    <!-- Cursos -->
+    {{util.search('/search', 'Cursos', 'vista_busqueda_cursos')}}
+    
+    <!-- Grupos -->
+    {{util.search('/search', 'Grupos', 'vista_busqueda_grupos')}}
+    
+    <!-- Personal -->
+    {{util.search('/search', 'Personal', 'vista_busqueda_personal')}}
 {% endblock %}
--->
 
 <!-- Uncomment the next section and override the "footer" block if you want to -->
 <!-- 

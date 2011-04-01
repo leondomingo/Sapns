@@ -1,31 +1,36 @@
 <script type="text/javascript">
     $(document).ready(function() {
+
+        function search(button) {
+            
+            // parent grid of this search
+            var grid_id = button.parent().parent().attr('id');
+
+            // results per page
+            var rp = $('#' + grid_id + ' .sp_grid_rp').val();
+            
+            // Add params to the form
+            var params = 
+                '<input name="rp" type="hidden" value="' + rp + '"/>';
+                
+            $('#' + grid_id + ' .sp_search_form').append(params);
+            
+            // submit the search
+            $('#' + grid_id + ' .sp_search_form').submit();
+        }
     	
     	// Link auto-submit with "Search..." button
-    	$('.sp_search_form').keypress(function(event) {
-    		if (event.which == '13') {
-    			var grid_name = $(this).parent().parent().attr('id');
-    			$('#' + grid_name + ' .sp_search_btn').click();
+    	$('.sp_search_form .sp_search_txt').keypress(function(event) {
+    		// Pressed ENTER (13) in text search box
+    		if (event.which == 13) {
+    			var grid_id = $(this).parent().parent().attr('id');
+    			search($('#' + grid_id + ' .sp_search_btn'));
     		}
     	});
-    	
+
     	// Clicking on search button
     	$('.sp_search_form .sp_search_btn').click(function() {
-    		
-    		// parent grid of this search
-    		var grid_name = $(this).parent().parent().attr('id');
-
-    		// results per page
-    		var rp = $('#' + grid_name + ' .sp_grid_rp').val();
-    		
-    		// Add params to the form
-    		var params = 
-    			'<input name="rp" type="hidden" value="' + rp + '"/>';
-    			
-    		$('#' + grid_name + ' .sp_search_form').append(params);
-    		
-    		// submit the search
-    		$('#' + grid_name + ' .sp_search_form').submit();
+    		search($(this));
     	});
     	
     	// Clicking on an action
@@ -34,11 +39,11 @@
     		if ($(this).attr('require_id') == 'true') {
         		
         		// parent grid of this action
-        		var grid_name = $(this).parent().parent().parent().attr('id');
+        		var grid_id = $(this).parent().parent().parent().attr('id');
         		
         		// get the id of the selected row
         		var id_selected = null;
-        		$('#' + grid_name + ' .sp_grid_row_id').each(function() {
+        		$('#' + grid_id + ' .sp_grid_row_id').each(function() {
         			if ($(this).attr('checked') == true) {
         				id_selected = $(this).attr('id_row');
         			}
@@ -52,15 +57,21 @@
         				
         			$(this).parent().append(id_param);        			
         			$(this).parent().submit();
-        			//window.location = $(this).attr('url') + '?id=' + id_selected;
         		}
         		else {
         			alert('You must select a row before click on this action')
         		}
     		}
     		else {
-    			window.location = $(this).attr('url');
+    			$(this).parent().submit();
     		}
+    	});
+    	
+    	// Changing results per page
+    	$('.sp_grid_rp').change(function() {
+    		var grid_id = $(this).parent().parent().parent().attr('id');
+    		//alert(grid_id);
+    		search($('#' + grid_id + ' .sp_search_btn'));
     	});
     });
 </script>
@@ -68,10 +79,11 @@
 <!-- Grid -->
 <div id="{{grid.name}}" cls="{{grid.cls}}">
 {% if grid.caption %}
-<div class="sp_grid_caption">{{grid.caption}}</div>
+<div class="sp_grid_caption">{{grid.caption|escape}}</div>
 {% endif %}
 <form class="sp_search_form" method="post" action="{{grid.search_url}}">
     <input type="hidden" name="cls" value="{{grid.cls}}"/>
+    <input type="hidden" name="caption" value="{{grid.caption}}"/>
     <input class="sp_search_txt" name="q" type="text" value="{{q}}"/>
     <input class="sp_search_btn" type="button" value="Search..."/>
 </form>
@@ -80,35 +92,98 @@
     <td/>
     <!-- Column titles -->
     {% for col in grid.cols %}
-    <td class="sp_col_title" style="width: {{col.width}}px; ">{{col.title}}</td>
+    <td class="sp_col_title" style="width: {{col.width}}px; ">{{col.title|escape}}</td>
     {% endfor %}
     </tr>
     
     <!-- Data rows -->
     {% for row in grid.data %}
+        <!-- Fill in grid -->
         <tr class="sp_grid_row">
         <td><input class="sp_grid_row_id" type="checkbox" id_row="{{row[0]}}" title="{{row[0]}}"/></td>
         {% for cell in row %}
-        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};">{{cell}}</td>
+        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};">{{cell|escape}}</td>
         {% endfor %}
+        </tr>
+    {% else %}
+        <!-- No results -->
+        <tr class="sp_grid_row" style="width: 100%;">
+            <td class="sp_grid_cell">No results</td>
         </tr>
     {% endfor %}
 </table>
 <!-- Grid pager -->
 <div class="sp_grid_pager">
-    <select class="sp_grid_rp">
-        <option value="10"  {% if grid.rp == '10' %}selected="selected"{% endif %}>10</option>
-        <option value="50"  {% if grid.rp == '50' %}selected="selected"{% endif %}>50</option>
-        <option value="100" {% if grid.rp == '100' %}selected="selected"{% endif %}>100</option>
-    </select>
+    <div>
+      <div class="sp_grid_pager_desc">Page {{grid.pag_n}} of {{grid.total_pag}} / Showing rows {{grid.pos+1}} to {{grid.pos+grid.rp}}</div>    
+      <select class="sp_grid_rp">
+          <option value="10"  {% if grid.rp == 10 %}selected="selected"{% endif %}>10</option>
+          <option value="50"  {% if grid.rp == 50 %}selected="selected"{% endif %}>50</option>
+          <option value="100" {% if grid.rp == 100 %}selected="selected"{% endif %}>100</option>
+      </select>
+    </div>
+
+    <!-- First page -->
+    <form method="post" action="{{grid.search_url}}">
+        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+        <input type="hidden" name="caption" value="{{grid.caption}}"/>
+        <input type="hidden" name="q" value="{{q}}"/>
+        <input type="hidden" name="rp" value="{{grid.rp}}"/>
+        <input type="hidden" name="pag_n" value="{{1}}"/>
+        <input class="sp_grid_pag_back" type="submit" value="|<<" title="pag. 1"/>
+    </form>
+    
+    {# {% if grid.pag_n-1 > 0 %} #}
+    <form method="post" action="{{grid.search_url}}">
+        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+        <input type="hidden" name="caption" value="{{grid.caption}}"/>
+        <input type="hidden" name="q" value="{{q}}"/>
+        <input type="hidden" name="rp" value="{{grid.rp}}"/>
+        <input type="hidden" name="pag_n" value="{{grid.pag_n-1}}"/>
+        {% if grid.pag_n-1 > 0 %}
+        <input class="sp_grid_pag_back" type="submit" value="<<" title="pag. {{grid.pag_n-1}}"/>
+        {% else %}
+        <input class="sp_grid_pag_back" type="button" value="<<"/>
+        {% endif %}
+    </form>
+    {# {% endif %} #}
+    
+    <div>
+        <input class="sp_grid_current_page" type="text" value="{{grid.pag_n}}"/>
+    </div>
+    
+    {# {% if grid.pag_n+1 <= grid.total_pag %} #}
+    <form method="post" action="{{grid.search_url}}" style="float: left;">
+        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+        <input type="hidden" name="caption" value="{{grid.caption}}"/>
+        <input type="hidden" name="q" value="{{q}}"/>
+        <input type="hidden" name="rp" value="{{grid.rp}}"/>
+        <input type="hidden" name="pag_n" value="{{grid.pag_n+1}}"/>
+        {% if grid.pag_n+1 <= grid.total_pag %}
+        <input class="sp_grid_pag_forth" type="submit" value=">>" title="pag. {{grid.pag_n+1}}"/>
+        {% else %}
+        <input class="sp_grid_pag_forth" type="button" value=">>"/>
+        {% endif %}
+    </form>
+    {# {% endif %} #}
+
+    <!-- Last page -->    
+    <form method="post" action="{{grid.search_url}}">
+        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+        <input type="hidden" name="caption" value="{{grid.caption}}"/>
+        <input type="hidden" name="q" value="{{q}}"/>
+        <input type="hidden" name="rp" value="{{grid.rp}}"/>
+        <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
+        <input class="sp_grid_pag_forth" type="submit" value=">>|" title="pag. {{grid.total_pag}}"/>
+    </form>
 </div>
 <!-- Grid actions -->
 <div class="sp_grid_actions">
     <div class="sp_grid_actions_title">Actions:</div>
     {% for act in grid.actions %}
     <form method="post" action="{{act.url}}">
-        <input class="sp_grid_action" type="button" value="{{act.title}}" url="{{act.url}}"
-            require_id="{%if act.require_id%}true{%else%}false{%endif%}"/>
+        <input class="sp_grid_action" type="button" value="{{act.title|escape}}" url="{{act.url}}"
+            require_id="{{act.require_id|lower}}"/>
     </form>
     {% endfor %}
 </div>

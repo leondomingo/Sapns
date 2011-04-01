@@ -99,11 +99,15 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose('listof.html')
-    def search(self, cls='', q='', rp=10, pag_n=1):
+    def search(self, cls='', q='', rp=10, pag_n=1, caption=''):
         
-        pos = (int(pag_n)-1) * int(rp)
-        ds = np_search(DBSession, cls, q=q, rp=int(rp), offset=pos)
+        rp = int(rp)
+        pag_n = int(pag_n)
         
+        pos = (pag_n-1) * rp
+        ds = np_search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos)
+        
+        # TODO: guardar en la configuración global de la aplicación
         ds.date_fmt = '%m/%d/%Y'
         data = ds.to_data()
         
@@ -117,19 +121,25 @@ class RootController(BaseController):
                              width=w,
                              align='center'))
         
+        # TODO: calcular las acciones
         actions = [dict(title='New', url=url('/clientes/nuevo'), require_id=False),
                    dict(title='Edit', url=url('/clientes/editar'), require_id=True),
                    dict(title='Delete', url=url('/clientes/borrar'), require_id=True),
                    dict(title='Merge', url=url('/clientes/fusionar'), require_id=True),                   
                    ]
         
+        total_pag = int(ds.count/rp)
+        if total_pag == 0:
+            total_pag = 1
+        
         return dict(page='search',
                     q=q,
-                    grid=dict(caption='', name='clientes',
+                    grid=dict(caption=caption, name='clientes',
                               cls=cls,
                               search_url=url('/search'), 
                               cols=cols, data=data, 
-                              actions=actions, pag_n=pag_n, rp=rp, total=ds.count))
+                              actions=actions, pag_n=pag_n, rp=rp, pos=pos,
+                              total=ds.count, total_pag=total_pag))
     
     def data(self, cls='', id=None):
         pass
