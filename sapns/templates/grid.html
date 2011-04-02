@@ -1,3 +1,4 @@
+{% macro js_functions() %}
 <script type="text/javascript">
     $(document).ready(function() {
 
@@ -14,6 +15,8 @@
                 '<input name="rp" type="hidden" value="' + rp + '"/>';
                 
             $('#' + grid_id + ' .sp_search_form').append(params);
+            
+            //alert($('#' + grid_id + ' .sp_search_txt').val());
             
             // submit the search
             $('#' + grid_id + ' .sp_search_form').submit();
@@ -75,9 +78,11 @@
     	});
     });
 </script>
+{% endmacro %}
 
+{% macro show(page, q, grid) %}
 <!-- Grid -->
-<div id="{{grid.name}}" cls="{{grid.cls}}">
+<div id="{{grid.name}}">
 {% if grid.caption %}
 <div class="sp_grid_caption">{{grid.caption|escape}}</div>
 {% endif %}
@@ -115,11 +120,12 @@
 <!-- Grid pager -->
 <div class="sp_grid_pager">
     <div>
-      <div class="sp_grid_pager_desc">Page {{grid.pag_n}} of {{grid.total_pag}} / Showing rows {{grid.pos+1}} to {{grid.pos+grid.rp}}</div>    
+      <div class="sp_grid_pager_desc">Page {{grid.pag_n}} of {{grid.total_pag}} / Showing rows {{grid.pos+1}} to {{grid.pos + grid.totalp}}</div>    
       <select class="sp_grid_rp">
           <option value="10"  {% if grid.rp == 10 %}selected="selected"{% endif %}>10</option>
           <option value="50"  {% if grid.rp == 50 %}selected="selected"{% endif %}>50</option>
           <option value="100" {% if grid.rp == 100 %}selected="selected"{% endif %}>100</option>
+          <option value="0"   {% if grid.rp == 0 %}selected="selected"{% endif %}>All</option>
       </select>
     </div>
 
@@ -188,3 +194,4 @@
     {% endfor %}
 </div>
 </div>
+{% endmacro %}
