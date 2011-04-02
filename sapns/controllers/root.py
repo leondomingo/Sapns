@@ -12,7 +12,7 @@ from sapns.model import DBSession
 from sapns import model
 from sapns.controllers.secure import SecureController
 
-from neptuno.postgres.search import search as np_search 
+from neptuno.postgres.search import search
 
 from sapns.controllers.error import ErrorController
 
@@ -99,16 +99,17 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose('listof.html')
-    def search(self, cls='', q='', rp=10, pag_n=1, caption=''):
+    def list(self, cls='', q='', rp=10, pag_n=1, caption=''):
         
         rp = int(rp)
         pag_n = int(pag_n)
         
         pos = (pag_n-1) * rp
-        ds = np_search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos)
+        ds = search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos)
         
         # TODO: guardar en la configuración global de la aplicación
         ds.date_fmt = '%m/%d/%Y'
+        
         data = ds.to_data()
         
         cols = []
@@ -128,19 +129,30 @@ class RootController(BaseController):
                    dict(title='Merge', url=url('/clientes/fusionar'), require_id=True),                   
                    ]
         
-        total_pag = int(ds.count/rp)
-        if total_pag == 0:
-            total_pag = 1
+        total_pag = 1
+        if rp > 0:
+            total_pag = ds.count/rp
+            
+            if ds.count % rp != 0:
+                total_pag += 1
+            
+            if total_pag == 0:
+                total_pag = 1
         
-        return dict(page='search',
+        # rows in this page
+        totalp = ds.count - pos
+        if rp and totalp > rp:
+            totalp = rp
+        
+        return dict(page='list',
                     q=q,
                     grid=dict(caption=caption, name='clientes',
                               cls=cls,
-                              search_url=url('/search'), 
+                              search_url=url('/list'), 
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
-                              total=ds.count, total_pag=total_pag))
-    
+                              totalp=totalp, total=ds.count, total_pag=total_pag))
+
     def data(self, cls='', id=None):
         pass
     

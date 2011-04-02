@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% import 'grid.html' as grid_html %}
 
 {% block head %}
 <!-- JQuery 1.5.1 -->
@@ -7,5 +8,6 @@
 
 {% block middle %}
     {{super()}}
-    {% include 'grid.html' %}
+    {{grid_html.js_functions()}}
+    {{grid_html.show(page, q, grid)}}
 {% endblock %}
