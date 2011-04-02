@@ -112,7 +112,7 @@ class RootController(BaseController):
         data = ds.to_data()
         
         cols = []
-        for col in ds.cols:
+        for col in ds.labels:
             w = 120
             if col == 'id':
                 w = 60

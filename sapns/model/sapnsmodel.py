@@ -7,7 +7,7 @@ from datetime import datetime
 import sys
 
 from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime
+from sqlalchemy.types import Unicode, Integer, DateTime, String, Boolean
 from sqlalchemy.orm import relation, synonym
 
 from sapns.model import DeclarativeBase, metadata, DBSession
@@ -32,7 +32,7 @@ class Shortcuts(DeclarativeBase):
         return ('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
 
     def __unicode__(self):
-        return u('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
+        return u'<Shortcut: user=%s, action=%s>' % (self.user, self.action)
 
 
 class SapnsClass(DeclarativeBase):
@@ -57,12 +57,12 @@ class SapnsAttribute(DeclarativeBase):
     __tablename__ = 'sp_attributes'
 
     attribute_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    name = Colum(Unicode(30), nullable=False)
+    name = Column(Unicode(30), nullable=False)
     title = Column(Unicode(100), nullable=False)
     
     sapnsclass = Column('class_id', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
-    reference_order = Columm(Integer)
+    reference_order = Column(Integer)
     insertion_order = Column(Integer)
 
 class SapnsAction(DeclarativeBase):
@@ -170,7 +170,7 @@ class SapnsReport(DeclarativeBase):
     
     description = Column(String)
 
-class SapnsReporParam(DeclarativeBase):
+class SapnsReportParam(DeclarativeBase):
     
     """
     Sapns param list: so we know what to request from the user when we launch the report

@@ -279,7 +279,7 @@ clear:both;
 .sp_app_subtitle {
 	font-size: 12px;
 	text-align: left;
-	color: yellow;
+	color: #EFE76E;
 	margin-left: 10px;
 }
 
@@ -305,12 +305,16 @@ clear:both;
 .sp_search_btn {
 	border: 1px solid gray;
 	float: none;
+	color: #6B5C0A;
 }
 
 .sp_col_title {
+	color: #EDA94B;
 	background-color: gray;
 	font-weight: bold;
 	text-align: center;
+	font-family: arial;
+	height: 30px;
 }
 
 .sp_grid_row_id {
@@ -324,6 +328,7 @@ clear:both;
 .sp_grid_cell {
 	/*background-color: white;*/
 	font-family: Arial;
+	height: 45px;
 }
 
 .sp_grid_pager {
@@ -340,6 +345,7 @@ clear:both;
 	float: left;
 	height: 30px;
 	vertical-align: center;
+	margin-top: 5px;
 }
 
 .sp_grid_current_page {
@@ -374,6 +380,7 @@ clear:both;
     text-align: center;
     border: 1px solid gray;
     margin: 2px;
+    color: #6B5C0A;
 }
 
 .sp_grid_action:hover {
