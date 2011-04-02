@@ -146,7 +146,7 @@ class RootController(BaseController):
         
         return dict(page='list',
                     q=q,
-                    grid=dict(caption=caption, name='clientes',
+                    grid=dict(caption=caption, name=cls,
                               cls=cls,
                               search_url=url('/list'), 
                               cols=cols, data=data, 
