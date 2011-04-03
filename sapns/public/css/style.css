@@ -315,6 +315,9 @@ clear:both;
 	text-align: center;
 	font-family: arial;
 	height: 30px;
+	border: 1px solid darkgray;
+	padding-left: 5px;
+	padding-right: 5px;
 }
 
 .sp_grid_row_id {
@@ -329,6 +332,13 @@ clear:both;
 	/*background-color: white;*/
 	font-family: Arial;
 	height: 45px;
+}
+
+.sp_grid_noresults {
+	text-align: center; 
+	color: maroon; 
+	font-weight: bold; 
+	font-size: 15px;
 }
 
 .sp_grid_pager {

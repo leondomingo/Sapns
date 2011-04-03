@@ -13,6 +13,7 @@ from sapns import model
 from sapns.controllers.secure import SecureController
 
 from neptuno.postgres.search import search
+from neptuno.util import format_float
 
 from sapns.controllers.error import ErrorController
 
@@ -99,16 +100,26 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose('listof.html')
-    def list(self, cls='', q='', rp=10, pag_n=1, caption=''):
+    def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids=False):
+        
+        # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
         
         rp = int(rp)
         pag_n = int(pag_n)
+        show_ids = (True if show_ids.lower() == 'true' else False)
         
         pos = (pag_n-1) * rp
-        ds = search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos)
+        ds = search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos, 
+                    show_ids=show_ids)
         
         # TODO: guardar en la configuración global de la aplicación
         ds.date_fmt = '%m/%d/%Y'
+        ds.true_const = u'Sí'
+        ds.false_const = 'No'
+        def fmt(valor):
+            return format_float(valor, separador_miles=',', separador_decimal='.')
+            
+        ds.float_fmt = fmt
         
         data = ds.to_data()
         
@@ -146,6 +157,7 @@ class RootController(BaseController):
         
         return dict(page='list',
                     q=q,
+                    show_ids=show_ids,
                     grid=dict(caption=caption, name=cls,
                               cls=cls,
                               search_url=url('/list'), 

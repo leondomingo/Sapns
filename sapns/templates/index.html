@@ -19,20 +19,13 @@
 {% block middle %}
     {{ super() }}
     
+    {{util.list('/list', 'Mostrar tabla/vista', None)}}
+    
     <!-- Alumnos -->
-    {{util.search('/list', 'Alumnos', 'vista_busqueda_alumnos')}}
+    {{util.list('/list', 'Alumnos', 'vista_busqueda_alumnos')}}
     
     <!-- Clientes -->
-    {{util.search('/list', 'Clientes', 'vista_busqueda_clientes')}}
-    
-    <!-- Cursos -->
-    {{util.search('/list', 'Cursos', 'vista_busqueda_cursos')}}
-    
-    <!-- Grupos -->
-    {{util.search('/list', 'Grupos', 'vista_busqueda_grupos')}}
-    
-    <!-- Personal -->
-    {{util.search('/list', 'Personal', 'vista_busqueda_personal')}}
+    {{util.list('/list', 'Clientes', 'vista_busqueda_clientes')}}    
 {% endblock %}
 
 <!-- Uncomment the next section and override the "footer" block if you want to -->

@@ -80,7 +80,7 @@
 </script>
 {% endmacro %}
 
-{% macro show(page, q, grid) %}
+{% macro show(page, q, grid, show_ids) %}
 <!-- Grid -->
 <div id="{{grid.name}}">
 {% if grid.caption %}
@@ -89,6 +89,7 @@
 <form class="sp_search_form" method="post" action="{{grid.search_url}}">
     <input type="hidden" name="cls" value="{{grid.cls}}"/>
     <input type="hidden" name="caption" value="{{grid.caption}}"/>
+    <input type="hidden" name="show_ids" value="{{show_ids}}"/>
     <input class="sp_search_txt" name="q" type="text" value="{{q}}"/>
     <input class="sp_search_btn" type="button" value="Search..."/>
 </form>
@@ -105,17 +106,21 @@
     {% for row in grid.data %}
         <!-- Fill in grid -->
         <tr class="sp_grid_row">
-        <td><input class="sp_grid_row_id" type="checkbox" id_row="{{row[0]}}" title="{{row[0]}}"/></td>
+        <td title="{{loop.index}}"><input class="sp_grid_row_id" type="checkbox" 
+            id_row="{{row[0]}}"/></td>
         {% for cell in row %}
-        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};">{{cell|escape}}</td>
+        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};"
+            title="{{grid.cols[loop.index0].title}}">{{cell|escape}}</td>
         {% endfor %}
         </tr>
     {% else %}
         <!-- No results -->
         <tr class="sp_grid_row" style="width: 100%;">
-            <td class="sp_grid_cell">No results</td>
+            <td class="sp_grid_cell sp_grid_noresults" 
+                colspan="{{grid.cols|length + 1}}">No results</td>
         </tr>
     {% endfor %}
+
 </table>
 <!-- Grid pager -->
 <div class="sp_grid_pager">
@@ -136,6 +141,7 @@
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{1}}"/>
+        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input class="sp_grid_pag_back" type="submit" value="|<<" title="pag. 1"/>
     </form>
     
@@ -146,6 +152,7 @@
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{grid.pag_n-1}}"/>
+        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         {% if grid.pag_n-1 > 0 %}
         <input class="sp_grid_pag_back" type="submit" value="<<" title="pag. {{grid.pag_n-1}}"/>
         {% else %}
@@ -165,6 +172,7 @@
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{grid.pag_n+1}}"/>
+        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         {% if grid.pag_n+1 <= grid.total_pag %}
         <input class="sp_grid_pag_forth" type="submit" value=">>" title="pag. {{grid.pag_n+1}}"/>
         {% else %}
@@ -180,6 +188,7 @@
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
+        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input class="sp_grid_pag_forth" type="submit" value=">>|" title="pag. {{grid.total_pag}}"/>
     </form>
 </div>
