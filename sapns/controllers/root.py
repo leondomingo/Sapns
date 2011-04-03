@@ -16,6 +16,7 @@ from neptuno.postgres.search import search
 from neptuno.util import format_float
 
 from sapns.controllers.error import ErrorController
+from tg.controllers.util import urlencode
 
 __all__ = ['RootController']
 
@@ -154,10 +155,12 @@ class RootController(BaseController):
         totalp = ds.count - pos
         if rp and totalp > rp:
             totalp = rp
-        
+            
         return dict(page='list',
                     q=q,
                     show_ids=show_ids,
+                    link='/list?' + urlencode(dict(cls=cls, q=q, rp=rp, pag_n=pag_n,
+                                                   caption=caption, show_ids=show_ids)),
                     grid=dict(caption=caption, name=cls,
                               cls=cls,
                               search_url=url('/list'), 

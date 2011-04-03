@@ -98,7 +98,7 @@
     <td/>
     <!-- Column titles -->
     {% for col in grid.cols %}
-    <td class="sp_col_title" style="width: {{col.width}}px; ">{{col.title|escape}}</td>
+    <td class="sp_col_title" style="width: {{col.width}}px;">{{col.title|escape}}</td>
     {% endfor %}
     </tr>
     
@@ -109,7 +109,8 @@
         <td title="{{loop.index}}"><input class="sp_grid_row_id" type="checkbox" 
             id_row="{{row[0]}}"/></td>
         {% for cell in row %}
-        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};"
+        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};
+            width: {{grid.cols[loop.index0].width}}px;"
             title="{{grid.cols[loop.index0].title}}">{{cell|escape}}</td>
         {% endfor %}
         </tr>
@@ -124,15 +125,15 @@
 </table>
 <!-- Grid pager -->
 <div class="sp_grid_pager">
-    <div>
-      <div class="sp_grid_pager_desc">Page {{grid.pag_n}} of {{grid.total_pag}} / Showing rows {{grid.pos+1}} to {{grid.pos + grid.totalp}}</div>    
+    <!-- <div> -->
+      <p class="sp_grid_pager_desc">Page {{grid.pag_n}} of {{grid.total_pag}} / Showing rows {{grid.pos+1}} to {{grid.pos + grid.totalp}}</p>    
       <select class="sp_grid_rp">
           <option value="10"  {% if grid.rp == 10 %}selected="selected"{% endif %}>10</option>
           <option value="50"  {% if grid.rp == 50 %}selected="selected"{% endif %}>50</option>
           <option value="100" {% if grid.rp == 100 %}selected="selected"{% endif %}>100</option>
           <option value="0"   {% if grid.rp == 0 %}selected="selected"{% endif %}>All</option>
       </select>
-    </div>
+    <!-- </div> -->
 
     <!-- First page -->
     <form method="post" action="{{grid.search_url}}">
@@ -194,7 +195,7 @@
 </div>
 <!-- Grid actions -->
 <div class="sp_grid_actions">
-    <div class="sp_grid_actions_title">Actions:</div>
+    {#<div class="sp_grid_actions_title">Actions:</div>#}
     {% for act in grid.actions %}
     <form method="post" action="{{act.url}}">
         <input class="sp_grid_action" type="button" value="{{act.title|escape}}" url="{{act.url}}"
