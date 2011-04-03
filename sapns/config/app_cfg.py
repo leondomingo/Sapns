@@ -17,10 +17,43 @@ from tg.configuration import AppConfig
 
 import sapns
 from sapns import model
-from sapns.lib import app_globals, helpers 
+from sapns.lib import app_globals, helpers
 import neptuno.util as np_util
 
-base_config = AppConfig()
+class CustomConfig(AppConfig):
+    def setup_jinja_renderer(self):
+        from tg.configuration import config, warnings
+        from jinja2 import ChoiceLoader, Environment, FileSystemLoader
+        from tg.render import render_jinja
+ 
+        if not 'jinja_extensions' in self :
+            self.jinja_extensions = []
+ 
+        # TODO: Load jinja filters automatically from given modules
+        if not 'jinja_filters' in self:
+            self.jinja_filter = []
+ 
+        config['pylons.app_globals'].jinja2_env = Environment(loader=ChoiceLoader(
+                 [FileSystemLoader(path) for path in self.paths['templates']]),
+                 auto_reload=self.auto_reload_templates, extensions=self.jinja_extensions)
+       
+        # Jinja's unable to request c's attributes without strict_c
+        warnings.simplefilter("ignore")
+        config['pylons.strict_c'] = True
+        warnings.resetwarnings()
+        config['pylons.stritmpl_contextt_tmpl_context'] = True
+        self.render_functions.jinja = render_jinja
+ 
+    def add_jinja_filter(self, func, func_name=None):
+        from tg.configuration import config
+ 
+        if not func_name:
+            func_name = func.__name__
+ 
+        config['pylons.app_globals'].jinja2_env.filters[func_name] = func
+
+#base_config = AppConfig()
+base_config = CustomConfig()
 base_config.renderers = []
 
 base_config.package = sapns
@@ -30,6 +63,7 @@ base_config.renderers.append('json')
 #Set the default renderer
 base_config.default_renderer = 'jinja'
 base_config.renderers.append('jinja')
+base_config.jinja_extensions = ['jinja2.ext.i18n']
 # if you want raw speed and have installed chameleon.genshi
 # you should try to use this renderer instead.
 # warning: for the moment chameleon does not handle i18n translations

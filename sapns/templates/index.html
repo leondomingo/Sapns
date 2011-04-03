@@ -19,13 +19,13 @@
 {% block middle %}
     {{ super() }}
     
-    {{util.list('/list', 'Mostrar tabla/vista', None)}}
+    {{util.list('/list', _('Show table/view'), None)}}
     
     <!-- Alumnos -->
-    {{util.list('/list', 'Alumnos', 'vista_busqueda_alumnos')}}
+    {{util.list('/list', _('Students'), 'vista_busqueda_alumnos')}}
     
     <!-- Clientes -->
-    {{util.list('/list', 'Clientes', 'vista_busqueda_clientes')}}    
+    {{util.list('/list', _('Clients'), 'vista_busqueda_clientes')}}    
 {% endblock %}
 
 <!-- Uncomment the next section and override the "footer" block if you want to -->

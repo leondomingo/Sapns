@@ -9,8 +9,8 @@
 
 {% block middle %}
     {{super()}}
-    {{grid_html.js_functions()}}
-    {{grid_html.show(page, q, grid, show_ids)}}
+    {{grid_html.js_functions(_)}}
+    {{grid_html.show(page, _, q, grid, show_ids)}}
     <a href="{{link}}">permalink</a>
     
     {# {{var}} #}
