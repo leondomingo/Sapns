@@ -159,7 +159,7 @@ class RootController(BaseController):
         if rp and totalp > rp:
             totalp = rp
             
-        return dict(page='list',
+        return dict(page='list', gettext=_,
                     q=q,
                     show_ids=show_ids,
                     link='/list?' + urlencode(dict(cls=cls, q=q, rp=rp, pag_n=pag_n,
