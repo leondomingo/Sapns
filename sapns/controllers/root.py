@@ -17,6 +17,7 @@ from neptuno.postgres.search import search
 
 from sapns.controllers.error import ErrorController
 from tg.controllers.util import urlencode
+#from pylons.templating import render_jinja2
 
 __all__ = ['RootController']
 
@@ -104,6 +105,8 @@ class RootController(BaseController):
     def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids=False):
         
         # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
+        
+        #var1 = render_jinja2('pruebas/prueba.txt', extra_vars=dict(mensaje='Hola, mundo!'))
         
         rp = int(rp)
         pag_n = int(pag_n)

@@ -52,8 +52,8 @@ setup(
                                  'public/*/*']},
     message_extractors={'sapns': [
             ('**.py', 'python', None),
-            ('templates/**.mako', 'mako', None),
-            ('templates/**.html', 'genshi', None),
+            #('templates/**.mako', 'mako', None),
+            ('templates/**.html', 'jinja2', None),
             ('public/**', 'ignore', None)]},
 
     entry_points="""

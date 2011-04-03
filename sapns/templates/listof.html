@@ -2,8 +2,9 @@
 {% import 'grid.html' as grid_html %}
 
 {% block head %}
-<!-- JQuery 1.5.1 -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+    {{super()}}
+    <!-- JQuery 1.5.1 -->
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
 {% endblock %}
 
 {% block middle %}
@@ -11,4 +12,6 @@
     {{grid_html.js_functions()}}
     {{grid_html.show(page, q, grid, show_ids)}}
     <a href="{{link}}">permalink</a>
+    
+    {# {{var}} #}
 {% endblock %}

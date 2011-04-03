@@ -318,6 +318,7 @@ clear:both;
 	border: 1px solid darkgray;
 	padding-left: 5px;
 	padding-right: 5px;
+	cursor: pointer;
 }
 
 .sp_grid_row_id {
@@ -332,6 +333,7 @@ clear:both;
 	/*background-color: white;*/
 	font-family: Arial;
 	height: 45px;
+	cursor: pointer;
 }
 
 .sp_grid_noresults {
