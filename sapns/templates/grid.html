@@ -72,7 +72,7 @@
     	
     	// Changing results per page
     	$('.sp_grid_rp').change(function() {
-    		var grid_id = $(this).parent().parent().parent().attr('id');
+    		var grid_id = $(this).parent().parent().attr('id');
     		//alert(grid_id);
     		search($('#' + grid_id + ' .sp_search_btn'));
     	});
@@ -95,7 +95,7 @@
 </form>
 <table class="sp_grid">
     <tr>
-    <td/>
+    <td class="sp_col_title">*</td>
     <!-- Column titles -->
     {% for col in grid.cols %}
     <td class="sp_col_title" style="width: {{col.width}}px;">{{col.title|escape}}</td>

@@ -30,6 +30,17 @@ cache_dir = %(here)s/data
 beaker.session.key = sapns
 beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
 
+# Sapns settings
+formats.date = %m/%d/%Y
+formats.time = %H:%M
+grid.date_format = %m/%d/%Y
+grid.time_format = %H:%M
+grid.time_format = %m/%d/%Y %H:%M
+grid.true_const = Yes
+grid.false_const = No
+
+# TODO: Application's settings here
+
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings
 # here:

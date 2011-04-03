@@ -18,6 +18,7 @@ from tg.configuration import AppConfig
 import sapns
 from sapns import model
 from sapns.lib import app_globals, helpers 
+import neptuno.util as np_util
 
 base_config = AppConfig()
 base_config.renderers = []
@@ -67,3 +68,8 @@ base_config.sa_auth.post_login_url = '/post_login'
 # You may optionally define a page where you want users to be redirected to
 # on logout:
 base_config.sa_auth.post_logout_url = '/post_logout'
+
+# Sapns settings
+def format_float(value):
+    return np_util.format_float(value, thousands_sep=',', decimal_sep='.', 
+                                show_sign=False, n_dec=2) 

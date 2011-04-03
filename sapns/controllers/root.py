@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect
+from tg import expose, flash, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
@@ -11,9 +11,9 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession
 from sapns import model
 from sapns.controllers.secure import SecureController
+import sapns.config.app_cfg as app_cfg
 
 from neptuno.postgres.search import search
-from neptuno.util import format_float
 
 from sapns.controllers.error import ErrorController
 from tg.controllers.util import urlencode
@@ -113,14 +113,13 @@ class RootController(BaseController):
         ds = search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     show_ids=show_ids)
         
-        # TODO: guardar en la configuración global de la aplicación
-        ds.date_fmt = '%m/%d/%Y'
-        ds.true_const = u'Sí'
-        ds.false_const = 'No'
-        def fmt(valor):
-            return format_float(valor, separador_miles=',', separador_decimal='.')
-            
-        ds.float_fmt = fmt
+        # Reading global settings
+        ds.date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        ds.time_fmt = config.get('grid.time_format', default='%H:%M')
+        ds.true_const = config.get('grid.true_const', default='Yes')
+        ds.false_const = config.get('grid.false_const', default='No')
+        
+        ds.float_fmt = app_cfg.format_float
         
         data = ds.to_data()
         
@@ -141,6 +140,7 @@ class RootController(BaseController):
                    dict(title='Merge', url=url('/clientes/fusionar'), require_id=True),                   
                    ]
         
+        # total number of pages
         total_pag = 1
         if rp > 0:
             total_pag = ds.count/rp
