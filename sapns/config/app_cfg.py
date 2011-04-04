@@ -21,6 +21,7 @@ from sapns.lib import app_globals, helpers
 import neptuno.util as np_util
 
 class CustomConfig(AppConfig):
+    
     def setup_jinja_renderer(self):
         from tg.configuration import config, warnings
         from jinja2 import ChoiceLoader, Environment, FileSystemLoader
@@ -28,7 +29,7 @@ class CustomConfig(AppConfig):
  
         if not 'jinja_extensions' in self :
             self.jinja_extensions = []
- 
+            
         # TODO: Load jinja filters automatically from given modules
         if not 'jinja_filters' in self:
             self.jinja_filter = []

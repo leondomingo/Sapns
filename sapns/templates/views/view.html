@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% import 'util.html' as util %}
+
+{% block head %}
+    {{super()}}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/views.css')}}"/>
+    {{util.jquery()}}
+    <!-- <script type="text/javascript" src="{{tg.url('/js/views.js')}}"></script>-->
+{% endblock %}
+
+{% block middle %}
+<form id="form_view" method="post" action="">
+</form>
+<script type="text/javascript">
+{% include 'views/views.js' %}
+</script>
+{% include 'views/header.html' %}
+{% include 'views/columns.html' %}
+{% include 'views/relations.html' %}
+{% include 'views/filters.html' %}
+{% include 'views/order.html' %}
+{% endblock %}

@@ -1,0 +1,112 @@
+.sp_view_caption {
+	background-color: gray;
+	color: white;
+	font-weight: bold;
+	padding-left: 20px;
+	font-size: 15px;
+}
+
+.sp_view_edit {
+	background-color: white;
+    margin-top: 10px;
+    margin-bottom: 10px;
+    overflow: auto;
+}
+
+.sp_view_title {
+	width: 625px;
+}
+
+.sp_view_code {
+	width: 625px;
+}
+
+.sp_view_columns {
+	height: 225px;
+}
+
+.sp_view_relations {
+    height: 180px;
+}
+
+.sp_view_filters {
+    height: 180px;
+}
+
+.sp_view_orders {
+    height: 150px;
+}
+
+.sp_view_label {
+	width: 80px;
+	padding-left: 5px;
+	/*color: gray;*/
+}
+
+.sp_view_label_must {
+	font-weight: bold;
+}
+
+.sp_view_label_table {
+	color: gray;
+}
+
+/* column */
+.sp_column_title {
+	width: 100px;
+}
+
+.sp_column_definition {
+	width: 250px;
+}
+
+.sp_column_alias {
+	width: 100px;
+}
+
+/* relation */
+.sp_relation_table {
+	width: 180px;
+}
+
+.sp_relation_alias {
+    width: 90px;
+}
+
+.sp_relation_lbl {
+	color: gray;
+}
+
+.sp_relation_condition {
+	width: 300px;
+}
+
+.sp_view_label_alias {
+	color: gray;
+}
+
+.sp_view_label_condition {
+	color: gray;
+}
+
+/* filter */
+.sp_filter_lbl {
+    color: gray;
+    width: 80px;
+    padding-left: 5px;
+}
+
+.sp_filter_definition {
+	width: 625px;
+}
+
+/* order */
+.sp_order_lbl {
+	color: gray;
+	width: 80px;
+	padding-left: 5px;
+}
+
+.sp_order_definition {
+	width: 625px;
+}

@@ -170,6 +170,10 @@ class RootController(BaseController):
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
+    
+    @expose('views/view.html')
+    def view(self):
+        return dict(page='views')
 
     def data(self, cls='', id=None):
         pass
