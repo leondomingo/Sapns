@@ -16,6 +16,7 @@ import sapns.config.app_cfg as app_cfg
 from neptuno.postgres.search import search
 
 from sapns.controllers.error import ErrorController
+from sapns.controllers.views import ViewsController
 from tg.controllers.util import urlencode
 #from pylons.templating import render_jinja2
 
@@ -41,6 +42,8 @@ class RootController(BaseController):
     admin = AdminController(model, DBSession, config_type=TGAdminConfig)
 
     error = ErrorController()
+    
+    views = ViewsController()
 
     @expose('index.html')
     def index(self):
@@ -171,10 +174,6 @@ class RootController(BaseController):
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
     
-    @expose('views/view.html')
-    def view(self):
-        return dict(page='views')
-
     def data(self, cls='', id=None):
         pass
     

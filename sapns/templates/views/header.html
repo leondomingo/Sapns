@@ -4,25 +4,25 @@
         <!-- Title -->
         <tr>
             <td class="sp_view_label sp_view_label_must">{{_('Title')}}</td>
-            <td><input class="sp_view_title" id="view_title" type="text" value=""/></td>
+            <td><input class="sp_view_title" id="view_title" type="text" value="{{view.title}}"/></td>
         </tr>
         
         <!-- Code -->
         <tr>
             <td class="sp_view_label sp_view_label_must">{{_('Code')}}</td>
-            <td><input class="sp_view_code" id="view_code" type="text" value=""/></td>
+            <td><input class="sp_view_code" id="view_code" type="text" value="{{view.code}}"/></td>
         </tr>
         
         <!-- Table -->
         <tr>
             <td class="sp_view_label sp_view_label_must">{{_('Table')}}</td>
-            <td><input class="sp_view_table" id="view_table" type="text" value=""/></td>
+            <td><input class="sp_view_table" id="view_table" type="text" value="{{view.relations[0].table}}"/></td>
         </tr>
         
         <!-- Alias -->
         <tr>
             <td class="sp_view_label sp_view_label_must">{{_('Alias')}}</td>
-            <td><input class="sp_view_table_alias" id="view_table_alias" type="text" value=""/></td>
+            <td><input class="sp_view_table_alias" id="view_table_alias" type="text" value="{{view.relations[0].alias}}"/></td>
         </tr>
         
         <tr>

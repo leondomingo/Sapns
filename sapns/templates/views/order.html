@@ -7,5 +7,14 @@
     </table>
     <!-- list of orders -->
     <table id="order_list">
+    {% for o in view.order %}
+    <tr class="order_item">
+        <td class='sp_order_lbl'>{{_('Definition')}}</td>
+        <td><input class="sp_order_definition" type="text" value="{{o}}"/></td>
+        <td><input class="btn_remove_order" type="button" value="{{_('Remove order')}}"/></td>
+        <td><input class="btn_up_order" type="button" value="{{_('Up')}}"/></td>
+        <td><input class="btn_down_order" type="button" value="{{_('Down')}}"/></td>
+    </tr>
+    {% endfor %}
     </table>
 </div>
