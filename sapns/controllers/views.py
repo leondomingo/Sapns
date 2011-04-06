@@ -2,8 +2,8 @@
 """Views management controller"""
 
 # turbogears imports
-from tg import expose
-#from tg import redirect, validate, flash
+import simplejson as sj
+from tg import expose, validate, redirect, url
 
 # third party imports
 #from pylons.i18n import ugettext as _
@@ -11,8 +11,12 @@ from tg import expose
 
 # project specific imports
 from sapns.lib.base import BaseController
+from formencode import schema, validators
+from pylons import tmpl_context
 #from sapns.model import DBSession, metadata
 
+class ViewSchema(schema.Schema):
+    pass   
 
 class ViewsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
@@ -20,17 +24,52 @@ class ViewsController(BaseController):
     
     @expose('views/view.html')
     def edit(self, id=None):
+        
+        # TODO: cargar datos de la vista con ese "id"
+        #id = validators.Int().to_python(id)
+        
+        # fake data
+        columns = []
+        relations = [dict(table='alumnos',
+                          alias='alum',
+                          condition='',
+                          ),
+                     dict(table='clientes',
+                          alias='clie_a',
+                          condition='clie_a.id = alum.id_clientes_clienteactual'
+                          ) 
+                    ]
         filters = ['f1', 'f2', 'f3']
         order = ['o1', 'o2', 'o3']
         
-        return dict(page='views/edit', 
-                    view=dict(title=u'Title',
-                              code=u'Code',
-                              columns=[],
-                              relations=[dict(table='alumnos',
-                                              alias='alum',
-                                              condition='',
-                                              )],                              
-                              filters=filters,
-                              order=order))
+        view = dict(id=id or '',
+                    title=u'Title',
+                    code=u'Code',
+                    columns=columns,
+                    relations=relations,
+                    filters=filters,
+                    order=order)
+                
+        return dict(page='views/edit', view=view)
 
+    @expose('views/view.html')
+    def error_handler(self, **kw):
+        view = dict(id=kw['id'],
+                    title=kw['title'],
+                    code=kw['code'],
+                    columns=sj.loads(kw['columns']),
+                    relations=sj.loads(kw['relations']),
+                    filters=sj.loads(kw['filters']),
+                    order=sj.loads(kw['order']),
+                    )
+        
+        return dict(page='views/edit', view=view)
+    
+    @expose('json')
+    @validate(validators={'title': validators.NotEmpty(), 'code': validators.NotEmpty()}, 
+              error_handler=error_handler)
+    def save(self, **kw):
+        
+        id = validators.Int().to_python(kw['id'])
+        
+        redirect(url('/views/edit'))

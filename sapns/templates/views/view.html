@@ -13,7 +13,7 @@
 
 {% block middle %}
 <form id="form_view" method="post" action="/views/save">
-    <input type="hidden" name="id"/>
+    <input type="hidden" name="id" value="{{view.id}}"/>
     <input type="hidden" name="title"/>
     <input type="hidden" name="code"/>    
     <input type="hidden" name="columns"/>
@@ -21,6 +21,9 @@
     <input type="hidden" name="filters"/>
     <input type="hidden" name="order"/>
 </form>
+{% if tmpl_context.form_errors %}
+{{tmpl_context.form_errors}}
+{% endif %}
 {% include 'views/header.html' %}
 {% include 'views/columns.html' %}
 {% include 'views/relations.html' %}
