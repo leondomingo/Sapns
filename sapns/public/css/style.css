@@ -399,3 +399,8 @@ clear:both;
 	background-color: white;
 	color: gray;
 }
+
+.sp_field_error {
+    background-color: red;
+    color: white;
+}

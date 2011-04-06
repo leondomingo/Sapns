@@ -1,7 +1,6 @@
 $(document).ready(function() {
 	
 	$('#btn_add_column').click(function() {
-		//alert('Adding a column!')
 		
 		var new_column = 
 			'<tr class="column_item">\n' +
@@ -36,7 +35,6 @@ $(document).ready(function() {
 	});
 	
 	$('#btn_add_relation').click(function() {
-		//alert('Adding a relation!')
 		
 		var new_relation = 
 			'<tr class="relation_item">\n' +
@@ -76,7 +74,6 @@ $(document).ready(function() {
 	});
 	
 	$('#btn_add_filter').click(function() {
-		//alert('Adding a filter!')
 		
 		var new_filter = 
 			'<tr class="filter_item">\n' +
@@ -108,8 +105,6 @@ $(document).ready(function() {
 	});
 
 	$('#btn_add_order').click(function() {
-		//alert('Adding an order!')
-		
 		var new_order = 
 			'<tr class="order_item">\n' +
 			"<td class='sp_order_lbl'>{{_('Definition')}}</td>\n" +
@@ -140,16 +135,37 @@ $(document).ready(function() {
 	});
 	
 	$('#btn_save_view').click(function() {
-		//alert('Saving view...')
 		
-		// TODO: collect data
+		var error = false;
 		
-		// view
-		$('#form_view input[name=title]').val($('#view_title').val());
-		$('#form_view input[name=code]').val($('#view_code').val());
+		// view (header)
+		
+		// title
+		$('#view_title').removeClass('sp_field_error');
+		if ($('#view_title').val() != '') { 
+			$('#form_view input[name=title]').val($('#view_title').val());
+		}
+		else {
+			error = true;
+			$('#view_title').addClass('sp_field_error');
+		}
+		
+		// code
+		$('#view_code').removeClass('sp_field_error');
+		if ($('#view_code').val() != '') {
+			$('#form_view input[name=code]').val($('#view_code').val());
+		}
+		else {
+			error = true;
+			$('#view_code').addClass('sp_field_error');
+		}
 		
 		// columns
+		$('.sp_column_definition').removeClass('sp_field_error')
+		$('.sp_column_alias').removeClass('sp_field_error');
+
 		var column_items = [];
+		var column_aliases = [];
 		
 		$('.column_item').each(function(i) {
 			var item = {
@@ -159,6 +175,25 @@ $(document).ready(function() {
 				align: $(this).find('.sp_column_align').val()
 			};
 			
+			// check for already-used aliases
+			var this_alias = item.alias.toLowerCase();
+			
+			if (this_alias != '') {
+				if (column_aliases.indexOf(this_alias) == -1) {
+					column_aliases[column_aliases.length] = this_alias;
+				}
+				else {
+					error = true;
+					$(this).find('.sp_column_alias').addClass('sp_field_error');
+				}
+			}
+
+			// "definition" can not be empty
+			if (item.definition == '') {
+				error = true;
+				$(this).find('.sp_column_definition').addClass('sp_field_error');
+			}
+			
 			column_items[i] = item;			
 		});
 		
@@ -167,11 +202,28 @@ $(document).ready(function() {
 		// relations
 		var relation_items = [];
 		
+		var table_aliases = [];
+		
+		$('#view_table').removeClass('sp_field_error');
 		relation_items[0] = {
 			table: $('#view_table').val(),
 			alias: $('#view_table_alias').val(),
 			condition: null
 		};
+		
+		var this_alias = $('#view_table_alias').val().toLowerCase();
+		if (this_alias != '') {
+			table_aliases[table_aliases.length] = this_alias;
+		}
+		
+		if (relation_items[0].table == '') {
+			error = true;
+			$('#view_table').addClass('sp_field_error');
+		}
+		
+		$('.sp_relation_table').removeClass('sp_field_error');
+		$('.sp_relation_alias').removeClass('sp_field_error');
+		$('.sp_relation_condition').removeClass('sp_field_error');
 		
 		$('.relation_item').each(function(i) {
 			
@@ -179,7 +231,30 @@ $(document).ready(function() {
 				table: $(this).find('.sp_relation_table').val(),
 				alias: $(this).find('.sp_relation_alias').val(),
 				condition: $(this).find('.sp_relation_condition').val()
-			};		
+			};
+			
+			var this_alias = $(this).find('.sp_relation_alias').val().toLowerCase();
+			if (this_alias != '') {
+				if (table_aliases.indexOf(this_alias) == -1) {
+					table_aliases[table_aliases.length] = this_alias;
+				}
+				else {
+					error = true;
+					$(this).find('.sp_relation_alias').addClass('sp_field_error');
+				}
+			}
+			
+			// table
+			if (item.table == '') {
+				error = true;
+				$(this).find('.sp_relation_table').addClass('sp_field_error');
+			}
+			
+			// condition
+			if (item.condition == '') {
+				error = true;
+				$(this).find('.sp_relation_condition').addClass('sp_field_error');
+			}
 			
 			relation_items[i+1] = item;
 		});
@@ -188,21 +263,38 @@ $(document).ready(function() {
 		
 		// filters
 		var filter_items = [];
+		$('.sp_filter_definition').removeClass('sp_field_error');
 		$('.sp_filter_definition').each(function(i) {
 			filter_items[i] = $(this).val();
+			if ($(this).val() == '') {
+				error = true;
+				$(this).addClass('sp_field_error');
+			}
 		});
 		
 		$('#form_view input[name=filters]').val(JSON.stringify(filter_items));
 		
 		// order
 		var order_items = [];
+		$('.sp_order_definition').removeClass('sp_field_error');
 		$('.sp_order_definition').each(function(i) {
 			order_items[i] = $(this).val();
+			
+			if ($(this).val() == '') {
+				error = true;
+				$(this).addClass('sp_field_error');
+			}
 		});
 		
 		$('#form_view input[name=order]').val(JSON.stringify(order_items));
 		
 		// Submit the view form
-		$('#form_view').submit();
+		if (!error) {
+			$('#form_view').submit();
+		}
+		else {
+			// Warning!
+			alert('{{_('Please, check the information you have entered')}}')
+		}
 	});
 });
