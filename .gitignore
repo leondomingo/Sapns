@@ -4,3 +4,4 @@ production.ini
 .pydevproject
 .settings/
 *.pyc
+data/

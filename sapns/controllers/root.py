@@ -3,6 +3,7 @@
 
 from tg import expose, flash, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
+from tg.i18n import set_lang, get_lang
 from tgext.admin.tgadminconfig import TGAdminConfig
 from tgext.admin.controller import AdminController
 from repoze.what import predicates
@@ -19,6 +20,9 @@ from sapns.controllers.error import ErrorController
 from sapns.controllers.views import ViewsController
 from tg.controllers.util import urlencode
 #from pylons.templating import render_jinja2
+
+#import logging
+#import simplejson as sj
 
 __all__ = ['RootController']
 
@@ -47,7 +51,8 @@ class RootController(BaseController):
 
     @expose('index.html')
     def index(self):
-        return dict(page='index')
+        curr_lang = get_lang()
+        return dict(page='index', curr_lang=curr_lang)
 
     @expose('environ.html')
     def environ(self):
@@ -175,6 +180,11 @@ class RootController(BaseController):
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
+        
+    @expose()
+    def setlang(self, lang='en', came_from='/'):
+        set_lang(lang)
+        redirect(came_from)
     
     def data(self, cls='', id=None):
         pass

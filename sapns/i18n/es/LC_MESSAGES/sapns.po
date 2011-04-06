@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-06 14:55+0200\n"
+"PO-Revision-Date: 2011-04-06 18:59+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,24 +17,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:63
+#: sapns/controllers/root.py:68
 msgid "Only for managers"
 msgstr "Sólo para managers"
 
-#: sapns/controllers/root.py:69
+#: sapns/controllers/root.py:74
 msgid "Only for the editor"
 msgstr "Sólo para el editor"
 
-#: sapns/controllers/root.py:79
+#: sapns/controllers/root.py:84
 msgid "Wrong credentials"
 msgstr "Credenciales incorrectas"
 
-#: sapns/controllers/root.py:94
+#: sapns/controllers/root.py:99
 #, python-format
 msgid "Welcome back, %s!"
 msgstr "¡Bienvenido, %s!"
 
-#: sapns/controllers/root.py:104
+#: sapns/controllers/root.py:109
 msgid "We hope to see you soon!"
 msgstr "¡Esperamos verte pronto!"
 
@@ -45,6 +45,10 @@ msgstr ""
 #: sapns/controllers/secure.py:25
 msgid "Secure Controller here"
 msgstr ""
+
+#: sapns/templates/base.html:18
+msgid "You are in"
+msgstr "Estás en"
 
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
@@ -79,15 +83,15 @@ msgstr "página 1"
 msgid "page %(p)d"
 msgstr "página %(p)d"
 
-#: sapns/templates/index.html:22
+#: sapns/templates/index.html:27
 msgid "Show table/view"
 msgstr "Mostrar tabla/vista"
 
-#: sapns/templates/index.html:25
+#: sapns/templates/index.html:30
 msgid "Students"
 msgstr "Alumnos"
 
-#: sapns/templates/index.html:28
+#: sapns/templates/index.html:33
 msgid "Clients"
 msgstr "Clientes"
 
