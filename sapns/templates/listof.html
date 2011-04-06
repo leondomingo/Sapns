@@ -13,6 +13,9 @@
 
 {% block middle %}
     {{super()}}
+    {% if came_from %}
+    <a href="{{tg.url(came_from)}}">return...</a>
+    {% endif %}
     {{grid_html.js_functions(_)}}
     {{grid_html.show(page, _, q, grid, show_ids)}}
     <a href="{{link}}">permalink</a>

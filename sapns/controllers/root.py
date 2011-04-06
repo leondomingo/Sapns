@@ -105,7 +105,8 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose('listof.html')
-    def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids=False):
+    def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids='false', 
+             came_from='/'):
         
         # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
         
@@ -165,6 +166,7 @@ class RootController(BaseController):
         return dict(page='list',
                     q=q,
                     show_ids=show_ids,
+                    came_from=came_from,
                     link='/list?' + urlencode(dict(cls=cls, q=q, rp=rp, pag_n=pag_n,
                                                    caption=caption, show_ids=show_ids)),
                     grid=dict(caption=caption, name=cls,

@@ -7,5 +7,26 @@
     </table>
     <!-- list of columns -->
     <table id="column_list">
+        {% for col in view.columns %}
+        <tr class="column_item">
+        <td class="">{{_('Title')}}</td>
+        <td><input class="sp_column_title" type="text" value="{{col.title}}"/></td>
+        <td class="">{{_('Definition')}}</td>
+        <td><input class="sp_column_definition" type="text" value="{{col.definition}}"/></td>
+        <td class="">{{_('Alias')}}</td>
+        <td><input class="sp_column_alias" type="text" value="{{col.alias}}"/></td>
+        <td class="">{{_('Align')}}</td>
+        <td>
+        <select class="sp_column_align">
+            <option value="center" {% if col.align == 'center' %}selected="selected"{% endif %}>{{_('center')}}</option>
+            <option value="left"   {% if col.align == 'left'   %}selected="selected"{% endif %}>{{_('left')}}</option>
+            <option value="right"  {% if col.align == 'right'  %}selected="selected"{% endif %}>{{_('right')}}</option>
+        </select>
+        </td>         
+        <td><input class="btn_remove_column" type="button" value="{{_('Remove column')}}"/></td>
+        <td><input class="btn_up_column" type="button" value="{{_('Up')}}"/></td>
+        <td><input class="btn_down_column" type="button" value="{{_('Down')}}"/></td>
+        </tr>
+        {% endfor %}
     </table>
 </div>

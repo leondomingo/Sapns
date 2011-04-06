@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-03 23:46+0200\n"
+"POT-Creation-Date: 2011-04-06 14:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:60
+#: sapns/controllers/root.py:63
 msgid "Only for managers"
 msgstr ""
 
-#: sapns/controllers/root.py:66
+#: sapns/controllers/root.py:69
 msgid "Only for the editor"
 msgstr ""
 
-#: sapns/controllers/root.py:76
+#: sapns/controllers/root.py:79
 msgid "Wrong credentials"
 msgstr ""
 
-#: sapns/controllers/root.py:91
+#: sapns/controllers/root.py:94
 #, python-format
 msgid "Welcome back, %s!"
 msgstr ""
 
-#: sapns/controllers/root.py:101
+#: sapns/controllers/root.py:104
 msgid "We hope to see you soon!"
 msgstr ""
 
@@ -87,5 +87,117 @@ msgstr ""
 
 #: sapns/templates/index.html:28
 msgid "Clients"
+msgstr ""
+
+#: sapns/templates/views/columns.html:2
+msgid "Columns"
+msgstr ""
+
+#: sapns/templates/views/columns.html:5
+msgid "Add column"
+msgstr ""
+
+#: sapns/templates/views/columns.html:12 sapns/templates/views/header.html:6
+msgid "Title"
+msgstr ""
+
+#: sapns/templates/views/columns.html:14 sapns/templates/views/filters.html:12
+#: sapns/templates/views/order.html:12
+msgid "Definition"
+msgstr ""
+
+#: sapns/templates/views/columns.html:16 sapns/templates/views/header.html:24
+#: sapns/templates/views/relations.html:14
+msgid "Alias"
+msgstr ""
+
+#: sapns/templates/views/columns.html:18
+msgid "Align"
+msgstr ""
+
+#: sapns/templates/views/columns.html:21
+msgid "center"
+msgstr ""
+
+#: sapns/templates/views/columns.html:22
+msgid "left"
+msgstr ""
+
+#: sapns/templates/views/columns.html:23
+msgid "right"
+msgstr ""
+
+#: sapns/templates/views/columns.html:26
+msgid "Remove column"
+msgstr ""
+
+#: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
+#: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
+msgid "Up"
+msgstr ""
+
+#: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
+#: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
+msgid "Down"
+msgstr ""
+
+#: sapns/templates/views/filters.html:2
+msgid "Filters"
+msgstr ""
+
+#: sapns/templates/views/filters.html:5
+msgid "Add filter"
+msgstr ""
+
+#: sapns/templates/views/filters.html:14
+msgid "Remove filter"
+msgstr ""
+
+#: sapns/templates/views/header.html:2
+msgid "View"
+msgstr ""
+
+#: sapns/templates/views/header.html:12
+msgid "Code"
+msgstr ""
+
+#: sapns/templates/views/header.html:18 sapns/templates/views/relations.html:12
+msgid "Table"
+msgstr ""
+
+#: sapns/templates/views/header.html:31
+msgid "Save view"
+msgstr ""
+
+#: sapns/templates/views/header.html:41
+msgid "Show view"
+msgstr ""
+
+#: sapns/templates/views/order.html:2
+msgid "Order"
+msgstr ""
+
+#: sapns/templates/views/order.html:5
+msgid "Add order"
+msgstr ""
+
+#: sapns/templates/views/order.html:14
+msgid "Remove order"
+msgstr ""
+
+#: sapns/templates/views/relations.html:2
+msgid "Relations"
+msgstr ""
+
+#: sapns/templates/views/relations.html:5
+msgid "Add relation"
+msgstr ""
+
+#: sapns/templates/views/relations.html:16
+msgid "Condition"
+msgstr ""
+
+#: sapns/templates/views/relations.html:18
+msgid "Remove relation"
 msgstr ""
 

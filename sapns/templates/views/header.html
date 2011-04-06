@@ -25,9 +25,23 @@
             <td><input class="sp_view_table_alias" id="view_table_alias" type="text" value="{{view.relations[0].alias}}"/></td>
         </tr>
         
+        <!-- Save view -->
         <tr>
             <td/>
             <td><input id="btn_save_view" class="" type="button" value="{{_('Save view')}}"/></td>
-        </tr>        
+        </tr>
+    
+        <!--        
+        <tr>
+            <td/>
+            <td>
+            <form method="post" action="{{tg.url('/list')}}">
+                <input type="hidden" name="came_from" value="{{'/views/edit?id=' + view.id}}"/>
+                <input type="hidden" name="cls" value="alumnos"/>
+                <input type="submit" value="{{_('Show view')}}"/>
+            </form>
+            </td>
+        </tr>
+        -->        
     </table>
 </div>

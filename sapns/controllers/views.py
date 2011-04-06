@@ -29,7 +29,18 @@ class ViewsController(BaseController):
         #id = validators.Int().to_python(id)
         
         # fake data
-        columns = []
+        columns = [dict(title='t1',
+                        definition='d1',
+                        alias='a1',
+                        align='right',
+                        ),
+                   dict(title='t2',
+                        definition='d2',
+                        alias='a2',
+                        align='left',
+                        ),
+                   ]
+        
         relations = [dict(table='alumnos',
                           alias='alum',
                           condition='',

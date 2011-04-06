@@ -12,9 +12,9 @@ $(document).ready(function() {
 			'<td><input class="sp_column_alias" type="text"/></td>\n' +
 			'<td class="">{{_('Align')}}</td>\n' +
 			'<td><select class="sp_column_align">' +
-			'<option value="center">center</option>\n' +
-			'<option value="left">left</option>\n' +
-			'<option value="right">right</option>\n' +
+			'<option value="center">{{_('center')}}</option>\n' +
+			'<option value="left">{{_('left')}}</option>\n' +
+			'<option value="right">{{_('right')}}</option>\n' +
 			'</select>' +
 			'</td>\n' +			
 			'<td><input class="btn_remove_column" type="button" value="{{_('Remove column')}}"/></td>\n' +
