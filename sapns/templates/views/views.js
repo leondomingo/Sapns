@@ -342,7 +342,7 @@ $(document).ready(function() {
 		}
 		else {
 			// Warning!
-			alert('{{_('Please, check the information you have entered')}}')
+			alert('{{_('Please, check the information you have entered')}}');
 		}
 	});
 });

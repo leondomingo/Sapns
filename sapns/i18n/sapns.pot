@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-06 18:59+0200\n"
+"POT-Creation-Date: 2011-04-06 21:16+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,29 +54,29 @@ msgstr ""
 msgid "You must select a row before click on this action"
 msgstr ""
 
-#: sapns/templates/grid.html:94
+#: sapns/templates/grid.html:93
 msgid "Search..."
 msgstr ""
 
-#: sapns/templates/grid.html:121
+#: sapns/templates/grid.html:120
 msgid "No results"
 msgstr ""
 
-#: sapns/templates/grid.html:129
+#: sapns/templates/grid.html:128
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 
-#: sapns/templates/grid.html:134
+#: sapns/templates/grid.html:133
 msgid "All"
 msgstr ""
 
-#: sapns/templates/grid.html:146
+#: sapns/templates/grid.html:145
 msgid "page 1"
 msgstr ""
 
-#: sapns/templates/grid.html:158 sapns/templates/grid.html:178
-#: sapns/templates/grid.html:193
+#: sapns/templates/grid.html:157 sapns/templates/grid.html:177
+#: sapns/templates/grid.html:192
 #, python-format
 msgid "page %(p)d"
 msgstr ""
@@ -205,3 +205,6 @@ msgstr ""
 msgid "Remove relation"
 msgstr ""
 
+#: sapns/templates/views/views.js:345
+msgid "Please, check the information you have entered"
+msgstr ""
