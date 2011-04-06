@@ -2,8 +2,16 @@ $(document).ready(function() {
 	
 	$('#btn_add_column').click(function() {
 		
+		var last_pos = $('.column_item:last').attr('pos');
+		if (last_pos == undefined) {
+			last_pos = 0;
+		}
+		else {
+			last_pos = (last_pos*1) + 1;
+		}
+		
 		var new_column = 
-			'<tr class="column_item">\n' +
+			'<tr class="column_item" pos="' + last_pos + '">\n' +
 			'<td class="">{{_('Title')}}</td>\n' +
 			'<td><input class="sp_column_title" type="text"/></td>\n' +
 			'<td class="">{{_('Definition')}}</td>\n' +
@@ -36,8 +44,16 @@ $(document).ready(function() {
 	
 	$('#btn_add_relation').click(function() {
 		
+		var last_pos = $('.relation_item:last').attr('pos');
+		if (last_pos == undefined) {
+			last_pos = 0;
+		}
+		else {
+			last_pos = (last_pos*1) + 1;
+		}
+		
 		var new_relation = 
-			'<tr class="relation_item">\n' +
+			'<tr class="relation_item" pos="' + last_pos + '">\n' +
 			"<td class='sp_relation_lbl'>{{_('Table')}}</td>\n" +
 			'<td>\n' +
 			'<input class="sp_relation_table" type="text"/>\n' +
@@ -75,8 +91,16 @@ $(document).ready(function() {
 	
 	$('#btn_add_filter').click(function() {
 		
+		var last_pos = $('.filter_item:last').attr('pos');
+		if (last_pos == undefined) {
+			last_pos = 0;
+		}
+		else {
+			last_pos = (last_pos*1) + 1;
+		}
+		
 		var new_filter = 
-			'<tr class="filter_item">\n' +
+			'<tr class="filter_item" pos="' + last_pos + '">\n' +
 			"<td class='sp_filter_lbl'>{{_('Definition')}}</td>\n" +
 			'<td>\n' +
 			'<input class="sp_filter_definition" type="text"/>\n' +
@@ -105,8 +129,17 @@ $(document).ready(function() {
 	});
 
 	$('#btn_add_order').click(function() {
+		
+		var last_pos = $('.order_item:last').attr('pos');
+		if (last_pos == undefined) {
+			last_pos = 0;
+		}
+		else {
+			last_pos = (last_pos*1) + 1;
+		}
+		
 		var new_order = 
-			'<tr class="order_item">\n' +
+			'<tr class="order_item" pos="' + last_pos + '">\n' +
 			"<td class='sp_order_lbl'>{{_('Definition')}}</td>\n" +
 			'<td>\n' +
 			'<input class="sp_order_definition" type="text"/>\n' +
@@ -134,6 +167,21 @@ $(document).ready(function() {
 		$(this).parent().parent().remove();
 	});
 	
+	
+	$('.btn_up_order').click(function(){
+		var pos = $(this).parent().parent().attr('pos');
+		pos = pos*1;
+		
+		var prev_pos = pos - 1;
+		
+		if (pos > 0) {
+			// get the previous item in the list
+			var prev_item = $('.order_item:eq(' + prev_pos + ')');
+			prev_item.remove();
+		}
+	});
+	
+	// "Save view" button
 	$('#btn_save_view').click(function() {
 		
 		var error = false;

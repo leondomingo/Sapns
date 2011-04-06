@@ -8,7 +8,7 @@
     <!-- list of relations -->
     <table id="relation_list">
     {% for r in view.relations[1:] %}
-        <tr class="relation_item">
+        <tr class="relation_item" pos="{{loop.index0}}">
         <td class='sp_relation_lbl'>{{_('Table')}}</td>
         <td><input class="sp_relation_table" type="text" value="{{r.table}}"/></td>
         <td class='sp_relation_lbl'>{{_('Alias')}}</td>

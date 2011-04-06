@@ -8,7 +8,7 @@
     <!-- list of filters -->
     <table id="filter_list">
     {% for f in view.filters %}
-    <tr class="filter_item">
+    <tr class="filter_item" pos="{{loop.index0}}">
         <td class='sp_filter_lbl'>{{_('Definition')}}</td>
         <td><input class="sp_filter_definition" type="text" value="{{f}}"/></td>
         <td><input class="btn_remove_filter" type="button" value="{{_('Remove filter')}}"/></td>
