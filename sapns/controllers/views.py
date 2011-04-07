@@ -76,11 +76,9 @@ class ViewsController(BaseController):
         
         return dict(page='views/edit', view=view)
     
-    @expose('json')
-    @validate(validators={'title': validators.NotEmpty(), 'code': validators.NotEmpty()}, 
-              error_handler=error_handler)
+    @expose() #'json')
+#    @validate(validators={'title': validators.NotEmpty(), 'code': validators.NotEmpty()}, 
+#              error_handler=error_handler)
     def save(self, **kw):
-        
-        id = validators.Int().to_python(kw['id'])
-        
+        #id = validators.Int().to_python(kw['id'])
         redirect(url('/views/edit'))
