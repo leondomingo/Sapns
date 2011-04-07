@@ -40,11 +40,6 @@
 .sp_view_label {
 	width: 80px;
 	padding-left: 5px;
-	/*color: gray;*/
-}
-
-.sp_view_label_must {
-	font-weight: bold;
 }
 
 .sp_view_label_table {
@@ -73,10 +68,6 @@
     width: 90px;
 }
 
-.sp_relation_lbl {
-	color: gray;
-}
-
 .sp_relation_condition {
 	width: 300px;
 }
@@ -91,19 +82,17 @@
 
 /* filter */
 .sp_filter_lbl {
-    color: gray;
     width: 80px;
     padding-left: 5px;
 }
 
 .sp_filter_definition {
 	width: 625px;
-	height: 50px;
+	height: 40px;
 }
 
 /* order */
 .sp_order_lbl {
-	color: gray;
 	width: 80px;
 	padding-left: 5px;
 }

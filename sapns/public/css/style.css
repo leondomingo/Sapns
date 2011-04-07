@@ -404,3 +404,16 @@ clear:both;
     background-color: red;
     color: white;
 }
+
+.sp_text_field {
+	font-family: sans-serif;
+}
+
+.sp_label_field {
+	color: gray;
+	font-family: sans-serif;
+}
+
+.sp_label_field_must {
+	font-weight: bold;
+}

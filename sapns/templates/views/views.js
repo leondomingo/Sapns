@@ -1,3 +1,4 @@
+{% import 'views/order_item.html' as oi %}
 $(document).ready(function() {
 	
 	$('#btn_add_column').click(function() {
@@ -13,11 +14,11 @@ $(document).ready(function() {
 		var new_column = 
 			'<tr class="column_item" pos="' + last_pos + '">\n' +
 			'<td class="">{{_('Title')}}</td>\n' +
-			'<td><input class="sp_column_title" type="text"/></td>\n' +
+			'<td><input class="sp_text_field sp_column_title" type="text"/></td>\n' +
 			'<td class="">{{_('Definition')}}</td>\n' +
-			'<td><input class="sp_column_definition" type="text"/></td>\n' +
+			'<td><input class="sp_text_field sp_column_definition" type="text"/></td>\n' +
 			'<td class="">{{_('Alias')}}</td>\n' +
-			'<td><input class="sp_column_alias" type="text"/></td>\n' +
+			'<td><input class="sp_text_field sp_column_alias" type="text"/></td>\n' +
 			'<td class="">{{_('Align')}}</td>\n' +
 			'<td><select class="sp_column_align">' +
 			'<option value="center">{{_('center')}}</option>\n' +
@@ -55,26 +56,14 @@ $(document).ready(function() {
 		var new_relation = 
 			'<tr class="relation_item" pos="' + last_pos + '">\n' +
 			"<td class='sp_relation_lbl'>{{_('Table')}}</td>\n" +
-			'<td>\n' +
-			'<input class="sp_relation_table" type="text"/>\n' +
-			'</td>\n' +
+			'<td><input class="sp_text_field sp_relation_table" type="text"/></td>\n' +
 			"<td class='sp_relation_lbl'>{{_('Alias')}}</td>\n" +
-			'<td>\n' +
-			'<input class="sp_relation_alias" type="text"/>\n' +
-			'</td>\n' +
+			'<td><input class="sp_text_field sp_relation_alias" type="text"/></td>\n' +
 			"<td class='sp_relation_lbl'>{{_('Condition')}}</td>\n" +
-			'<td>\n' +
-			'<input class="sp_relation_condition" type="text"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_remove_relation" type="button" value="{{_('Remove relation')}}"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_up_relation" type="button" value="{{_('Up')}}"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_down_relation" type="button" value="{{_('Down')}}"/>\n' +
-			'</td>\n' +
+			'<td><input class="sp_text_field sp_relation_condition" type="text"/></td>\n' +
+			'<td><input class="btn_remove_relation" type="button" value="{{_('Remove relation')}}"/></td>\n' +
+			'<td><input class="btn_up_relation" type="button" value="{{_('Up')}}"/></td>\n' +
+			'<td><input class="btn_down_relation" type="button" value="{{_('Down')}}"/></td>\n' +
 			'</tr>\n'
 		
 		$('#relation_list').append(new_relation);
@@ -103,16 +92,10 @@ $(document).ready(function() {
 			'<tr class="filter_item" pos="' + last_pos + '">\n' +
 			"<td class='sp_filter_lbl'>{{_('Definition')}}</td>\n" +
 			//'<td><input class="sp_filter_definition" type="text"/></td>\n' +
-			'<td><textarea class="sp_filter_definition">{{f}}</textarea></td>\n' +
-			'<td>\n' + 
-			'<input class="btn_remove_filter" type="button" value="{{_('Remove filter')}}"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_up_filter" type="button" value="{{_('Up')}}"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_down_filter" type="button" value="{{_('Down')}}"/>\n' +
-			'</td>\n' +
+			'<td><textarea class="sp_text_field sp_filter_definition">{{f}}</textarea></td>\n' +
+			'<td><input class="btn_remove_filter" type="button" value="{{_('Remove filter')}}"/></td>\n' +
+			'<td><input class="btn_up_filter" type="button" value="{{_('Up')}}"/></td>\n' +
+			'<td><input class="btn_down_filter" type="button" value="{{_('Down')}}"/></td>\n' +
 			'</tr>\n'
 		
 		$('#filter_list').append(new_filter);
@@ -194,19 +177,12 @@ $(document).ready(function() {
 		
 		var new_order = 
 			'<tr class="order_item" pos="' + last_pos + '">\n' +
-			"<td class='sp_order_lbl'>{{_('Definition')}}</td>\n" +
-			'<td>\n' +
-			'<input class="sp_order_definition" type="text"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_remove_order" type="button" value="{{_('Remove order')}}"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_up_order" type="button" value="{{_('Up')}}"/>\n' +
-			'</td>\n' +
-			'<td>\n' + 
-			'<input class="btn_down_order" type="button" value="{{_('Down')}}"/>\n' +
-			'</td>\n' +
+			'{% include 'views/order_item.html'%}\n';
+//			"<td class='sp_order_lbl'>{{_('Definition')}}</td>\n" +
+//			'<td><input class="sp_text_field sp_order_definition" type="text"/></td>\n' +
+//			'<td><input class="btn_remove_order" type="button" value="{{_('Remove order')}}"/></td>\n' +
+//			'<td><input class="btn_up_order" type="button" value="{{_('Up')}}"/></td>\n' +
+//			'<td><input class="btn_down_order" type="button" value="{{_('Down')}}"/></td>\n' +
 			'</tr>\n'
 		
 		$('#order_list').append(new_order);

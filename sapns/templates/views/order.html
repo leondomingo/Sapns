@@ -8,13 +8,9 @@
     <!-- list of orders -->
     <table id="order_list">
     {% for o in view.order %}
-    <tr class="order_item" pos={{loop.index0}}>
-        <td class='sp_order_lbl'>{{_('Definition')}}</td>
-        <td><input class="sp_order_definition" type="text" value="{{o}}"/></td>
-        <td><input class="btn_remove_order" type="button" value="{{_('Remove order')}}"/></td>
-        <td><input class="btn_up_order" type="button" value="{{_('Up')}}"/></td>
-        <td><input class="btn_down_order" type="button" value="{{_('Down')}}"/></td>
-    </tr>
+        <tr class="order_item" pos="{{pos}}">
+        {% include 'views/order_item.html' %}
+        </tr>
     {% endfor %}
     </table>
 </div>

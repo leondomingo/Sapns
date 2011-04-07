@@ -135,7 +135,7 @@ msgstr "dcha"
 
 #: sapns/templates/views/columns.html:26
 msgid "Remove column"
-msgstr "Borrar columna"
+msgstr "Quitar columna"
 
 #: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
 #: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
@@ -153,11 +153,11 @@ msgstr "Filtros"
 
 #: sapns/templates/views/filters.html:5
 msgid "Add filter"
-msgstr "Añadir filtros"
+msgstr "Añadir filtro"
 
 #: sapns/templates/views/filters.html:14
 msgid "Remove filter"
-msgstr "Borrar filtro"
+msgstr "Quitar filtro"
 
 #: sapns/templates/views/header.html:2
 msgid "View"
@@ -190,7 +190,7 @@ msgstr "Añadir orden"
 
 #: sapns/templates/views/order.html:14
 msgid "Remove order"
-msgstr "Borrar orden"
+msgstr "Quitar orden"
 
 #: sapns/templates/views/relations.html:2
 msgid "Relations"
@@ -206,7 +206,7 @@ msgstr "Condición"
 
 #: sapns/templates/views/relations.html:18
 msgid "Remove relation"
-msgstr "Borrar relación"
+msgstr "Quitar relación"
 
 #: sapns/templates/views/views.js:345
 msgid "Please, check the information you have entered"
