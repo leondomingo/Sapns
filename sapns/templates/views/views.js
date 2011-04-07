@@ -126,6 +126,61 @@ $(document).ready(function() {
 	$('.btn_remove_filter').click(function() {
 		$(this).parent().parent().remove();
 	});
+	
+	function remove_order() {
+		$(this).parent().parent().remove();
+	}
+	
+	function apply_new_order() {
+		var new_order = [];
+		$('.order_item').each(function(){
+			var pos = $(this).attr('pos')*1;
+			new_order[pos] = $(this);
+			$(this).remove();
+		});
+		
+		for (var i=0; i<new_order.length; i++) {
+			$('#order_list').append(new_order[i]);
+			
+			// recover click events
+			$('.order_item:last .btn_up_order').bind('click', order_up);
+			$('.order_item:last .btn_down_order').bind('click', order_down);
+			$('.order_item:last .btn_remove_order').bind('click', remove_order);
+		}
+	}
+	
+	function order_up() {
+		var pos = $(this).parent().parent().attr('pos');
+		pos = pos*1;
+		
+		var prev_pos = pos - 1;
+		
+		if (pos > 0) {
+			// get the previous item in the list
+			var prev_item = $('.order_item:eq(' + prev_pos + ')');
+			prev_item.attr('pos', pos);
+			$(this).parent().parent().attr('pos', prev_pos);
+			
+			apply_new_order();
+		}
+	}
+	
+	function order_down() {
+		var pos = $(this).parent().parent().attr('pos');
+		pos = pos*1;
+		
+		var next_pos = pos + 1;
+		
+		var max = $('.order_item:last').attr('pos')*1;
+		if (pos < max) {
+			// get the next item in the list
+			var next_item = $('.order_item:eq(' + next_pos + ')');
+			next_item.attr('pos', pos);
+			$(this).parent().parent().attr('pos', next_pos);
+			
+			apply_new_order();
+		}
+	}
 
 	$('#btn_add_order').click(function() {
 		
@@ -155,30 +210,17 @@ $(document).ready(function() {
 			'</tr>\n'
 		
 		$('#order_list').append(new_order);
-		$('#order_list .order_item:last .btn_remove_order').click(function() {
-			$(this).parent().parent().remove();
-		});
+		
+		$('#order_list .order_item:last .btn_remove_order').click(remove_order);
+		$('#order_list:last .btn_up_order').click(order_up);
+		$('#order_list:last .btn_down_order').bind('click', order_down);
 		
 		$('#order_list .order_item:last .sp_order_definition').focus();
 	});
 	
-	$('.btn_remove_order').click(function() {
-		$(this).parent().parent().remove();
-	});
-	
-	
-	$('.btn_up_order').click(function(){
-		var pos = $(this).parent().parent().attr('pos');
-		pos = pos*1;
-		
-		var prev_pos = pos - 1;
-		
-		if (pos > 0) {
-			// get the previous item in the list
-			var prev_item = $('.order_item:eq(' + prev_pos + ')');
-			prev_item.remove();
-		}
-	});
+	$('.btn_remove_order').click(remove_order);
+	$('.btn_up_order').click(order_up);
+	$('.btn_down_order').click(order_down);
 	
 	// "Save view" button
 	$('#btn_save_view').click(function() {
@@ -341,7 +383,7 @@ $(document).ready(function() {
 		}
 		else {
 			// Warning!
-			alert('{{_('Please, check the information you have entered')}}')
+			alert('{{_('Please, check the information you have entered')}}');
 		}
 	});
 });
