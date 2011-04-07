@@ -102,9 +102,8 @@ $(document).ready(function() {
 		var new_filter = 
 			'<tr class="filter_item" pos="' + last_pos + '">\n' +
 			"<td class='sp_filter_lbl'>{{_('Definition')}}</td>\n" +
-			'<td>\n' +
-			'<input class="sp_filter_definition" type="text"/>\n' +
-			'</td>\n' +
+			//'<td><input class="sp_filter_definition" type="text"/></td>\n' +
+			'<td><textarea class="sp_filter_definition">{{f}}</textarea></td>\n' +
 			'<td>\n' + 
 			'<input class="btn_remove_filter" type="button" value="{{_('Remove filter')}}"/>\n' +
 			'</td>\n' +
