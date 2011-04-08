@@ -9,11 +9,11 @@
     <table id="relation_list">
     {% for r in view.relations[1:] %}
         <tr class="relation_item" pos="{{loop.index0}}">
-        <td class='sp_label_field'>{{_('Table')}}</td>
+        <td class="sp_label_field">{{_('Table')}}</td>
         <td><input class="sp_text_field sp_relation_table" type="text" value="{{r.table}}"/></td>
-        <td class='sp_label_field'>{{_('Alias')}}</td>
+        <td class="sp_label_field">{{_('Alias')}}</td>
         <td><input class="sp_text_field sp_relation_alias" type="text" value="{{r.alias}}"/></td>
-        <td class='sp_label_field'>{{_('Condition')}}</td>
+        <td class="sp_label_field">{{_('Condition')}}</td>
         <td><input class="sp_text_field sp_relation_condition" type="text" value="{{r.condition}}"/></td>
         <td><input class="btn_remove_relation" type="button" value="{{_('Remove relation')}}"/></td>
         <td><input class="btn_up_relation" type="button" value="{{_('Up')}}"/></td>

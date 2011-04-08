@@ -407,6 +407,7 @@ clear:both;
 
 .sp_text_field {
 	font-family: sans-serif;
+	border: 1px solid #C68D11;
 }
 
 .sp_label_field {

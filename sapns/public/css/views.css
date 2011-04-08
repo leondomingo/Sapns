@@ -30,7 +30,7 @@
 }
 
 .sp_view_filters {
-    height: 180px;
+    height: 200px;
 }
 
 .sp_view_orders {
@@ -88,7 +88,10 @@
 
 .sp_filter_definition {
 	width: 625px;
+	max-width: 625px;
+	min-width: 625px;
 	height: 40px;
+	min-height: 40px;
 }
 
 /* order */

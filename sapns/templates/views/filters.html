@@ -9,7 +9,7 @@
     <table id="filter_list">
     {% for f in view.filters %}
     <tr class="filter_item" pos="{{loop.index0}}">
-        <td class='sp_label_field sp_filter_lbl'>{{_('Definition')}}</td>
+        <td class="sp_label_field sp_filter_lbl">{{_('Definition')}}</td>
         <td><textarea class="sp_text_field sp_filter_definition">{{f|escape}}</textarea></td>
         <td><input class="btn_remove_filter" type="button" value="{{_('Remove filter')}}"/></td>
         <td><input class="btn_up_filter" type="button" value="{{_('Up')}}"/></td>
