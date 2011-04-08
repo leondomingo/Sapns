@@ -407,11 +407,18 @@ clear:both;
 
 .sp_text_field {
 	font-family: sans-serif;
-	border: 1px solid #C68D11;
+	border-top: 1px solid #605B7C;
+	border-left: 1px solid gray;
+	border-right: 1px solid gray;
+	border-bottom: 1px solid gray;
+}
+
+.sp_text_field:focus {
+	border: 1px solid orange;
 }
 
 .sp_label_field {
-	color: gray;
+	color: #605B7C;
 	font-family: sans-serif;
 }
 
