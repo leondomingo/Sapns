@@ -1,3 +1,15 @@
+// Internet Explorer lacks of "Array.indexOf" function
+if(!Array.indexOf) {
+	Array.prototype.indexOf = function(obj) {
+		for(var i=0; i<this.length; i++){
+			if(this[i] == obj) {
+				return i;
+			}
+		}
+		return -1;
+	}
+}
+
 $(document).ready(function() {
 	
 	function item_up(button, item_class, f) {
@@ -67,7 +79,19 @@ $(document).ready(function() {
 		$(this).parent().parent().remove();
 		update_order('column_item');
 	}
+
+	function column_up() {
+		item_up($(this), 'column_item', apply_new_order_column);
+	}
 	
+	function column_down() {
+		item_down($(this), 'column_item', apply_new_order_column);
+	}
+
+	function apply_new_order_column(){
+		apply_new_order0('column', column_up, column_down, remove_column);
+	}
+
 	$('#btn_add_column').click(function() {
 		
 		var last_pos = $('.column_item:last').attr('pos');
@@ -79,13 +103,14 @@ $(document).ready(function() {
 		}
 		
 		var new_column = 
-	        '<td class="sp_label_field ">{{_('Title')}}</td>\n' +
+			'<tr class="column_item" pos="' + last_pos + '">\n' +
+	        '<td class="sp_label_field">{{_('Title')}}</td>\n' +
 	        '<td><input class="sp_text_field sp_column_title" type="text"/></td>\n' +
 	        '<td class="sp_label_field ">{{_('Definition')}}</td>\n' +
 	        '<td><input class="sp_text_field sp_column_definition" type="text"/></td>\n' +
-	        '<td class="sp_label_field ">{{_('Alias')}}</td>\n' +
+	        '<td class="sp_label_field">{{_('Alias')}}</td>\n' +
 	        '<td><input class="sp_text_field sp_column_alias" type="text"/></td>\n' +
-	        '<td class="sp_label_field ">{{_('Align')}}</td>\n' +
+	        '<td class="sp_label_field">{{_('Align')}}</td>\n' +
 	        '<td>\n' +
 	        '<select class="sp_column_align">\n' +
 	            '<option value="center">{{_('center')}}</option>\n' +
@@ -98,8 +123,6 @@ $(document).ready(function() {
 	        '<td><input class="btn_down_column" type="button" value="{{_('Down')}}"/></td>\n' +
 			'</tr>\n';
 		
-		//alert(new_column);
-		
 		$('#column_list').append(new_column);
 		$('#column_list:last .btn_remove_column').click(remove_column);
 		
@@ -107,6 +130,8 @@ $(document).ready(function() {
 	});
 	
 	$('.btn_remove_column').click(remove_column);
+	$('.btn_up_column').click(column_up);
+	$('.btn_down_column').click(column_down);
 	
 	// relations
 	function remove_relation() {
@@ -304,7 +329,7 @@ $(document).ready(function() {
 			
 			// check for already-used aliases
 			var this_alias = item.alias.toLowerCase();
-			
+
 			if (this_alias != '') {
 				if (column_aliases.indexOf(this_alias) == -1) {
 					column_aliases[column_aliases.length] = this_alias;
@@ -321,14 +346,13 @@ $(document).ready(function() {
 				$(this).find('.sp_column_definition').addClass('sp_field_error');
 			}
 			
-			column_items[i] = item;			
+			column_items[i] = item;
 		});
 		
 		$('#form_view input[name=columns]').val(JSON.stringify(column_items));
 		
 		// relations
 		var relation_items = [];
-		
 		var table_aliases = [];
 		
 		$('#view_table').removeClass('sp_field_error');
