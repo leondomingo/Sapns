@@ -79,7 +79,7 @@
 </script>
 {% endmacro %}
 
-{% macro show(page, _, q, grid, show_ids) %}
+{% macro show(page, _, q, grid, show_ids, link=None) %}
 <!-- Grid -->
 <div id="{{grid.name}}">
 {% if grid.caption %}
@@ -92,6 +92,10 @@
     <input class="sp_search_txt" name="q" type="text" value="{{q}}"/>
     <input class="sp_button sp_search_btn" type="button" value="{{_('Search...')}}"/>
 </form>
+{% if link %}
+<div style="font-size: 9px;"><a href="{{link}}">[this search]</a></div>
+{% endif %}
+
 <table class="sp_grid">
     <tr>
     <td class="sp_col_title">*</td>
@@ -201,6 +205,8 @@
     </form>
     </div>
     {% endfor %}
+    
+    </div>
 </div>
 </div>
 {% endmacro %}

@@ -385,7 +385,7 @@ clear:both;
 .sp_grid_actions {
 	/*border: 1px solid gray;*/
 	clear: left;
-	background-color: #B4BD3C;
+	background-color: #CCCFA5; /*#B4BD3C;*/
 	height: 25px;
 }
 
