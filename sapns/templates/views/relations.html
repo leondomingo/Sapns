@@ -2,7 +2,7 @@
     <div class="sp_view_caption">{{_('Relations')}}</div>
     <table>
         <tr>
-            <td><input id="btn_add_relation" type="button" value="{{_('Add relation')}}"/></td>
+            <td><input id="btn_add_relation" class="sp_button" type="button" value="{{_('Add relation')}}"/></td>
         </tr>
     </table>
     <!-- list of relations -->
@@ -15,9 +15,9 @@
         <td><input class="sp_text_field sp_relation_alias" type="text" value="{{r.alias}}"/></td>
         <td class="sp_label_field">{{_('Condition')}}</td>
         <td><input class="sp_text_field sp_relation_condition" type="text" value="{{r.condition}}"/></td>
-        <td><input class="btn_remove_relation" type="button" value="{{_('Remove relation')}}"/></td>
-        <td><input class="btn_up_relation" type="button" value="{{_('Up')}}"/></td>
-        <td><input class="btn_down_relation" type="button" value="{{_('Down')}}"/></td>
+        <td><input class="sp_button btn_remove_relation" type="button" value="{{_('Remove relation')}}"/></td>
+        <td><input class="sp_button btn_up_relation" type="button" value="{{_('Up')}}"/></td>
+        <td><input class="sp_button btn_down_relation" type="button" value="{{_('Down')}}"/></td>
         </tr>
     {% endfor %}
     </table>

@@ -31,6 +31,8 @@
     
     <!-- Clientes -->
     {{util.list('/list', _('Clients'), 'vista_busqueda_clientes')}}
+    
+    <a href="{{tg.url('/views/edit')}}">{{_('View editor')}}</a>
 {% endblock %}
 
 <!-- Uncomment the next section and override the "footer" block if you want to -->

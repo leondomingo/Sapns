@@ -2,7 +2,7 @@
     <div class="sp_view_caption">{{_('Columns')}}</div>
     <table>
         <tr>
-            <td><input id="btn_add_column" type="button" value="{{_('Add column')}}"/></td>
+            <td><input id="btn_add_column" class="sp_button" type="button" value="{{_('Add column')}}"/></td>
         </tr>
     </table>
     <!-- list of columns -->
@@ -17,15 +17,15 @@
         <td><input class="sp_text_field sp_column_alias" type="text" value="{{col.alias}}"/></td>
         <td class="sp_label_field ">{{_('Align')}}</td>
         <td>
-        <select class="sp_column_align">
+        <select class="sp_button sp_column_align">
             <option value="center" {% if col.align == 'center' %}selected="selected"{% endif %}>{{_('center')}}</option>
             <option value="left"   {% if col.align == 'left'   %}selected="selected"{% endif %}>{{_('left')}}</option>
             <option value="right"  {% if col.align == 'right'  %}selected="selected"{% endif %}>{{_('right')}}</option>
         </select>
         </td>         
-        <td><input class="btn_remove_column" type="button" value="{{_('Remove column')}}"/></td>
-        <td><input class="btn_up_column" type="button" value="{{_('Up')}}"/></td>
-        <td><input class="btn_down_column" type="button" value="{{_('Down')}}"/></td>
+        <td><input class="sp_button btn_remove_column" type="button" value="{{_('Remove column')}}"/></td>
+        <td><input class="sp_button btn_up_column" type="button" value="{{_('Up')}}"/></td>
+        <td><input class="sp_button btn_down_column" type="button" value="{{_('Down')}}"/></td>
         </tr>
         {% endfor %}
     </table>

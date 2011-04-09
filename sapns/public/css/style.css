@@ -1,5 +1,5 @@
 html {
-	background: #555555 url('../images/pagebg.png') top left repeat-x;
+	background: #CCCFA5;
 	text-align: center;
 	margin: 0;
 	padding: 0;
@@ -15,7 +15,7 @@ body {
 }
 
 a {
-	color: white; /*#286571;*/
+	color: #848937; /*#286571;*/
 	font-weight: bold;
 	text-decoration: none;
 }
@@ -247,7 +247,7 @@ clear:both;
 }
 
 .sp_header {
-	background-color: gray;
+	background-color: #B4BD3C;
 	color: white;
 	height: 100px;
 	margin-top: 20px;
@@ -263,7 +263,7 @@ clear:both;
 }
 
 .sp_footer {
-	background-color: gray;
+	background-color: #B4BD3C;
 	color: white;
 	height: 80px;
 	text-align: right;
@@ -279,13 +279,20 @@ clear:both;
 .sp_app_subtitle {
 	font-size: 12px;
 	text-align: left;
-	color: #EFE76E;
+	color: #723532; /*#EFE76E;*/
 	margin-left: 10px;
+}
+
+.sp_button {
+    font-size: 11px;
+    text-align: center;
+    margin: 2px;
+    /*color: #723532;*/
 }
 
 .sp_grid {
 	margin-top: 10px;
-	background-color: gray;
+	background-color: #B5AFAF;
 }
 
 .sp_grid_caption {
@@ -303,14 +310,13 @@ clear:both;
 }
 
 .sp_search_btn {
-	border: 1px solid gray;
 	float: none;
-	color: #6B5C0A;
+	width: 80px;
 }
 
 .sp_col_title {
-	color: #EDA94B;
-	background-color: gray;
+	color: #F9F9F9;
+	background-color: #B4BD3C;
 	font-weight: bold;
 	text-align: center;
 	font-family: arial;
@@ -349,7 +355,7 @@ clear:both;
 }
 
 .sp_grid_pager_desc {
-	color: white;
+	color: #F9F9F9;
 	font-family: arial;
 	/*background-color: gray;*/
 	width: 350px;
@@ -358,6 +364,7 @@ clear:both;
 	height: 30px;
 	vertical-align: center;
 	margin-top: 5px;
+	height: 25px;
 }
 
 .sp_grid_current_page {
@@ -376,28 +383,26 @@ clear:both;
 }
 
 .sp_grid_actions {
-	border: 1px solid gray;
+	/*border: 1px solid gray;*/
+	clear: left;
+	background-color: #B4BD3C;
+	height: 25px;
 }
 
 .sp_grid_actions_title {
-	border: 1px dotted white;
-	width: 60px;
+	/*border: 1px dotted white;*/
+	width: 100px;
 	text-align: center;
+	float: left;
+	clear: left;
+	margin-top: 4px;
+	color: #F9F9F9;
+	font-size: 10px;
 }
 
 .sp_grid_action {
-	font-size: 11px;
-    float: left;
-    width: 60px;
-    text-align: center;
-    border: 1px solid gray;
+	min-width: 80px;
     margin: 2px;
-    color: #6B5C0A;
-}
-
-.sp_grid_action:hover {
-	background-color: white;
-	color: gray;
 }
 
 .sp_field_error {
