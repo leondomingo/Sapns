@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+    {#{{tables}}#}
+    {% for table in tables %}
+    <div style="margin-top: 5px; border: 1px solid gray;">
+        <div style="font-weight: bold; background-color: gray; color: white; padding-left: 10px;">{{table.name}}</div>
+        {% for col in table.columns %}
+        <div style="width: 300px; float: left;">{{col.name}}</div>
+        <div style="float: left; width: 300px;">{{col.type_name}}</div>
+        {% if col.fk_table != None %}
+        <div>{{col.fk_table}}</div>
+        {% else %}
+        <div>-</div>
+        {% endif %}
+        {% endfor %}
+    </div>
+    {% endfor %}
+{% endblock %}

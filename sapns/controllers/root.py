@@ -19,6 +19,7 @@ from neptuno.postgres.search import search
 from sapns.controllers.error import ErrorController
 from sapns.controllers.views import ViewsController
 from tg.controllers.util import urlencode
+from sapns.controllers.util import UtilController
 #from pylons.templating import render_jinja2
 
 #import logging
@@ -48,6 +49,8 @@ class RootController(BaseController):
     error = ErrorController()
     
     views = ViewsController()
+    
+    util = UtilController()
 
     @expose('index.html')
     def index(self):
@@ -185,7 +188,7 @@ class RootController(BaseController):
     def setlang(self, lang='en', came_from='/'):
         set_lang(lang)
         redirect(came_from)
-    
+        
     def data(self, cls='', id=None):
         pass
     
