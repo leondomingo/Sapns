@@ -12,7 +12,13 @@ from sqlalchemy.orm import relation, synonym
 
 from sapns.model import DeclarativeBase, metadata, DBSession
 
-class Shortcuts(DeclarativeBase):
+__all__ = ['SapnsShortcuts', 'SapnsClass', 'SapnsAttribute', 'SapnsAction',
+           'SapnsView', 'SapnsViewAttribute', 'SapnsViewRelation',
+           'SapnsViewFilter', 'SapnsViewOrder', 'SapnsReport',
+           'SapnsReportParam',
+           ]
+
+class SapnsShortcuts(DeclarativeBase):
     """
     Shortcuts sapns base table
     """
@@ -25,8 +31,8 @@ class Shortcuts(DeclarativeBase):
     order = Column(Integer)
     parent_id = Column(Integer)
     
-    user = Column('user_id', Integer, ForeignKey('sp_users.id'), nullable=False)
-    action = Column('action_id', Integer, ForeignKey('sp_actions.id'), nullable=False)
+    user = Column('id_user', Integer, ForeignKey('sp_users.id'), nullable=False)
+    action = Column('id_action', Integer, ForeignKey('sp_actions.id'), nullable=False)
     
     def __repr__(self):
         return ('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
@@ -60,7 +66,7 @@ class SapnsAttribute(DeclarativeBase):
     name = Column(Unicode(30), nullable=False)
     title = Column(Unicode(100), nullable=False)
     
-    sapnsclass = Column('class_id', Integer, ForeignKey('sp_classes.id'), nullable=False)
+    sapnsclass = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
@@ -74,7 +80,7 @@ class SapnsAction(DeclarativeBase):
     __tablename__ = 'sp_actions'
     
     action_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    
+
     name = Column(Unicode(100), nullable=False)
     url = Column(Unicode(200), nullable=False)
     type = Column(Unicode(80), nullable=False)
@@ -91,7 +97,7 @@ class SapnsView(DeclarativeBase):
     
     title = Column(Unicode(200), nullable=False)
 
-class SanpsViewAttribute(DeclarativeBase):
+class SapnsViewAttribute(DeclarativeBase):
     
     """
     View columns in Sapns
@@ -110,7 +116,7 @@ class SanpsViewAttribute(DeclarativeBase):
     text_align = Column(Unicode(10))
     width = Column(Integer)
     
-    view = Column('view_id', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
     
 class SapnsViewRelation(DeclarativeBase):
     
@@ -120,12 +126,12 @@ class SapnsViewRelation(DeclarativeBase):
     
     __tablename__ = 'sp_view_relations'
     
-    relation_id = Column('id', autoincrement=True, primary_key=True)
+    relation_id = Column('id', Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     alias = Column(Unicode(100), nullable=False)
     condition = Column(String)
     
-    view = Column('view_id', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
     
 class SapnsViewFilter(DeclarativeBase):
     
@@ -135,11 +141,12 @@ class SapnsViewFilter(DeclarativeBase):
     
     __tablename__ = 'sp_view_filters'
 
-    filter_id = Column('id', autoincrement=True, primary_key=True)
+    filter_id = Column('id', Integer, autoincrement=True, primary_key=True)
+    
     definition = Column(String)
     active = Column(Boolean)
 
-    view = Column('view_id', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
 
 class SapnsViewOrder(DeclarativeBase):
     
@@ -149,11 +156,11 @@ class SapnsViewOrder(DeclarativeBase):
     
     __tablename__ = 'sp_view_order'
     
-    order_id = Column('id', autoincrement=True, primary_key=True)
+    order_id = Column('id', Integer, autoincrement=True, primary_key=True)
     definition = Column(String)
     sort_order = Column(Integer)
 
-    view = Column('view_id', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
     
 class SapnsReport(DeclarativeBase):
     
@@ -161,9 +168,9 @@ class SapnsReport(DeclarativeBase):
     Sapns reports (probably in JasperReports, for starters
     """
     
-    __tablename = 'sp_reports'
+    __tablename__ = 'sp_reports'
     
-    report_id = Column('id', autoincrement=True, primary_key=True)
+    report_id = Column('id', Integer, autoincrement=True, primary_key=True)
     
     code = Column(Unicode(50), nullable=False, unique=True)
     name = Column(Unicode(200), nullable=False, unique=True)
@@ -178,15 +185,15 @@ class SapnsReportParam(DeclarativeBase):
     
     __tablename__ = 'sp_report_parameters' 
     
-    param_id = Column('id', autoincrement=True, primary_key=True)
+    reportparam_id = Column('id', Integer, autoincrement=True, primary_key=True)
     
     name = Column(Unicode(200), nullable=False)
     
-    sapnsclass = Column('class_id', Integer, ForeignKey=('sp_class.id'), nullable=False)
+    sapnsclass = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
     default_value = Column(Unicode(200))
     
     sort_order = Column(Integer)
     expression = Column(String)
     
-    report = Column('report_id', Integer, ForeignKey=('sp_report.id'), nullable=False)
+    report = Column('id_report', Integer, ForeignKey('sp_reports.id'), nullable=False)

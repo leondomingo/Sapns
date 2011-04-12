@@ -60,3 +60,6 @@ def init_model(engine):
 
 # Import your model modules here.
 from sapns.model.auth import User, Group, Permission
+from sapns.model.sapnsmodel import * 
+# TODO: Your app model
+#from sapns.model.yourappmodel import *

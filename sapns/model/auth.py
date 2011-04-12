@@ -33,19 +33,19 @@ __all__ = ['User', 'Group', 'Permission']
 
 # This is the association table for the many-to-many relationship between
 # groups and permissions. This is required by repoze.what.
-group_permission_table = Table('tg_group_permission', metadata,
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+group_permission_table = Table('sp_role_permission', metadata,
+    Column('id_role', Integer, ForeignKey('sp_roles.id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('permission_id', Integer, ForeignKey('tg_permission.permission_id',
+    Column('id_permission', Integer, ForeignKey('sp_permission.id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
 # This is the association table for the many-to-many relationship between
 # groups and members - this is, the memberships. It's required by repoze.what.
-user_group_table = Table('tg_user_group', metadata,
-    Column('user_id', Integer, ForeignKey('tg_user.user_id',
+user_group_table = Table('sp_user_role', metadata,
+    Column('id_user', Integer, ForeignKey('sp_users.id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True),
-    Column('group_id', Integer, ForeignKey('tg_group.group_id',
+    Column('id_role', Integer, ForeignKey('sp_roles.id',
         onupdate="CASCADE", ondelete="CASCADE"), primary_key=True)
 )
 
@@ -61,15 +61,15 @@ class Group(DeclarativeBase):
 
     """
 
-    __tablename__ = 'tg_group'
+    __tablename__ = 'sp_roles'
 
     #{ Columns
 
-    group_id = Column(Integer, autoincrement=True, primary_key=True)
+    group_id = Column('id', Integer, autoincrement=True, primary_key=True)
 
-    group_name = Column(Unicode(16), unique=True, nullable=False)
+    group_name = Column('name', Unicode(16), unique=True, nullable=False)
 
-    display_name = Column(Unicode(255))
+    display_name = Column('description', Unicode(255))
 
     created = Column(DateTime, default=datetime.now)
 
@@ -80,7 +80,7 @@ class Group(DeclarativeBase):
     #{ Special methods
 
     def __repr__(self):
-        return ('<Group: name=%s>' % self.group_name).encode('utf-8')
+        return ('<Role: name=%s>' % self.group_name).encode('utf-8')
 
     def __unicode__(self):
         return self.group_name
@@ -99,11 +99,11 @@ class User(DeclarativeBase):
     least the ``user_name`` column.
 
     """
-    __tablename__ = 'tg_user'
+    __tablename__ = 'sp_users'
 
     #{ Columns
 
-    user_id = Column(Integer, autoincrement=True, primary_key=True)
+    user_id = Column('id', Integer, autoincrement=True, primary_key=True)
 
     user_name = Column(Unicode(16), unique=True, nullable=False)
 
@@ -198,15 +198,15 @@ class Permission(DeclarativeBase):
 
     """
 
-    __tablename__ = 'tg_permission'
+    __tablename__ = 'sp_permission'
 
     #{ Columns
 
-    permission_id = Column(Integer, autoincrement=True, primary_key=True)
+    permission_id = Column('id', Integer, autoincrement=True, primary_key=True)
 
-    permission_name = Column(Unicode(63), unique=True, nullable=False)
+    permission_name = Column('name', Unicode(63), unique=True, nullable=False)
 
-    description = Column(Unicode(255))
+    description = Column('description', Unicode(255))
 
     #{ Relations
 
