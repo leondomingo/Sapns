@@ -3,7 +3,7 @@
 
 # turbogears imports
 import simplejson as sj
-from tg import expose, validate, redirect, url
+from tg import expose, redirect, url #, validate
 
 # third party imports
 #from pylons.i18n import ugettext as _
@@ -11,8 +11,8 @@ from tg import expose, validate, redirect, url
 
 # project specific imports
 from sapns.lib.base import BaseController
-from formencode import schema, validators
-from pylons import tmpl_context
+from formencode import schema #, validators
+#from pylons import tmpl_context
 #from sapns.model import DBSession, metadata
 
 class ViewSchema(schema.Schema):
@@ -23,7 +23,7 @@ class ViewsController(BaseController):
     #allow_only = authorize.not_anonymous()
     
     @expose('views/view.html')
-    def edit(self, id=None):
+    def edit(self, id=None, came_from='/'):
         
         # TODO: cargar datos de la vista con ese "id"
         #id = validators.Int().to_python(id)
@@ -61,7 +61,7 @@ class ViewsController(BaseController):
                     filters=filters,
                     order=order)
                 
-        return dict(page='views/edit', view=view)
+        return dict(page='views/edit', came_from=came_from, view=view)
 
     @expose('views/view.html')
     def error_handler(self, **kw):

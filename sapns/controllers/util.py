@@ -2,7 +2,7 @@
 """Views management controller"""
 
 # turbogears imports
-from tg import expose
+from tg import expose, url
 
 # third party imports
 #from pylons.i18n import ugettext as _
@@ -23,6 +23,10 @@ class UtilController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
     
+    @expose('util/index.html')
+    def index(self, came_from='/'):
+        return dict(page='util', came_from=came_from)
+    
     @expose('util/tables.html')
     def extract_model(self):
         
@@ -32,7 +36,9 @@ class UtilController(BaseController):
         logger.info(meta.bind)
         
         tables = []
-        for tbl in meta.sorted_tables:
+        for tbl in sorted(meta.sorted_tables, 
+                          # table name alphabetical order
+                          cmp=lambda x,y: cmp(x.name, y.name)):
             
             if not tbl.name.startswith('sp_'):
                 
@@ -104,4 +110,5 @@ class UtilController(BaseController):
                     
                 tables.append(t)
                 
-        return dict(page='extract_model', tables=tables)
+        return dict(page='extract_model', came_from=url('/util'), 
+                    tables=tables)

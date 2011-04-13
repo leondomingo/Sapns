@@ -1,15 +1,55 @@
 {% extends 'base.html' %}
 
 {% block middle %}
+  <style type="text/css">
+      .table_name {
+          font-weight: bold; 
+          background-color: #B4BD3C;
+          color: white; 
+          padding-left: 10px;        
+      }
+      
+      .col_title {
+          background-color: gray;
+          color: white;
+          text-align: center;
+          font-style: italic;
+      }
+      
+      .col_name {
+        width: 300px;
+        float: left;
+      }
+      
+      .col_type {
+        width: 300px;
+        float: left;
+      }
+      
+      .col_ref {
+      }
+  </style>
+
     {#{{tables}}#}
     {% for table in tables %}
     <div style="margin-top: 5px; border: 1px solid gray;">
-        <div style="font-weight: bold; background-color: gray; color: white; padding-left: 10px;">{{table.name}}</div>
+        <div class="table_name">{{table.name}}</div>
+        <div class="col_title col_name">Name</div>
+        <div class="col_title col_type">Type</div>
+        <div class="col_title">References</div>
         {% for col in table.columns %}
-        <div style="width: 300px; float: left;">{{col.name}}</div>
-        <div style="float: left; width: 300px;">{{col.type_name}}</div>
+        <div class="col_name">{{col.name}}</div>
+        <div class="col_type" style="color: 
+            {%- if col.type_name == 'integer' %}red
+            {%- elif col.type_name == 'numeric' %}maroon
+            {%- elif col.type_name == 'date' %}brown
+            {%- elif col.type_name == 'time' %}orange
+            {%- elif col.type_name == 'string' %}green
+            {%- elif col.type_name == 'text' %}olive
+            {%- elif col.type_name == 'boolean' -%}blue          
+            {%- else %}navy{%- endif %};">{{col.type_name}}</div>
         {% if col.fk_table != None %}
-        <div>{{col.fk_table}}</div>
+        <div class="col_ref">{{col.fk_table}}</div>
         {% else %}
         <div>-</div>
         {% endif %}

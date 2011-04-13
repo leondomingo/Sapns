@@ -16,6 +16,9 @@
     
     <div class="sp_middle">
     <div><a href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
+    {% if came_from %}
+    <div><a href="{{came_from}}">{{_('return')}}</a></div>
+    {% endif %}
     {% block middle %}
     {% endblock middle %}
     </div>
