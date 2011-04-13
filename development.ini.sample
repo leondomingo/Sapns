@@ -40,6 +40,9 @@ grid.true_const = Yes
 grid.false_const = No
 
 # TODO: Application's settings here
+app.name = Sapns
+app.subtitle = Web Information System
+app.company_url = http://www.sapns.org
 
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings

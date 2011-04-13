@@ -6,7 +6,9 @@
           font-weight: bold; 
           background-color: #B4BD3C;
           color: white; 
-          padding-left: 10px;        
+          padding-left: 15px;
+          font-size: 16px;
+          height: 24px;        
       }
       
       .col_title {
@@ -14,11 +16,13 @@
           color: white;
           text-align: center;
           font-style: italic;
+          border: 1px dotted white;
       }
       
       .col_name {
         width: 300px;
         float: left;
+        padding-left: 5px;
       }
       
       .col_type {
@@ -29,31 +33,41 @@
       .col_ref {
       }
   </style>
+  
+    <div>
+        <a style="font-size: 9px;" href="{{tg.url('/util/code_model', file_name=tg.config.get('app.name', 'Sapns')+'.model.py.txt')}}">[{{_('Source of this model')}}]</a>
+    </div>
 
     {#{{tables}}#}
     {% for table in tables %}
-    <div style="margin-top: 5px; border: 1px solid gray;">
-        <div class="table_name">{{table.name}}</div>
-        <div class="col_title col_name">Name</div>
-        <div class="col_title col_type">Type</div>
-        <div class="col_title">References</div>
+    <div style="margin-top: 15px; border: 1px solid gray;">
+        <div class="table_name">{{table.name}} ({{table.class_name}})</div>
+        <div class="col_title col_name">{{_('Name')}}</div>
+        <div class="col_title col_type">{{_('Type')}}</div>
+        <div class="col_title">{{_('Primary key/References')}}</div>
         {% for col in table.columns %}
         <div class="col_name">{{col.name}}</div>
         <div class="col_type" style="color: 
-            {%- if col.type_name == 'integer' %}red
-            {%- elif col.type_name == 'numeric' %}maroon
-            {%- elif col.type_name == 'date' %}brown
-            {%- elif col.type_name == 'time' %}orange
-            {%- elif col.type_name == 'string' %}green
-            {%- elif col.type_name == 'text' %}olive
-            {%- elif col.type_name == 'boolean' -%}blue          
+            {%- if col.type_name == 'Integer' %}red
+            {%- elif col.type_name == 'Numeric' %}maroon
+            {%- elif col.type_name == 'Date' %}brown
+            {%- elif col.type_name == 'Time' %}orange
+            {%- elif col.type_name == 'Unicode' %}green
+            {%- elif col.type_name == 'String' %}olive
+            {%- elif col.type_name == 'Boolean' -%}blue          
             {%- else %}navy{%- endif %};">{{col.type_name}}</div>
         {% if col.fk_table != None %}
-        <div class="col_ref">{{col.fk_table}}</div>
+        <div class="col_ref">[{{col.fk_table}}]</div>
+        {% elif col.pk %}
+        <div>*</div>
         {% else %}
-        <div>-</div>
+        <div>.</div>
         {% endif %}
         {% endfor %}
     </div>
     {% endfor %}
+    
+    <div>
+        <a style="font-size: 9px;" href="{{tg.url('/util/code_model', file_name=tg.config.get('app.name', 'Sapns')+'.model.py.txt')}}">[{{_('Source of this model')}}]</a>
+    </div>
 {% endblock %}

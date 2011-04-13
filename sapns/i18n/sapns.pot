@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-06 21:16+0200\n"
+"POT-Creation-Date: 2011-04-13 20:17+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,24 +17,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:68
+#: sapns/controllers/root.py:71
 msgid "Only for managers"
 msgstr ""
 
-#: sapns/controllers/root.py:74
+#: sapns/controllers/root.py:77
 msgid "Only for the editor"
 msgstr ""
 
-#: sapns/controllers/root.py:84
+#: sapns/controllers/root.py:87
 msgid "Wrong credentials"
 msgstr ""
 
-#: sapns/controllers/root.py:99
+#: sapns/controllers/root.py:102
 #, python-format
 msgid "Welcome back, %s!"
 msgstr ""
 
-#: sapns/controllers/root.py:109
+#: sapns/controllers/root.py:112
 msgid "We hope to see you soon!"
 msgstr ""
 
@@ -50,6 +50,10 @@ msgstr ""
 msgid "You are in"
 msgstr ""
 
+#: sapns/templates/base.html:20
+msgid "return"
+msgstr ""
+
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
 msgstr ""
@@ -58,39 +62,71 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
-#: sapns/templates/grid.html:120
+#: sapns/templates/grid.html:124
 msgid "No results"
 msgstr ""
 
-#: sapns/templates/grid.html:128
+#: sapns/templates/grid.html:132
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 
-#: sapns/templates/grid.html:133
+#: sapns/templates/grid.html:137
 msgid "All"
 msgstr ""
 
-#: sapns/templates/grid.html:145
+#: sapns/templates/grid.html:149
 msgid "page 1"
 msgstr ""
 
-#: sapns/templates/grid.html:157 sapns/templates/grid.html:177
-#: sapns/templates/grid.html:192
+#: sapns/templates/grid.html:161 sapns/templates/grid.html:180
+#: sapns/templates/grid.html:194
 #, python-format
 msgid "page %(p)d"
 msgstr ""
 
-#: sapns/templates/index.html:27
+#: sapns/templates/index.html:28
 msgid "Show table/view"
 msgstr ""
 
-#: sapns/templates/index.html:30
+#: sapns/templates/index.html:33
 msgid "Students"
 msgstr ""
 
-#: sapns/templates/index.html:33
+#: sapns/templates/index.html:38
 msgid "Clients"
+msgstr ""
+
+#: sapns/templates/index.html:42
+msgid "Utilities"
+msgstr ""
+
+#: sapns/templates/util/index.html:24
+msgid "Extract model"
+msgstr ""
+
+#: sapns/templates/util/index.html:28
+msgid "Code model"
+msgstr ""
+
+#: sapns/templates/util/index.html:32
+msgid "View editor"
+msgstr ""
+
+#: sapns/templates/util/tables.html:38 sapns/templates/util/tables.html:71
+msgid "Source of this model"
+msgstr ""
+
+#: sapns/templates/util/tables.html:45
+msgid "Name"
+msgstr ""
+
+#: sapns/templates/util/tables.html:46
+msgid "Type"
+msgstr ""
+
+#: sapns/templates/util/tables.html:47
+msgid "Primary key/References"
 msgstr ""
 
 #: sapns/templates/views/columns.html:2
@@ -205,6 +241,3 @@ msgstr ""
 msgid "Remove relation"
 msgstr ""
 
-#: sapns/templates/views/views.js:345
-msgid "Please, check the information you have entered"
-msgstr ""

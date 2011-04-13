@@ -23,6 +23,10 @@
     <li>
         <a href="{{tg.url('/util/extract_model')}}">{{_('Extract model')}}</a>
     </li>
+
+    <li>
+        <a href="{{tg.url('/util/code_model', app_name=tg.config.get('app.name', 'Sapns'))}}">{{_('Code model')}}</a>
+    </li>
     
     <li>
         <a href="{{tg.url('/views/edit', came_from=tg.url('/util'))}}">{{_('View editor')}}</a>

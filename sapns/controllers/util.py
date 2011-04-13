@@ -2,7 +2,7 @@
 """Views management controller"""
 
 # turbogears imports
-from tg import expose, url
+from tg import expose, url, response
 
 # third party imports
 #from pylons.i18n import ugettext as _
@@ -18,6 +18,7 @@ import logging
 from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
     BOOLEAN, BLOB
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
+from pylons.templating import render_jinja2
 
 class UtilController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
@@ -26,6 +27,17 @@ class UtilController(BaseController):
     @expose('util/index.html')
     def index(self, came_from='/'):
         return dict(page='util', came_from=came_from)
+    
+    #@expose('util/model.template')
+    @expose(content_type='text/plain')
+    def code_model(self, app_name='MyApp', file_name=''):
+        r = self.extract_model()
+        if file_name:
+            response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+
+        return render_jinja2('util/model.template',
+                             extra_vars=dict(app_name=app_name,
+                                             tables=r['tables']))
     
     @expose('util/tables.html')
     def extract_model(self):
@@ -45,8 +57,14 @@ class UtilController(BaseController):
                 logger.info('Table: %s' % tbl.name)
                 
                 t = dict(name=tbl.name,
-                         columns=[]
-                         )
+                         columns=[])
+                
+                # class name
+                class_name = [i.title() for i in tbl.name.split('_')]
+                t['class_name'] = ''.join(class_name)
+                
+                #t['pk'] = dir(tbl.primary_key)
+                t['pk'] = [k for k in tbl.primary_key.columns.keys()] #['id'].name
                 
                 fk_cols = []
                 fk_tables = []
@@ -56,37 +74,45 @@ class UtilController(BaseController):
                     fk_cols.append(fk.parent.name)
                     
                 for c in tbl.columns:
-                    col = dict(name=c.name, type=c.type, fk='-')
+                    col = dict(name=c.name, type=repr(c.type), fk='-', 
+                               length=None, prec=None, scale=None,
+                               pk=False)
+
+                    # is primary key?                    
+                    col['pk'] = c.name in tbl.primary_key.columns.keys()
                     
                     logger.info('%s' % type(c.type))
                     
                     type_name = '---'
                     if isinstance(c.type, INTEGER):
-                        type_name = 'integer'
+                        type_name = 'Integer'
                         
                     elif isinstance(c.type, NUMERIC):
-                        type_name = 'numeric'
+                        type_name = 'Numeric'
+                        col['prec'] = c.type.precision
+                        col['scale'] = c.type.scale
                         
                     elif isinstance(c.type, BIGINT):
-                        type_name = 'bigint'
+                        type_name = 'Integer'
 
                     elif isinstance(c.type, DATE):
-                        type_name = 'date'
+                        type_name = 'Date'
                         
                     elif isinstance(c.type, TIME):
-                        type_name = 'time'
+                        type_name = 'Time'
                         
                     elif isinstance(c.type, TIMESTAMP):
-                        type_name = 'timestamp'
+                        type_name = 'DateTime'
 
                     elif isinstance(c.type, VARCHAR):
-                        type_name = 'string'
+                        type_name = 'Unicode'
+                        col['length'] = c.type.length
                         
                     elif isinstance(c.type, TEXT):
-                        type_name = 'text'
+                        type_name = 'String'
                         
                     elif isinstance(c.type, BOOLEAN):
-                        type_name = 'boolean'
+                        type_name = 'Boolean'
                         
                     elif isinstance(c.type, BLOB):
                         type_name = 'blob'

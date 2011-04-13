@@ -1,0 +1,26 @@
+# -*- coding: utf-8 -*-
+"""{{app_name}} model"""
+
+from sqlalchemy import *
+from sqlalchemy.orm import mapper, relation
+from sqlalchemy import Table, ForeignKey, Column
+from sqlalchemy.types import Integer, Unicode
+#from sqlalchemy.orm import relation, backref
+
+from sapns.model import DeclarativeBase, metadata, DBSession
+
+__all__ = [{% for table in tables %}'{{table.class_name}}'{% if not loop.last %}, {%endif%}{% endfor %}]
+
+{% for table in tables %}
+class {{table.class_name}}(DeclarativeBase):
+    __tablename__ = '{{table.name}}'
+
+
+{%- for col in table.columns %}
+    {{col.name}} = Column('{{col.name}}', {{col.type_name}}
+    {%- if col.length != None %}({{col.length}}){% endif %}
+    {%- if col.prec != None %}({{col.prec}}, {{col.scale}}){% endif %}
+    {%- if col.pk == True %}, primary_key=True{% endif %} 
+    {%- if col.fk_table != None %}, ForeignKey('{{col.fk_table}}.id'){% endif %})
+{%- endfor %}    
+{% endfor %}

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-06 21:16+0200\n"
+"PO-Revision-Date: 2011-04-13 20:17+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,24 +17,24 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:68
+#: sapns/controllers/root.py:71
 msgid "Only for managers"
 msgstr "Sólo para managers"
 
-#: sapns/controllers/root.py:74
+#: sapns/controllers/root.py:77
 msgid "Only for the editor"
 msgstr "Sólo para el editor"
 
-#: sapns/controllers/root.py:84
+#: sapns/controllers/root.py:87
 msgid "Wrong credentials"
 msgstr "Credenciales incorrectas"
 
-#: sapns/controllers/root.py:99
+#: sapns/controllers/root.py:102
 #, python-format
 msgid "Welcome back, %s!"
 msgstr "¡Bienvenido, %s!"
 
-#: sapns/controllers/root.py:109
+#: sapns/controllers/root.py:112
 msgid "We hope to see you soon!"
 msgstr "¡Esperamos verte pronto!"
 
@@ -50,6 +50,10 @@ msgstr ""
 msgid "You are in"
 msgstr "Estás en"
 
+#: sapns/templates/base.html:20
+msgid "return"
+msgstr "volver"
+
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
 msgstr "Tiene que seleccionar una fila antes utilizar esta acción"
@@ -58,42 +62,74 @@ msgstr "Tiene que seleccionar una fila antes utilizar esta acción"
 msgid "Search..."
 msgstr "Buscar..."
 
-#: sapns/templates/grid.html:120
+#: sapns/templates/grid.html:124
 msgid "No results"
 msgstr "No hay resultados"
 
-#: sapns/templates/grid.html:128
+#: sapns/templates/grid.html:132
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta "
 "%(pos1)d"
 
-#: sapns/templates/grid.html:133
+#: sapns/templates/grid.html:137
 msgid "All"
 msgstr "Todos"
 
-#: sapns/templates/grid.html:145
+#: sapns/templates/grid.html:149
 msgid "page 1"
 msgstr "página 1"
 
-#: sapns/templates/grid.html:157 sapns/templates/grid.html:177
-#: sapns/templates/grid.html:192
+#: sapns/templates/grid.html:161 sapns/templates/grid.html:180
+#: sapns/templates/grid.html:194
 #, python-format
 msgid "page %(p)d"
 msgstr "página %(p)d"
 
-#: sapns/templates/index.html:27
+#: sapns/templates/index.html:28
 msgid "Show table/view"
 msgstr "Mostrar tabla/vista"
 
-#: sapns/templates/index.html:30
+#: sapns/templates/index.html:33
 msgid "Students"
 msgstr "Alumnos"
 
-#: sapns/templates/index.html:33
+#: sapns/templates/index.html:38
 msgid "Clients"
 msgstr "Clientes"
+
+#: sapns/templates/index.html:42
+msgid "Utilities"
+msgstr "Utilidades"
+
+#: sapns/templates/util/index.html:24
+msgid "Extract model"
+msgstr "Extraer modelo"
+
+#: sapns/templates/util/index.html:28
+msgid "Code model"
+msgstr "Código fuente del modelo"
+
+#: sapns/templates/util/index.html:32
+msgid "View editor"
+msgstr "Editor de vista"
+
+#: sapns/templates/util/tables.html:38 sapns/templates/util/tables.html:71
+msgid "Source of this model"
+msgstr "Código de este modelo"
+
+#: sapns/templates/util/tables.html:45
+msgid "Name"
+msgstr "Nombre"
+
+#: sapns/templates/util/tables.html:46
+msgid "Type"
+msgstr "Tipo"
+
+#: sapns/templates/util/tables.html:47
+msgid "Primary key/References"
+msgstr "Clave primaria/Referencias"
 
 #: sapns/templates/views/columns.html:2
 msgid "Columns"
@@ -207,8 +243,4 @@ msgstr "Condición"
 #: sapns/templates/views/relations.html:18
 msgid "Remove relation"
 msgstr "Quitar relación"
-
-#: sapns/templates/views/views.js:345
-msgid "Please, check the information you have entered"
-msgstr "Por favor, compruebe la información introducida"
 

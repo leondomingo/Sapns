@@ -3,12 +3,12 @@
   Modelo de datos básico de sapns 
 """
 import os
-from datetime import datetime
 import sys
+from datetime import datetime
 
-from sqlalchemy import Table, ForeignKey, Column
-from sqlalchemy.types import Unicode, Integer, DateTime, String, Boolean
-from sqlalchemy.orm import relation, synonym
+from sqlalchemy import ForeignKey, Column #, Table
+from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
+#from sqlalchemy.orm import relation, synonym
 
 from sapns.model import DeclarativeBase, metadata, DBSession
 
