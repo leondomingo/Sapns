@@ -53,9 +53,17 @@ class RootController(BaseController):
     util = UtilController()
 
     @expose('index.html')
-    def index(self):
+    def index(self, sc_type='list'):
         curr_lang = get_lang()
-        return dict(page='index', curr_lang=curr_lang)
+        
+        # TODO: get user shortcuts
+        shortcuts = []
+        shortcuts.append(dict(url='/views', title='Views'))
+        shortcuts.append(dict(url='/util/extract_model', title='Extract model'))
+        shortcuts.append(dict(url='/views/edit', title='Edit view'))
+        
+        return dict(page='index', curr_lang=curr_lang, 
+                    shortcuts=shortcuts, sc_type=sc_type)
 
     @expose('environ.html')
     def environ(self):
@@ -67,17 +75,17 @@ class RootController(BaseController):
         """Display some information about auth* on this application."""
         return dict(page='auth')
 
-    @expose('sapns.templates.index')
-    @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-    def manage_permission_only(self, **kw):
-        """Illustrate how a page for managers only works."""
-        return dict(page='managers stuff')
-
-    @expose('sapns.templates.index')
-    @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-    def editor_user_only(self, **kw):
-        """Illustrate how a page exclusive for the editor works."""
-        return dict(page='editor stuff')
+#    @expose('index.html')
+#    @require(predicates.has_permission('manage', msg=l_('Only for managers')))
+#    def manage_permission_only(self, **kw):
+#        """Illustrate how a page for managers only works."""
+#        return dict(page='managers stuff')
+#
+#    @expose('index.html')
+#    @require(predicates.is_user('editor', msg=l_('Only for the editor')))
+#    def editor_user_only(self, **kw):
+#        """Illustrate how a page exclusive for the editor works."""
+#        return dict(page='editor stuff')
 
     @expose('login.html')
     def login(self, came_from=url('/')):

@@ -1,0 +1,5 @@
+<ul>
+    {% for sc in shortcuts %}
+    <li><a href="{{tg.url(sc.url)}}">{{sc.title}}</a></li>
+    {% endfor %}
+</ul>

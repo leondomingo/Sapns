@@ -23,7 +23,7 @@ from sqlalchemy.sql.expression import and_
 
 class UtilController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
-    allow_only = authorize.not_anonymous()
+    #allow_only = authorize.not_anonymous()
     
     @expose('util/index.html')
     def index(self, came_from='/'):
@@ -89,13 +89,14 @@ class UtilController(BaseController):
     
     @expose(content_type='text/plain')
     def code_model(self, app_name='MyApp', file_name=''):
-        r = self.extract_model()
+        mdl = self.extract_model()
         if file_name:
-            response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+            response.headerlist.append(('Content-Disposition', 
+                                        'attachment;filename=%s' % file_name))
 
         return render_jinja2('util/model.template',
                              extra_vars=dict(app_name=app_name,
-                                             tables=r['tables']))
+                                             tables=mdl['tables']))
     
     @expose('util/tables.html')
     def extract_model(self):
