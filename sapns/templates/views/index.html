@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+    <h1>Very soon on your screen!</h1>
+    <ul>
+        <li>
+            <a href="{{tg.url('/views/edit', came_from=tg.url('/views'))}}">New/Edit</a>
+        </li>
+        <li>
+            <a href="{{tg.url('/views/share', came_from=tg.url('/views'))}}">Share</a>
+        </li>
+        <li>
+            <a href="{{tg.url('/views/delete', came_from=tg.url('/views'))}}">Delete</a>
+        </li>
+    </ul>
+{% endblock %}

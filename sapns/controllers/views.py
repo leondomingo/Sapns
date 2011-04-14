@@ -6,7 +6,7 @@ import simplejson as sj
 from tg import expose, redirect, url #, validate
 
 # third party imports
-#from pylons.i18n import ugettext as _
+from pylons.i18n import ugettext as _
 #from repoze.what import predicates
 
 # project specific imports
@@ -21,6 +21,10 @@ class ViewSchema(schema.Schema):
 class ViewsController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
+    
+    @expose('views/index.html')
+    def index(self, came_from='/'):
+        return dict(page='views', came_from=url(came_from))
     
     @expose('views/view.html')
     def edit(self, id=None, came_from='/'):
@@ -82,3 +86,15 @@ class ViewsController(BaseController):
     def save(self, **kw):
         #id = validators.Int().to_python(kw['id'])
         redirect(url('/views/edit'))
+        
+    @expose('views/share.html')
+    def share(self, **kw):
+        came_from = kw.get('came_from', url('/views'))
+        # TODO: views/share
+        return dict(page='views/share', came_from=came_from)
+    
+    @expose('message.html')
+    def delete(self, id_view=None, came_from='/views'):
+        
+        return dict(message=_('The view has been successfully deleted'),
+                    came_from=came_from)

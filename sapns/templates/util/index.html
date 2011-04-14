@@ -29,7 +29,9 @@
     </li>
     
     <li>
-        <a href="{{tg.url('/views/edit', came_from=tg.url('/util'))}}">{{_('View editor')}}</a>
+        <a href="{{tg.url('/util/update_metadata', came_from=tg.url('/util'))}}">
+        {{_('Update meta-data')}}
+        </a>
     </li>
     </ul>
 {% endblock %}

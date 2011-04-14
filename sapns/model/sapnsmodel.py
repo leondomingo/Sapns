@@ -6,7 +6,7 @@ import os
 import sys
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Column, UniqueConstraint
+from sqlalchemy import ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relation, synonym
 
@@ -75,7 +75,7 @@ class SapnsClass(DeclarativeBase):
     
     class_id = Column('id', Integer, autoincrement=True, primary_key=True)
     
-    name = Column(Unicode(30), nullable=False)
+    name = Column(Unicode(50), nullable=False)
     title = Column(Unicode(100), nullable=False)
     description = Column(String)
     
@@ -91,14 +91,15 @@ class SapnsAttribute(DeclarativeBase):
     __table_args__ = (UniqueConstraint('name', 'id_class'), {})
 
     attribute_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    name = Column(Unicode(30), nullable=False)
+    name = Column(Unicode(60), nullable=False)
     title = Column(Unicode(100), nullable=False)
     
     class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
+    type_ = Column('type', Unicode(20), nullable=False)
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
-    is_collection = Column(Boolean)
+    is_collection = Column(Boolean, DefaultClause('false'), default=False)
     
 SapnsClass.attributes = \
     relation(SapnsAttribute,

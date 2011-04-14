@@ -2,33 +2,91 @@
 """Views management controller"""
 
 # turbogears imports
-from tg import expose, url, response
+from tg import expose, url, response, redirect
 
 # third party imports
-#from pylons.i18n import ugettext as _
-#from repoze.what import predicates
+from pylons.i18n import ugettext as _
+from repoze.what import authorize, predicates
 
 # project specific imports
 from sapns.lib.base import BaseController
 from sqlalchemy.schema import MetaData
-from sapns.model import DBSession
-#from sapns.model import DBSession, metadata
+from sapns.model import DBSession, metadata
 
 import logging
 from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
     BOOLEAN, BLOB
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
 from pylons.templating import render_jinja2
+from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute
+from sqlalchemy.sql.expression import and_
 
 class UtilController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
-    #allow_only = authorize.not_anonymous()
+    allow_only = authorize.not_anonymous()
     
     @expose('util/index.html')
     def index(self, came_from='/'):
         return dict(page='util', came_from=came_from)
     
-    #@expose('util/model.template')
+    @expose('message.html')
+    def update_metadata(self, came_from='/util'):
+        
+        logger = logging.getLogger(__name__ + '/update_metadata')
+        
+        tables = self.extract_model()['tables']
+        for tbl in tables:
+            
+            logger.info('Table: %s' % tbl['name'])
+            
+            klass = DBSession.query(SapnsClass).\
+                        filter(SapnsClass.name == tbl['name']).\
+                        first()
+            
+            if not klass:
+                logger.warning('.....creating')
+                
+                klass = SapnsClass()
+                klass.name = tbl['name']
+                klass.title = tbl['name'].title()
+                klass.description = 'Class: %s' % tbl['name']
+                
+                DBSession.add(klass)
+                DBSession.flush()
+                
+            else:
+                logger.warning('.....already exists')
+                
+            for i, col in enumerate(tbl['columns']):
+                
+                logger.info('Column: %s' % col['name'])
+                
+                atr = DBSession.query(SapnsAttribute).\
+                        filter(and_(SapnsAttribute.name == col['name'],
+                                    SapnsAttribute.class_id == klass.class_id, 
+                                    )).\
+                        first()
+                        
+                if not atr and col['name'] != id:
+                    logger.warning('.....creating')
+                    
+                    atr = SapnsAttribute()
+                    atr.name = col['name']
+                    atr.title = col['name'].replace('_', ' ').title()
+                    atr.class_id = klass.class_id
+                    atr.type_ = col['type_name']
+                    atr.reference_order = i
+                    atr.insertion_order = i
+                    atr.is_collection = False
+                    
+                    DBSession.add(atr)
+                    DBSession.flush()
+                    
+                else:
+                    logger.warning('.....already exists')
+                    
+        return dict(message=_('Process terminated'), came_from=url(came_from))
+    
     @expose(content_type='text/plain')
     def code_model(self, app_name='MyApp', file_name=''):
         r = self.extract_model()
@@ -45,7 +103,7 @@ class UtilController(BaseController):
         logger = logging.getLogger(__name__ + '/extract_model')
         
         meta = MetaData(bind=DBSession.bind, reflect=True)
-        logger.info(meta.bind)
+        logger.info('Connected to "%s"' % meta.bind)
         
         tables = []
         for tbl in sorted(meta.sorted_tables, 
