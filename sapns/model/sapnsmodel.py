@@ -6,7 +6,7 @@ import os
 import sys
 from datetime import datetime
 
-from sqlalchemy import ForeignKey, Column #, Table
+from sqlalchemy import ForeignKey, Column, UniqueConstraint
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relation, synonym
 
@@ -14,17 +14,16 @@ from sapns.model import DeclarativeBase, metadata, DBSession
 from sapns.model.auth import User
 from sqlalchemy.sql.expression import and_
 
-__all__ = ['SapnsShortcuts', 'SapnsClass', 'SapnsAttribute', 
-           'SapnsAction', 'SapnsView', 'SapnsViewAttribute', 
-           'SapnsPrivilege', 'SapnsAttrPrivilege',
-           'SapnsViewRelation', 'SapnsViewFilter', 'SapnsViewOrder', 
-           'SapnsReport', 'SapnsReportParam',
+__all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
+           'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
+           'SapnsShortcuts', 'SapnsUsers', 'SapnsView', 'SapnsViewColumn',
+           'SapnsViewFilter', 'SapnsViewOrder', 'SapnsViewRelation',
           ]
 
 # inherited class
 class SapnsUsers(User):
     
-    def shortcuts(self):
+    def sorted_shortcuts(self):
         sc = []
         for sc in DBSession.query(SapnsShortcuts).\
                 filter(and_(SapnsShortcuts.user == self.user_id,
@@ -44,13 +43,12 @@ class SapnsShortcuts(DeclarativeBase):
     __tablename__ = 'sp_shortcuts'
 
     shortcut_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    
     title = Column(Unicode(50))
     order = Column(Integer)
     parent_id = Column('id_parent_shortcut', Integer, ForeignKey('sp_shortcuts.id'))
     
-    user = Column('id_user', Integer, ForeignKey('sp_users.id'), nullable=False)
-    action = Column('id_action', Integer, ForeignKey('sp_actions.id'), nullable=False)
+    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), nullable=False)
+    action_id = Column('id_action', Integer, ForeignKey('sp_actions.id'), nullable=False)
     
     def __repr__(self):
         return ('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
@@ -59,11 +57,12 @@ class SapnsShortcuts(DeclarativeBase):
         return u'<Shortcut: user=%s, action=%s>' % (self.user, self.action)
     
 
-# TODO: 1-to-1 relation
+# TODO: 1-to-1 autoreference relation
 SapnsShortcuts.children = \
     relation(SapnsShortcuts,
              backref='parent',
              uselist=False,
+             remote_side=[SapnsShortcuts.shortcut_id],
              primaryjoin=SapnsShortcuts.shortcut_id == SapnsShortcuts.parent_id)
 
 class SapnsClass(DeclarativeBase):
@@ -72,12 +71,15 @@ class SapnsClass(DeclarativeBase):
     """
 
     __tablename__ = 'sp_classes'
+    __table_args__ = (UniqueConstraint('name'), {})
     
     class_id = Column('id', Integer, autoincrement=True, primary_key=True)
     
     name = Column(Unicode(30), nullable=False)
     title = Column(Unicode(100), nullable=False)
     description = Column(String)
+    
+    # attributes (SapnsAttribute)
     
 class SapnsAttribute(DeclarativeBase):
     
@@ -86,6 +88,7 @@ class SapnsAttribute(DeclarativeBase):
     """
     
     __tablename__ = 'sp_attributes'
+    __table_args__ = (UniqueConstraint('name', 'id_class'), {})
 
     attribute_id = Column('id', Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(30), nullable=False)
@@ -106,8 +109,10 @@ class SapnsPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_privilege'
     
-    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), primary_key=True)
-    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), primary_key=True)
+    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), 
+                     primary_key=True, nullable=False)
+    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), 
+                      primary_key=True, nullable=False)
     
     @staticmethod
     def has_privilege(id_user, id_class):
@@ -141,8 +146,10 @@ class SapnsAttrPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_attr_privilege'
     
-    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), primary_key=True)
-    attribute_id = Column('id_attribute', Integer, ForeignKey('sp_attributes.id'), primary_key=True)
+    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), 
+                     primary_key=True, nullable=False)
+    attribute_id = Column('id_attribute', Integer, ForeignKey('sp_attributes.id'), 
+                          primary_key=True, nullable=False)
     access = Column(Unicode(15)) # denied, read-only, read/write
     
     ACCESS_DENIED = 'denied'
@@ -219,29 +226,36 @@ class SapnsView(DeclarativeBase):
     __tablename__ = 'sp_views'
     
     view_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    
     title = Column(Unicode(200), nullable=False)
+    code = Column(Unicode(30), nullable=False)
 
-class SapnsViewAttribute(DeclarativeBase):
+class SapnsViewColumn(DeclarativeBase):
     
     """
     View columns in Sapns
     """
     
-    __tablename__ = 'sp_view_attrs'
+    __tablename__ = 'sp_view_columns'
     
-    viewattribute_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    
+    column_id = Column('id', Integer, autoincrement=True, primary_key=True)
     title = Column(Unicode(30), nullable=False)
     definition = Column(String, nullable=False)
     alias = Column(Unicode(100), nullable=False)
-    
     order = Column(Integer)
     
     text_align = Column(Unicode(10))
     width = Column(Integer)
     
-    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    # columns (SapnsViewColumn)
+    # relations (SapnsViewRelation)
+    # filters (SapnsViewFilter)
+    # orders (SapnsViewOrder)
+    
+SapnsView.columns = \
+    relation(SapnsViewColumn, 
+             backref='view', 
+             primaryjoin=SapnsView.view_id == SapnsViewColumn.view_id)
     
 class SapnsViewRelation(DeclarativeBase):
     
@@ -256,7 +270,12 @@ class SapnsViewRelation(DeclarativeBase):
     alias = Column(Unicode(100), nullable=False)
     condition = Column(String)
     
-    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    
+SapnsView.relations = \
+    relation(SapnsViewRelation, 
+             backref='view', 
+             primaryjoin=SapnsView.view_id == SapnsViewRelation.view_id)
     
 class SapnsViewFilter(DeclarativeBase):
     
@@ -271,7 +290,12 @@ class SapnsViewFilter(DeclarativeBase):
     definition = Column(String)
     active = Column(Boolean)
 
-    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    
+SapnsView.filters = \
+    relation(SapnsViewFilter, 
+             backref='view', 
+             primaryjoin=SapnsView.view_id == SapnsViewFilter.view_id)
 
 class SapnsViewOrder(DeclarativeBase):
     
@@ -285,7 +309,12 @@ class SapnsViewOrder(DeclarativeBase):
     definition = Column(String)
     sort_order = Column(Integer)
 
-    view = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    
+SapnsView.orders = \
+    relation(SapnsViewOrder, 
+             backref='view', 
+             primaryjoin=SapnsView.view_id == SapnsViewOrder.view_id)
     
 class SapnsReport(DeclarativeBase):
     
@@ -314,11 +343,16 @@ class SapnsReportParam(DeclarativeBase):
     
     name = Column(Unicode(200), nullable=False)
     
-    sapnsclass = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
+    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
     default_value = Column(Unicode(200))
     
     sort_order = Column(Integer)
     expression = Column(String)
     
-    report = Column('id_report', Integer, ForeignKey('sp_reports.id'), nullable=False)
+    report_id = Column('id_report', Integer, ForeignKey('sp_reports.id'), nullable=False)
+    
+SapnsReport.params = \
+    relation(SapnsReportParam, 
+             backref='report', 
+             primaryjoin=SapnsReport.report_id == SapnsReportParam.report_id)
