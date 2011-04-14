@@ -3,7 +3,7 @@
 <head>
 {% block head %}
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>Sapns - Web Information System</title>
+<title>{{tg.config.get('app.name', 'Sapns')}} - {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
 {% endblock %}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
 </head>

@@ -1,0 +1,30 @@
+.table_name {
+    font-weight: bold; 
+    background-color: #B4BD3C;
+    color: white; 
+    padding-left: 15px;
+    font-size: 16px;
+    height: 24px;        
+}
+
+.col_title {
+    background-color: gray;
+    color: white;
+    text-align: center;
+    font-style: italic;
+    border: 1px dotted white;
+}
+
+.col_name {
+  width: 300px;
+  float: left;
+  padding-left: 5px;
+}
+
+.col_type {
+  width: 300px;
+  float: left;
+}
+
+.col_ref {
+}

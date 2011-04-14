@@ -189,7 +189,6 @@ class User(DeclarativeBase):
         hash.update(password + str(self.password[:40]))
         return self.password[40:] == hash.hexdigest()
 
-
 class Permission(DeclarativeBase):
     """
     Permission definition for :mod:`repoze.what`.
