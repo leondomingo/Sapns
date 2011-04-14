@@ -14,12 +14,14 @@ from sapns.model import DeclarativeBase, metadata, DBSession
 from sapns.model.auth import User
 from sqlalchemy.sql.expression import and_
 
-__all__ = ['SapnsShortcuts', 'SapnsClass', 'SapnsAttribute', 'SapnsAction',
-           'SapnsView', 'SapnsViewAttribute', 'SapnsViewRelation',
-           'SapnsViewFilter', 'SapnsViewOrder', 'SapnsReport',
-           'SapnsReportParam',
-           ]
+__all__ = ['SapnsShortcuts', 'SapnsClass', 'SapnsAttribute', 
+           'SapnsAction', 'SapnsView', 'SapnsViewAttribute', 
+           'SapnsPrivilege', 'SapnsAttrPrivilege',
+           'SapnsViewRelation', 'SapnsViewFilter', 'SapnsViewOrder', 
+           'SapnsReport', 'SapnsReportParam',
+          ]
 
+# inherited class
 class SapnsUsers(User):
     
     def shortcuts(self):
@@ -61,7 +63,8 @@ class SapnsShortcuts(DeclarativeBase):
 SapnsShortcuts.children = \
     relation(SapnsShortcuts,
              backref='parent',
-             primarykey=SapnsShortcuts.shortcut_id == SapnsShortcuts.parent_id)
+             uselist=False,
+             primaryjoin=SapnsShortcuts.shortcut_id == SapnsShortcuts.parent_id)
 
 class SapnsClass(DeclarativeBase):
     """
@@ -70,7 +73,7 @@ class SapnsClass(DeclarativeBase):
 
     __tablename__ = 'sp_classes'
     
-    class_id = Column('id', Integer, autoincrement=True, primary_key=True )
+    class_id = Column('id', Integer, autoincrement=True, primary_key=True)
     
     name = Column(Unicode(30), nullable=False)
     title = Column(Unicode(100), nullable=False)
@@ -92,6 +95,7 @@ class SapnsAttribute(DeclarativeBase):
     
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
+    is_collection = Column(Boolean)
     
 SapnsClass.attributes = \
     relation(SapnsAttribute,
