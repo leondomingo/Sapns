@@ -71,7 +71,10 @@
     {% elif sc_type == 'bigicon' %}
         {% include 'shortcuts/bigicon.html' %}
     {% endif %}
+    
+        <a href="{{tg.url('/', sc_parent=sc_parent)}}">subir</a>
     </div>
+
 {% endblock %}
 
 <!-- Uncomment the next section and override the "footer" block if you want to -->

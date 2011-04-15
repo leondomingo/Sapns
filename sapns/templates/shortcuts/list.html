@@ -1,5 +1,12 @@
 <ul>
     {% for sc in shortcuts %}
-    <li><a href="{{tg.url(sc.url)}}">{{sc.title}}</a></li>
+    <li>
+    {% if not sc.id %}
+    <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
+    {% else %}
+    {# This is a group #}
+    <a href="{{tg.url('/', sc_parent=sc.id)}}">{{sc.title}}</a>
+    {% endif %}
+    </li>
     {% endfor %}
 </ul>

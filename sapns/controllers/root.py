@@ -53,17 +53,29 @@ class RootController(BaseController):
     util = UtilController()
 
     @expose('index.html')
-    def index(self, sc_type='list'):
+    def index(self, sc_type='list', sc_parent=None):
         curr_lang = get_lang()
         
-        # TODO: get user shortcuts
+        # TODO: get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
+        pass
+        
         shortcuts = []
-        shortcuts.append(dict(url='/views', title='Views'))
-        shortcuts.append(dict(url='/util/extract_model', title='Extract model'))
-        shortcuts.append(dict(url='/views/edit', title='Edit view'))
+        
+        if not sc_parent:
+            shortcuts.append(dict(url='/views', title='Views'))
+            shortcuts.append(dict(url='/util/extract_model', title='Extract model'))
+            shortcuts.append(dict(url='/views/edit', title='Edit view'))
+            shortcuts.append(dict(title='Esto es un grupo', id=100))
+            
+        elif int(sc_parent) == 100:
+            shortcuts.append(dict(url='/', title='Item 1'))
+            shortcuts.append(dict(url='/', title='Item 2'))
+            shortcuts.append(dict(url='/', title='Item 3'))
+            
+            sc_parent = None
         
         return dict(page='index', curr_lang=curr_lang, 
-                    shortcuts=shortcuts, sc_type=sc_type)
+                    shortcuts=shortcuts, sc_type=sc_type, sc_parent=sc_parent)
 
     @expose('environ.html')
     def environ(self):
