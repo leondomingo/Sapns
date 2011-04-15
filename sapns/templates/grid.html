@@ -79,7 +79,7 @@
 </script>
 {% endmacro %}
 
-{% macro show(page, _, q, grid, show_ids, link=None) %}
+{% macro show(page, _, q, grid, show_ids, link=None, came_from=None) %}
 <!-- Grid -->
 <div id="{{grid.name}}">
 {% if grid.caption %}
@@ -89,6 +89,7 @@
     <input type="hidden" name="cls" value="{{grid.cls}}"/>
     <input type="hidden" name="caption" value="{{grid.caption}}"/>
     <input type="hidden" name="show_ids" value="{{show_ids}}"/>
+    <input type="hidden" name="came_from" value="{{came_from}}"/>
     <input class="sp_search_txt" name="q" type="text" value="{{q}}"/>
     <input class="sp_button sp_search_btn" type="button" value="{{_('Search...')}}"/>
 </form>
@@ -146,6 +147,7 @@
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
         <input class="sp_button sp_grid_pag_back" type="submit" value="|<<" title="{{_('page 1')}}"/>
     </form>
     
@@ -157,6 +159,7 @@
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{grid.pag_n-1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% if grid.pag_n-1 > 0 %}
         <input class="sp_button sp_grid_pag_back" type="submit" value="<<" title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
         {% else %}
@@ -176,6 +179,7 @@
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{grid.pag_n+1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% if grid.pag_n+1 <= grid.total_pag %}
         <input class="sp_button sp_grid_pag_forth" type="submit" value=">>" title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
         {% else %}
@@ -191,6 +195,7 @@
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
         <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
         <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|" title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
 </div>

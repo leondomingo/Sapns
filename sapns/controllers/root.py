@@ -9,7 +9,7 @@ from tgext.admin.controller import AdminController
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
+from sapns.model import DBSession, metadata
 from sapns import model
 from sapns.controllers.secure import SecureController
 import sapns.config.app_cfg as app_cfg
@@ -20,9 +20,13 @@ from sapns.controllers.error import ErrorController
 from sapns.controllers.views import ViewsController
 from tg.controllers.util import urlencode
 from sapns.controllers.util import UtilController
+from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass
+from sqlalchemy.exc import NoSuchTableError
 #from pylons.templating import render_jinja2
 
-#import logging
+import logging
+from sqlalchemy import Table
+from sqlalchemy.schema import MetaData
 #import simplejson as sj
 
 __all__ = ['RootController']
@@ -57,21 +61,17 @@ class RootController(BaseController):
         curr_lang = get_lang()
         
         # TODO: get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
-        pass
+
+        # TODO: usar el id del usuario conectado
+        id_user = 1
+        user = DBSession.query(SapnsUser).get(id_user)
         
-        shortcuts = []
+        shortcuts = user.get_shortcuts(id_parent=sc_parent)
         
-        if not sc_parent:
-            shortcuts.append(dict(url='/views', title='Views'))
-            shortcuts.append(dict(url='/util/extract_model', title='Extract model'))
-            shortcuts.append(dict(url='/views/edit', title='Edit view'))
-            shortcuts.append(dict(title='Esto es un grupo', id=100))
+        if sc_parent:
+            sc_parent = DBSession.query(SapnsShortcut).get(sc_parent).parent_id
             
-        elif int(sc_parent) == 100:
-            shortcuts.append(dict(url='/', title='Item 1'))
-            shortcuts.append(dict(url='/', title='Item 2'))
-            shortcuts.append(dict(url='/', title='Item 3'))
-            
+        else:
             sc_parent = None
         
         return dict(page='index', curr_lang=curr_lang, 
@@ -136,6 +136,10 @@ class RootController(BaseController):
     def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids='false', 
              came_from='/'):
         
+        logger = logging.getLogger('list')
+        
+        logger.info('came_from=%s' % came_from)
+        
         # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
         
         #var1 = render_jinja2('pruebas/prueba.txt', extra_vars=dict(mensaje='Hola, mundo!'))
@@ -145,7 +149,22 @@ class RootController(BaseController):
         show_ids = (True if show_ids.lower() == 'true' else False)
         
         pos = (pag_n-1) * rp
-        ds = search(DBSession, cls, q=q.encode('utf-8'), rp=rp, offset=pos, 
+        
+        logger.info('(before) cls=%s' % cls)
+        
+        meta = MetaData(bind=DBSession.bind)
+        
+        view = cls
+        try:
+            Table('vista_busqueda_%s' % cls, meta, autoload=True)
+            view = 'vista_busqueda_%s' % cls
+            
+        except NoSuchTableError:
+            pass
+            
+        logger.info('(after) cls=%s' % cls)
+        
+        ds = search(DBSession, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     show_ids=show_ids)
         
         # Reading global settings
@@ -169,11 +188,12 @@ class RootController(BaseController):
                              align='center'))
         
         # TODO: calcular las acciones
-        actions = [dict(title='New', url=url('/clientes/nuevo'), require_id=False),
-                   dict(title='Edit', url=url('/clientes/editar'), require_id=True),
-                   dict(title='Delete', url=url('/clientes/borrar'), require_id=True),
-                   dict(title='Merge', url=url('/clientes/fusionar'), require_id=True),                   
-                   ]
+        # actions
+        class_ = DBSession.query(SapnsClass).\
+                    filter(SapnsClass.name == cls).\
+                    first()
+                    
+        actions = class_.sorted_actions()
         
         # total number of pages
         total_pag = 1
@@ -194,7 +214,7 @@ class RootController(BaseController):
         return dict(page='list',
                     q=q,
                     show_ids=show_ids,
-                    came_from=came_from,
+                    came_from=url(came_from),
                     link='/list?' + urlencode(dict(cls=cls, q=q, rp=rp, pag_n=pag_n,
                                                    caption=caption, show_ids=show_ids)),
                     grid=dict(caption=caption, name=cls,

@@ -6,6 +6,8 @@ import os
 import sys
 from datetime import datetime
 
+from pylons.i18n import ugettext as _
+
 from sqlalchemy import ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relation, synonym
@@ -14,28 +16,65 @@ from sapns.model import DeclarativeBase, metadata, DBSession
 from sapns.model.auth import User
 from sqlalchemy.sql.expression import and_
 
+import logging
+
 __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
-           'SapnsShortcuts', 'SapnsUsers', 'SapnsView', 'SapnsViewColumn',
+           'SapnsShortcut', 'SapnsUser', 'SapnsView', 'SapnsViewColumn',
            'SapnsViewFilter', 'SapnsViewOrder', 'SapnsViewRelation',
           ]
 
 # inherited class
-class SapnsUsers(User):
+class SapnsUser(User):
     
-    def sorted_shortcuts(self):
-        sc = []
-        for sc in DBSession.query(SapnsShortcuts).\
-                filter(and_(SapnsShortcuts.user == self.user_id,
-                            SapnsShortcuts.parent_id == None)).\
-                order_by(SapnsShortcuts.order).\
+    def get_dashboard(self):
+        dboard = DBSession.query(SapnsShortcut).\
+                    filter(and_(SapnsShortcut.user_id == self.user_id,
+                                SapnsShortcut.parent_id == None)).\
+                    first()
+                    
+        return dboard
+    
+    def get_shortcuts(self, id_parent=None):
+        
+        logger = logging.getLogger('SapnsUser.get_shortcuts')
+
+        if not id_parent:
+            id_parent = self.get_dashboard().shortcut_id
+            
+        shortcuts = []
+        for sc, ac, cl in DBSession.query(SapnsShortcut, 
+                                          SapnsAction,
+                                          SapnsClass).\
+                outerjoin((SapnsAction,
+                           SapnsAction.action_id == SapnsShortcut.action_id)).\
+                outerjoin((SapnsClass, SapnsClass.class_id == SapnsAction.class_id)).\
+                filter(and_(SapnsShortcut.user_id == self.user_id,
+                            SapnsShortcut.parent_id == id_parent)).\
+                order_by(SapnsShortcut.order).\
                 all():
             
-            pass
+            logger.info('Getting shortcut "%s"' % sc.title)
+            url = ''
+            type_ = ''
+            class_ = ''
+            if ac:
+                url = ac.url
+                type_ = ac.type
+                
+                if cl:
+                    class_ = cl.name 
+                            
+            shortcuts.append(dict(url=url, 
+                                  title=sc.title,
+                                  action_type=type_,
+                                  cls=class_,
+                                  parent=sc.parent_id, 
+                                  id=sc.shortcut_id))
         
-        return sc
+        return shortcuts
 
-class SapnsShortcuts(DeclarativeBase):
+class SapnsShortcut(DeclarativeBase):
     """
     Shortcuts sapns base table
     """
@@ -48,7 +87,7 @@ class SapnsShortcuts(DeclarativeBase):
     parent_id = Column('id_parent_shortcut', Integer, ForeignKey('sp_shortcuts.id'))
     
     user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), nullable=False)
-    action_id = Column('id_action', Integer, ForeignKey('sp_actions.id'), nullable=False)
+    action_id = Column('id_action', Integer, ForeignKey('sp_actions.id')) #, nullable=False)
     
     def __repr__(self):
         return ('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
@@ -58,12 +97,12 @@ class SapnsShortcuts(DeclarativeBase):
     
 
 # TODO: 1-to-1 autoreference relation
-SapnsShortcuts.children = \
-    relation(SapnsShortcuts,
+SapnsShortcut.children = \
+    relation(SapnsShortcut,
              backref='parent',
              uselist=False,
-             remote_side=[SapnsShortcuts.shortcut_id],
-             primaryjoin=SapnsShortcuts.shortcut_id == SapnsShortcuts.parent_id)
+             remote_side=[SapnsShortcut.shortcut_id],
+             primaryjoin=SapnsShortcut.shortcut_id == SapnsShortcut.parent_id)
 
 class SapnsClass(DeclarativeBase):
     """
@@ -80,6 +119,19 @@ class SapnsClass(DeclarativeBase):
     description = Column(String)
     
     # attributes (SapnsAttribute)
+    
+    def sorted_actions(self):
+        
+        actions = []
+        for ac in DBSession.query(SapnsAction).\
+                filter(and_(SapnsAction.class_id == self.class_id,
+                            SapnsAction.type != SapnsAction.TYPE_LIST,
+                            )).\
+                all():
+            
+            actions.append(dict(title=_(ac.name), url=ac.url, require_id=True))
+    
+        return actions
     
 class SapnsAttribute(DeclarativeBase):
     
@@ -215,8 +267,20 @@ class SapnsAction(DeclarativeBase):
     action_id = Column('id', Integer, autoincrement=True, primary_key=True)
 
     name = Column(Unicode(100), nullable=False)
-    url = Column(Unicode(200), nullable=False)
-    type = Column(Unicode(80), nullable=False)
+    url = Column(Unicode(200)) #, nullable=False)
+    type = Column(Unicode(20), nullable=False)
+    
+    # TODO: puede ser nulo? (nullable=False)
+    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'))
+    
+    TYPE_NEW = 'new'
+    TYPE_EDIT = 'edit'
+    TYPE_DELETE = 'delete'
+    TYPE_REPORT = 'report'
+    TYPE_PROCESS = 'process'
+    TYPE_LIST = 'list'
+    TYPE_OBJECT = 'object'
+    TYPE_GROUP = 'group'
     
 class SapnsView(DeclarativeBase):
     

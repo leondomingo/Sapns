@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-06 21:16+0200\n"
+"PO-Revision-Date: 2011-04-15 15:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,24 +17,16 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:68
-msgid "Only for managers"
-msgstr ""
-
-#: sapns/controllers/root.py:74
-msgid "Only for the editor"
-msgstr ""
-
-#: sapns/controllers/root.py:84
+#: sapns/controllers/root.py:107
 msgid "Wrong credentials"
 msgstr ""
 
-#: sapns/controllers/root.py:99
+#: sapns/controllers/root.py:122
 #, python-format
 msgid "Welcome back, %s!"
 msgstr ""
 
-#: sapns/controllers/root.py:109
+#: sapns/controllers/root.py:132
 msgid "We hope to see you soon!"
 msgstr ""
 
@@ -46,51 +38,140 @@ msgstr ""
 msgid "Secure Controller here"
 msgstr ""
 
-#: sapns/templates/base.html:18
+#: sapns/controllers/util.py:49
+msgid "Dashboard"
+msgstr ""
+
+#: sapns/controllers/util.py:58
+msgid "Data exploration"
+msgstr ""
+
+#: sapns/controllers/util.py:77
+msgid "Project"
+msgstr ""
+
+#: sapns/controllers/util.py:102 sapns/controllers/util.py:171
+msgid "List"
+msgstr ""
+
+#: sapns/controllers/util.py:119
+msgid "The user dashboards have been created"
+msgstr ""
+
+#: sapns/controllers/util.py:142
+#, python-format
+msgid "Class: %s"
+msgstr ""
+
+#: sapns/controllers/util.py:168
+msgid "New"
+msgstr ""
+
+#: sapns/controllers/util.py:169
+msgid "Edit"
+msgstr ""
+
+#: sapns/controllers/util.py:170
+msgid "Delete"
+msgstr ""
+
+#: sapns/controllers/util.py:201
+msgid "Process terminated"
+msgstr ""
+
+#: sapns/controllers/views.py:99
+msgid "The view has been successfully deleted"
+msgstr ""
+
+#: sapns/templates/base.html:19
 msgid "You are in"
+msgstr ""
+
+#: sapns/templates/base.html:23
+msgid "return"
 msgstr ""
 
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
 msgstr ""
 
-#: sapns/templates/grid.html:93
+#: sapns/templates/grid.html:94
 msgid "Search..."
 msgstr ""
 
-#: sapns/templates/grid.html:120
+#: sapns/templates/grid.html:125
 msgid "No results"
 msgstr ""
 
-#: sapns/templates/grid.html:128
+#: sapns/templates/grid.html:133
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 
-#: sapns/templates/grid.html:133
+#: sapns/templates/grid.html:138
 msgid "All"
 msgstr ""
 
-#: sapns/templates/grid.html:145
+#: sapns/templates/grid.html:151
 msgid "page 1"
 msgstr ""
 
-#: sapns/templates/grid.html:157 sapns/templates/grid.html:177
-#: sapns/templates/grid.html:192
+#: sapns/templates/grid.html:164 sapns/templates/grid.html:184
+#: sapns/templates/grid.html:199
 #, python-format
 msgid "page %(p)d"
 msgstr ""
 
-#: sapns/templates/index.html:27
+#: sapns/templates/index.html:28
 msgid "Show table/view"
 msgstr ""
 
-#: sapns/templates/index.html:30
+#: sapns/templates/index.html:33
 msgid "Students"
 msgstr ""
 
-#: sapns/templates/index.html:33
+#: sapns/templates/index.html:38
 msgid "Clients"
+msgstr ""
+
+#: sapns/templates/index.html:42
+msgid "Utilities"
+msgstr ""
+
+#: sapns/templates/index.html:46
+msgid "Views"
+msgstr ""
+
+#: sapns/templates/index.html:61
+msgid "Shortcuts"
+msgstr ""
+
+#: sapns/templates/util/index.html:24
+msgid "Extract model"
+msgstr ""
+
+#: sapns/templates/util/index.html:28
+msgid "Code model"
+msgstr ""
+
+#: sapns/templates/util/index.html:33
+msgid "Update meta-data"
+msgstr ""
+
+#: sapns/templates/util/tables.html:12 sapns/templates/util/tables.html:48
+msgid "Source of this model"
+msgstr ""
+
+#: sapns/templates/util/tables.html:20
+msgid "Name"
+msgstr ""
+
+#: sapns/templates/util/tables.html:21
+msgid "Type"
+msgstr ""
+
+#: sapns/templates/util/tables.html:22
+msgid "Primary key/References"
 msgstr ""
 
 #: sapns/templates/views/columns.html:2
@@ -205,7 +286,6 @@ msgstr ""
 msgid "Remove relation"
 msgstr ""
 
-#: sapns/templates/views/views.js:345
-msgid "Please, check the information you have entered"
-msgstr ""
+#~ msgid "Class: %sname"
+#~ msgstr ""
 

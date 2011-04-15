@@ -58,22 +58,24 @@
         }
     </style>
     
-    <div>{{_('Shortcuts')}}</div>
+    <div><a href="/">{{_('Shortcuts')}}</a></div>
     {#<div>
         <a class="sc_type" href="{{tg.url('/', sc_type='list')}}">List</a>
         <a class="sc_type" href="{{tg.url('/', sc_type='bigicon')}}">Big icon</a>
         <a class="sc_type" style="float: none;" href="{{tg.url('/', sc_type='smallicon')}}">Small icon</a>
     </div>#}
     
-    <div style="border: 1px solid white; height: 300px;">
+    <div style="border: 1px solid white; height: 300px; overflow: auto;">
     {% if sc_type == 'list' %}
         {% include 'shortcuts/list.html' %}
     {% elif sc_type == 'bigicon' %}
         {% include 'shortcuts/bigicon.html' %}
     {% endif %}
     
-        <a href="{{tg.url('/', sc_parent=sc_parent)}}">subir</a>
     </div>
+    {% if sc_parent %}    
+    <a href="{{tg.url('/', sc_parent=sc_parent)}}">subir</a>
+    {% endif %}
 
 {% endblock %}
 
