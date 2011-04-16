@@ -3,6 +3,7 @@
 
 # turbogears imports
 from tg import expose, url, response, redirect, config
+from tg.i18n import set_lang
 
 # third party imports
 from pylons.i18n import ugettext as _
@@ -10,21 +11,30 @@ from repoze.what import authorize, predicates
 
 # project specific imports
 from sapns.lib.base import BaseController
-from sqlalchemy.schema import MetaData
 from sapns.model import DBSession, metadata
 
 import logging
+from sqlalchemy.schema import MetaData
+from sqlalchemy.sql.expression import and_
 from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
     BOOLEAN, BLOB
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
 from pylons.templating import render_jinja2
 from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
     SapnsShortcut, SapnsAction
-from sqlalchemy.sql.expression import and_
 
 class UtilController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
     #allow_only = authorize.not_anonymous()
+    
+    @expose('message.html')
+    def init(self):
+        set_lang('en')
+        self.update_metadata()
+        self.create_dashboards()
+        
+        return dict(message=_('Initialization was completed successfully'),
+                    came_from=url('/'))
     
     @expose('util/index.html')
     def index(self, came_from='/'):

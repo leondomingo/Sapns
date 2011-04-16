@@ -97,6 +97,7 @@
 <div style="font-size: 9px;"><a href="{{link}}">[this search]</a></div>
 {% endif %}
 
+<div style="overflow:auto">
 <table class="sp_grid">
     <tr>
     <td class="sp_col_title">*</td>
@@ -127,6 +128,7 @@
     {% endfor %}
 
 </table>
+</div>
 <!-- Grid pager -->
 <div class="sp_grid_pager">
     <!-- <div> -->
@@ -205,6 +207,8 @@
     {% for act in grid.actions %}
     <div style="float: left;">
     <form method="post" action="{{act.url}}">
+        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+        <input type="hidden" name="came_from" value="{{link}}"/>
         <input class="sp_button sp_grid_action" type="button" value="{{act.title|escape}}" 
             url="{{act.url}}" require_id="{{act.require_id|lower}}"/>
     </form>

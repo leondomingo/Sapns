@@ -129,7 +129,19 @@ class SapnsClass(DeclarativeBase):
                             )).\
                 all():
             
-            actions.append(dict(title=_(ac.name), url=ac.url, require_id=True))
+            url = ac.url
+            require_id = True
+            if ac.type == SapnsAction.TYPE_NEW:
+                url = SapnsAction.URL_NEW
+                require_id = False
+            
+            elif ac.type == SapnsAction.TYPE_EDIT:
+                url = SapnsAction.URL_EDIT
+            
+            elif ac.type == SapnsAction.TYPE_DELETE:
+                url = SapnsAction.URL_DELETE
+            
+            actions.append(dict(title=_(ac.name), url=url, require_id=require_id))
     
         return actions
     
@@ -281,6 +293,11 @@ class SapnsAction(DeclarativeBase):
     TYPE_LIST = 'list'
     TYPE_OBJECT = 'object'
     TYPE_GROUP = 'group'
+    
+    # default URL
+    URL_NEW = '/new'
+    URL_EDIT = '/edit'
+    URL_DELETE = '/delete'
     
 class SapnsView(DeclarativeBase):
     

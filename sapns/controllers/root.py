@@ -9,7 +9,7 @@ from tgext.admin.controller import AdminController
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
-from sapns.model import DBSession, metadata
+from sapns.model import DBSession
 from sapns import model
 from sapns.controllers.secure import SecureController
 import sapns.config.app_cfg as app_cfg
@@ -22,7 +22,6 @@ from tg.controllers.util import urlencode
 from sapns.controllers.util import UtilController
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass
 from sqlalchemy.exc import NoSuchTableError
-#from pylons.templating import render_jinja2
 
 import logging
 from sqlalchemy import Table
@@ -76,6 +75,14 @@ class RootController(BaseController):
         
         return dict(page='index', curr_lang=curr_lang, 
                     shortcuts=shortcuts, sc_type=sc_type, sc_parent=sc_parent)
+        
+    @expose()
+    def init(self):
+        redirect(url('/util/init'))
+        
+    @expose('message.html')
+    def message(self, message='Error!', came_from='/'):
+        return dict(message=message, came_from=url(came_from))
 
     @expose('environ.html')
     def environ(self):
@@ -141,8 +148,6 @@ class RootController(BaseController):
         logger.info('came_from=%s' % came_from)
         
         # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
-        
-        #var1 = render_jinja2('pruebas/prueba.txt', extra_vars=dict(mensaje='Hola, mundo!'))
         
         rp = int(rp)
         pag_n = int(pag_n)
@@ -235,6 +240,28 @@ class RootController(BaseController):
     def save(self, cls='', id=None):
         pass
     
-    def delete(self, cls='', id=None):
-        pass
+    @expose('delete.html')
+    def delete(self, cls='', id=None, q=False, came_from='/'):
         
+        # does the record exist?
+        meta = MetaData(DBSession.bind)
+        tbl = Table(cls, meta, autoload=True)
+        
+        this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
+        if not this_record:
+            # record does not exist
+            redirect(url('/message', message=_('Record does not exist'),
+                         came_from=came_from))
+        
+        if not q:
+            # redirect to the question page
+            return dict(cls=cls, id=id, came_from=url(came_from))
+            
+        # delete record
+        tbl.delete(tbl.c.id == id).execute()
+        
+        redirect(url('/message', 
+                     message=_('Record was successfully deleted'), 
+                     came_from=url(came_from)))
+        
+        redirect(url(came_from))

@@ -430,3 +430,9 @@ clear:both;
 .sp_label_field_must {
 	font-weight: bold;
 }
+
+.sp_message {
+	/*font-family: Arial;*/
+	font-size: 25px;
+	color: #605B7C;
+}

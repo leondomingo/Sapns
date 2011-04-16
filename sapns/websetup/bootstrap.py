@@ -1,12 +1,8 @@
 # -*- coding: utf-8 -*-
 """Setup the sapns application"""
 
-import logging
-from tg import config
 from sapns import model
-
 import transaction
-
 
 def bootstrap(command, conf, vars):
     """Place any commands to setup sapns here"""
@@ -45,6 +41,7 @@ def bootstrap(command, conf, vars):
     
         model.DBSession.add(u1)
         model.DBSession.flush()
+        
         transaction.commit()
     except IntegrityError:
         print 'Warning, there was a problem adding your auth data, it may have already been added:'
