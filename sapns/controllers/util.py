@@ -21,7 +21,7 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
 from pylons.templating import render_jinja2
 from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
-    SapnsShortcut, SapnsAction
+    SapnsShortcut, SapnsAction, SapnsPrivilege, SapnsAttrPrivilege
 
 class UtilController(BaseController):
     #Uncomment this line if your controller requires an authenticated user
@@ -122,10 +122,31 @@ class UtilController(BaseController):
                     sc_table.user_id = us.user_id
                     sc_table.action_id = act_table.action_id
                     sc_table.order = i
-                    
+
                     DBSession.add(sc_table)
                     DBSession.flush()
                     
+                    # privileges
+                    priv = SapnsPrivilege()
+                    priv.user_id = us.user_id
+                    priv.class_id = cls.class_id
+                    
+                    DBSession.add(priv)
+                    DBSession.flush()
+                    
+                    # attribute privileges
+                    for atr in DBSession.query(SapnsAttribute).\
+                            filter(SapnsAttribute.class_id == cls.class_id).\
+                            all():
+                        
+                        priv_atr = SapnsAttrPrivilege()
+                        priv_atr.user_id = us.user_id
+                        priv_atr.attribute_id = atr.attribute_id
+                        priv_atr.access = SapnsAttrPrivilege.ACCESS_READWRITE
+                        
+                        DBSession.add(priv_atr)
+                        DBSession.flush()
+
         return dict(message=_('The user dashboards have been created'), 
                     came_from=url(came_from))
     
