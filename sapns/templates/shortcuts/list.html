@@ -3,7 +3,31 @@
     <li>
     {% if sc.action_type %}
         {% if sc.action_type == 'list' %}
-            <a href="{{tg.url('/list', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">{{sc.title}}</a>
+            <div>
+            <div style="width: 200px; float: left;">
+            <a href="{{tg.url('/list', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
+                {{sc.title}}</a>
+            </div>
+            
+            <!-- actions over shortcuts -->
+            <div style="float: left;">
+            <form method="post" action="">
+                <input class="sp_button" title="{{'%s on %s'|format(_('One'), sc.title)}}" type="submit" value="{{_('One')}}"/>
+            </form>
+            </div>
+            
+            <div style="float: left;">
+            <form method="post" action="">
+                <input class="sp_button" title="{{'%s on %s'|format(_('Two'), sc.title)}}" type="submit" value="{{_('Two')}}"/>
+            </form>
+            </div>
+            
+            <div>
+            <form method="post" action="">
+                <input class="sp_button" title="{{'%s on %s'|format(_('Three'), sc.title)}}" type="submit" value="{{_('Three')}}"/>
+            </form>
+            </div>
+            </div>
         {% else %}
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
         {% endif %}

@@ -19,35 +19,6 @@
 {% block middle %}
     {{ super() }}
     
-    {#{{curr_lang[0]}}#}
-    <a {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %} href="{{tg.url('/setlang', lang='en')}}">[English]</a>    
-    <a {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %} href="{{tg.url('/setlang', lang='es')}}">[Español]</a>
-        
-    <ul>
-    <li>
-    {{util.list('/list', _('Show table/view'), None)}}
-    </li>
-    
-    <!-- Alumnos -->
-    <li>
-    {{util.list('/list', _('Students'), 'vista_busqueda_alumnos')}}
-    </li>
-    
-    <!-- Clientes -->
-    <li>
-    {{util.list('/list', _('Clients'), 'vista_busqueda_clientes')}}
-    </li>
-    
-    <li>
-        <a href="{{tg.url('/util', came_from='/')}}">{{_('Utilities')}}</a>
-    </li>
-    
-    <li>
-        <a href="{{tg.url('/views', came_from='/')}}">{{_('Views')}}</a>
-    </li>
-    
-    </ul>
-    
     <style type="text/css">
         .sc_type {
             border: 1px dotted gray;
@@ -76,6 +47,21 @@
     {% if sc_parent %}    
     <a href="{{tg.url('/', sc_parent=sc_parent)}}">subir</a>
     {% endif %}
+
+    <ul>
+    <li>
+        <a href="{{tg.url('/util', came_from='/')}}">{{_('Utilities')}}</a>
+    </li>
+    
+    <li>
+        <a href="{{tg.url('/views', came_from='/')}}">{{_('Views')}}</a>
+    </li>
+    
+    </ul>
+
+    {#{{curr_lang[0]}}#}
+    <a {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %} href="{{tg.url('/setlang', lang='en')}}">[English]</a>    
+    <a {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %} href="{{tg.url('/setlang', lang='es')}}">[Español]</a>
 
 {% endblock %}
 
