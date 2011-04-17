@@ -150,7 +150,7 @@ class RootController(BaseController):
         
         logger = logging.getLogger('list')
         
-        # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
+        # does this user have permission on this table?
         user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
         
         if not user.has_privilege(cls):
@@ -278,9 +278,9 @@ class RootController(BaseController):
                               came_from=came_from)))
         
         if id:
-            this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
-            if not this_record:
-                # record does not exist
+            row = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
+            if not row:
+                # row does not exist
                 redirect(url('/message', 
                              dict(message=_('Record does not exist'),
                                   came_from=came_from)))
@@ -296,9 +296,11 @@ class RootController(BaseController):
                 order_by(SapnsAttribute.insertion_order).\
                 all():
             
-            attributes.append(dict(name=atr.name, title=atr.title, type=atr.type))
+            attributes.append(dict(name=atr.name, title=atr.title, 
+                                   type=atr.type, value=row[atr.name] or ''))
             
-        return dict(cls=cls, id=id, attributes=attributes)
+        return dict(cls=cls, id=id, attributes=attributes, 
+                    came_from=url(came_from))
     
     @expose('delete.html')
     def delete(self, cls='', id=None, q=False, came_from='/'):

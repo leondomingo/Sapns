@@ -3,11 +3,11 @@
 
 # turbogears imports
 import simplejson as sj
-from tg import expose, redirect, url #, validate
+from tg import expose, redirect, url
 
 # third party imports
 from pylons.i18n import ugettext as _
-#from repoze.what import predicates
+from repoze.what import authorize
 
 # project specific imports
 from sapns.lib.base import BaseController
@@ -19,8 +19,7 @@ class ViewSchema(schema.Schema):
     pass   
 
 class ViewsController(BaseController):
-    #Uncomment this line if your controller requires an authenticated user
-    #allow_only = authorize.not_anonymous()
+    allow_only = authorize.has_permission('manage')
     
     @expose('views/index.html')
     def index(self, came_from='/'):

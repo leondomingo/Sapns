@@ -52,7 +52,18 @@
     {% for atr in attributes %}
     <div class="sp_edit_field">
         <div class="sp_label_field">{{atr.title|escape}}</div>
-        <div><input class="sp_input_field" type="text" name="{{atr.name}}"/></div>
+        <div>
+        <!-- Boolean -->
+        {% if atr.type == 'Boolean' %}
+        <input class="sp_input_field" type="checkbox" name="{{atr.name}}"
+            {% if atr.value %}checked="checked"{% endif %}/>
+        {% elif atr.type == 'String' %}
+        <textarea class="sp_input_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
+        {% else %}
+        <input class="sp_input_field" type="text" name="{{atr.name}}" 
+            value="{{atr.value}}"/>
+        {% endif %}
+        </div>
     </div>
     {% endfor %}
 </div>

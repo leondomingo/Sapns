@@ -132,6 +132,7 @@ form.loginfields input#submit
     margin-top: 10px;
     color: #fff;
     padding: 10px 140px 20px 10px;
+    cursor: pointer;
 }
 
 * html form.loginfields input#submit
@@ -281,6 +282,14 @@ clear:both;
 	text-align: left;
 	color: #723532; /*#EFE76E;*/
 	margin-left: 10px;
+}
+
+.sp_logout {
+    text-align: center; 
+    margin-left: 90%; 
+    width: 90px;
+    background-color: white;
+    border: 1px dotted gray;	
 }
 
 .sp_button {

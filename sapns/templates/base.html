@@ -8,11 +8,11 @@
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
 </head>
 <body>
-    <div class="sp_header">
     {% block header %}
+    <div class="sp_header">
         {% include 'header.html' %}
-    {% endblock %}
     </div>
+    {% endblock %}
     
     <div class="sp_middle">
     {% if page %}
