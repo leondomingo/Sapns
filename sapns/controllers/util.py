@@ -211,7 +211,7 @@ class UtilController(BaseController):
                                     )).\
                         first()
                         
-                if not atr and col['name'] != id:
+                if not atr and col['name'] != 'id':
                     logger.warning('.....creating')
                     
                     atr = SapnsAttribute()

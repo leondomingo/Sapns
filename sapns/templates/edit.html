@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+
+{% import 'util.html' as util %}
+{{util.jquery()}}
+
+<script type="text/javascript">
+    $(document).ready(function() {
+    	
+    	$('#save_button').click(function() {
+    		var params = '';
+    		$('.sp_input_field').each(function(){
+    			params += 
+    				'<input type="hidden" ' + 
+    			        'name="' + $(this).attr('name') + '" ' + 
+    			        'value="' + $(this).val() + '"/>\n';
+    		});
+    		
+    		//alert(params)
+    		
+    		//$('#edit_form').append(params).submit();
+    		//alert($('#edit_form').html());
+    	});
+    });
+</script>
+
+<style type="text/css">
+    .sp_edit_panel {
+        overflow: auto;
+    }
+    
+    .sp_save_button {
+        position: fixed;
+        right: 300px;
+    }
+    
+    .sp_edit_field {
+    }
+</style>
+
+<form id="edit_form" method="post" action="{{tg.url('/save')}}">
+    <input type="hidden" name="cls" value="{{cls}}"/> 
+    <input type="hidden" name="id" value="{{id}}"/>
+</form>
+
+<div class="sp_edit_panel">
+    <div class="sp_save_button">
+        <input id="save_button" class="sp_button" type="button" value="{{_('Save')}}"/>
+    </div>
+    
+    {% for atr in attributes %}
+    <div class="sp_edit_field">
+        <div class="sp_label_field">{{atr.title|escape}}</div>
+        <div><input class="sp_input_field" type="text" name="{{atr.name}}"/></div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

@@ -1,2 +1,7 @@
 <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
 <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
+{% if request.identity %}
+    <a href="{{tg.url('/logout_handler')}}">logout</a>
+{% else %}
+    <a href="{{tg.url('/login')}}">Login</a>
+{% endif %}

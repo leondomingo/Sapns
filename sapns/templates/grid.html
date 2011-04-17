@@ -90,7 +90,7 @@
     <input type="hidden" name="caption" value="{{grid.caption}}"/>
     <input type="hidden" name="show_ids" value="{{show_ids}}"/>
     <input type="hidden" name="came_from" value="{{came_from}}"/>
-    <input class="sp_search_txt" name="q" type="text" value="{{q}}"/>
+    <input class="sp_search_txt" name="q" type="text" value="{{q|escape}}"/>
     <input class="sp_button sp_search_btn" type="button" value="{{_('Search...')}}"/>
 </form>
 {% if link %}

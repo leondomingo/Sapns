@@ -20,12 +20,14 @@ from sapns.controllers.error import ErrorController
 from sapns.controllers.views import ViewsController
 from tg.controllers.util import urlencode
 from sapns.controllers.util import UtilController
-from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass
+from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
+    SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege
 from sqlalchemy.exc import NoSuchTableError
 
 import logging
 from sqlalchemy import Table
 from sqlalchemy.schema import MetaData
+from sqlalchemy.sql.expression import and_
 #import simplejson as sj
 
 __all__ = ['RootController']
@@ -56,6 +58,7 @@ class RootController(BaseController):
     util = UtilController()
 
     @expose('index.html')
+    @require(predicates.not_anonymous())
     def index(self, sc_type='list', sc_parent=None):
         curr_lang = get_lang()
         
@@ -81,6 +84,7 @@ class RootController(BaseController):
         redirect(url('/util/init'))
         
     @expose('message.html')
+    @require(predicates.not_anonymous())
     def message(self, message='Error!', came_from='/'):
         return dict(message=message, came_from=url(came_from))
 
@@ -140,14 +144,19 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose('listof.html')
+    @require(predicates.not_anonymous())
     def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids='false', 
              came_from='/'):
         
         logger = logging.getLogger('list')
         
-        logger.info('came_from=%s' % came_from)
-        
         # TODO: controlar permiso del usuario sobre la tabla/vista (cls)
+        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        
+        if not user.has_privilege(cls):
+            redirect(url('/message',
+                         dict(message=_('Sorry, you do not have privilege on this class'),
+                              came_from=came_from)))
         
         rp = int(rp)
         pag_n = int(pag_n)
@@ -240,6 +249,57 @@ class RootController(BaseController):
     def save(self, cls='', id=None):
         pass
     
+    @expose('edit.html')
+    @require(predicates.not_anonymous())
+    def edit(self, cls='', id=None, came_from='/'):
+        
+        user = request.identity['user']
+        
+        # does this user have privilege on this class?
+        priv = DBSession.query(SapnsPrivilege).\
+                join((SapnsClass, 
+                      SapnsClass.class_id == SapnsPrivilege.class_id)).\
+                filter(and_(SapnsPrivilege.user_id == user.user_id, 
+                            SapnsClass.name == cls)).\
+                first()
+                
+        if not priv:
+            redirect(url('/message', 
+                         dict(message=_('Sorry, you do not have privilege on this class'),
+                              came_from=came_from)))
+        
+        meta = MetaData(DBSession.bind)
+        try:
+            tbl = Table(cls, meta, autoload=True)
+            
+        except NoSuchTableError:
+            redirect(url('/message', 
+                         dict(message=_('This class does not exist'),
+                              came_from=came_from)))
+        
+        if id:
+            this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
+            if not this_record:
+                # record does not exist
+                redirect(url('/message', 
+                             dict(message=_('Record does not exist'),
+                                  came_from=came_from)))
+            
+        # get attributes
+        attributes = []
+        for atr in DBSession.query(SapnsAttribute).\
+                join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
+                join((SapnsAttrPrivilege, 
+                      and_(SapnsAttrPrivilege.user_id == user.user_id,
+                           SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
+                filter(and_(SapnsClass.name == cls)).\
+                order_by(SapnsAttribute.insertion_order).\
+                all():
+            
+            attributes.append(dict(name=atr.name, title=atr.title, type=atr.type))
+            
+        return dict(cls=cls, id=id, attributes=attributes)
+    
     @expose('delete.html')
     def delete(self, cls='', id=None, q=False, came_from='/'):
         
@@ -250,8 +310,9 @@ class RootController(BaseController):
         this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
         if not this_record:
             # record does not exist
-            redirect(url('/message', message=_('Record does not exist'),
-                         came_from=came_from))
+            redirect(url('/message', 
+                         dict(message=_('Record does not exist'),
+                              came_from=came_from)))
         
         if not q:
             # redirect to the question page
@@ -260,8 +321,8 @@ class RootController(BaseController):
         # delete record
         tbl.delete(tbl.c.id == id).execute()
         
-        redirect(url('/message', 
-                     message=_('Record was successfully deleted'), 
-                     came_from=url(came_from)))
+        redirect(url('/message',
+                     dict(message=_('Record was successfully deleted'),
+                          came_from=url(came_from))))
         
         redirect(url(came_from))

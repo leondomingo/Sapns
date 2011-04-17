@@ -73,6 +73,16 @@ class SapnsUser(User):
                                   id=sc.shortcut_id))
         
         return shortcuts
+    
+    def has_privilege(self, cls):
+        priv = DBSession.query(SapnsPrivilege).\
+                join((SapnsClass, 
+                      SapnsClass.class_id == SapnsPrivilege.class_id)).\
+                filter(and_(SapnsPrivilege.user_id == self.user_id, 
+                            SapnsClass.name == cls)).\
+                first()
+                
+        return priv != None
 
 class SapnsShortcut(DeclarativeBase):
     """
@@ -160,14 +170,15 @@ class SapnsAttribute(DeclarativeBase):
     
     class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
-    type_ = Column('type', Unicode(20), nullable=False)
+    type = Column(Unicode(20), nullable=False)
+    #require = Column(Boolean, default=False)
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
     is_collection = Column(Boolean, DefaultClause('false'), default=False)
     
 SapnsClass.attributes = \
     relation(SapnsAttribute,
-             backref='class_',
+             backref='class',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.class_id)
 
 class SapnsPrivilege(DeclarativeBase):
