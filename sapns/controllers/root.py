@@ -49,7 +49,7 @@ class RootController(BaseController):
     """
     secc = SecureController()
 
-    admin = AdminController(model, DBSession, config_type=TGAdminConfig)
+    #admin = AdminController(model, DBSession, config_type=TGAdminConfig)
 
     error = ErrorController()
     
@@ -61,13 +61,11 @@ class RootController(BaseController):
     @require(predicates.not_anonymous())
     def index(self, sc_type='list', sc_parent=None):
         curr_lang = get_lang()
-        
-        # TODO: get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
 
-        # TODO: usar el id del usuario conectado
-        id_user = 1
-        user = DBSession.query(SapnsUser).get(id_user)
-        
+        # connected user
+        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+
+        # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=sc_parent)
         
         if sc_parent:
@@ -97,18 +95,6 @@ class RootController(BaseController):
     def auth(self):
         """Display some information about auth* on this application."""
         return dict(page='auth')
-
-#    @expose('index.html')
-#    @require(predicates.has_permission('manage', msg=l_('Only for managers')))
-#    def manage_permission_only(self, **kw):
-#        """Illustrate how a page for managers only works."""
-#        return dict(page='managers stuff')
-#
-#    @expose('index.html')
-#    @require(predicates.is_user('editor', msg=l_('Only for the editor')))
-#    def editor_user_only(self, **kw):
-#        """Illustrate how a page exclusive for the editor works."""
-#        return dict(page='editor stuff')
 
     @expose('login.html')
     def login(self, came_from=url('/')):
@@ -163,21 +149,17 @@ class RootController(BaseController):
         show_ids = (True if show_ids.lower() == 'true' else False)
         
         pos = (pag_n-1) * rp
-        
-        logger.info('(before) cls=%s' % cls)
-        
+
         meta = MetaData(bind=DBSession.bind)
         
-        view = cls
         try:
+            # TODO: cambiar "vista_busqueda_" por "_view_"
             Table('vista_busqueda_%s' % cls, meta, autoload=True)
             view = 'vista_busqueda_%s' % cls
             
         except NoSuchTableError:
-            pass
+            view = cls
             
-        logger.info('(after) cls=%s' % cls)
-        
         ds = search(DBSession, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     show_ids=show_ids)
         
@@ -201,8 +183,7 @@ class RootController(BaseController):
                              width=w,
                              align='center'))
         
-        # TODO: calcular las acciones
-        # actions
+        # actions for this class
         class_ = DBSession.query(SapnsClass).\
                     filter(SapnsClass.name == cls).\
                     first()
