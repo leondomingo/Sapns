@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+    {% import 'util.html' as util %}
+    {{util.jquery()}}
+  
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+        $('#save_ins_order').click(function() {
+        	
+        	var atributos = [];
+            $('.ins_atr').each(function() {
+            	atributos[atributos.length] = {
+            			id: $(this).attr('id_atr'),
+                        title: $(this).find('.sp_text_field').val(),
+                        order: $(this).attr('ord'),
+                        required: $(this).find('input[type=checkbox]').attr('checked')
+                };
+            });
+            
+            $('#form_insert_order input[name=attributes]').val(JSON.stringify(atributos));
+            $('#form_insert_order').submit();
+        });
+    });
+    </script>
+
+    <div>
+    
+    <!-- Header -->
+    <!--<div>
+        <div style="width: 80%; font-weight: bold; float: left; padding-left: 10px;
+            background-color: orange;">Title</div>
+        <div style="width: 80px; text-align: center; float: left;
+            background-color: blue;">Required</div>
+        <div style="float: left; width: 50px; background-color: green;">Up</div>
+        <div style="">Down</div>
+    </div>-->
+        
+    {% for atr in insertion %}
+    <div class="ins_atr" id_atr="{{atr.id}}" ord="{{loop.index0}}">
+        <div style="margin-top: 3px; margin-left: 15px;">
+            <div style="width: 80%; font-weight: bold; float: left;">
+                <input class="sp_text_field" style="width: 99%;" type="text" 
+                    value="{{atr.title}}"/>
+            </div>
+            
+            <div style="float: left; width: 5%; text-align: center;">
+                <input type="checkbox" 
+                    title="{{_('%s required')|format(atr.title)}}"
+                    {% if atr.required %} checked="checked" {% endif %} />
+            </div>
+            
+            <div style="float: left;">
+                <input class="sp_button reforder_up" type="button" 
+                    value="{{_('Up')}}"/>
+            </div>
+            
+            <div>
+                <input class="sp_button reforder_down" type="button" 
+                    value="{{_('Down')}}"/>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    
+    <div style="height: 50px;">
+        <input id="save_ins_order" class="sp_button" style="margin-top: 20px;" 
+            type="button" value="{{_('Save')}}"/>
+    </div>
+    
+    <form id="form_insert_order" method="post" action="{{tg.url('/ins_order_save')}}">
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
+        <input type="hidden" name="attributes" value="" />
+    </form>
+{% endblock %}

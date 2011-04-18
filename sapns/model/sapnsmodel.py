@@ -163,6 +163,20 @@ class SapnsClass(DeclarativeBase):
     
         return actions
     
+    def insertion(self):
+        
+        ins = []
+        for atr in DBSession.query(SapnsAttribute).\
+                filter(and_(SapnsAttribute.class_id == self.class_id,
+                            )).\
+                order_by(SapnsAttribute.insertion_order).\
+                all():
+            
+            ins.append(dict(id=atr.attribute_id, title=atr.title, 
+                            required=atr.required))
+            
+        return ins
+    
     def reference(self, all=False):
         
         cond_all = None
@@ -176,7 +190,7 @@ class SapnsClass(DeclarativeBase):
                 order_by(SapnsAttribute.reference_order).\
                 all():
             
-            ref.append(dict(title=atr.title, name=atr.name, 
+            ref.append(dict(id=atr.attribute_id, title=atr.title, name=atr.name, 
                             included=atr.reference_order != None))
             
         return ref

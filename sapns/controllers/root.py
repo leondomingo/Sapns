@@ -28,7 +28,7 @@ import logging
 from sqlalchemy import Table
 from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
-#import simplejson as sj
+import simplejson as sj
 
 __all__ = ['RootController']
 
@@ -330,9 +330,26 @@ class RootController(BaseController):
             
         class_ = SapnsClass.by_name(cls)
         
-        return dict(page='insertion order', insertion=[], 
+        return dict(page='insertion order', insertion=class_.insertion(), 
                     came_from=url(came_from))
-
+        
+    @expose()
+    def ins_order_save(self, attributes='', came_from='/'):
+        
+        # save insertion order
+        attributes = sj.loads(attributes)
+        
+        for atr in attributes:
+            
+            attribute = DBSession.query(SapnsAttribute).get(atr['id'])
+            attribute.title = atr['title']
+            attribute.insertion_order = atr['order']
+            attribute.required = atr['required']
+            
+            DBSession.add(attribute)
+            DBSession.flush()
+        
+        redirect(url(came_from))
     
     @expose('order/reference.html')
     @require(predicates.has_permission('manage'))
@@ -351,8 +368,17 @@ class RootController(BaseController):
         return dict(page='reference order', reference=class_.reference(all=True), 
                     came_from=url(came_from))
     
-    def ref_order_save(self, cls='', reference=None, came_from='/'):
+    @expose()
+    def ref_order_save(self, attributes='', came_from='/'):
         
-        # TODO: save reference order
+        # save reference order
+        attributes = sj.loads(attributes)
+        
+        for atr in attributes:
+            attribute = DBSession.query(SapnsAttribute).get(atr['id'])
+            
+            attribute.reference_order = atr['order']
+            DBSession.add(attribute)
+            DBSession.flush()
         
         redirect(url(came_from))

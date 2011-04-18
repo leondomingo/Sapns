@@ -1,9 +1,40 @@
 {% extends 'base.html' %}
 
 {% block middle %}
+    {% import 'util.html' as util %}
+    {{util.jquery()}}
+  
+    <script type="text/javascript">
+        $(document).ready(function() {
+
+        $('#save_ref_order').click(function() {
+            
+            var atributos = [];
+            var i = 0;
+            $('.ref_atr').each(function() {
+            	
+            	var ord = null;
+            	if ($(this).find('input[type=checkbox]').attr('checked')) {
+            		ord = i;
+            	}
+            	
+            	i++;
+            	
+                atributos[atributos.length] = {
+                        id: $(this).attr('id_atr'),
+                        order: ord
+                };
+            });
+            
+            $('#form_ref_order input[name=attributes]').val(JSON.stringify(atributos));
+            $('#form_ref_order').submit();
+        });
+    });
+    </script>
+
     <div>
     {% for atr in reference %}
-    <div>
+    <div class="ref_atr" id_atr="{{atr.id}}" ord="{{loop.index0}}">
         <div style="border-bottom: 1px dotted gray;">
             <div style="float: left; width: 40px; text-align: center;">
                 <input type="checkbox" {% if atr.included %}checked="checked"{% endif %}/>
@@ -17,6 +48,11 @@
     </div>
     
     <div style="height: 50px;">
-        <input class="sp_button" style="margin-top: 20px;" type="button" value="{{_('Save')}}"/>
+        <input id="save_ref_order" class="sp_button" style="margin-top: 20px;" type="button" value="{{_('Save')}}"/>
     </div>
+    
+    <form id="form_ref_order" method="post" action="{{tg.url('/ref_order_save')}}">
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
+        <input type="hidden" name="attributes" value=""/>
+    </form>
 {% endblock %}

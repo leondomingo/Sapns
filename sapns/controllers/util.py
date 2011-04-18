@@ -201,6 +201,7 @@ class UtilController(BaseController):
             create_action(_('Delete'), SapnsAction.TYPE_DELETE)
             create_action(_('List'), SapnsAction.TYPE_LIST)
                 
+            first_ref = False
             for i, col in enumerate(tbl['columns']):
                 
                 logger.info('Column: %s' % col['name'])
@@ -219,7 +220,10 @@ class UtilController(BaseController):
                     atr.title = col['name'].replace('_', ' ').title()
                     atr.class_id = klass.class_id
                     atr.type = col['type_name']
-                    atr.reference_order = i
+                    if atr.type == 'Unicode' and not first_ref:
+                        atr.reference_order = 0
+                        first_ref = True
+                        
                     atr.insertion_order = i
                     atr.is_collection = False
                     
