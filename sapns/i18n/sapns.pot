@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-15 15:32+0200\n"
+"POT-Creation-Date: 2011-04-18 08:10+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,17 +17,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:107
+#: sapns/controllers/root.py:104
 msgid "Wrong credentials"
 msgstr ""
 
-#: sapns/controllers/root.py:122
+#: sapns/controllers/root.py:119
 #, python-format
 msgid "Welcome back, %s!"
 msgstr ""
 
-#: sapns/controllers/root.py:132
+#: sapns/controllers/root.py:129
 msgid "We hope to see you soon!"
+msgstr ""
+
+#: sapns/controllers/root.py:144 sapns/controllers/root.py:249
+msgid "Sorry, you do not have privilege on this class"
+msgstr ""
+
+#: sapns/controllers/root.py:258
+msgid "This class does not exist"
+msgstr ""
+
+#: sapns/controllers/root.py:266 sapns/controllers/root.py:297
+msgid "Record does not exist"
+msgstr ""
+
+#: sapns/controllers/root.py:308
+msgid "Record was successfully deleted"
 msgstr ""
 
 #: sapns/controllers/secure.py:20
@@ -38,48 +54,52 @@ msgstr ""
 msgid "Secure Controller here"
 msgstr ""
 
-#: sapns/controllers/util.py:49
+#: sapns/controllers/util.py:36
+msgid "Initialization was completed successfully"
+msgstr ""
+
+#: sapns/controllers/util.py:59
 msgid "Dashboard"
 msgstr ""
 
-#: sapns/controllers/util.py:58
+#: sapns/controllers/util.py:68
 msgid "Data exploration"
 msgstr ""
 
-#: sapns/controllers/util.py:77
+#: sapns/controllers/util.py:87
 msgid "Project"
 msgstr ""
 
-#: sapns/controllers/util.py:102 sapns/controllers/util.py:171
+#: sapns/controllers/util.py:112 sapns/controllers/util.py:202
 msgid "List"
 msgstr ""
 
-#: sapns/controllers/util.py:119
+#: sapns/controllers/util.py:150
 msgid "The user dashboards have been created"
 msgstr ""
 
-#: sapns/controllers/util.py:142
+#: sapns/controllers/util.py:173
 #, python-format
 msgid "Class: %s"
 msgstr ""
 
-#: sapns/controllers/util.py:168
+#: sapns/controllers/util.py:199
 msgid "New"
 msgstr ""
 
-#: sapns/controllers/util.py:169
+#: sapns/controllers/util.py:200
 msgid "Edit"
 msgstr ""
 
-#: sapns/controllers/util.py:170
+#: sapns/controllers/util.py:201
 msgid "Delete"
 msgstr ""
 
-#: sapns/controllers/util.py:201
+#: sapns/controllers/util.py:232
 msgid "Process terminated"
 msgstr ""
 
-#: sapns/controllers/views.py:99
+#: sapns/controllers/views.py:98
 msgid "The view has been successfully deleted"
 msgstr ""
 
@@ -91,6 +111,22 @@ msgstr ""
 msgid "return"
 msgstr ""
 
+#: sapns/templates/delete.html:21
+msgid "Do you really want to delete this record?"
+msgstr ""
+
+#: sapns/templates/delete.html:23
+msgid "Yes"
+msgstr ""
+
+#: sapns/templates/delete.html:24
+msgid "No"
+msgstr ""
+
+#: sapns/templates/edit.html:49
+msgid "Save"
+msgstr ""
+
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
 msgstr ""
@@ -99,51 +135,51 @@ msgstr ""
 msgid "Search..."
 msgstr ""
 
-#: sapns/templates/grid.html:125
+#: sapns/templates/grid.html:126
 msgid "No results"
 msgstr ""
 
-#: sapns/templates/grid.html:133
+#: sapns/templates/grid.html:135
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 
-#: sapns/templates/grid.html:138
+#: sapns/templates/grid.html:140
 msgid "All"
 msgstr ""
 
-#: sapns/templates/grid.html:151
+#: sapns/templates/grid.html:153
 msgid "page 1"
 msgstr ""
 
-#: sapns/templates/grid.html:164 sapns/templates/grid.html:184
-#: sapns/templates/grid.html:199
+#: sapns/templates/grid.html:166 sapns/templates/grid.html:186
+#: sapns/templates/grid.html:201
 #, python-format
 msgid "page %(p)d"
 msgstr ""
 
-#: sapns/templates/index.html:28
-msgid "Show table/view"
+#: sapns/templates/index.html:32
+msgid "Shortcuts"
 msgstr ""
 
-#: sapns/templates/index.html:33
-msgid "Students"
-msgstr ""
-
-#: sapns/templates/index.html:38
-msgid "Clients"
-msgstr ""
-
-#: sapns/templates/index.html:42
+#: sapns/templates/index.html:53
 msgid "Utilities"
 msgstr ""
 
-#: sapns/templates/index.html:46
+#: sapns/templates/index.html:57
 msgid "Views"
 msgstr ""
 
-#: sapns/templates/index.html:61
-msgid "Shortcuts"
+#: sapns/templates/shortcuts/list.html:15
+msgid "One"
+msgstr ""
+
+#: sapns/templates/shortcuts/list.html:21
+msgid "Two"
+msgstr ""
+
+#: sapns/templates/shortcuts/list.html:27
+msgid "Three"
 msgstr ""
 
 #: sapns/templates/util/index.html:24

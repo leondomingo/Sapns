@@ -66,7 +66,7 @@ class SapnsUser(User):
                     class_ = cl.name 
                             
             shortcuts.append(dict(url=url, 
-                                  title=sc.title,
+                                  title=_(sc.title),
                                   action_type=type_,
                                   cls=class_,
                                   parent=sc.parent_id, 

@@ -74,8 +74,8 @@ class RootController(BaseController):
         else:
             sc_parent = None
         
-        return dict(page='index', curr_lang=curr_lang, 
-                    shortcuts=shortcuts, sc_type=sc_type, sc_parent=sc_parent)
+        return dict(page='index', curr_lang=curr_lang, shortcuts=shortcuts, 
+                    sc_type=sc_type, sc_parent=sc_parent)
         
     @expose()
     def init(self):

@@ -209,8 +209,9 @@
     <form method="post" action="{{act.url}}">
         <input type="hidden" name="cls" value="{{grid.cls}}"/>
         <input type="hidden" name="came_from" value="{{link}}"/>
-        <input class="sp_button sp_grid_action" type="button" value="{{act.title|escape}}" 
-            url="{{act.url}}" require_id="{{act.require_id|lower}}"/>
+        <input class="sp_button sp_grid_action" type="button" value="{{act.title|escape}}"
+            title="{{act.url}}" url="{{act.url}}" 
+            require_id="{{act.require_id|lower}}"/>
     </form>
     </div>
     {% endfor %}
