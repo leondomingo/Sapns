@@ -11,14 +11,20 @@
             
             <!-- actions over shortcuts -->
             <div style="float: left;">
-            <form method="post" action="">
-                <input class="sp_button" title="{{'%s on %s'|format(_('One'), sc.title)}}" type="submit" value="{{_('One')}}"/>
+            <form method="post" action="/ins_order">
+                <input type="hidden" name="cls" value="{{sc.cls}}"/>
+                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+                <input class="sp_button" title="{{'%s on %s'|format(_('Insertion order'), sc.title)}}" 
+                    type="submit" value="{{_('Insertion order')}}"/>
             </form>
             </div>
             
             <div style="float: left;">
-            <form method="post" action="">
-                <input class="sp_button" title="{{'%s on %s'|format(_('Two'), sc.title)}}" type="submit" value="{{_('Two')}}"/>
+            <form method="post" action="/ref_order">
+                <input type="hidden" name="cls" value="{{sc.cls}}"/>
+                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+                <input class="sp_button" title="{{'%s on %s'|format(_('Reference order'), sc.title)}}" 
+                    type="submit" value="{{_('Reference order')}}"/>
             </form>
             </div>
             

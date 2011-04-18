@@ -2,16 +2,16 @@
 """Views management controller"""
 
 # turbogears imports
-from tg import expose, url, response, redirect, config
+from tg import expose, url, response, config
 from tg.i18n import set_lang
 
 # third party imports
 from pylons.i18n import ugettext as _
-from repoze.what import authorize, predicates
+from repoze.what import authorize
 
 # project specific imports
 from sapns.lib.base import BaseController
-from sapns.model import DBSession, metadata
+from sapns.model import DBSession
 
 import logging
 from sqlalchemy.schema import MetaData
@@ -218,7 +218,7 @@ class UtilController(BaseController):
                     atr.name = col['name']
                     atr.title = col['name'].replace('_', ' ').title()
                     atr.class_id = klass.class_id
-                    atr.type_ = col['type_name']
+                    atr.type = col['type_name']
                     atr.reference_order = i
                     atr.insertion_order = i
                     atr.is_collection = False

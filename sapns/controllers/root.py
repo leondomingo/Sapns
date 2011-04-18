@@ -4,8 +4,8 @@
 from tg import expose, flash, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tg.i18n import set_lang, get_lang
-from tgext.admin.tgadminconfig import TGAdminConfig
-from tgext.admin.controller import AdminController
+#from tgext.admin.tgadminconfig import TGAdminConfig
+#from tgext.admin.controller import AdminController
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
@@ -237,17 +237,19 @@ class RootController(BaseController):
         user = request.identity['user']
         
         # does this user have privilege on this class?
-        priv = DBSession.query(SapnsPrivilege).\
+        priv_class = DBSession.query(SapnsPrivilege, SapnsClass).\
                 join((SapnsClass, 
                       SapnsClass.class_id == SapnsPrivilege.class_id)).\
                 filter(and_(SapnsPrivilege.user_id == user.user_id, 
                             SapnsClass.name == cls)).\
                 first()
                 
-        if not priv:
-            redirect(url('/message', 
+        if not priv_class:
+            redirect(url('/message',
                          dict(message=_('Sorry, you do not have privilege on this class'),
                               came_from=came_from)))
+            
+        __, class_ = priv_class
         
         meta = MetaData(DBSession.bind)
         try:
@@ -258,6 +260,7 @@ class RootController(BaseController):
                          dict(message=_('This class does not exist'),
                               came_from=came_from)))
         
+        ref = None
         if id:
             row = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
             if not row:
@@ -265,6 +268,9 @@ class RootController(BaseController):
                 redirect(url('/message', 
                              dict(message=_('Record does not exist'),
                                   came_from=came_from)))
+                
+            # reference
+            ref = '.'.join([unicode(row[atr['name']] or '') for atr in class_.reference()])
             
         # get attributes
         attributes = []
@@ -280,8 +286,8 @@ class RootController(BaseController):
             attributes.append(dict(name=atr.name, title=atr.title, 
                                    type=atr.type, value=row[atr.name] or ''))
             
-        return dict(cls=cls, id=id, attributes=attributes, 
-                    came_from=url(came_from))
+        return dict(cls=cls, id=id, attributes=attributes,
+                    reference=ref, came_from=url(came_from))
     
     @expose('delete.html')
     def delete(self, cls='', id=None, q=False, came_from='/'):
@@ -307,5 +313,46 @@ class RootController(BaseController):
         redirect(url('/message',
                      dict(message=_('Record was successfully deleted'),
                           came_from=url(came_from))))
+        
+        redirect(url(came_from))
+        
+    @expose('order/insert.html')
+    @require(predicates.has_permission('manage'))
+    def ins_order(self, cls='', came_from='/'):
+        
+        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        
+        # check privilege on this class
+        if not user.has_privilege(cls):
+            redirect(url('/message', 
+                         dict(message=_('Sorry, you do not have privilege on this class'),
+                              came_from=came_from)))
+            
+        class_ = SapnsClass.by_name(cls)
+        
+        return dict(page='insertion order', insertion=[], 
+                    came_from=url(came_from))
+
+    
+    @expose('order/reference.html')
+    @require(predicates.has_permission('manage'))
+    def ref_order(self, cls='', came_from='/'):
+        
+        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        
+        # check privilege on this class
+        if not user.has_privilege(cls):
+            redirect(url('/message', 
+                         dict(message=_('Sorry, you do not have privilege on this class'),
+                              came_from=came_from)))
+            
+        class_ = SapnsClass.by_name(cls)
+        
+        return dict(page='reference order', reference=class_.reference(all=True), 
+                    came_from=url(came_from))
+    
+    def ref_order_save(self, cls='', reference=None, came_from='/'):
+        
+        # TODO: save reference order
         
         redirect(url(came_from))

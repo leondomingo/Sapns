@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block middle %}
+    <div>
+    {% for atr in reference %}
+    <div>
+        <div style="border-bottom: 1px dotted gray;">
+            <div style="float: left; width: 40px; text-align: center;">
+                <input type="checkbox" {% if atr.included %}checked="checked"{% endif %}/>
+            </div>
+            <div style="width: 80%; font-weight: bold; float: left;">{{atr.title}}</div>
+            <div style="float: left;"><input class="sp_button reforder_up" type="button" value="{{_('Up')}}"/></div>
+            <div><input class="sp_button reforder_down" type="button" value="{{_('Down')}}"/></div>
+        </div>
+    </div>
+    {% endfor %}
+    </div>
+    
+    <div style="height: 50px;">
+        <input class="sp_button" style="margin-top: 20px;" type="button" value="{{_('Save')}}"/>
+    </div>
+{% endblock %}

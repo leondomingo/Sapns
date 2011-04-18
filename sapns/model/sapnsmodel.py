@@ -130,6 +130,14 @@ class SapnsClass(DeclarativeBase):
     
     # attributes (SapnsAttribute)
     
+    @staticmethod
+    def by_name(cls):
+        class_ = DBSession.query(SapnsClass).\
+            filter(SapnsClass.name == cls).\
+            first()
+            
+        return class_
+    
     def sorted_actions(self):
         
         actions = []
@@ -155,6 +163,24 @@ class SapnsClass(DeclarativeBase):
     
         return actions
     
+    def reference(self, all=False):
+        
+        cond_all = None
+        if not all:
+            cond_all = SapnsAttribute.reference_order != None
+        
+        ref = []
+        for atr in DBSession.query(SapnsAttribute).\
+                filter(and_(SapnsAttribute.class_id == self.class_id,
+                            cond_all)).\
+                order_by(SapnsAttribute.reference_order).\
+                all():
+            
+            ref.append(dict(title=atr.title, name=atr.name, 
+                            included=atr.reference_order != None))
+            
+        return ref
+    
 class SapnsAttribute(DeclarativeBase):
     
     """
@@ -171,7 +197,7 @@ class SapnsAttribute(DeclarativeBase):
     class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
     
     type = Column(Unicode(20), nullable=False)
-    #require = Column(Boolean, default=False)
+    required = Column(Boolean, default=False)
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
     is_collection = Column(Boolean, DefaultClause('false'), default=False)

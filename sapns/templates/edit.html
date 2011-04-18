@@ -37,6 +37,19 @@
     
     .sp_edit_field {
     }
+    
+    .sp_input_field {
+        width: 97%;
+        max-width: 97%;
+        min-width: 97%;
+        margin-left: 1%;
+    }
+    
+    .sp_memo_field {
+        min-height: 40px;
+        height: 100px;
+        /*font-family: Courier;*/
+    }
 </style>
 
 <form id="edit_form" method="post" action="{{tg.url('/save')}}">
@@ -49,16 +62,31 @@
         <input id="save_button" class="sp_button" type="button" value="{{_('Save')}}"/>
     </div>
     
+    <div style="font-size: 25px; margin-left: 1%;">
+        {{cls}}
+    </div>
+
+    {% if reference %}    
+    <div style="margin-left: 1%; width: 97%; font-size: 15px; color: black; 
+        background-color: white;">[{{reference}}]</div>
+    {% endif %}
+    
+    <div style="height: 10px;">
+    </div>
+    
     {% for atr in attributes %}
     <div class="sp_edit_field">
-        <div class="sp_label_field">{{atr.title|escape}}</div>
+        <div class="sp_label_field" 
+            style="margin-left: 10px; 
+                margin-top: 4px;
+                margin-bottom: 2px;">{{atr.title|escape}}</div>
         <div>
         <!-- Boolean -->
         {% if atr.type == 'Boolean' %}
         <input class="sp_input_field" type="checkbox" name="{{atr.name}}"
             {% if atr.value %}checked="checked"{% endif %}/>
         {% elif atr.type == 'String' %}
-        <textarea class="sp_input_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
+        <textarea class="sp_input_field sp_memo_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
         {% else %}
         <input class="sp_input_field" type="text" name="{{atr.name}}" 
             value="{{atr.value}}"/>
@@ -66,5 +94,7 @@
         </div>
     </div>
     {% endfor %}
+    <div style="height: 40px;">
+    </div>
 </div>
 {% endblock %}
