@@ -29,6 +29,7 @@ from sqlalchemy import Table
 from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
 import simplejson as sj
+from sapns.controllers.users import UsersController
 
 __all__ = ['RootController']
 
@@ -56,6 +57,8 @@ class RootController(BaseController):
     views = ViewsController()
     
     util = UtilController()
+    
+    users = UsersController()
 
     @expose('index.html')
     @require(predicates.not_anonymous())

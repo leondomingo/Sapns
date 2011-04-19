@@ -79,12 +79,13 @@
 </script>
 {% endmacro %}
 
-{% macro show(page, _, q, grid, show_ids, link=None, came_from=None) %}
+{% macro show(page, _, q, grid, show_ids, link=None, came_from=None, with_search=True, with_pager=True) %}
 <!-- Grid -->
 <div id="{{grid.name}}">
 {% if grid.caption %}
 <div class="sp_grid_caption">{{grid.caption|escape}}</div>
 {% endif %}
+{% if with_search %}
 <form class="sp_search_form" method="post" action="{{grid.search_url}}">
     <input type="hidden" name="cls" value="{{grid.cls}}"/>
     <input type="hidden" name="caption" value="{{grid.caption}}"/>
@@ -93,6 +94,8 @@
     <input class="sp_search_txt" name="q" type="text" value="{{q|escape}}"/>
     <input class="sp_button sp_search_btn" type="button" value="{{_('Search...')}}"/>
 </form>
+{% endif %}
+
 {% if link %}
 <div style="font-size: 9px;"><a href="{{link}}">[this search]</a></div>
 {% endif %}
@@ -129,6 +132,8 @@
 
 </table>
 </div>
+
+{% if with_pager %}
 <!-- Grid pager -->
 <div class="sp_grid_pager">
     <!-- <div> -->
@@ -201,6 +206,9 @@
         <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|" title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
 </div>
+{% endif %}
+
+{% if grid.actions %}
 <!-- Grid actions -->
 <div class="sp_grid_actions">
     <div class="sp_grid_actions_title">Actions:</div>
@@ -215,8 +223,7 @@
     </form>
     </div>
     {% endfor %}
-    
-    </div>
 </div>
+{% endif %}
 </div>
 {% endmacro %}
