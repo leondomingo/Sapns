@@ -10,13 +10,13 @@
         $('#save_ins_order').click(function() {
         	
         	var atributos = [];
-            $('.ins_atr').each(function() {
+            $('.ins_attr').each(function() {
             	atributos[atributos.length] = {
-            			id: $(this).attr('id_atr'),
-                        title: $(this).find('.sp_text_field').val(),
-                        order: $(this).attr('ord'),
-                        required: $(this).find('.attr_required').attr('checked'),
-                        visible: $(this).find('.attr_visible').attr('checked')
+            		id: $(this).attr('id_attr'),
+                    title: $(this).find('.sp_text_field').val(),
+                    order: $(this).attr('pos'),
+                    required: $(this).find('.attr_required').attr('checked'),
+                    visible: $(this).find('.attr_visible').attr('checked')
                 };
             });
             
@@ -40,10 +40,63 @@
         }).each(function() {
         	color_visible($(this));
         });
+        
+        function new_order() {
+            var new_order = [];
+            $('.ins_attr').each(function(){
+                var pos = $(this).attr('pos')*1;
+                new_order[pos] = $(this);
+                $(this).remove();
+            });
+            
+            // apply new order
+            
+            for (var i=0; i<new_order.length; i++) {
+                $('#insertion').append(new_order[i]);
+                
+                // recover click events
+                $('.ins_attr:last .insorder_up').click(function() { ins_up($(this)); });
+                $('.ins_attr:last .insorder_down').click(function() { ins_down($(this)); });
+            }
+        }
+        
+        function ins_up (button) {
+            var pos = button.parent().parent().parent().attr('pos')*1;
+            if (pos > 0) {
+                
+                // update order
+                var prev_pos = pos - 1;
+                var prev_item = $('.ins_attr:eq(' + prev_pos + ')');
+                prev_item.attr('pos', pos);
+                button.parent().parent().parent().attr('pos', prev_pos);
+                
+                // create new order
+                new_order();
+            }
+        }
+        
+        function ins_down (button) {
+            var pos = button.parent().parent().parent().attr('pos')*1;
+            var max = $('.ins_attr:last').attr('pos')*1;
+            if (pos < max) {
+                
+                // update order
+                var next_pos = pos + 1;
+                var next_item = $('.ins_attr:eq(' + next_pos + ')');
+                next_item.attr('pos', pos);
+                button.parent().parent().parent().attr('pos', next_pos);
+                
+                // create new order
+                new_order();
+            }
+        }
+        
+        $('.insorder_up').click(function() { ins_up($(this)); });
+        $('.insorder_down').click(function() { ins_down($(this)); });
     });
     </script>
 
-    <div>
+    <div id="insertion">
     
     <!-- Header -->
     <!--<div>
@@ -56,7 +109,7 @@
     </div>-->
         
     {% for attr in insertion %}
-    <div class="ins_atr" id_atr="{{attr.id}}" ord="{{loop.index0}}">
+    <div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}">
         <div style="margin-top: 3px; margin-left: 15px;">
             <div class="attr_title" style="width: 78%; font-weight: bold; float: left;">
                 <input class="sp_text_field" style="width: 99%;" type="text"
@@ -78,12 +131,12 @@
             </div>
             
             <div style="float: left;">
-                <input class="sp_button reforder_up" type="button" 
+                <input class="sp_button insorder_up" type="button" 
                     value="{{_('Up')}}"/>
             </div>
             
             <div>
-                <input class="sp_button reforder_down" type="button" 
+                <input class="sp_button insorder_down" type="button" 
                     value="{{_('Down')}}"/>
             </div>
         </div>
