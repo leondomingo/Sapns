@@ -11,33 +11,86 @@
             
             var atributos = [];
             var i = 0;
-            $('.ref_atr').each(function() {
+            $('.attr_included').each(function() {
             	
-            	var ord = null;
-            	if ($(this).find('input[type=checkbox]').attr('checked')) {
-            		ord = i;
+            	var pos = null;
+            	if ($(this).attr('checked')) {
+            		pos = $(this).parent().parent().parent().attr('pos');
             	}
             	
             	i++;
             	
                 atributos[atributos.length] = {
-                        id: $(this).attr('id_atr'),
-                        order: ord
+                	id: $(this).parent().parent().parent().attr('id_attr'),
+                    order: pos
                 };
             });
             
             $('#form_ref_order input[name=attributes]').val(JSON.stringify(atributos));
             $('#form_ref_order').submit();
         });
+        
+        function new_order() {
+        	var new_order = [];
+            $('.ref_attr').each(function(){
+                var pos = $(this).attr('pos')*1;
+                new_order[pos] = $(this);
+                $(this).remove();
+            });
+            
+            // apply new order
+            
+            for (var i=0; i<new_order.length; i++) {
+                $('#reference').append(new_order[i]);
+                
+                // recover click events
+                $('.ref_attr:last .reforder_up').click(function() { ref_up($(this)); });
+                $('.ref_attr:last .reforder_down').click(function() { ref_down($(this)); });
+            }
+        }
+        
+        function ref_up (button) {
+            var pos = button.parent().parent().parent().attr('pos')*1;
+            if (pos > 0) {
+            	
+                // update order
+                var prev_pos = pos - 1;
+                var prev_item = $('.ref_attr:eq(' + prev_pos + ')');
+                prev_item.attr('pos', pos);
+                button.parent().parent().parent().attr('pos', prev_pos);
+                
+                // create new order
+                new_order();
+            }
+        }
+        
+        function ref_down (button) {
+            var pos = button.parent().parent().parent().attr('pos')*1;
+            var max = $('.ref_attr:last').attr('pos')*1;
+            if (pos < max) {
+                
+                // update order
+                var next_pos = pos + 1;
+                var next_item = $('.ref_attr:eq(' + next_pos + ')');
+                next_item.attr('pos', pos);
+                button.parent().parent().parent().attr('pos', next_pos);
+                
+                // create new order
+                new_order();
+            }
+        }
+        
+        $('.reforder_up').click(function() { ref_up($(this)); });
+        $('.reforder_down').click(function() { ref_down($(this)); });
     });
     </script>
 
-    <div>
+    <div id="reference">
     {% for attr in reference %}
-    <div class="ref_atr" id_atr="{{attr.id}}" ord="{{loop.index0}}">
+    <div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}">
         <div style="border-bottom: 1px dotted gray;">
             <div style="float: left; width: 40px; text-align: center;">
-                <input type="checkbox" 
+                <input class="attr_included" type="checkbox" 
                     {% if attr.included %}checked="checked"{% endif %}/>
             </div>
             
@@ -45,8 +98,13 @@
                 float: left;
                 {% if not attr.visible %}color: red;{% endif %}">{{attr.title}}</div>
             
-            <div style="float: left;"><input class="sp_button reforder_up" 
-                type="button" value="{{_('Up')}}"/></div>
+            <!-- up -->
+            <div style="float: left;">
+                <input class="sp_button reforder_up"
+                    type="button" value="{{_('Up')}}"/>
+            </div>
+            
+            <!-- down -->
             <div>
                 <input class="sp_button reforder_down" type="button" 
                     value="{{_('Down')}}"/>
