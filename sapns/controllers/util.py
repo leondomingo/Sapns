@@ -92,53 +92,73 @@ class UtilController(BaseController):
                 DBSession.add(sc_project)
                 DBSession.flush()
                 
-                # data exploration/project
-                tables = self.extract_model()['tables']
+            else:
+                logger.info('Dashboard already exists')
+                data_ex = us.get_dataexploration()
+                sc_sapns = data_ex.by_order(0)
+                sc_project = data_ex.by_order(1)
                 
-                for i, tbl in enumerate(tables):
+            # data exploration/project
+            tables = self.extract_model()['tables']
+            
+            for i, tbl in enumerate(tables):
+                
+                cls = DBSession.query(SapnsClass).\
+                        filter(SapnsClass.name == tbl['name']).\
+                        first()
+                
+                # look for this table action
+                act_table = DBSession.query(SapnsAction).\
+                                filter(and_(SapnsAction.type == SapnsAction.TYPE_LIST,
+                                            SapnsAction.class_id == cls.class_id)).\
+                                first()
+                                
+                if not act_table:
+                    act_table = SapnsAction()
+                    act_table.name = _('List')
+                    act_table.type = SapnsAction.TYPE_LIST
+                    act_table.class_id = cls.class_id
                     
-                    cls = DBSession.query(SapnsClass).\
-                            filter(SapnsClass.name == tbl['name']).\
-                            first()
+                    DBSession.add(act_table)
+                    DBSession.flush()
                     
-                    # look for this table action
-                    act_table = DBSession.query(SapnsAction).\
-                                    filter(and_(SapnsAction.type == SapnsAction.TYPE_LIST,
-                                                SapnsAction.class_id == cls.class_id)).\
-                                    first()
-                                    
-                    if not act_table:
-                        act_table = SapnsAction()
-                        act_table.name = _('List')
-                        act_table.type = SapnsAction.TYPE_LIST
-                        act_table.class_id = cls.class_id
+                sc_table = DBSession.query(SapnsShortcut).\
+                        filter(and_(SapnsShortcut.parent_id == sc_project.shortcut_id,
+                                    SapnsShortcut.action_id == act_table.action_id,
+                                    SapnsShortcut.user_id == us.user_id,
+                                    )).\
+                        first()
                         
-                        DBSession.add(act_table)
-                        DBSession.flush()
-                    
+                # does this user have this class shortcut?
+                if not sc_table:
                     sc_table = SapnsShortcut()
                     sc_table.title = tbl['name']
                     sc_table.parent_id = sc_project.shortcut_id
                     sc_table.user_id = us.user_id
                     sc_table.action_id = act_table.action_id
                     sc_table.order = i
-
+    
                     DBSession.add(sc_table)
                     DBSession.flush()
-                    
+                
                     # privileges
                     priv = SapnsPrivilege()
                     priv.user_id = us.user_id
                     priv.class_id = cls.class_id
-                    
+                
                     DBSession.add(priv)
                     DBSession.flush()
                     
-                    # attribute privileges
-                    for atr in DBSession.query(SapnsAttribute).\
-                            filter(SapnsAttribute.class_id == cls.class_id).\
-                            all():
-                        
+                else:
+                    logger.info('Shortcut for "%s" already exists' % cls.title)
+                
+                # attribute privileges
+                for atr in DBSession.query(SapnsAttribute).\
+                        filter(SapnsAttribute.class_id == cls.class_id).\
+                        all():
+                    
+                    #if not SapnsAttrPrivilege.get_privilege(us.user_id, atr.attribute_id):
+                    if not us.attr_privilege(atr.attribute_id):
                         priv_atr = SapnsAttrPrivilege()
                         priv_atr.user_id = us.user_id
                         priv_atr.attribute_id = atr.attribute_id
@@ -146,6 +166,9 @@ class UtilController(BaseController):
                         
                         DBSession.add(priv_atr)
                         DBSession.flush()
+                        
+                    else:
+                        logger.info('Privilege for "%s" already exists' % atr.title)
 
         return dict(message=_('The user dashboards have been created'), 
                     came_from=url(came_from))

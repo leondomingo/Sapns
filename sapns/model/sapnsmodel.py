@@ -24,7 +24,7 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsViewFilter', 'SapnsViewOrder', 'SapnsViewRelation',
           ]
 
-# inherited class
+# inherited class from "User"
 class SapnsUser(User):
     
     def get_dashboard(self):
@@ -34,6 +34,15 @@ class SapnsUser(User):
                     first()
                     
         return dboard
+    
+    def get_dataexploration(self):
+        data_exploration = DBSession.query(SapnsShortcut).\
+                filter(and_(SapnsShortcut.parent_id == self.get_dashboard().shortcut_id,
+                            SapnsShortcut.order == 0,
+                            )).\
+                first()
+                
+        return data_exploration
     
     def get_shortcuts(self, id_parent=None):
         
@@ -83,11 +92,18 @@ class SapnsUser(User):
                 first()
                 
         return priv != None
+    
+    def attr_privilege(self, id_attribute):
+        priv_atr = DBSession.query(SapnsAttrPrivilege).\
+                filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
+                            SapnsAttrPrivilege.attribute_id == id_attribute,
+                            )).\
+                first()
+                
+        return priv_atr
 
 class SapnsShortcut(DeclarativeBase):
-    """
-    Shortcuts sapns base table
-    """
+    """Shortcuts sapns base table"""
 
     __tablename__ = 'sp_shortcuts'
 
@@ -105,6 +121,14 @@ class SapnsShortcut(DeclarativeBase):
     def __unicode__(self):
         return u'<Shortcut: user=%s, action=%s>' % (self.user, self.action)
     
+    def by_order(self, order):
+        """Return a 'child' shortcut (of this) with the indicated 'order'"""
+        sc = DBSession.query(SapnsShortcut).\
+                filter(and_(SapnsShortcut.parent_id == self.shortcut_id,
+                            SapnsShortcut.order == order)).\
+                first()
+                
+        return sc
 
 # TODO: 1-to-1 autoreference relation
 SapnsShortcut.children = \
@@ -115,9 +139,7 @@ SapnsShortcut.children = \
              primaryjoin=SapnsShortcut.shortcut_id == SapnsShortcut.parent_id)
 
 class SapnsClass(DeclarativeBase):
-    """
-    List of sapns tables
-    """
+    """List of sapns tables"""
 
     __tablename__ = 'sp_classes'
     __table_args__ = (UniqueConstraint('name'), {})
@@ -197,9 +219,7 @@ class SapnsClass(DeclarativeBase):
     
 class SapnsAttribute(DeclarativeBase):
     
-    """
-    List of sapns columns in tables
-    """
+    """List of sapns columns in tables"""
     
     __tablename__ = 'sp_attributes'
     __table_args__ = (UniqueConstraint('name', 'id_class'), {})
@@ -364,9 +384,7 @@ class SapnsView(DeclarativeBase):
 
 class SapnsViewColumn(DeclarativeBase):
     
-    """
-    View columns in Sapns
-    """
+    """View columns in Sapns"""
     
     __tablename__ = 'sp_view_columns'
     
@@ -392,9 +410,7 @@ SapnsView.columns = \
     
 class SapnsViewRelation(DeclarativeBase):
     
-    """
-    View joins in Sapns
-    """
+    """View joins in Sapns"""
     
     __tablename__ = 'sp_view_relations'
     
@@ -412,9 +428,7 @@ SapnsView.relations = \
     
 class SapnsViewFilter(DeclarativeBase):
     
-    """
-    'Where' clauses in Sapns views
-    """
+    """'Where' clauses in Sapns views"""
     
     __tablename__ = 'sp_view_filters'
 
@@ -432,9 +446,7 @@ SapnsView.filters = \
 
 class SapnsViewOrder(DeclarativeBase):
     
-    """
-    Sort order in Sapns views
-    """
+    """Sort order in Sapns views"""
     
     __tablename__ = 'sp_view_order'
     
@@ -451,9 +463,7 @@ SapnsView.orders = \
     
 class SapnsReport(DeclarativeBase):
     
-    """
-    Sapns reports (probably in JasperReports, for starters
-    """
+    """Sapns reports (probably in JasperReports, for starters)"""
     
     __tablename__ = 'sp_reports'
     
@@ -466,9 +476,7 @@ class SapnsReport(DeclarativeBase):
 
 class SapnsReportParam(DeclarativeBase):
     
-    """
-    Sapns param list: so we know what to request from the user when we launch the report
-    """
+    """Sapns param list: so we know what to request from the user when we launch the report"""
     
     __tablename__ = 'sp_report_parameters' 
     
