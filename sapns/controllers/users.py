@@ -2,8 +2,7 @@
 """Users management controller"""
 
 # turbogears imports
-from tg import expose, url, response, config
-from tg.i18n import set_lang
+from tg import expose, url, config
 
 # third party imports
 from pylons.i18n import ugettext as _
@@ -14,32 +13,30 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession
 
 import logging
-from sqlalchemy.schema import MetaData
-from sqlalchemy.sql.expression import and_
-from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
-    BOOLEAN, BLOB
-from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
-from pylons.templating import render_jinja2
-from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
-    SapnsShortcut, SapnsAction, SapnsPrivilege, SapnsAttrPrivilege
+from sapns.model.sapnsmodel import SapnsUser 
 from neptuno.dataset import DataSet
 
 class UsersController(BaseController):
     # only for "managers"
-    allow_only = authorize.has_permission('manage')
+    allow_only = authorize.has_permission('manage') or authorize.has_permission('users')
     
     @expose('users/index.html')
-    def index(self, came_from='/'):
+    def index(self, came_from='/users'):
     
         pos = 0
 
-        ds = DataSet([('id', 'id',  ''), ('display_name', 'Display name', ''), 
-                      ('user_name', 'User name', '')])
+        ds = DataSet([('id', 'id',  ''), 
+                      ('display_name', _('Display name'), ''), 
+                      ('user_name', _('User name'), ''),
+                      ('e_mail', _('E-mail address'), ''),
+                      ])
         
         for us in DBSession.query(SapnsUser).all():
             ds.append(dict(id=us.user_id,
                            display_name=us.display_name, 
-                           user_name=us.user_name))
+                           user_name=us.user_name,
+                           e_mail=us.email_address,
+                           ))
             
         actions = []
         actions.append(dict(title=_('New'), url='/users/user_new', require_id=True))
@@ -72,7 +69,7 @@ class UsersController(BaseController):
         return dict(page='users',
                     show_ids=True,
                     came_from=url(came_from),
-                    link=url(came_from),
+                    link=None,
                     grid=dict(caption=None, name='users_list',
                               cls='', 
                               search_url=url('/users'), 
@@ -81,18 +78,20 @@ class UsersController(BaseController):
                               totalp=totalp, total=ds.count, total_pag=1))
         
     @expose('users/user_edit.html')
-    def user_edit(self, id=None, cls=None, link='/'):
-        return dict(link=url(link))
+    def user_edit(self, id=None, cls=None, came_from='/users'):
+        
+        user = DBSession.query(SapnsUser).get(id)
+        return dict(user=user, came_from=url(came_from))
     
     @expose('users/user_delete.html')
-    def user_delete(self, id=None, cls=None, came_from='/'):
+    def user_delete(self, id=None, cls=None, came_from='/users'):
         return dict(came_from=url(came_from))
     
     @expose('users/permission.html')
-    def permission(self, came_from='/'):
+    def permission(self, came_from='/users'):
         return dict(came_from=url(came_from))
     
     @expose('users/roles.html')
-    def roles(self, came_from='/'):
+    def roles(self, came_from='/users'):
         return dict(came_from=url(came_from))
         

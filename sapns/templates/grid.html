@@ -168,7 +168,8 @@
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% if grid.pag_n-1 > 0 %}
-        <input class="sp_button sp_grid_pag_back" type="submit" value="<<" title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
+        <input class="sp_button sp_grid_pag_back" type="submit" value="<<" 
+            title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
         {% else %}
         <input class="sp_button sp_grid_pag_back" type="button" value="<<" disabled="disabled"/>
         {% endif %}
@@ -188,7 +189,8 @@
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% if grid.pag_n+1 <= grid.total_pag %}
-        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>" title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
+        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>" 
+            title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
         {% else %}
         <input class="sp_button sp_grid_pag_forth" type="button" value=">>" disabled="disabled"/>
         {% endif %}
@@ -203,7 +205,8 @@
         <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|" title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
+        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|" 
+            title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
 </div>
 {% endif %}
@@ -216,7 +219,11 @@
     <div style="float: left;">
     <form method="post" action="{{act.url}}">
         <input type="hidden" name="cls" value="{{grid.cls}}"/>
+        {% if link != None %}
         <input type="hidden" name="came_from" value="{{link}}"/>
+        {% else %}
+        <input type="hidden" name="came_from" value="{{came_from}}"/>
+        {% endif %}
         <input class="sp_button sp_grid_action" type="button" value="{{act.title|escape}}"
             title="{{act.url}}" url="{{act.url}}" 
             require_id="{{act.require_id|lower}}"/>

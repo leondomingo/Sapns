@@ -1,6 +1,31 @@
 {% extends 'base.html' %}
 
 {% block middle %}
-    {{came_from}}
-    <h1>Very soon on your screen</h1>
+    <form method="post" action="/users/user_save">
+    <div>
+        <div>
+            <div class="sp_label_field">{{_('Display name')}}</div>
+            <input class="sp_text_field" type="text" name="display_name" value="{{user.display_name}}"/>
+        </div>
+        
+        <div>
+            <div class="sp_label_field">{{_('User name')}}</div>
+            <input class="sp_text_field" type="text" name="user_name" value="{{user.user_name}}"/>
+        </div>
+
+        <div>
+            <div class="sp_label_field">{{_('E-mail address')}}</div>
+            <input class="sp_text_field" type="text" name="email_address" value="{{user.email_address}}"/>
+        </div>
+        
+        <div>
+            <div class="sp_label_field">{{_('Password')}}</div>
+            <input class="sp_text_field" type="password" name="password" value=""/>
+        </div>
+        
+        <div>
+            <input id="save_user_btn" type="submit" value="{{_('Save')}}"/>
+        </div>
+    </div>
+    </form>
 {% endblock %}

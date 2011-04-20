@@ -10,7 +10,6 @@ from repoze.what import predicates
 
 from sapns.lib.base import BaseController
 from sapns.model import DBSession
-from sapns import model
 from sapns.controllers.secure import SecureController
 import sapns.config.app_cfg as app_cfg
 
@@ -22,10 +21,10 @@ from tg.controllers.util import urlencode
 from sapns.controllers.util import UtilController
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
     SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege
-from sqlalchemy.exc import NoSuchTableError
 
 import logging
 from sqlalchemy import Table
+from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
 import simplejson as sj
@@ -136,8 +135,6 @@ class RootController(BaseController):
     @require(predicates.not_anonymous())
     def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids='false', 
              came_from='/'):
-        
-        logger = logging.getLogger('list')
         
         # does this user have permission on this table?
         user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
