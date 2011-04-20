@@ -188,14 +188,14 @@ class SapnsClass(DeclarativeBase):
     def insertion(self):
         
         ins = []
-        for atr in DBSession.query(SapnsAttribute).\
-                filter(and_(SapnsAttribute.class_id == self.class_id,
-                            )).\
+        for attr in DBSession.query(SapnsAttribute).\
+                filter(SapnsAttribute.class_id == self.class_id).\
                 order_by(SapnsAttribute.insertion_order).\
                 all():
             
-            ins.append(dict(id=atr.attribute_id, title=atr.title, 
-                            required=atr.required))
+            ins.append(dict(id=attr.attribute_id, title=attr.title,
+                            name=attr.name, required=attr.required, 
+                            visible=attr.visible))
             
         return ins
     
@@ -206,14 +206,16 @@ class SapnsClass(DeclarativeBase):
             cond_all = SapnsAttribute.reference_order != None
         
         ref = []
-        for atr in DBSession.query(SapnsAttribute).\
+        for attr in DBSession.query(SapnsAttribute).\
                 filter(and_(SapnsAttribute.class_id == self.class_id,
                             cond_all)).\
                 order_by(SapnsAttribute.reference_order).\
                 all():
             
-            ref.append(dict(id=atr.attribute_id, title=atr.title, name=atr.name, 
-                            included=atr.reference_order != None))
+            ref.append(dict(id=attr.attribute_id, title=attr.title, 
+                            name=attr.name, included=attr.reference_order != None,
+                            visible=attr.visible
+                            ))
             
         return ref
     
@@ -234,6 +236,7 @@ class SapnsAttribute(DeclarativeBase):
     required = Column(Boolean, default=False)
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
+    visible = Column(Boolean, default=True)
     is_collection = Column(Boolean, DefaultClause('false'), default=False)
     
 SapnsClass.attributes = \

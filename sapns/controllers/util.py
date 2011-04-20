@@ -247,6 +247,8 @@ class UtilController(BaseController):
                         atr.reference_order = 0
                         first_ref = True
                         
+                    atr.visible = True
+                        
                     atr.insertion_order = i
                     atr.is_collection = False
                     

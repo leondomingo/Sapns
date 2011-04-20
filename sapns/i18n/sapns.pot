@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-18 08:10+0200\n"
+"POT-Creation-Date: 2011-04-20 14:19+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,32 +17,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:104
+#: sapns/controllers/root.py:106
 msgid "Wrong credentials"
 msgstr ""
 
-#: sapns/controllers/root.py:119
+#: sapns/controllers/root.py:121
 #, python-format
 msgid "Welcome back, %s!"
 msgstr ""
 
-#: sapns/controllers/root.py:129
+#: sapns/controllers/root.py:131
 msgid "We hope to see you soon!"
 msgstr ""
 
 #: sapns/controllers/root.py:144 sapns/controllers/root.py:249
+#: sapns/controllers/root.py:328 sapns/controllers/root.py:363
 msgid "Sorry, you do not have privilege on this class"
 msgstr ""
 
-#: sapns/controllers/root.py:258
+#: sapns/controllers/root.py:260
 msgid "This class does not exist"
 msgstr ""
 
-#: sapns/controllers/root.py:266 sapns/controllers/root.py:297
+#: sapns/controllers/root.py:269 sapns/controllers/root.py:303
 msgid "Record does not exist"
 msgstr ""
 
-#: sapns/controllers/root.py:308
+#: sapns/controllers/root.py:314
 msgid "Record was successfully deleted"
 msgstr ""
 
@@ -52,6 +53,30 @@ msgstr ""
 
 #: sapns/controllers/secure.py:25
 msgid "Secure Controller here"
+msgstr ""
+
+#: sapns/controllers/users.py:29 sapns/templates/users/user_edit.html:7
+msgid "Display name"
+msgstr ""
+
+#: sapns/controllers/users.py:30 sapns/templates/users/user_edit.html:12
+msgid "User name"
+msgstr ""
+
+#: sapns/controllers/users.py:31 sapns/templates/users/user_edit.html:17
+msgid "E-mail address"
+msgstr ""
+
+#: sapns/controllers/users.py:42 sapns/controllers/util.py:222
+msgid "New"
+msgstr ""
+
+#: sapns/controllers/users.py:43 sapns/controllers/util.py:223
+msgid "Edit"
+msgstr ""
+
+#: sapns/controllers/users.py:44 sapns/controllers/util.py:224
+msgid "Delete"
 msgstr ""
 
 #: sapns/controllers/util.py:36
@@ -70,32 +95,20 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
-#: sapns/controllers/util.py:112 sapns/controllers/util.py:202
+#: sapns/controllers/util.py:118 sapns/controllers/util.py:225
 msgid "List"
 msgstr ""
 
-#: sapns/controllers/util.py:150
+#: sapns/controllers/util.py:173
 msgid "The user dashboards have been created"
 msgstr ""
 
-#: sapns/controllers/util.py:173
+#: sapns/controllers/util.py:196
 #, python-format
 msgid "Class: %s"
 msgstr ""
 
-#: sapns/controllers/util.py:199
-msgid "New"
-msgstr ""
-
-#: sapns/controllers/util.py:200
-msgid "Edit"
-msgstr ""
-
-#: sapns/controllers/util.py:201
-msgid "Delete"
-msgstr ""
-
-#: sapns/controllers/util.py:232
+#: sapns/controllers/util.py:259
 msgid "Process terminated"
 msgstr ""
 
@@ -123,7 +136,8 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: sapns/templates/edit.html:49
+#: sapns/templates/edit.html:62 sapns/templates/order/insert.html:70
+#: sapns/templates/order/reference.html:51 sapns/templates/users/user_edit.html:27
 msgid "Save"
 msgstr ""
 
@@ -131,31 +145,35 @@ msgstr ""
 msgid "You must select a row before click on this action"
 msgstr ""
 
-#: sapns/templates/grid.html:94
+#: sapns/templates/grid.html:95
 msgid "Search..."
 msgstr ""
 
-#: sapns/templates/grid.html:126
+#: sapns/templates/grid.html:129
 msgid "No results"
 msgstr ""
 
-#: sapns/templates/grid.html:135
+#: sapns/templates/grid.html:140
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 
-#: sapns/templates/grid.html:140
+#: sapns/templates/grid.html:145
 msgid "All"
 msgstr ""
 
-#: sapns/templates/grid.html:153
+#: sapns/templates/grid.html:158
 msgid "page 1"
 msgstr ""
 
-#: sapns/templates/grid.html:166 sapns/templates/grid.html:186
-#: sapns/templates/grid.html:201
+#: sapns/templates/grid.html:172 sapns/templates/grid.html:193
+#: sapns/templates/grid.html:209
 #, python-format
 msgid "page %(p)d"
+msgstr ""
+
+#: sapns/templates/header.html:5
+msgid "logout"
 msgstr ""
 
 #: sapns/templates/index.html:32
@@ -170,16 +188,49 @@ msgstr ""
 msgid "Views"
 msgstr ""
 
-#: sapns/templates/shortcuts/list.html:15
-msgid "One"
+#: sapns/templates/index.html:61
+msgid "Users"
 msgstr ""
 
-#: sapns/templates/shortcuts/list.html:21
-msgid "Two"
+#: sapns/templates/order/insert.html:50
+#, python-format
+msgid "%s required"
 msgstr ""
 
-#: sapns/templates/shortcuts/list.html:27
+#: sapns/templates/order/insert.html:56 sapns/templates/order/reference.html:43
+#: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
+#: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
+msgid "Up"
+msgstr ""
+
+#: sapns/templates/order/insert.html:61 sapns/templates/order/reference.html:44
+#: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
+#: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
+msgid "Down"
+msgstr ""
+
+#: sapns/templates/shortcuts/list.html:17 sapns/templates/shortcuts/list.html:18
+msgid "Insertion order"
+msgstr ""
+
+#: sapns/templates/shortcuts/list.html:26 sapns/templates/shortcuts/list.html:27
+msgid "Reference order"
+msgstr ""
+
+#: sapns/templates/shortcuts/list.html:33
 msgid "Three"
+msgstr ""
+
+#: sapns/templates/users/index.html:19
+msgid "Permission"
+msgstr ""
+
+#: sapns/templates/users/index.html:23
+msgid "Roles"
+msgstr ""
+
+#: sapns/templates/users/user_edit.html:22
+msgid "Password"
 msgstr ""
 
 #: sapns/templates/util/index.html:24
@@ -250,16 +301,6 @@ msgstr ""
 
 #: sapns/templates/views/columns.html:26
 msgid "Remove column"
-msgstr ""
-
-#: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
-#: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
-msgid "Up"
-msgstr ""
-
-#: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
-#: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
-msgid "Down"
 msgstr ""
 
 #: sapns/templates/views/filters.html:2

@@ -279,7 +279,8 @@ class RootController(BaseController):
                 join((SapnsAttrPrivilege, 
                       and_(SapnsAttrPrivilege.user_id == user.user_id,
                            SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
-                filter(and_(SapnsClass.name == cls)).\
+                filter(and_(SapnsClass.name == cls,
+                            SapnsAttribute.visible == True)).\
                 order_by(SapnsAttribute.insertion_order).\
                 all():
             
@@ -339,12 +340,13 @@ class RootController(BaseController):
         # save insertion order
         attributes = sj.loads(attributes)
         
-        for atr in attributes:
+        for attr in attributes:
             
-            attribute = DBSession.query(SapnsAttribute).get(atr['id'])
-            attribute.title = atr['title']
-            attribute.insertion_order = atr['order']
-            attribute.required = atr['required']
+            attribute = DBSession.query(SapnsAttribute).get(attr['id'])
+            attribute.title = attr['title']
+            attribute.insertion_order = attr['order']
+            attribute.required = attr['required']
+            attribute.visible = attr['visible']
             
             DBSession.add(attribute)
             DBSession.flush()
@@ -374,10 +376,10 @@ class RootController(BaseController):
         # save reference order
         attributes = sj.loads(attributes)
         
-        for atr in attributes:
-            attribute = DBSession.query(SapnsAttribute).get(atr['id'])
+        for attr in attributes:
+            attribute = DBSession.query(SapnsAttribute).get(attr['id'])
             
-            attribute.reference_order = atr['order']
+            attribute.reference_order = attr['order']
             DBSession.add(attribute)
             DBSession.flush()
         

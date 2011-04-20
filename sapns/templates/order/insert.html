@@ -15,12 +15,30 @@
             			id: $(this).attr('id_atr'),
                         title: $(this).find('.sp_text_field').val(),
                         order: $(this).attr('ord'),
-                        required: $(this).find('input[type=checkbox]').attr('checked')
+                        required: $(this).find('.attr_required').attr('checked'),
+                        visible: $(this).find('.attr_visible').attr('checked')
                 };
             });
             
             $('#form_insert_order input[name=attributes]').val(JSON.stringify(atributos));
             $('#form_insert_order').submit();
+        });
+        
+        function color_visible(check) {
+            if (check.attr('checked')) {
+            	check.parent().parent().find('.attr_title').
+                  find('.sp_text_field').css('background-color', 'white');
+            }
+            else {
+            	check.parent().parent().find('.attr_title').
+                  find('.sp_text_field').css('background-color', 'gray');
+            }
+        }
+        
+        $('.attr_visible').click(function() {
+        	color_visible($(this));
+        }).each(function() {
+        	color_visible($(this));
         });
     });
     </script>
@@ -37,18 +55,26 @@
         <div style="">Down</div>
     </div>-->
         
-    {% for atr in insertion %}
-    <div class="ins_atr" id_atr="{{atr.id}}" ord="{{loop.index0}}">
+    {% for attr in insertion %}
+    <div class="ins_atr" id_atr="{{attr.id}}" ord="{{loop.index0}}">
         <div style="margin-top: 3px; margin-left: 15px;">
-            <div style="width: 80%; font-weight: bold; float: left;">
-                <input class="sp_text_field" style="width: 99%;" type="text" 
-                    value="{{atr.title}}"/>
+            <div class="attr_title" style="width: 78%; font-weight: bold; float: left;">
+                <input class="sp_text_field" style="width: 99%;" type="text"
+                    title="{{attr.name}}" value="{{attr.title}}"/>
             </div>
             
+            <!-- required -->
             <div style="float: left; width: 5%; text-align: center;">
-                <input type="checkbox" 
-                    title="{{_('%s required')|format(atr.title)}}"
-                    {% if atr.required %} checked="checked" {% endif %} />
+                <input class="attr_required" type="checkbox" 
+                    title="{{_('%s required')|format(attr.title)}}"
+                    {% if attr.required %} checked="checked" {% endif %} />
+            </div>
+
+            <!-- visible -->
+            <div style="float: left; width: 5%; text-align: center;">
+                <input class="attr_visible" type="checkbox" 
+                    title="{{_('%s visible')|format(attr.title)}}"
+                    {% if attr.visible %} checked="checked" {% endif %} />
             </div>
             
             <div style="float: left;">

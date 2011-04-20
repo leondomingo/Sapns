@@ -2,6 +2,6 @@
 <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
 {% if request.identity %}
 <div class="sp_logout">
-    <a href="{{tg.url('/logout_handler')}}">logout</a>
+    <a href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
 </div>
 {% endif %}

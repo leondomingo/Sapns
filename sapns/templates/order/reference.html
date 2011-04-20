@@ -33,22 +33,32 @@
     </script>
 
     <div>
-    {% for atr in reference %}
-    <div class="ref_atr" id_atr="{{atr.id}}" ord="{{loop.index0}}">
+    {% for attr in reference %}
+    <div class="ref_atr" id_atr="{{attr.id}}" ord="{{loop.index0}}">
         <div style="border-bottom: 1px dotted gray;">
             <div style="float: left; width: 40px; text-align: center;">
-                <input type="checkbox" {% if atr.included %}checked="checked"{% endif %}/>
+                <input type="checkbox" 
+                    {% if attr.included %}checked="checked"{% endif %}/>
             </div>
-            <div style="width: 80%; font-weight: bold; float: left;">{{atr.title}}</div>
-            <div style="float: left;"><input class="sp_button reforder_up" type="button" value="{{_('Up')}}"/></div>
-            <div><input class="sp_button reforder_down" type="button" value="{{_('Down')}}"/></div>
+            
+            <div title="{{attr.name}}" style="width: 80%; font-weight: bold; 
+                float: left;
+                {% if not attr.visible %}color: red;{% endif %}">{{attr.title}}</div>
+            
+            <div style="float: left;"><input class="sp_button reforder_up" 
+                type="button" value="{{_('Up')}}"/></div>
+            <div>
+                <input class="sp_button reforder_down" type="button" 
+                    value="{{_('Down')}}"/>
+            </div>
         </div>
     </div>
     {% endfor %}
     </div>
     
     <div style="height: 50px;">
-        <input id="save_ref_order" class="sp_button" style="margin-top: 20px;" type="button" value="{{_('Save')}}"/>
+        <input id="save_ref_order" class="sp_button" style="margin-top: 20px;" 
+            type="button" value="{{_('Save')}}"/>
     </div>
     
     <form id="form_ref_order" method="post" action="{{tg.url('/ref_order_save')}}">
