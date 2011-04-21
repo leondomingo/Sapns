@@ -83,16 +83,15 @@ class SapnsUser(User):
         
         return shortcuts
     
-    def copy_from(self, user_id):
+    def copy_from(self, other_id):
         
         logger = logging.getLogger('SapnsUser.copy_from')
         try:
             # shortcuts
+            logger.info('Copying shortcuts')
             parents = {}
             for sc in DBSession.query(SapnsShortcut).\
-                    filter(SapnsShortcut.user_id == user_id):
-                
-                logger.info('Copying shortcut "%s"...' % sc.title)
+                    filter(SapnsShortcut.user_id == other_id):
                 
                 sc_copy = SapnsShortcut()
                 sc_copy.title = sc.title
@@ -106,15 +105,39 @@ class SapnsUser(User):
                 
                 parents[sc.shortcut_id] = sc_copy.shortcut_id
                 
+            logger.info('Updating parents')
             for sc_copy in DBSession.query(SapnsShortcut).\
                     filter(and_(SapnsShortcut.user_id == self.user_id,
                                 SapnsShortcut.parent_id != None)):
-                
-                logger.info('Updating parent...')
-                
+
                 # update parent shortcut
                 sc_copy.parent_id = parents[sc_copy.parent_id]
                 DBSession.add(sc_copy)
+                DBSession.flush()
+                
+            # privileges (on classes)
+            logger.info('Copying privileges')
+            for priv in DBSession.query(SapnsPrivilege).\
+                    filter(SapnsPrivilege.user_id == other_id):
+
+                priv_copy = SapnsPrivilege()
+                priv_copy.class_id = priv.class_id
+                priv_copy.user_id = self.user_id
+                
+                DBSession.add(priv_copy)
+                DBSession.flush()
+            
+            # attribute privileges
+            logger.info('Copying attribute privileges')
+            for ap in DBSession.query(SapnsAttrPrivilege).\
+                    filter(SapnsAttrPrivilege.user_id == other_id):
+                
+                ap_copy = SapnsAttrPrivilege()
+                ap_copy.user_id = self.user_id
+                ap_copy.attribute_id = ap.attribute_id
+                ap_copy.access = ap.access
+                
+                DBSession.add(ap_copy)
                 DBSession.flush()
                 
         except Exception, e:
@@ -149,8 +172,14 @@ class SapnsShortcut(DeclarativeBase):
     order = Column(Integer)
     parent_id = Column('id_parent_shortcut', Integer, ForeignKey('sp_shortcuts.id'))
     
-    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), nullable=False)
-    action_id = Column('id_action', Integer, ForeignKey('sp_actions.id')) #, nullable=False)
+    user_id = Column('id_user', Integer, 
+                     ForeignKey('sp_users.id', 
+                                onupdate='CASCADE', ondelete='CASCADE'), 
+                     nullable=False)
+    
+    action_id = Column('id_action', Integer, 
+                       ForeignKey('sp_actions.id', 
+                                  onupdate='CASCADE', ondelete='SET NULL')) #, nullable=False)
     
     def __repr__(self):
         return ('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
@@ -267,13 +296,15 @@ class SapnsAttribute(DeclarativeBase):
     name = Column(Unicode(60), nullable=False)
     title = Column(Unicode(100), nullable=False)
     
-    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
+    class_id = Column('id_class', Integer, 
+                      ForeignKey('sp_classes.id', onupdate='CASCADE', ondelete='CASCADE'), 
+                      nullable=False)
     
     type = Column(Unicode(20), nullable=False)
-    required = Column(Boolean, default=False)
+    required = Column(Boolean, DefaultClause('false'), default=False)
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
-    visible = Column(Boolean, default=True)
+    visible = Column(Boolean, DefaultClause('true'), default=True)
     is_collection = Column(Boolean, DefaultClause('false'), default=False)
     
 SapnsClass.attributes = \
@@ -285,9 +316,13 @@ class SapnsPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_privilege'
     
-    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), 
+    user_id = Column('id_user', Integer, 
+                     ForeignKey('sp_users.id', 
+                                onupdate='CASCADE', ondelete='CASCADE'), 
                      primary_key=True, nullable=False)
-    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), 
+    
+    class_id = Column('id_class', Integer, 
+                      ForeignKey('sp_classes.id', onupdate='CASCADE', ondelete='CASCADE'), 
                       primary_key=True, nullable=False)
     
     @staticmethod
@@ -322,10 +357,16 @@ class SapnsAttrPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_attr_privilege'
     
-    user_id = Column('id_user', Integer, ForeignKey('sp_users.id'), 
+    user_id = Column('id_user', Integer, 
+                     ForeignKey('sp_users.id', 
+                                onupdate='CASCADE', ondelete='CASCADE'), 
                      primary_key=True, nullable=False)
-    attribute_id = Column('id_attribute', Integer, ForeignKey('sp_attributes.id'), 
+    
+    attribute_id = Column('id_attribute', Integer, 
+                          ForeignKey('sp_attributes.id',
+                                     onupdate='CASCADE', ondelete='CASCADE'), 
                           primary_key=True, nullable=False)
+    
     access = Column(Unicode(15)) # denied, read-only, read/write
     
     ACCESS_DENIED = 'denied'
@@ -394,7 +435,9 @@ class SapnsAction(DeclarativeBase):
     type = Column(Unicode(20), nullable=False)
     
     # TODO: puede ser nulo? (nullable=False)
-    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'))
+    class_id = Column('id_class', Integer, 
+                      ForeignKey('sp_classes.id', 
+                                 onupdate='CASCADE', ondelete='CASCADE'))
     
     TYPE_NEW = 'new'
     TYPE_EDIT = 'edit'
@@ -437,7 +480,11 @@ class SapnsViewColumn(DeclarativeBase):
     text_align = Column(Unicode(10))
     width = Column(Integer)
     
-    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, 
+                     ForeignKey('sp_views.id',
+                                onupdate='CASCADE', ondelete='CASCADE'), 
+                     nullable=False)
+    
     # columns (SapnsViewColumn)
     # relations (SapnsViewRelation)
     # filters (SapnsViewFilter)
@@ -459,7 +506,10 @@ class SapnsViewRelation(DeclarativeBase):
     alias = Column(Unicode(100), nullable=False)
     condition = Column(String)
     
-    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, 
+                     ForeignKey('sp_views.id',
+                                onupdate='CASCADE', ondelete='CASCADE'), 
+                     nullable=False)
     
 SapnsView.relations = \
     relation(SapnsViewRelation, 
@@ -477,7 +527,10 @@ class SapnsViewFilter(DeclarativeBase):
     definition = Column(String)
     active = Column(Boolean)
 
-    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, 
+                     ForeignKey('sp_views.id',
+                                onupdate='CASCADE', ondelete='CASCADE'), 
+                     nullable=False)
     
 SapnsView.filters = \
     relation(SapnsViewFilter, 
@@ -494,7 +547,10 @@ class SapnsViewOrder(DeclarativeBase):
     definition = Column(String)
     sort_order = Column(Integer)
 
-    view_id = Column('id_view', Integer, ForeignKey('sp_views.id'), nullable=False)
+    view_id = Column('id_view', Integer, 
+                     ForeignKey('sp_views.id',
+                                onupdate='CASCADE', ondelete='CASCADE'), 
+                     nullable=False)
     
 SapnsView.orders = \
     relation(SapnsViewOrder, 
@@ -524,14 +580,20 @@ class SapnsReportParam(DeclarativeBase):
     
     name = Column(Unicode(200), nullable=False)
     
-    class_id = Column('id_class', Integer, ForeignKey('sp_classes.id'), nullable=False)
+    class_id = Column('id_class', Integer, 
+                      ForeignKey('sp_classes.id',
+                                 onupdate='CASCADE', ondelete='CASCADE'), 
+                      nullable=False)
     
     default_value = Column(Unicode(200))
     
     sort_order = Column(Integer)
     expression = Column(String)
     
-    report_id = Column('id_report', Integer, ForeignKey('sp_reports.id'), nullable=False)
+    report_id = Column('id_report', Integer, 
+                       ForeignKey('sp_reports.id',
+                                  onupdate='CASCADE', ondelete='CASCADE'), 
+                       nullable=False)
     
 SapnsReport.params = \
     relation(SapnsReportParam, 
