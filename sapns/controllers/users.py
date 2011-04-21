@@ -2,7 +2,7 @@
 """Users management controller"""
 
 # turbogears imports
-from tg import expose, url, config
+from tg import expose, url, config, redirect
 
 # third party imports
 from pylons.i18n import ugettext as _
@@ -15,6 +15,7 @@ from sapns.model import DBSession
 import logging
 from sapns.model.sapnsmodel import SapnsUser 
 from neptuno.dataset import DataSet
+from sapns.controllers.util import UtilController
 
 class UsersController(BaseController):
     # only for "managers"
@@ -31,7 +32,7 @@ class UsersController(BaseController):
                       ('e_mail', _('E-mail address'), ''),
                       ])
         
-        for us in DBSession.query(SapnsUser).all():
+        for us in DBSession.query(SapnsUser).order_by(SapnsUser.user_id):
             ds.append(dict(id=us.user_id,
                            display_name=us.display_name, 
                            user_name=us.user_name,
@@ -39,7 +40,7 @@ class UsersController(BaseController):
                            ))
             
         actions = []
-        actions.append(dict(title=_('New'), url='/users/user_new', require_id=True))
+        actions.append(dict(title=_('New'), url='/users/user_new', require_id=False))
         actions.append(dict(title=_('Edit'), url='/users/user_edit', require_id=True))
         actions.append(dict(title=_('Delete'), url='/users/user_delete', require_id=True))
         
@@ -82,6 +83,47 @@ class UsersController(BaseController):
         
         user = DBSession.query(SapnsUser).get(id)
         return dict(user=user, came_from=url(came_from))
+    
+    @expose('users/user_edit.html')
+    def user_new(self, id=None, cls=None, came_from='/users'):
+        
+        other_users = []
+        for us in DBSession.query(SapnsUser):
+            other_users.append(dict(id=us.user_id, name=us.user_name))
+        
+        return dict(user={}, other_users=other_users, came_from=url(came_from))
+    
+    @expose()
+    def user_save(self, **params):
+        
+        try:
+            new_user = False
+            if params['id']:
+                user = DBSession.query(SapnsUser).get(params['id'])
+            else:
+                new_user = True
+                user = SapnsUser()
+                
+            user.display_name = params['display_name']
+            user.user_name = params['user_name']
+            user.email_address = params['email_address']
+            
+            if params['password'] != '':
+                user.password = params['password']
+                
+            DBSession.add(user)
+            DBSession.flush()
+            
+            # TODO: copy shortcuts form another user
+            if new_user:
+                user.copy_from(int(params['copy_from']))
+        
+        except:
+            redirect(url('/message', 
+                         dict(message=_('An error occurred while saving the user'),
+                              came_from='/users')))
+
+        redirect(url('/users'))
     
     @expose('users/user_delete.html')
     def user_delete(self, id=None, cls=None, came_from='/users'):

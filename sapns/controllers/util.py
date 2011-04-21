@@ -45,7 +45,7 @@ class UtilController(BaseController):
         
         logger = logging.getLogger(__name__ + '/create_dashboards')
         
-        for us in DBSession.query(SapnsUser).all():
+        for us in DBSession.query(SapnsUser):
             
             logger.info('Creating dashboard for "%s"' % us.display_name)
             

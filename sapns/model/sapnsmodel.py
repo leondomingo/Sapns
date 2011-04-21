@@ -83,6 +83,43 @@ class SapnsUser(User):
         
         return shortcuts
     
+    def copy_from(self, user_id):
+        
+        logger = logging.getLogger('SapnsUser.copy_from')
+        try:
+            # shortcuts
+            parents = {}
+            for sc in DBSession.query(SapnsShortcut).\
+                    filter(SapnsShortcut.user_id == user_id):
+                
+                logger.info('Copying shortcut "%s"...' % sc.title)
+                
+                sc_copy = SapnsShortcut()
+                sc_copy.title = sc.title
+                sc_copy.parent_id = sc.parent_id
+                sc_copy.user_id = self.user_id
+                sc_copy.action_id = sc.action_id
+                sc_copy.order = sc.order
+                
+                DBSession.add(sc_copy)
+                DBSession.flush()
+                
+                parents[sc.shortcut_id] = sc_copy.shortcut_id
+                
+            for sc_copy in DBSession.query(SapnsShortcut).\
+                    filter(and_(SapnsShortcut.user_id == self.user_id,
+                                SapnsShortcut.parent_id != None)):
+                
+                logger.info('Updating parent...')
+                
+                # update parent shortcut
+                sc_copy.parent_id = parents[sc_copy.parent_id]
+                DBSession.add(sc_copy)
+                DBSession.flush()
+                
+        except Exception, e:
+            logger.error(e)
+    
     def has_privilege(self, cls):
         priv = DBSession.query(SapnsPrivilege).\
                 join((SapnsClass, 
