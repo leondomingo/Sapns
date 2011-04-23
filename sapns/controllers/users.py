@@ -15,10 +15,10 @@ from sapns.model import DBSession
 import logging
 from sapns.model.sapnsmodel import SapnsUser 
 from neptuno.dataset import DataSet
-from sapns.controllers.util import UtilController
 
 class UsersController(BaseController):
-    # only for "managers"
+    # manage
+    # users
     allow_only = authorize.has_permission('manage') or authorize.has_permission('users')
     
     @expose('users/index.html')
@@ -79,13 +79,17 @@ class UsersController(BaseController):
                               totalp=totalp, total=ds.count, total_pag=1))
         
     @expose('users/user_edit.html')
-    def user_edit(self, id=None, cls=None, came_from='/users'):
+    def user_edit(self, **params):
+        
+        id = int(params['id'])
+        came_from = params.get('came_from', '/users')
         
         user = DBSession.query(SapnsUser).get(id)
         return dict(user=user, came_from=url(came_from))
     
     @expose('users/user_edit.html')
-    def user_new(self, id=None, cls=None, came_from='/users'):
+    def user_new(self, **params):
+        came_from = params.get('came_from', '/users')
         
         other_users = []
         for us in DBSession.query(SapnsUser):
@@ -114,7 +118,7 @@ class UsersController(BaseController):
             DBSession.add(user)
             DBSession.flush()
             
-            # TODO: copy shortcuts form another user
+            # copy shortcuts and privileges form another user
             if new_user:
                 user.copy_from(int(params['copy_from']))
         
@@ -125,9 +129,24 @@ class UsersController(BaseController):
 
         redirect(url('/users'))
     
-    @expose('users/user_delete.html')
-    def user_delete(self, id=None, cls=None, came_from='/users'):
-        return dict(came_from=url(came_from))
+    @expose()
+    def user_delete(self, **params):
+        
+        logger = logging.getLogger(__name__ + '/user_delete')
+        try:
+            id = int(params['id'])
+            came_from = params.get('came_from', '/users')
+            
+            DBSession.query(SapnsUser).\
+                filter(SapnsUser.user_id == id).\
+                delete()
+                
+            DBSession.flush()
+
+        except Exception, e:
+            logger.error(e)
+        
+        redirect(url(came_from))
     
     @expose('users/permission.html')
     def permission(self, came_from='/users'):

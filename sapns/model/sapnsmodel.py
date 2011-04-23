@@ -170,7 +170,9 @@ class SapnsShortcut(DeclarativeBase):
     shortcut_id = Column('id', Integer, autoincrement=True, primary_key=True)
     title = Column(Unicode(50))
     order = Column(Integer)
-    parent_id = Column('id_parent_shortcut', Integer, ForeignKey('sp_shortcuts.id'))
+    parent_id = Column('id_parent_shortcut', Integer, 
+                       ForeignKey('sp_shortcuts.id',
+                                  onupdate='CASCADE', ondelete='CASCADE'))
     
     user_id = Column('id_user', Integer, 
                      ForeignKey('sp_users.id', 
