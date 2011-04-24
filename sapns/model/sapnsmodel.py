@@ -299,8 +299,13 @@ class SapnsAttribute(DeclarativeBase):
     title = Column(Unicode(100), nullable=False)
     
     class_id = Column('id_class', Integer, 
-                      ForeignKey('sp_classes.id', onupdate='CASCADE', ondelete='CASCADE'), 
+                      ForeignKey('sp_classes.id', 
+                                 onupdate='CASCADE', ondelete='CASCADE'), 
                       nullable=False)
+    
+    related_class_id = Column('id_related_class', Integer, 
+                              ForeignKey('sp_classes.id',
+                                         onupdate='CASCADE', ondelete='SET NULL'))
     
     type = Column(Unicode(20), nullable=False)
     required = Column(Boolean, DefaultClause('false'), default=False)

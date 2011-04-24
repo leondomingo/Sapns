@@ -6,7 +6,7 @@ from tg import expose, url, response, config
 from tg.i18n import set_lang
 
 # third party imports
-from pylons.i18n import ugettext as _
+from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from repoze.what import authorize
 
 # project specific imports
@@ -56,7 +56,7 @@ class UtilController(BaseController):
                 dboard = SapnsShortcut()
                 dboard.user_id = us.user_id
                 dboard.parent_id = None
-                dboard.title = _('Dashboard')
+                dboard.title = unicode(l_('Dashboard'))
                 dboard.order = 0
                 
                 DBSession.add(dboard)
@@ -65,7 +65,7 @@ class UtilController(BaseController):
                 # data exploration
                 
                 data_ex = SapnsShortcut()
-                data_ex.title = _('Data exploration')
+                data_ex.title = unicode(l_('Data exploration'))
                 data_ex.parent_id = dboard.shortcut_id
                 data_ex.user_id = us.user_id
                 data_ex.order = 0
@@ -84,7 +84,7 @@ class UtilController(BaseController):
                 
                 # Data exploration/Project
                 sc_project = SapnsShortcut()
-                sc_project.title = config.get('app.name', _('Project'))
+                sc_project.title = config.get('app.name', unicode(l_('Project')))
                 sc_project.parent_id = data_ex.shortcut_id
                 sc_project.user_id = us.user_id
                 sc_project.order = 1
@@ -115,7 +115,7 @@ class UtilController(BaseController):
                                 
                 if not act_table:
                     act_table = SapnsAction()
-                    act_table.name = _('List')
+                    act_table.name = unicode(l_('List'))
                     act_table.type = SapnsAction.TYPE_LIST
                     act_table.class_id = cls.class_id
                     
@@ -153,22 +153,22 @@ class UtilController(BaseController):
                     logger.info('Shortcut for "%s" already exists' % cls.title)
                 
                 # attribute privileges
-                for atr in DBSession.query(SapnsAttribute).\
+                for attr in DBSession.query(SapnsAttribute).\
                         filter(SapnsAttribute.class_id == cls.class_id).\
                         all():
                     
-                    #if not SapnsAttrPrivilege.get_privilege(us.user_id, atr.attribute_id):
-                    if not us.attr_privilege(atr.attribute_id):
-                        priv_atr = SapnsAttrPrivilege()
-                        priv_atr.user_id = us.user_id
-                        priv_atr.attribute_id = atr.attribute_id
-                        priv_atr.access = SapnsAttrPrivilege.ACCESS_READWRITE
+                    #if not SapnsAttrPrivilege.get_privilege(us.user_id, attr.attribute_id):
+                    if not us.attr_privilege(attr.attribute_id):
+                        priv_attr = SapnsAttrPrivilege()
+                        priv_attr.user_id = us.user_id
+                        priv_attr.attribute_id = attr.attribute_id
+                        priv_attr.access = SapnsAttrPrivilege.ACCESS_READWRITE
                         
-                        DBSession.add(priv_atr)
+                        DBSession.add(priv_attr)
                         DBSession.flush()
                         
                     else:
-                        logger.info('Privilege for "%s" already exists' % atr.title)
+                        logger.info('Privilege for "%s" already exists' % attr.title)
 
         return dict(message=_('The user dashboards have been created'), 
                     came_from=url(came_from))
@@ -179,6 +179,8 @@ class UtilController(BaseController):
         logger = logging.getLogger(__name__ + '/update_metadata')
         
         tables = self.extract_model()['tables']
+        tables_id = {}
+        pending_attr = {}
         for tbl in tables:
             
             logger.info('Table: %s' % tbl['name'])
@@ -193,7 +195,7 @@ class UtilController(BaseController):
                 klass = SapnsClass()
                 klass.name = tbl['name']
                 klass.title = tbl['name'].title()
-                desc = _('Class: %s')
+                desc = unicode(l_('Class: %s'))
                 klass.description =  desc % tbl['name']
                 
                 DBSession.add(klass)
@@ -201,6 +203,8 @@ class UtilController(BaseController):
                 
             else:
                 logger.warning('.....already exists')
+                
+            tables_id[tbl['name']] = klass.class_id
                 
             # create an action
             def create_action(name, type_):
@@ -219,45 +223,57 @@ class UtilController(BaseController):
                     DBSession.flush()
                     
             # create standard actions
-            create_action(_('New'), SapnsAction.TYPE_NEW)
-            create_action(_('Edit'), SapnsAction.TYPE_EDIT)
-            create_action(_('Delete'), SapnsAction.TYPE_DELETE)
-            create_action(_('List'), SapnsAction.TYPE_LIST)
+            create_action(unicode(l_('New')), SapnsAction.TYPE_NEW)
+            create_action(unicode(l_('Edit')), SapnsAction.TYPE_EDIT)
+            create_action(unicode(l_('Delete')), SapnsAction.TYPE_DELETE)
+            create_action(unicode(l_('List')), SapnsAction.TYPE_LIST)
                 
             first_ref = False
             for i, col in enumerate(tbl['columns']):
                 
                 logger.info('Column: %s' % col['name'])
                 
-                atr = DBSession.query(SapnsAttribute).\
+                attr = DBSession.query(SapnsAttribute).\
                         filter(and_(SapnsAttribute.name == col['name'],
                                     SapnsAttribute.class_id == klass.class_id, 
                                     )).\
                         first()
                         
-                if not atr and col['name'] != 'id':
+                if not attr and col['name'] != 'id':
                     logger.warning('.....creating')
                     
-                    atr = SapnsAttribute()
-                    atr.name = col['name']
-                    atr.title = col['name'].replace('_', ' ').title()
-                    atr.class_id = klass.class_id
-                    atr.type = col['type_name']
-                    if atr.type == 'Unicode' and not first_ref:
-                        atr.reference_order = 0
+                    attr = SapnsAttribute()
+                    attr.name = col['name']
+                    attr.title = col['name'].replace('_', ' ').title()
+                    attr.class_id = klass.class_id
+                    attr.type = col['type_name']
+                    if attr.type == 'Unicode' and not first_ref:
+                        attr.reference_order = 0
                         first_ref = True
                         
-                    atr.visible = True
+                    attr.visible = True
                         
-                    atr.insertion_order = i
-                    atr.is_collection = False
+                    attr.insertion_order = i
+                    attr.is_collection = False
                     
-                    DBSession.add(atr)
+                    DBSession.add(attr)
                     DBSession.flush()
                     
                 else:
                     logger.warning('.....already exists')
                     
+                # foreign key
+                if col['fk_table'] != None:
+                    pending_attr[attr.attribute_id] = col['fk_table'].name
+            
+        # update related classes
+        for attr_id, fk_table in pending_attr.iteritems():
+            attr = DBSession.query(SapnsAttribute).get(attr_id)
+            attr.related_class_id = tables_id[fk_table]
+            
+            DBSession.add(attr)
+            DBSession.flush()
+
         return dict(message=_('Process terminated'), came_from=url(came_from))
     
     @expose(content_type='text/plain')
@@ -295,8 +311,7 @@ class UtilController(BaseController):
                 class_name = [i.title() for i in tbl.name.split('_')]
                 t['class_name'] = ''.join(class_name)
                 
-                #t['pk'] = dir(tbl.primary_key)
-                t['pk'] = [k for k in tbl.primary_key.columns.keys()] #['id'].name
+                t['pk'] = [k for k in tbl.primary_key.columns.keys()]
                 
                 fk_cols = []
                 fk_tables = []
