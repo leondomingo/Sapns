@@ -10,16 +10,34 @@
     	
     	$('#save_button').click(function() {
     		var params = '';
-    		$('.sp_input_field').each(function(){
+    		
+    		// text
+    		$('.sp_text_field').each(function(){
     			params += 
     				'<input type="hidden" ' + 
-    			        'name="' + $(this).attr('name') + '" ' + 
+    			        'name="fld_' + $(this).attr('name') + '" ' + 
     			        'value="' + $(this).val() + '"/>\n';
     		});
     		
-    		//alert(params)
+    		// checkbox
+            $('input[type="checkbox"]').each(function(){
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + $(this).attr('checked') + '"/>\n';
+            });
     		
-    		//$('#edit_form').append(params).submit();
+    		// select fields
+            $('.sp_select_field').each(function(){
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + $(this).val() + '"/>\n';
+            });
+    		
+    		alert(params)
+    		
+    		$('#edit_form').append(params).submit();
     		//alert($('#edit_form').html());
     	});
     });
@@ -38,12 +56,17 @@
     .sp_edit_field {
     }
     
-    .sp_input_field {
+    .sp_text_field {
         width: 97%;
         max-width: 97%;
         min-width: 97%;
         margin-left: 1%;
     }
+    
+    .sp_select_field {
+        width: 85%;
+        margin-left: 1%;
+    }    
     
     .sp_memo_field {
         min-height: 40px;
@@ -83,12 +106,27 @@
         <div>
         <!-- Boolean -->
         {% if atr.type == 'Boolean' %}
-        <input class="sp_input_field" type="checkbox" name="{{atr.name}}"
-            {% if atr.value %}checked="checked"{% endif %}/>
+        <input class="sp_text_field" type="checkbox" name="{{atr.name}}"
+            {% if atr.value %}checked{% endif %}/>
         {% elif atr.type == 'String' %}
-        <textarea class="sp_input_field sp_memo_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
+        <textarea class="sp_text_field sp_memo_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
+        {% elif atr.vals != None %}
+        <select name="{{atr.name}}" 
+            related_class="{{atr.related_class}}" class="sp_select_field">
+            <option value="null" 
+                {% if atr.value == None %}selected{%endif%}>{{_('none')}}</option>
+            {% for value in atr.vals %}
+            <option value="{{value.id}}" 
+                {% if value.id == atr.value %}selected{%endif%}>{{value.title}}</value>
+            {% endfor %}
+        </select>
+        <a href="/list?cls={{atr.related_class}}"
+            title="{{atr.related_class}}">[{{_('list')}}]</a>
+        {% if atr.value %}
+        <a href="/edit?cls={{atr.related_class}}&id={{atr.value}}">[{{_('edit')}}]</a>
+        {% endif %}
         {% else %}
-        <input class="sp_input_field" type="text" name="{{atr.name}}" 
+        <input class="sp_text_field" type="text" name="{{atr.name}}" 
             value="{{atr.value}}"/>
         {% endif %}
         </div>

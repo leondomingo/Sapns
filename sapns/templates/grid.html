@@ -139,10 +139,10 @@
     <!-- <div> -->
       <div class="sp_grid_pager_desc">{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.totalp)}}</div>
       <select class="sp_button sp_grid_rp">
-          <option value="10"  {% if grid.rp == 10 %}selected="selected"{% endif %}>10</option>
-          <option value="50"  {% if grid.rp == 50 %}selected="selected"{% endif %}>50</option>
-          <option value="100" {% if grid.rp == 100 %}selected="selected"{% endif %}>100</option>
-          <option value="0"   {% if grid.rp == 0 %}selected="selected"{% endif %}>{{_('All')}}</option>
+          <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
+          <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
+          <option value="100" {% if grid.rp == 100 %}selected{% endif %}>100</option>
+          <option value="0"   {% if grid.rp == 0 %}selected{% endif %}>{{_('All')}}</option>
       </select>
     <!-- </div> -->
 
@@ -171,7 +171,7 @@
         <input class="sp_button sp_grid_pag_back" type="submit" value="<<" 
             title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
         {% else %}
-        <input class="sp_button sp_grid_pag_back" type="button" value="<<" disabled="disabled"/>
+        <input class="sp_button sp_grid_pag_back" type="button" value="<<" disabled/>
         {% endif %}
     </form>
     {# {% endif %} #}
@@ -192,7 +192,7 @@
         <input class="sp_button sp_grid_pag_forth" type="submit" value=">>" 
             title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
         {% else %}
-        <input class="sp_button sp_grid_pag_forth" type="button" value=">>" disabled="disabled"/>
+        <input class="sp_button sp_grid_pag_forth" type="button" value=">>" disabled/>
         {% endif %}
     </form>
 

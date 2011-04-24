@@ -287,6 +287,16 @@ class SapnsClass(DeclarativeBase):
             
         return ref
     
+    def attr_by_name(self, attr_name):
+        
+        attr = DBSession.query(SapnsAttribute).\
+                filter(and_(SapnsAttribute.class_id == self.class_id,
+                            SapnsAttribute.name == attr_name,
+                            )).\
+                first()
+                
+        return attr
+    
 class SapnsAttribute(DeclarativeBase):
     
     """List of sapns columns in tables"""
@@ -306,6 +316,12 @@ class SapnsAttribute(DeclarativeBase):
     related_class_id = Column('id_related_class', Integer, 
                               ForeignKey('sp_classes.id',
                                          onupdate='CASCADE', ondelete='SET NULL'))
+    
+    TYPE_INTEGER = 'Integer'
+    TYPE_BOOLEAN = 'Boolean'
+    TYPE_NUMERIC = 'Numeric'
+    TYPE_UNICODE = 'Unicode'
+    TYPE_STRING = 'String' # memo type
     
     type = Column(Unicode(20), nullable=False)
     required = Column(Boolean, DefaultClause('false'), default=False)

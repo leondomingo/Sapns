@@ -23,6 +23,7 @@ from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
     SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege
 
 import logging
+import re
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
@@ -227,12 +228,56 @@ class RootController(BaseController):
     def data(self, cls='', id=None):
         pass
     
-    def save(self, cls='', id=None):
-        pass
+    @expose()
+    @require(predicates.not_anonymous())
+    def save(self, **params):
+        
+        logger = logging.getLogger(__name__ + '/save')
+        logger.info(params)
+
+        cls = SapnsClass.by_name(params['cls'])
+        came_from = params.get('came_from', '/list?cls=%s' % cls.name)
+        
+        fields = {}
+        
+        if params['id'] != '':
+            fields['id'] = int(params['id'])
+        
+        for field_name, field_value in params.iteritems():
+            m_field = re.search(r'^fld_(.+)', field_name)
+            if m_field:
+                field_name_ = m_field.group(1) 
+                attr = cls.attr_by_name(field_name_)
+                
+                # null values
+                if field_value == 'null':
+                    field_value = None
+                    
+                else:
+                    # integer
+                    if attr.type == SapnsAttribute.TYPE_INTEGER:
+                        field_value = int(field_value)
+                    
+                    # numeric
+                    elif attr.type == SapnsAttribute.TYPE_NUMERIC:
+                        field_value = float(field_value)
+                    
+                    # boolean
+                    elif attr.type == SapnsAttribute.TYPE_BOOLEAN:
+                        field_value = (True if field_value == 'true' else False)
+                
+                fields[field_name_] = field_value
+                
+        
+        logger.info(fields)
+        
+        redirect(url(came_from))
     
     @expose('edit.html')
     @require(predicates.not_anonymous())
     def edit(self, cls='', id=None, came_from='/'):
+        
+        logger = logging.getLogger(__name__ + '/edit')
         
         user = request.identity['user']
         
@@ -270,11 +315,11 @@ class RootController(BaseController):
                                   came_from=came_from)))
                 
             # reference
-            ref = '.'.join([unicode(row[atr['name']] or '') for atr in class_.reference()])
+            ref = '.'.join([unicode(row[attr['name']] or '') for attr in class_.reference()])
             
         # get attributes
         attributes = []
-        for atr in DBSession.query(SapnsAttribute).\
+        for attr in DBSession.query(SapnsAttribute).\
                 join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
                 join((SapnsAttrPrivilege, 
                       and_(SapnsAttrPrivilege.user_id == user.user_id,
@@ -284,8 +329,40 @@ class RootController(BaseController):
                 order_by(SapnsAttribute.insertion_order).\
                 all():
             
-            attributes.append(dict(name=atr.name, title=atr.title, 
-                                   type=atr.type, value=row[atr.name] or ''))
+            attributes.append(dict(name=attr.name, title=attr.title, 
+                                   type=attr.type, value=row[attr.name] or '',
+                                   vals=None))
+            
+            if attr.related_class_id:
+                # vals
+                attributes[-1]['vals'] = []
+                try:
+                    rel_class = DBSession.query(SapnsClass).get(attr.related_class_id)
+                    ref_rel = rel_class.reference()
+                    tbl_rel = Table(rel_class.name, meta, autoload=True)
+                    
+                    # related_class
+                    attributes[-1]['related_class'] = rel_class.name
+                    
+                    logger.info(rel_class.name)
+                    
+                    logger.info(tbl_rel.select())
+                    
+                    vals = attributes[-1]['vals']
+                    for rel_obj in DBSession.execute(tbl_rel.select()):
+                        try:
+                            title_values = [rel_obj[r['name']] for r in ref_rel]
+                            logger.info('.'.join(title_values))
+                            vals.append(dict(id=rel_obj.id,
+                                             title='.'.join(title_values)
+                                             ))
+                            
+                        except Exception, e:
+                            logger.error(e)
+                
+                except:
+                    attributes[-1]['values'] = None
+                
             
         return dict(cls=cls, id=id, attributes=attributes,
                     reference=ref, came_from=url(came_from))
