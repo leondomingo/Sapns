@@ -64,9 +64,14 @@
     	});
     	
     	// create datepickers
-    	// with specific date format
+    	// with specific date format and options
     	$('.sp_date_field').datepicker({
-    		firstDay: 1,
+    		firstDay: {{js_options.first_day}},
+    		changeYear: true,
+    		showOn: 'button',
+    		autoSize: true,
+    		nextText: "{{_('Next')}}",
+    		prevText: "{{_('Prev')}}",
     		dateFormat: '{{js_options.date_format}}',
     		dayNames: ["{{_('Sunday')}}", "{{_('Monday')}}", "{{_('Tuesday')}}",
     		           "{{_('Wednesday')}}", "{{_('Thursday')}}", "{{_('Friday')}}",
@@ -88,7 +93,12 @@
     
     .sp_save_button {
         position: fixed;
-        right: 300px;
+        right: 350px;
+        width: 80px;
+        height: 30px;
+        text-align: center;
+        background-color: #B4BD3C;
+        border: 1px solid gray;
     }
     
     .sp_edit_field {
@@ -107,19 +117,16 @@
     }
     
     .sp_checkbox_field {
-        with: 97;
         margin-left: 1%;
     }
     
     .sp_date_field {
-        with: 97;
         margin-left: 1%;
     }
     
     .sp_memo_field {
         min-height: 40px;
         height: 100px;
-        /*font-family: Courier;*/
     }
 </style>
 
@@ -164,8 +171,10 @@
         {% elif attr.type == 'Date' %}
         <input class="sp_date_field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>
+        <!-- Memo -->
         {% elif attr.type == 'String' %}
-        <textarea class="sp_text_field sp_memo_field" name="{{attr.name}}">{{attr.value}}</textarea>
+        <textarea class="sp_text_field sp_memo_field" name="{{attr.name}}">{{attr.value|escape}}</textarea>
+        <!-- Select -->
         {% elif attr.vals != None %}
         <select name="{{attr.name}}"
             related_class="{{attr.related_class}}" class="sp_select_field">
@@ -184,7 +193,7 @@
             {% endif %}
         {% else %}
         <input class="sp_text_field" type="text" name="{{attr.name}}" 
-            value="{{attr.value}}"/>
+            value="{{attr.value|escape}}"/>
         {% endif %}
         </div>
     </div>

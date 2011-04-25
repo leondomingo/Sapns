@@ -353,7 +353,9 @@ class RootController(BaseController):
         # js options
         js_options = dict(date_format=config.get('js.date_format', default='mm-dd-yy'),
                           day_names_min=config.get('js.day_names_min'),
-                          month_names=config.get('js.month_names')
+                          month_names=config.get('js.month_names'),
+                          first_day=config.get('js.first_day'),
+                          
                           )
         
         ref = None

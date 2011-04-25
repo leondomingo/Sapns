@@ -41,7 +41,7 @@ grid.false_const = No
 
 # JavaScript options
 js.date_format = mm/dd/yy
-# 0-sunday, 1-monday, 2-tuesday, ..., 6-saturday
+# 0-sunday, 1-monday, ..., 6-saturday
 js.first_day = 1
 
 # TODO: Application's settings here
