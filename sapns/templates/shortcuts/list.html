@@ -3,36 +3,46 @@
     <li>
     {% if sc.action_type %}
         {% if sc.action_type == 'list' %}
-            <div style="{% if loop.index % 2 == 0 %}background-color: white;{%endif%}">
-            <div style="width: 400px; float: left; margin-top: 5px; padding-left: 20px;">
+            <div style="{% if loop.index % 2 == 0 %}background-color: white;{%endif%}
+                height: 24px;">
+                
+            <div style="width: 400px; float: left;
+                margin-top: 2px;
+                padding-left: 20px;">
             <a href="{{tg.url('/list', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{sc.title}}</a>
             </div>
             
             <!-- actions over shortcuts -->
-            <div style="float: left;">
-            <form method="post" action="/ins_order">
-                <input type="hidden" name="cls" value="{{sc.cls}}"/>
-                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
-                <input class="sp_button" title="{{'%s on %s'|format(_('Insertion order'), sc.title)}}" 
-                    type="submit" value="{{_('Insertion order')}}"/>
-            </form>
+            
+            <!-- insertion order -->
+            <div style="float: left; border: 1px solid #B4BD3C;
+                padding-left: 2px; padding-right: 2px;
+                margin-top: 2px;
+                margin-left: 5px; margin-right: 5px;">
+            
+            <a href="{{tg.url('/ins_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
+                {{_('Insertion order')}}
+            </a>
             </div>
             
-            <div style="float: left;">
-            <form method="post" action="/ref_order">
-                <input type="hidden" name="cls" value="{{sc.cls}}"/>
-                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
-                <input class="sp_button" title="{{'%s on %s'|format(_('Reference order'), sc.title)}}" 
-                    type="submit" value="{{_('Reference order')}}"/>
-            </form>
+            <!-- reference order -->
+            <div style="border: 1px solid #B4BD3C;
+                float: left;
+                padding-left: 2px; padding-right: 2px;
+                margin-top: 2px;
+                margin-left: 5px; margin-right: 5px;">
+            
+            <a href="{{tg.url('/ref_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
+                {{_('Reference order')}}
+            </a>
             </div>
             
-            <div>
+            <!--<div>
             <form method="post" action="">
                 <input class="sp_button" title="{{'%s on %s'|format(_('Three'), sc.title)}}" type="submit" value="{{_('Three')}}"/>
             </form>
-            </div>
+            </div>-->
             </div>
         {% else %}
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
