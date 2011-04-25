@@ -148,7 +148,7 @@ class RootController(BaseController):
         
         rp = int(rp)
         pag_n = int(pag_n)
-        show_ids = (True if show_ids.lower() == 'true' else False)
+        show_ids = strtobool(show_ids)
         
         pos = (pag_n-1) * rp
 
@@ -359,7 +359,7 @@ class RootController(BaseController):
                                   came_from=came_from)))
                 
             # reference
-            ref = '.'.join([unicode(row[attr['name']] or '') for attr in class_.reference()])
+            ref = SapnsClass.object_title(class_.name, id)
             
         # get attributes
         attributes = []
@@ -385,33 +385,24 @@ class RootController(BaseController):
                 attributes[-1]['vals'] = []
                 try:
                     rel_class = DBSession.query(SapnsClass).get(attr.related_class_id)
-                    ref_rel = rel_class.reference()
-                    tbl_rel = Table(rel_class.name, meta, autoload=True)
                     
                     # related_class
                     attributes[-1]['related_class'] = rel_class.name
                     
                     logger.info(rel_class.name)
                     
-                    logger.info(tbl_rel.select())
-                    
-                    vals = attributes[-1]['vals']
-                    for rel_obj in DBSession.execute(tbl_rel.select().limit(500)):
-                        try:
-                            title_values = [unicode(rel_obj[r['name']] or '') for r in ref_rel]
-                            logger.info('.'.join(title_values))
-                            vals.append(dict(id=rel_obj.id,
-                                             title='.'.join(title_values)
-                                             ))
+                    vals = SapnsClass.class_titles(rel_class.name)
                             
-                        except Exception, e:
-                            logger.error(e)
+                    # alphabetical sort
+                    attributes[-1]['vals'] = sorted(vals, cmp=lambda x,y: cmp(x['title'], y['title']))
                 
-                except:
-                    attributes[-1]['values'] = None
+                except Exception, e:
+                    logger.error(e)
+                    attributes[-1]['vals'] = None
                 
             
         return dict(cls=cls, title=class_.title, id=id, 
+                    related_classes=class_.related_classes(), 
                     attributes=attributes, reference=ref, came_from=url(came_from))
     
     @expose('delete.html')

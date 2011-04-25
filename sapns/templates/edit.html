@@ -101,6 +101,10 @@
     <div style="height: 10px;">
     </div>
     
+    {#{% for rc in related_classes %}
+    <div>{{rc.name}}.{{rc.attr_name}}</div>
+    {% endfor %}#}
+    
     {% for atr in attributes %}
     <div class="sp_edit_field">
         <div class="sp_label_field" 

@@ -8,13 +8,13 @@ from datetime import datetime
 
 from pylons.i18n import ugettext as _
 
-from sqlalchemy import ForeignKey, Column, UniqueConstraint, DefaultClause
+from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
+from sqlalchemy.sql.expression import and_, select, alias
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relation, synonym
 
 from sapns.model import DeclarativeBase, metadata, DBSession
 from sapns.model.auth import User
-from sqlalchemy.sql.expression import and_
 
 import logging
 
@@ -221,14 +221,111 @@ class SapnsClass(DeclarativeBase):
     # attributes (SapnsAttribute)
     
     @staticmethod
-    def by_name(cls):
-        class_ = DBSession.query(SapnsClass).\
-            filter(SapnsClass.name == cls).\
+    def by_name(class_name):
+        """
+        Returns the SapnsClass whose name is "class_name"
+        IN
+          class_name  <unicode>
+          
+        OUT
+          <SapnsClass>
+        """
+        cls = DBSession.query(SapnsClass).\
+            filter(SapnsClass.name == class_name).\
             first()
             
-        return class_
+        return cls
     
+    @staticmethod
+    def class_titles(class_name):
+        
+        logger = logging.getLogger(__name__ + '/class_titles')
+        
+        def __class_title(class_name, qry=None, attr=None):
+            
+            try:
+                meta = MetaData(bind=DBSession.bind)
+                cls = SapnsClass.by_name(class_name)
+                tbl = alias(Table(cls.name, meta, autoload=True))
+                
+                names = []
+                
+                if qry is None:
+                    qry = tbl
+                    names.append(tbl.c.id.label('id'))
+                    
+                else:
+                    qry = qry.outerjoin(tbl, attr == tbl.c.id)
+                    
+                for r in cls.reference():
+                    
+                    logger.info(r['name'])
+                    
+                    if not r['related_class_id']:
+                        names.append(tbl.c[r['name']])
+                        
+                    else:
+                        rel_class = DBSession.query(SapnsClass).get(r['related_class_id'])
+                        names_rel, qry = __class_title(rel_class.name, 
+                                                       qry=qry, attr=tbl.c[r['name']])
+                        names += names_rel
+                        
+                return names, qry
+            
+            except Exception, e:
+                logger.error(e)
+                
+        names, qry = __class_title(class_name, qry=None)
+        
+        sel = select(names, from_obj=qry, use_labels=True)
+        logger.info(sel)
+        
+        MAX_VALUES = 5000
+        titles = []
+        for row in DBSession.execute(sel.limit(MAX_VALUES)):
+            
+            cols = []
+            for n in names[1:]:
+                cols.append(unicode(row[n] or ''))
+                
+            title = '%s  [%d]' % ('.'.join(cols), row.id)
+                
+            titles.append(dict(id=row.id, title=title))
+                    
+        return titles
+    
+    @staticmethod
+    def object_title(class_name, id_object):
+        
+        if id_object is None:
+            return ''
+        
+        meta = MetaData(bind=DBSession.bind)
+        cls = SapnsClass.by_name(class_name)
+        tbl = Table(cls.name, meta, autoload=True)
+        row = DBSession.execute(tbl.select(whereclause=tbl.c.id == id_object)).fetchone()
+        ref = []
+        for r in cls.reference():
+            
+            if not r['related_class_id']:
+                ref.append(unicode(row[r['name']] or ''))
+                
+            else:
+                # related attribute
+                rel_class = DBSession.query(SapnsClass).get(r['related_class_id'])
+                rel_ref = SapnsClass.object_title(rel_class.name, row[r['name']])
+                
+                ref.append(rel_ref)
+                
+        return '.'.join(ref)
+
     def sorted_actions(self):
+        """
+        Returns a list of actions associated with this class.
+        
+        OUT
+          [{"title": <unicode>, "url": <unicode>, "require_id": <bool>}, ...]
+        """
         
         actions = []
         for ac in DBSession.query(SapnsAction).\
@@ -254,6 +351,13 @@ class SapnsClass(DeclarativeBase):
         return actions
     
     def insertion(self):
+        """
+        Return the list of attributes in "order of insertion" for this class.
+        
+        OUT
+          [{"id": <int>, "title": <unicode>, "name": <unicode>,
+            "required": <bool>, "visible": <bool>}, ...]
+        """
         
         ins = []
         for attr in DBSession.query(SapnsAttribute).\
@@ -268,6 +372,17 @@ class SapnsClass(DeclarativeBase):
         return ins
     
     def reference(self, all=False):
+        """
+        Returns the list of attributes in "order of reference" for this class.
+        
+        IN
+          all  <bool> (optional)
+          
+        OUT
+          [{"id": <int>, "title": <unicode>, "name": <unicode>, 
+            "included": <bool>, "visible": <bool>, 
+            "related_class_id": <int>}, ...]
+        """
         
         cond_all = None
         if not all:
@@ -282,12 +397,22 @@ class SapnsClass(DeclarativeBase):
             
             ref.append(dict(id=attr.attribute_id, title=attr.title, 
                             name=attr.name, included=attr.reference_order != None,
-                            visible=attr.visible
+                            visible=attr.visible, 
+                            related_class_id=attr.related_class_id,
                             ))
             
         return ref
     
     def attr_by_name(self, attr_name):
+        """
+        Returns a SapnsAttribute of this class whose name is "attr_name".
+        
+        IN
+          attr_name  <str>
+          
+        OUT
+          <SapnsAttribute>
+        """
         
         attr = DBSession.query(SapnsAttribute).\
                 filter(and_(SapnsAttribute.class_id == self.class_id,
@@ -297,6 +422,35 @@ class SapnsClass(DeclarativeBase):
                 
         return attr
     
+    def related_classes(self):
+        """
+        Returns a list of classes related with this and the attribute 
+        the relationship is built on.
+        
+        OUT
+          [{"id": <int>, 
+            "name": <unicode>, 
+            "title": <unicode>,
+            "attr_id": <int>, 
+            "attr_name": <unicode>,
+            "attr_title": <unicode>}, ...]
+        """
+        
+        related_classes = []
+        for cls, attr in DBSession.query(SapnsClass, SapnsAttribute).\
+                join((SapnsAttribute, 
+                      SapnsAttribute.class_id == SapnsClass.class_id)).\
+                filter(SapnsAttribute.related_class_id == self.class_id):
+            
+            rc = dict(id=cls.class_id, name=cls.name, title=cls.title,
+                      attr_id=attr.attribute_id,
+                      attr_name=attr.name, attr_title=attr.title)
+            
+            related_classes.append(rc)
+            
+        return related_classes
+                
+                
 class SapnsAttribute(DeclarativeBase):
     
     """List of sapns columns in tables"""
