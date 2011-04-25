@@ -322,6 +322,9 @@ class SapnsAttribute(DeclarativeBase):
     TYPE_NUMERIC = 'Numeric'
     TYPE_UNICODE = 'Unicode'
     TYPE_STRING = 'String' # memo type
+    TYPE_DATE = 'Date'
+    TYPE_TIME = 'Time'
+    TYPE_DATETIME = 'DateTime'
     
     type = Column(Unicode(20), nullable=False)
     required = Column(Boolean, DefaultClause('false'), default=False)
@@ -332,7 +335,7 @@ class SapnsAttribute(DeclarativeBase):
     
 SapnsClass.attributes = \
     relation(SapnsAttribute,
-             backref='class',
+             backref='class_',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.class_id)
 
 class SapnsPrivilege(DeclarativeBase):

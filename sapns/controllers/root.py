@@ -30,6 +30,7 @@ from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
 import simplejson as sj
 from sapns.controllers.users import UsersController
+from neptuno.util import strtobool, strtodate, strtotime
 
 __all__ = ['RootController']
 
@@ -238,10 +239,10 @@ class RootController(BaseController):
         cls = SapnsClass.by_name(params['cls'])
         came_from = params.get('came_from', '/list?cls=%s' % cls.name)
         
-        fields = {}
+        update = {}
         
         if params['id'] != '':
-            fields['id'] = int(params['id'])
+            update['id'] = int(params['id'])
         
         for field_name, field_value in params.iteritems():
             m_field = re.search(r'^fld_(.+)', field_name)
@@ -256,20 +257,52 @@ class RootController(BaseController):
                 else:
                     # integer
                     if attr.type == SapnsAttribute.TYPE_INTEGER:
-                        field_value = int(field_value)
+                        if field_value == '':
+                            field_value = None
+                        else:
+                            field_value = int(field_value)
                     
                     # numeric
                     elif attr.type == SapnsAttribute.TYPE_NUMERIC:
-                        field_value = float(field_value)
+                        if field_value == '':
+                            field_value = None
+                        else:
+                            field_value = float(field_value)
                     
                     # boolean
                     elif attr.type == SapnsAttribute.TYPE_BOOLEAN:
-                        field_value = (True if field_value == 'true' else False)
+                        field_value = strtobool(field_value)
+                        
+                    # date
+                    elif attr.type == SapnsAttribute.TYPE_DATE:
+                        if field_value == '':
+                            field_value = None
+                        else:
+                            field_value = strtodate(field_value)
+                    
+                    # time
+                    elif attr.type == SapnsAttribute.TYPE_TIME:
+                        if field_value == '':
+                            field_value = None
+                        else:
+                            field_value = strtotime(field_value, fmt='%H:%M:%S')
                 
-                fields[field_name_] = field_value
+                update[field_name_] = field_value
                 
+        logger.info(update)
+                
+        meta = MetaData(bind=DBSession.bind)
+        tbl = Table(cls.name, meta, autoload=True)
         
-        logger.info(fields)
+        if update.get('id', None):
+            logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
+            tbl.update(whereclause=tbl.c.id == update['id'], values=update).execute()
+            
+        else:
+            logger.info('Inserting new object in "%s"' % cls.name)
+            tbl.insert(values=update).execute()
+            
+        DBSession.flush()
         
         redirect(url(came_from))
     
@@ -349,9 +382,9 @@ class RootController(BaseController):
                     logger.info(tbl_rel.select())
                     
                     vals = attributes[-1]['vals']
-                    for rel_obj in DBSession.execute(tbl_rel.select()):
+                    for rel_obj in DBSession.execute(tbl_rel.select().limit(500)):
                         try:
-                            title_values = [rel_obj[r['name']] for r in ref_rel]
+                            title_values = [unicode(rel_obj[r['name']] or '') for r in ref_rel]
                             logger.info('.'.join(title_values))
                             vals.append(dict(id=rel_obj.id,
                                              title='.'.join(title_values)
@@ -364,8 +397,8 @@ class RootController(BaseController):
                     attributes[-1]['values'] = None
                 
             
-        return dict(cls=cls, id=id, attributes=attributes,
-                    reference=ref, came_from=url(came_from))
+        return dict(cls=cls, title=class_.title, id=id, 
+                    attributes=attributes, reference=ref, came_from=url(came_from))
     
     @expose('delete.html')
     def delete(self, cls='', id=None, q=False, came_from='/'):
@@ -408,14 +441,16 @@ class RootController(BaseController):
             
         class_ = SapnsClass.by_name(cls)
         
-        return dict(page='insertion order', insertion=class_.insertion(), 
-                    came_from=url(came_from))
+        return dict(page='insertion order', insertion=class_.insertion(),
+                    title=class_.title, came_from=url(came_from))
         
     @expose()
-    def ins_order_save(self, attributes='', came_from='/'):
+    def ins_order_save(self, attributes='', title='', came_from='/'):
         
         # save insertion order
         attributes = sj.loads(attributes)
+        
+        title_saved = False
         
         for attr in attributes:
             
@@ -426,6 +461,12 @@ class RootController(BaseController):
             attribute.visible = attr['visible']
             
             DBSession.add(attribute)
+            
+            if not title_saved:
+                title_saved = True
+                attribute.class_.title = title
+                DBSession.add(attribute.class_)
+            
             DBSession.flush()
         
         redirect(url(came_from))

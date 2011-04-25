@@ -20,6 +20,7 @@
                 };
             });
             
+            $('#form_insert_order input[name=title]').val($('#title_class').val());
             $('#form_insert_order input[name=attributes]').val(JSON.stringify(atributos));
             $('#form_insert_order').submit();
         });
@@ -107,6 +108,20 @@
         <div style="float: left; width: 50px; background-color: green;">Up</div>
         <div style="">Down</div>
     </div>-->
+    
+    <div class="class_title">
+        <!--<div style="margin-top: 3px; margin-left: 15px; float: left;">
+            {{_('Title class')}}
+        </div>-->
+        
+        <div style="margin-top: 3px; margin-left: 15px;">
+            <div class="" style="width: 78%; margin-bottom: 15px;">
+                <input id="title_class" class="sp_text_field" style="width: 99%;
+                    font-weight: bold; font-size: 18px;"
+                    type="text" value="{{title}}"/>
+            </div>
+        </div>
+    </div>
         
     {% for attr in insertion %}
     <div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}">
@@ -151,6 +166,7 @@
     
     <form id="form_insert_order" method="post" action="{{tg.url('/ins_order_save')}}">
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input type="hidden" name="attributes" value="" />
+        <input type="hidden" name="attributes" value=""/>
+        <input type="hidden" name="title" value=""/>
     </form>
 {% endblock %}

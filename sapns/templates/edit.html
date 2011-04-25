@@ -12,7 +12,7 @@
     		var params = '';
     		
     		// text
-    		$('.sp_text_field').each(function(){
+    		$('.sp_text_field').each(function() {
     			params += 
     				'<input type="hidden" ' + 
     			        'name="fld_' + $(this).attr('name') + '" ' + 
@@ -20,7 +20,7 @@
     		});
     		
     		// checkbox
-            $('input[type="checkbox"]').each(function(){
+            $('.sp_checkbox_field').each(function() {
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
@@ -28,17 +28,16 @@
             });
     		
     		// select fields
-            $('.sp_select_field').each(function(){
+            $('.sp_select_field').each(function() {
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
                         'value="' + $(this).val() + '"/>\n';
             });
     		
-    		alert(params)
+    		//alert(params)
     		
     		$('#edit_form').append(params).submit();
-    		//alert($('#edit_form').html());
     	});
     });
 </script>
@@ -66,7 +65,12 @@
     .sp_select_field {
         width: 85%;
         margin-left: 1%;
-    }    
+    }
+    
+    .sp_checkbox_field {
+        with: 97;
+        margin-left: 1%;
+    }
     
     .sp_memo_field {
         min-height: 40px;
@@ -86,7 +90,7 @@
     </div>
     
     <div style="font-size: 25px; margin-left: 1%;">
-        {{cls}}
+        {{title}}
     </div>
 
     {% if reference %}
@@ -106,7 +110,7 @@
         <div>
         <!-- Boolean -->
         {% if atr.type == 'Boolean' %}
-        <input class="sp_text_field" type="checkbox" name="{{atr.name}}"
+        <input class="sp_checkbox_field" type="checkbox" name="{{atr.name}}"
             {% if atr.value %}checked{% endif %}/>
         {% elif atr.type == 'String' %}
         <textarea class="sp_text_field sp_memo_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
