@@ -350,6 +350,12 @@ class RootController(BaseController):
             
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
+        # js options
+        js_options = dict(date_format=config.get('js.date_format', default='mm-dd-yy'),
+                          day_names_min=config.get('js.day_names_min'),
+                          month_names=config.get('js.month_names')
+                          )
+        
         ref = None
         row = None
         if id:
@@ -412,7 +418,8 @@ class RootController(BaseController):
             
         return dict(cls=cls, title=class_.title, id=id, 
                     related_classes=class_.related_classes(), 
-                    attributes=attributes, reference=ref, came_from=url(came_from))
+                    attributes=attributes, reference=ref, 
+                    js_options=js_options, came_from=url(came_from))
     
     @expose('delete.html')
     def delete(self, cls='', id=None, q=False, came_from='/'):

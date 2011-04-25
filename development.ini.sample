@@ -39,6 +39,11 @@ grid.time_format = %m/%d/%Y %H:%M
 grid.true_const = Yes
 grid.false_const = No
 
+# JavaScript options
+js.date_format = mm/dd/yy
+# 0-sunday, 1-monday, 2-tuesday, ..., 6-saturday
+js.first_day = 1
+
 # TODO: Application's settings here
 app.name = Sapns
 app.subtitle = Web Information System

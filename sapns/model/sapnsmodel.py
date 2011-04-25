@@ -8,6 +8,8 @@ from datetime import datetime
 
 from pylons.i18n import ugettext as _
 
+from tg import config
+
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.sql.expression import and_, select, alias
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
@@ -17,6 +19,7 @@ from sapns.model import DeclarativeBase, metadata, DBSession
 from sapns.model.auth import User
 
 import logging
+from neptuno.util import datetostr
 
 __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
@@ -241,6 +244,8 @@ class SapnsClass(DeclarativeBase):
         
         logger = logging.getLogger(__name__ + '/class_titles')
         
+        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        
         def __class_title(class_name, qry=None, attr=None):
             
             try:
@@ -249,10 +254,12 @@ class SapnsClass(DeclarativeBase):
                 tbl = alias(Table(cls.name, meta, autoload=True))
                 
                 names = []
+                types = []
                 
                 if qry is None:
                     qry = tbl
                     names.append(tbl.c.id.label('id'))
+                    types.append(SapnsAttribute.TYPE_INTEGER)
                     
                 else:
                     qry = qry.outerjoin(tbl, attr == tbl.c.id)
@@ -263,19 +270,21 @@ class SapnsClass(DeclarativeBase):
                     
                     if not r['related_class_id']:
                         names.append(tbl.c[r['name']])
+                        types.append(r['type'])
                         
                     else:
                         rel_class = DBSession.query(SapnsClass).get(r['related_class_id'])
-                        names_rel, qry = __class_title(rel_class.name, 
+                        names_rel, types_rel, qry = __class_title(rel_class.name, 
                                                        qry=qry, attr=tbl.c[r['name']])
                         names += names_rel
+                        types += types_rel
                         
-                return names, qry
+                return names, types, qry
             
             except Exception, e:
                 logger.error(e)
                 
-        names, qry = __class_title(class_name, qry=None)
+        names, types, qry = __class_title(class_name, qry=None)
         
         sel = select(names, from_obj=qry, use_labels=True)
         logger.info(sel)
@@ -285,8 +294,20 @@ class SapnsClass(DeclarativeBase):
         for row in DBSession.execute(sel.limit(MAX_VALUES)):
             
             cols = []
-            for n in names[1:]:
-                cols.append(unicode(row[n] or ''))
+            for n, t in zip(names[1:], types[1:]):
+                
+                value = row[n]
+                
+                if value:
+                    if t == SapnsAttribute.TYPE_DATE:
+                        cols.append(datetostr(value, fmt=date_fmt))
+                        
+                    # rest of types
+                    else:
+                        cols.append(unicode(value))
+                        
+                else:
+                    cols.append('')
                 
             title = '%s  [%d]' % ('.'.join(cols), row.id)
                 
@@ -297,8 +318,12 @@ class SapnsClass(DeclarativeBase):
     @staticmethod
     def object_title(class_name, id_object):
         
+        logger = logging.getLogger(__name__ + '/object_title')
+        
         if id_object is None:
             return ''
+        
+        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
         meta = MetaData(bind=DBSession.bind)
         cls = SapnsClass.by_name(class_name)
@@ -307,8 +332,21 @@ class SapnsClass(DeclarativeBase):
         ref = []
         for r in cls.reference():
             
+            logger.info(r['name'])
+            
             if not r['related_class_id']:
-                ref.append(unicode(row[r['name']] or ''))
+                
+                value = row[r['name']]
+                if value:
+                    if r['type'] == SapnsAttribute.TYPE_DATE:
+                        value = datetostr(value, fmt=date_fmt)
+                        
+                    else:
+                        value = unicode(value)
+                else:
+                    value = '' 
+                
+                ref.append(value)
                 
             else:
                 # related attribute
@@ -397,7 +435,7 @@ class SapnsClass(DeclarativeBase):
             
             ref.append(dict(id=attr.attribute_id, title=attr.title, 
                             name=attr.name, included=attr.reference_order != None,
-                            visible=attr.visible, 
+                            type=attr.type, visible=attr.visible, 
                             related_class_id=attr.related_class_id,
                             ))
             
