@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-20 14:19+0200\n"
+"PO-Revision-Date: 2011-04-25 10:32+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,33 +17,33 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.4\n"
 
-#: sapns/controllers/root.py:106
+#: sapns/controllers/root.py:108
 msgid "Wrong credentials"
 msgstr "Credenciales incorrectas"
 
-#: sapns/controllers/root.py:121
+#: sapns/controllers/root.py:123
 #, python-format
 msgid "Welcome back, %s!"
 msgstr "¡Bienvenido, %s!"
 
-#: sapns/controllers/root.py:131
+#: sapns/controllers/root.py:133
 msgid "We hope to see you soon!"
 msgstr "¡Esperamos verte pronto!"
 
-#: sapns/controllers/root.py:144 sapns/controllers/root.py:249
-#: sapns/controllers/root.py:328 sapns/controllers/root.py:363
+#: sapns/controllers/root.py:146 sapns/controllers/root.py:327
+#: sapns/controllers/root.py:439 sapns/controllers/root.py:483
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
-#: sapns/controllers/root.py:260
+#: sapns/controllers/root.py:338
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/root.py:269 sapns/controllers/root.py:303
+#: sapns/controllers/root.py:347 sapns/controllers/root.py:414
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
-#: sapns/controllers/root.py:314
+#: sapns/controllers/root.py:425
 #, fuzzy
 msgid "Record was successfully deleted"
 msgstr "La vista ha sido borrada correctamente"
@@ -56,30 +56,34 @@ msgstr ""
 msgid "Secure Controller here"
 msgstr ""
 
-#: sapns/controllers/users.py:29 sapns/templates/users/user_edit.html:7
+#: sapns/controllers/users.py:30 sapns/templates/users/user_edit.html:8
 msgid "Display name"
 msgstr "Nombre"
 
-#: sapns/controllers/users.py:30 sapns/templates/users/user_edit.html:12
+#: sapns/controllers/users.py:31 sapns/templates/users/user_edit.html:14
 msgid "User name"
 msgstr "Nombre de usuario"
 
-#: sapns/controllers/users.py:31 sapns/templates/users/user_edit.html:17
+#: sapns/controllers/users.py:32 sapns/templates/users/user_edit.html:20
 msgid "E-mail address"
 msgstr "E-mail"
 
-#: sapns/controllers/users.py:42 sapns/controllers/util.py:222
+#: sapns/controllers/users.py:43 sapns/controllers/util.py:226
 msgid "New"
 msgstr "Nuevo"
 
-#: sapns/controllers/users.py:43 sapns/controllers/util.py:223
+#: sapns/controllers/users.py:44 sapns/controllers/util.py:227
 msgid "Edit"
 msgstr "Editar"
 
-#: sapns/controllers/users.py:44 sapns/controllers/util.py:224
+#: sapns/controllers/users.py:45 sapns/controllers/util.py:228
 #, fuzzy
 msgid "Delete"
 msgstr "Borrar"
+
+#: sapns/controllers/users.py:127
+msgid "An error occurred while saving the user"
+msgstr ""
 
 #: sapns/controllers/util.py:36
 msgid "Initialization was completed successfully"
@@ -97,7 +101,7 @@ msgstr "Exploración de datos"
 msgid "Project"
 msgstr "Proyecto"
 
-#: sapns/controllers/util.py:118 sapns/controllers/util.py:225
+#: sapns/controllers/util.py:118 sapns/controllers/util.py:229
 #, fuzzy
 msgid "List"
 msgstr "Lista"
@@ -106,12 +110,12 @@ msgstr "Lista"
 msgid "The user dashboards have been created"
 msgstr "Se han creado los favoritos de usuario"
 
-#: sapns/controllers/util.py:196
+#: sapns/controllers/util.py:198
 #, fuzzy, python-format
 msgid "Class: %s"
 msgstr "Clase: %s"
 
-#: sapns/controllers/util.py:259
+#: sapns/controllers/util.py:277
 msgid "Process terminated"
 msgstr "Proceso terminado"
 
@@ -139,11 +143,27 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-#: sapns/templates/edit.html:62 sapns/templates/order/insert.html:70
-#: sapns/templates/order/reference.html:51
-#: sapns/templates/users/user_edit.html:27
+#: sapns/templates/edit.html:89 sapns/templates/order/insert.html:165
+#: sapns/templates/order/reference.html:119
+#: sapns/templates/users/user_edit.html:43
 msgid "Save"
 msgstr "Guardar"
+
+#: sapns/templates/edit.html:121
+msgid "none"
+msgstr "ninguno"
+
+#: sapns/templates/edit.html:128
+#, fuzzy
+#| msgid "List"
+msgid "list"
+msgstr "Lista"
+
+#: sapns/templates/edit.html:131
+#, fuzzy
+#| msgid "Edit"
+msgid "edit"
+msgstr "Editar"
 
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
@@ -199,18 +219,29 @@ msgstr "Vista"
 msgid "Users"
 msgstr "Usuarios"
 
-#: sapns/templates/order/insert.html:50
+#: sapns/templates/order/insert.html:115
+msgid "Title class"
+msgstr "Título de clase"
+
+#: sapns/templates/order/insert.html:138
 #, python-format
 msgid "%s required"
 msgstr "%s requerido"
 
-#: sapns/templates/order/insert.html:56 sapns/templates/order/reference.html:43
+#: sapns/templates/order/insert.html:145
+#, python-format
+msgid "%s visible"
+msgstr ""
+
+#: sapns/templates/order/insert.html:151
+#: sapns/templates/order/reference.html:104
 #: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
 #: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
 msgid "Up"
 msgstr "Subir"
 
-#: sapns/templates/order/insert.html:61 sapns/templates/order/reference.html:44
+#: sapns/templates/order/insert.html:156
+#: sapns/templates/order/reference.html:110
 #: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
 #: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
 msgid "Down"
@@ -230,17 +261,21 @@ msgstr "Orden de referencia"
 msgid "Three"
 msgstr ""
 
-#: sapns/templates/users/index.html:19
+#: sapns/templates/users/index.html:17
 msgid "Permission"
 msgstr "Permisos"
 
-#: sapns/templates/users/index.html:23
+#: sapns/templates/users/index.html:21
 msgid "Roles"
 msgstr ""
 
-#: sapns/templates/users/user_edit.html:22
+#: sapns/templates/users/user_edit.html:26
 msgid "Password"
-msgstr ""
+msgstr "Contraseña"
+
+#: sapns/templates/users/user_edit.html:33
+msgid "Copy from"
+msgstr "Copiar desde"
 
 #: sapns/templates/util/index.html:24
 msgid "Extract model"

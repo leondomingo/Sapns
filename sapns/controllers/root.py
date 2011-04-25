@@ -305,6 +305,16 @@ class RootController(BaseController):
         DBSession.flush()
         
         redirect(url(came_from))
+        
+    @expose('edit.html')
+    @require(predicates.not_anonymous())
+    def new(self, **params):
+        
+        cls = params.get('cls')
+        #id = params.get('id')
+        came_from = params.get('came_from', '/')
+        
+        redirect(url('/edit'), dict(cls=cls, id='', came_from=came_from))
     
     @expose('edit.html')
     @require(predicates.not_anonymous())
@@ -339,6 +349,7 @@ class RootController(BaseController):
                               came_from=came_from)))
         
         ref = None
+        row = None
         if id:
             row = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
             if not row:
@@ -362,9 +373,12 @@ class RootController(BaseController):
                 order_by(SapnsAttribute.insertion_order).\
                 all():
             
+            value = ''
+            if row:
+                value=row[attr.name] or ''
+            
             attributes.append(dict(name=attr.name, title=attr.title, 
-                                   type=attr.type, value=row[attr.name] or '',
-                                   vals=None))
+                                   type=attr.type, value=value, vals=None))
             
             if attr.related_class_id:
                 # vals
