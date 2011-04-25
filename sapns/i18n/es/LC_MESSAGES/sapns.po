@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-25 10:32+0200\n"
+"PO-Revision-Date: 2011-04-25 19:29+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -30,20 +30,20 @@ msgstr "¡Bienvenido, %s!"
 msgid "We hope to see you soon!"
 msgstr "¡Esperamos verte pronto!"
 
-#: sapns/controllers/root.py:146 sapns/controllers/root.py:327
-#: sapns/controllers/root.py:439 sapns/controllers/root.py:483
+#: sapns/controllers/root.py:146 sapns/controllers/root.py:337
+#: sapns/controllers/root.py:460 sapns/controllers/root.py:504
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
-#: sapns/controllers/root.py:338
+#: sapns/controllers/root.py:348
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/root.py:347 sapns/controllers/root.py:414
+#: sapns/controllers/root.py:366 sapns/controllers/root.py:435
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
-#: sapns/controllers/root.py:425
+#: sapns/controllers/root.py:446
 #, fuzzy
 msgid "Record was successfully deleted"
 msgstr "La vista ha sido borrada correctamente"
@@ -83,7 +83,7 @@ msgstr "Borrar"
 
 #: sapns/controllers/users.py:127
 msgid "An error occurred while saving the user"
-msgstr ""
+msgstr "Ocurrió un error mientras se guardaba el usuario"
 
 #: sapns/controllers/util.py:36
 msgid "Initialization was completed successfully"
@@ -143,27 +143,130 @@ msgstr "Sí"
 msgid "No"
 msgstr "No"
 
-#: sapns/templates/edit.html:89 sapns/templates/order/insert.html:165
+#: sapns/templates/edit.html:71
+msgid "Sunday"
+msgstr "Domingo"
+
+#: sapns/templates/edit.html:71
+msgid "Monday"
+msgstr "Lunes"
+
+#: sapns/templates/edit.html:71
+msgid "Tuesday"
+msgstr "Martes"
+
+#: sapns/templates/edit.html:72
+msgid "Wednesday"
+msgstr "Miércoles"
+
+#: sapns/templates/edit.html:72
+msgid "Thursday"
+msgstr "Jueves"
+
+#: sapns/templates/edit.html:72
+msgid "Friday"
+msgstr "Viernes"
+
+#: sapns/templates/edit.html:73
+msgid "Saturday"
+msgstr "Sábado"
+
+#: sapns/templates/edit.html:74
+msgid "Su"
+msgstr "Do"
+
+#: sapns/templates/edit.html:74
+msgid "Mo"
+msgstr "Lu"
+
+#: sapns/templates/edit.html:74
+msgid "Tu"
+msgstr "Ma"
+
+#: sapns/templates/edit.html:74
+msgid "We"
+msgstr "Mi"
+
+#: sapns/templates/edit.html:75
+msgid "Th"
+msgstr "Ju"
+
+#: sapns/templates/edit.html:75
+msgid "Fr"
+msgstr "Vi"
+
+#: sapns/templates/edit.html:75
+msgid "Sa"
+msgstr ""
+
+#: sapns/templates/edit.html:76
+msgid "January"
+msgstr "Enero"
+
+#: sapns/templates/edit.html:76
+msgid "February"
+msgstr "Febrero"
+
+#: sapns/templates/edit.html:76
+msgid "March"
+msgstr "Marzo"
+
+#: sapns/templates/edit.html:77
+msgid "April"
+msgstr "Abril"
+
+#: sapns/templates/edit.html:77
+msgid "May"
+msgstr "Mayo"
+
+#: sapns/templates/edit.html:77
+msgid "June"
+msgstr "Junio"
+
+#: sapns/templates/edit.html:78
+msgid "July"
+msgstr "Julio"
+
+#: sapns/templates/edit.html:78
+msgid "August"
+msgstr "Agosto"
+
+#: sapns/templates/edit.html:78
+msgid "September"
+msgstr "Septiembre"
+
+#: sapns/templates/edit.html:79
+#, fuzzy
+msgid "October"
+msgstr "Octubre"
+
+#: sapns/templates/edit.html:79
+msgid "November"
+msgstr "Noviembre"
+
+#: sapns/templates/edit.html:79
+msgid "December"
+msgstr "Diciembre"
+
+#: sapns/templates/edit.html:133 sapns/templates/order/insert.html:165
 #: sapns/templates/order/reference.html:119
 #: sapns/templates/users/user_edit.html:43
 msgid "Save"
 msgstr "Guardar"
 
-#: sapns/templates/edit.html:121
+#: sapns/templates/edit.html:173
 msgid "none"
 msgstr "ninguno"
 
-#: sapns/templates/edit.html:128
+#: sapns/templates/edit.html:180
 #, fuzzy
-#| msgid "List"
 msgid "list"
-msgstr "Lista"
+msgstr "lista"
 
-#: sapns/templates/edit.html:131
+#: sapns/templates/edit.html:183
 #, fuzzy
-#| msgid "Edit"
 msgid "edit"
-msgstr "Editar"
+msgstr "editar"
 
 #: sapns/templates/grid.html:65
 msgid "You must select a row before click on this action"
@@ -247,17 +350,15 @@ msgstr "Subir"
 msgid "Down"
 msgstr "Bajar"
 
-#: sapns/templates/shortcuts/list.html:17
-#: sapns/templates/shortcuts/list.html:18
+#: sapns/templates/shortcuts/list.html:25
 msgid "Insertion order"
 msgstr "Orden de inserción"
 
-#: sapns/templates/shortcuts/list.html:26
-#: sapns/templates/shortcuts/list.html:27
+#: sapns/templates/shortcuts/list.html:37
 msgid "Reference order"
 msgstr "Orden de referencia"
 
-#: sapns/templates/shortcuts/list.html:33
+#: sapns/templates/shortcuts/list.html:43
 msgid "Three"
 msgstr ""
 
