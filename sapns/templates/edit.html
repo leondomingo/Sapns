@@ -4,6 +4,7 @@
 
 {% import 'util.html' as util %}
 {{util.jquery()}}
+{{util.jquery_ui()}}
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -26,6 +27,28 @@
                         'name="fld_' + $(this).attr('name') + '" ' + 
                         'value="' + $(this).attr('checked') + '"/>\n';
             });
+
+    		// date
+            $('.sp_date_field').each(function() {
+            	
+            	var date_value = $(this).datepicker('getDate');
+            	
+            	if (date_value != null) {
+            		var year = date_value.getFullYear()
+              	    var month = date_value.getMonth() + 1;
+              	    var day = date_value.getDate();
+              	
+              	    date_value = year + '-' + month + '-' + day;
+            	}
+            	else {
+            		date_value = '';
+            	}
+            	
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + date_value + '"/>\n';
+            });
     		
     		// select fields
             $('.sp_select_field').each(function() {
@@ -39,6 +62,9 @@
     		
     		$('#edit_form').append(params).submit();
     	});
+    	
+    	$('.sp_date_field').datepicker();
+    		//dateFormat: 'yy-mm-dd'});
     });
 </script>
 
@@ -105,38 +131,42 @@
     <div>{{rc.name}}.{{rc.attr_name}}</div>
     {% endfor %}#}
     
-    {% for atr in attributes %}
+    {% for attr in attributes %}
     <div class="sp_edit_field">
         <div class="sp_label_field" 
             style="margin-left: 10px; 
                 margin-top: 4px;
-                margin-bottom: 2px;">{{atr.title|escape}}</div>
+                margin-bottom: 2px;">{{attr.title|escape}}</div>
         <div>
         <!-- Boolean -->
-        {% if atr.type == 'Boolean' %}
-        <input class="sp_checkbox_field" type="checkbox" name="{{atr.name}}"
-            {% if atr.value %}checked{% endif %}/>
-        {% elif atr.type == 'String' %}
-        <textarea class="sp_text_field sp_memo_field" name="{{atr.name}}"/>{{atr.value}}</textarea>
-        {% elif atr.vals != None %}
-        <select name="{{atr.name}}" 
-            related_class="{{atr.related_class}}" class="sp_select_field">
+        {% if attr.type == 'Boolean' %}
+        <input class="sp_checkbox_field" type="checkbox" name="{{attr.name}}"
+            {% if attr.value %}checked{% endif %}/>
+        <!-- Date -->
+        {% elif attr.type == 'Date' %}
+        <input class="sp_date_field" type="text" name="{{attr.name}}" 
+            value="{{attr.value}}"/>
+        {% elif attr.type == 'String' %}
+        <textarea class="sp_text_field sp_memo_field" name="{{attr.name}}">{{attr.value}}</textarea>
+        {% elif attr.vals != None %}
+        <select name="{{attr.name}}"
+            related_class="{{attr.related_class}}" class="sp_select_field">
             <option value="null" 
-                {% if atr.value == None %}selected{%endif%}>{{_('none')}}</option>
-            {% for value in atr.vals %}
+                {% if attr.value == None %}selected{%endif%}>{{_('none')}}</option>
+            {% for value in attr.vals %}
             <option value="{{value.id}}" 
-                {% if value.id == atr.value %}selected{%endif%}>{{value.title}}</value>
+                {% if value.id == attr.value %}selected{%endif%}>{{value.title}}</value>
             {% endfor %}
         </select>
-        <a href="/list?cls={{atr.related_class}}" target="_blank"
-            title="{{atr.related_class}}">[{{_('list')}}]</a>
-        {% if atr.value %}
-        <a href="/edit?cls={{atr.related_class}}&id={{atr.value}}" 
-            target="_blank">[{{_('edit')}}]</a>
-        {% endif %}
+        <a href="/list?cls={{attr.related_class}}" target="_blank"
+            title="{{attr.related_class}}">[{{_('list')}}]</a>
+            {% if attr.value %}
+            <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
+                target="_blank">[{{_('edit')}}]</a>
+            {% endif %}
         {% else %}
-        <input class="sp_text_field" type="text" name="{{atr.name}}" 
-            value="{{atr.value}}"/>
+        <input class="sp_text_field" type="text" name="{{attr.name}}" 
+            value="{{attr.value}}"/>
         {% endif %}
         </div>
     </div>

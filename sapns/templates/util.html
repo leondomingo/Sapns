@@ -14,5 +14,12 @@
 
 {% macro jquery() %}
 <!-- JQuery 1.5.1 -->
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+<script type="text/javascript" 
+    src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"></script>
+{% endmacro %}
+
+{% macro jquery_ui() %}
+<link rel="stylesheet" type="text/css" media="screen" 
+    href="/css/smoothness/jquery-ui.custom.css"/>
+<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 {% endmacro %}

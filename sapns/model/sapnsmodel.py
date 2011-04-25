@@ -46,7 +46,7 @@ class SapnsUser(User):
     
     def get_shortcuts(self, id_parent=None):
         
-        logger = logging.getLogger('SapnsUser.get_shortcuts')
+        #logger = logging.getLogger('SapnsUser.get_shortcuts')
 
         if not id_parent:
             id_parent = self.get_dashboard().shortcut_id
@@ -63,7 +63,7 @@ class SapnsUser(User):
                 order_by(SapnsShortcut.order).\
                 all():
             
-            logger.info('Getting shortcut "%s"' % sc.title)
+            #logger.info('Getting shortcut "%s"' % sc.title)
             url = ''
             type_ = ''
             class_ = ''

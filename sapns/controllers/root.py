@@ -30,7 +30,7 @@ from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
 import simplejson as sj
 from sapns.controllers.users import UsersController
-from neptuno.util import strtobool, strtodate, strtotime
+from neptuno.util import strtobool, strtodate, strtotime, datetostr
 
 __all__ = ['RootController']
 
@@ -347,6 +347,8 @@ class RootController(BaseController):
             redirect(url('/message', 
                          dict(message=_('This class does not exist'),
                               came_from=came_from)))
+            
+        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
         ref = None
         row = None
@@ -375,7 +377,14 @@ class RootController(BaseController):
             
             value = ''
             if row:
-                value=row[attr.name] or ''
+                if row[attr.name]:
+                    # date
+                    if attr.type == SapnsAttribute.TYPE_DATE:
+                        value = datetostr(row[attr.name], fmt=date_fmt)
+                    
+                    # rest of types
+                    else:
+                        value = row[attr.name] or ''
             
             attributes.append(dict(name=attr.name, title=attr.title, 
                                    type=attr.type, value=value, vals=None))
