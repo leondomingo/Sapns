@@ -523,7 +523,7 @@ class SapnsAttribute(DeclarativeBase):
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
     visible = Column(Boolean, DefaultClause('true'), default=True)
-    is_collection = Column(Boolean, DefaultClause('false'), default=False)
+    #is_collection = Column(Boolean, DefaultClause('false'), default=False)
     
 SapnsClass.attributes = \
     relation(SapnsAttribute,

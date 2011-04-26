@@ -135,8 +135,16 @@ class RootController(BaseController):
 
     @expose('listof.html')
     @require(predicates.not_anonymous())
-    def list(self, cls='', q='', rp=10, pag_n=1, caption='', show_ids='false', 
-             came_from='/'):
+    def list(self, **params):
+
+        # picking up parameters
+        cls = params.get('cls', '')
+        q = params.get('q', '')
+        rp = params.get('rp', 10)
+        pag_n = params.get('pag_n', 1)
+        caption = params.get('caption', '')
+        show_ids = params.get('show_ids', 'false')
+        came_from = params.get('came_from', '/')
         
         # does this user have permission on this table?
         user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
