@@ -293,7 +293,7 @@ class RootController(BaseController):
                         if field_value == '':
                             field_value = None
                         else:
-                            field_value = strtotime(field_value, fmt='%H:%M:%S')
+                            field_value = strtotime(field_value)
                 
                 update[field_name_] = field_value
                 
