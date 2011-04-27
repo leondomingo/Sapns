@@ -324,7 +324,7 @@ msgstr "Utilidades"
 #: sapns/templates/index.html:57
 #, fuzzy
 msgid "Views"
-msgstr "Vista"
+msgstr "Vistas"
 
 #: sapns/templates/index.html:61
 msgid "Users"

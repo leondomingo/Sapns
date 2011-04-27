@@ -8,7 +8,7 @@
 # and generally should not be modified by end users.
 
 [DEFAULT]
-debug = true
+debug = false
 # Uncomment and replace with the address which should receive any error reports
 #email_to = you@yourdomain.com
 smtp_server = localhost
@@ -16,8 +16,8 @@ error_email_from = paste@localhost
 
 [server:main]
 use = egg:Paste#http
-host = 127.0.0.1
-port = 8080
+host = 0.0.0.0
+port = 8081
 
 [sa_auth]
 cookie_secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
@@ -29,6 +29,25 @@ full_stack = true
 cache_dir = %(here)s/data
 beaker.session.key = sapns
 beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
+
+# Sapns settings
+formats.date = %m/%d/%Y
+formats.time = %H:%M
+grid.date_format = %m/%d/%Y
+grid.time_format = %H:%M
+grid.time_format = %m/%d/%Y %H:%M
+grid.true_const = Yes
+grid.false_const = No
+
+# JavaScript options
+js.date_format = mm/dd/yy
+# 0-sunday, 1-monday, ..., 6-saturday
+js.first_day = 1
+
+# TODO: Application's settings here
+app.name = Sapns
+app.subtitle = Web Information System
+app.company_url = http://www.sapns.org
 
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings
@@ -46,27 +65,6 @@ sqlalchemy.url=postgresql://postgres:pswd@localhost/sapns
 sqlalchemy.echo = false
 sqlalchemy.echo_pool = false
 sqlalchemy.pool_recycle = 3600
-
-# if you are using Mako and want to be able to reload
-# the mako template from disk during the development phase
-# you should say 'true' here
-# This option is only used for mako templating engine
-# WARNING: if you want to deploy your application using a zipped egg
-# (ie: if your application's setup.py defines zip-safe=True, then you
-# MUST put "false" for the production environment because there will
-# be no disk and real files to compare time with.
-# On the contrary if your application defines zip-safe=False and is
-# deployed in an unzipped manner, then you can leave this option to true
-templating.mako.reloadfromdisk = true
-
-# the compiled template dir is a directory that must be readable by your
-# webserver. It will be used to store the resulting templates once compiled
-# by the TemplateLookup system.
-# During development you generally don't need this option since paste's HTTP
-# server will have access to you development directories, but in production
-# you'll most certainly want to have apache or nginx to write in a directory
-# that does not contain any source code in any form for obvious security reasons.
-templating.mako.compiled_templates_dir = %(here)s/data/templates
 
 # WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*
 # Debug mode will enable the interactive debugging tool, allowing ANYONE to

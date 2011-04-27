@@ -6,6 +6,7 @@ from tg import expose, url, config, redirect
 
 # third party imports
 from pylons.i18n import ugettext as _
+from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize
 
 # project specific imports
@@ -17,9 +18,7 @@ from sapns.model.sapnsmodel import SapnsUser
 from neptuno.dataset import DataSet
 
 class UsersController(BaseController):
-    # manage
-    # users
-    allow_only = authorize.has_permission('manage') or authorize.has_permission('users')
+    allow_only = authorize.has_any_permission('manage', 'users')
     
     @expose('users/index.html')
     def index(self, came_from='/users'):

@@ -10,7 +10,6 @@ from repoze.what import predicates
 
 from sapns.lib.base import BaseController
 from sapns.model import DBSession
-from sapns.controllers.secure import SecureController
 import sapns.config.app_cfg as app_cfg
 
 from neptuno.postgres.search import search
@@ -49,10 +48,6 @@ class RootController(BaseController):
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
 
     """
-    secc = SecureController()
-
-    #admin = AdminController(model, DBSession, config_type=TGAdminConfig)
-
     error = ErrorController()
     
     views = ViewsController()

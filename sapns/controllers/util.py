@@ -24,8 +24,7 @@ from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
     SapnsShortcut, SapnsAction, SapnsPrivilege, SapnsAttrPrivilege
 
 class UtilController(BaseController):
-    # only for "managers"
-    allow_only = authorize.has_permission('manage') or authorize.has_permission('utilities')
+    allow_only = authorize.has_any_permission('manage', 'utilities')
     
     @expose('message.html')
     def init(self):

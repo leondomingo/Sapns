@@ -19,7 +19,7 @@ class ViewSchema(schema.Schema):
     pass   
 
 class ViewsController(BaseController):
-    allow_only = authorize.has_permission('manage') or authorize.has_permission('views')
+    allow_only = authorize.has_any_permission('manage', 'views')
     
     @expose('views/index.html')
     def index(self, came_from='/'):
