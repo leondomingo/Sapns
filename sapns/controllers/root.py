@@ -86,14 +86,15 @@ class RootController(BaseController):
         return dict(message=message, came_from=url(came_from))
 
     @expose('environ.html')
+    @require(predicates.has_permission('manage'))
     def environ(self):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ)
 
-    @expose('authentication.html')
-    def auth(self):
-        """Display some information about auth* on this application."""
-        return dict(page='auth')
+#    @expose('authentication.html')
+#    def auth(self):
+#        """Display some information about auth* on this application."""
+#        return dict(page='auth')
 
     @expose('login.html')
     def login(self, came_from=url('/')):
@@ -229,23 +230,28 @@ class RootController(BaseController):
         set_lang(lang)
         redirect(came_from)
         
-    def data(self, cls='', id=None):
-        pass
-    
     @expose()
     @require(predicates.not_anonymous())
-    def save(self, **params):
+    def save(self, cls='', id='', **params):
         
         logger = logging.getLogger(__name__ + '/save')
         logger.info(params)
 
-        cls = SapnsClass.by_name(params['cls'])
+        cls = SapnsClass.by_name(cls) #params['cls'])
         came_from = params.get('came_from', '/list?cls=%s' % cls.name)
         
+        # does this user have permission on this table?
+        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        
+        if not user.has_privilege(cls.name):
+            redirect(url('/message',
+                         dict(message=_('Sorry, you do not have privilege on this class'),
+                              came_from=came_from)))
+
         update = {}
         
-        if params['id'] != '':
-            update['id'] = int(params['id'])
+        if id != '': #params['id'] != '':
+            update['id'] = int(id) #params['id'])
         
         for field_name, field_value in params.iteritems():
             m_field = re.search(r'^fld_(.+)', field_name)
@@ -297,7 +303,7 @@ class RootController(BaseController):
         meta = MetaData(bind=DBSession.bind)
         tbl = Table(cls.name, meta, autoload=True)
         
-        if update.get('id', None):
+        if update.get('id'): #, None):
             logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
             tbl.update(whereclause=tbl.c.id == update['id'], values=update).execute()
             
@@ -411,10 +417,7 @@ class RootController(BaseController):
                     
                     logger.info(rel_class.name)
                     
-                    vals = SapnsClass.class_titles(rel_class.name)
-                            
-                    # alphabetical sort
-                    attributes[-1]['vals'] = sorted(vals, cmp=lambda x,y: cmp(x['title'], y['title']))
+                    attributes[-1]['vals'] = SapnsClass.class_titles(rel_class.name)
                 
                 except Exception, e:
                     logger.error(e)

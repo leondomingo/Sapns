@@ -274,8 +274,9 @@ class SapnsClass(DeclarativeBase):
                         
                     else:
                         rel_class = DBSession.query(SapnsClass).get(r['related_class_id'])
-                        names_rel, types_rel, qry = __class_title(rel_class.name, 
-                                                       qry=qry, attr=tbl.c[r['name']])
+                        names_rel, types_rel, qry = \
+                            __class_title(rel_class.name, qry=qry, attr=tbl.c[r['name']])
+
                         names += names_rel
                         types += types_rel
                         
@@ -286,12 +287,16 @@ class SapnsClass(DeclarativeBase):
                 
         names, types, qry = __class_title(class_name, qry=None)
         
-        sel = select(names, from_obj=qry, use_labels=True)
+        MAX_VALUES = 5000
+        
+        sel = select(names, from_obj=qry, use_labels=True).\
+                order_by(*tuple(names[1:])).\
+                limit(MAX_VALUES)
+                
         logger.info(sel)
         
-        MAX_VALUES = 5000
         titles = []
-        for row in DBSession.execute(sel.limit(MAX_VALUES)):
+        for row in DBSession.execute(sel):
             
             cols = []
             for n, t in zip(names[1:], types[1:]):
