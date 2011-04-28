@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-18 08:11+0200\n"
+"PO-Revision-Date: 2011-04-28 18:12+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -24,310 +24,482 @@ msgstr ""
 #: sapns/controllers/root.py:119
 #, python-format
 msgid "Welcome back, %s!"
-msgstr ""
+msgstr "Welcome back, %s!"
 
 #: sapns/controllers/root.py:129
 msgid "We hope to see you soon!"
-msgstr ""
+msgstr "We hope to see you soon!"
 
-#: sapns/controllers/root.py:144 sapns/controllers/root.py:249
+#: sapns/controllers/root.py:150 sapns/controllers/root.py:248
+#: sapns/controllers/root.py:346 sapns/controllers/root.py:468
+#: sapns/controllers/root.py:512
 msgid "Sorry, you do not have privilege on this class"
-msgstr ""
+msgstr "Sorry, you do not have privilege on this class"
 
-#: sapns/controllers/root.py:258
+#: sapns/controllers/root.py:357
 msgid "This class does not exist"
-msgstr ""
+msgstr "This class does not exist"
 
-#: sapns/controllers/root.py:266 sapns/controllers/root.py:297
+#: sapns/controllers/root.py:377 sapns/controllers/root.py:443
 msgid "Record does not exist"
-msgstr ""
+msgstr "Record does not exist"
 
-#: sapns/controllers/root.py:308
+#: sapns/controllers/root.py:454
 msgid "Record was successfully deleted"
-msgstr ""
+msgstr "Record was successfully deleted"
 
-#: sapns/controllers/secure.py:20
-msgid "Only for people with the \"manage\" permission"
-msgstr ""
+#: sapns/controllers/users.py:29 sapns/templates/users/user_edit.html:8
+msgid "Display name"
+msgstr "Display name"
 
-#: sapns/controllers/secure.py:25
-msgid "Secure Controller here"
-msgstr ""
+#: sapns/controllers/users.py:30 sapns/templates/users/user_edit.html:14
+msgid "User name"
+msgstr "User name"
 
-#: sapns/controllers/util.py:36
+#: sapns/controllers/users.py:31 sapns/templates/users/user_edit.html:20
+msgid "E-mail address"
+msgstr "E-mail address"
+
+#: sapns/controllers/users.py:42 sapns/controllers/util.py:225
+msgid "New"
+msgstr "New"
+
+#: sapns/controllers/users.py:43 sapns/controllers/util.py:226
+msgid "Edit"
+msgstr "Edit"
+
+#: sapns/controllers/users.py:44 sapns/controllers/util.py:227
+msgid "Delete"
+msgstr "Delete"
+
+#: sapns/controllers/users.py:126
+msgid "An error occurred while saving the user"
+msgstr "An error occurred while saving the user"
+
+#: sapns/controllers/util.py:35
 msgid "Initialization was completed successfully"
-msgstr ""
+msgstr "Initialization was completed successfully"
 
-#: sapns/controllers/util.py:59
+#: sapns/controllers/util.py:58
 msgid "Dashboard"
-msgstr ""
+msgstr "Dashboard"
 
-#: sapns/controllers/util.py:68
+#: sapns/controllers/util.py:67
 msgid "Data exploration"
-msgstr ""
+msgstr "Data exploration"
 
-#: sapns/controllers/util.py:87
+#: sapns/controllers/util.py:86
 msgid "Project"
-msgstr ""
+msgstr "Project"
 
-#: sapns/controllers/util.py:112 sapns/controllers/util.py:202
+#: sapns/controllers/util.py:117 sapns/controllers/util.py:228
 msgid "List"
-msgstr ""
+msgstr "List"
 
-#: sapns/controllers/util.py:150
+#: sapns/controllers/util.py:172
 msgid "The user dashboards have been created"
-msgstr ""
+msgstr "The user dashboards have been created"
 
-#: sapns/controllers/util.py:173
+#: sapns/controllers/util.py:197
 #, python-format
 msgid "Class: %s"
-msgstr ""
+msgstr "Class: %s"
 
-#: sapns/controllers/util.py:199
-msgid "New"
-msgstr ""
-
-#: sapns/controllers/util.py:200
-msgid "Edit"
-msgstr ""
-
-#: sapns/controllers/util.py:201
-msgid "Delete"
-msgstr ""
-
-#: sapns/controllers/util.py:232
+#: sapns/controllers/util.py:276
 msgid "Process terminated"
-msgstr ""
+msgstr "Process terminated"
 
 #: sapns/controllers/views.py:98
 msgid "The view has been successfully deleted"
-msgstr ""
+msgstr "The view has been successfully deleted"
 
 #: sapns/templates/base.html:19
 msgid "You are in"
-msgstr ""
+msgstr "You are in"
 
 #: sapns/templates/base.html:23
 msgid "return"
-msgstr ""
+msgstr "return"
 
 #: sapns/templates/delete.html:21
 msgid "Do you really want to delete this record?"
-msgstr ""
+msgstr "Do you really want to delete this record?"
 
 #: sapns/templates/delete.html:23
 msgid "Yes"
-msgstr ""
+msgstr "Yes"
 
 #: sapns/templates/delete.html:24
 msgid "No"
-msgstr ""
+msgstr "No"
 
-#: sapns/templates/edit.html:49
+#: sapns/templates/edit.html:74
+msgid "Next"
+msgstr "Next"
+
+#: sapns/templates/edit.html:75
+msgid "Prev"
+msgstr "Prev"
+
+#: sapns/templates/edit.html:77
+msgid "Sunday"
+msgstr "Sunday"
+
+#: sapns/templates/edit.html:77
+msgid "Monday"
+msgstr "Monday"
+
+#: sapns/templates/edit.html:77
+msgid "Tuesday"
+msgstr "Tuesday"
+
+#: sapns/templates/edit.html:78
+msgid "Wednesday"
+msgstr "Wednesday"
+
+#: sapns/templates/edit.html:78
+msgid "Thursday"
+msgstr "Thursday"
+
+#: sapns/templates/edit.html:78
+msgid "Friday"
+msgstr "Friday"
+
+#: sapns/templates/edit.html:79
+msgid "Saturday"
+msgstr "Saturday"
+
+#: sapns/templates/edit.html:80
+msgid "Su"
+msgstr "Su"
+
+#: sapns/templates/edit.html:80
+msgid "Mo"
+msgstr "Mo"
+
+#: sapns/templates/edit.html:80
+msgid "Tu"
+msgstr "Tu"
+
+#: sapns/templates/edit.html:80
+msgid "We"
+msgstr "We"
+
+#: sapns/templates/edit.html:81
+msgid "Th"
+msgstr "Th"
+
+#: sapns/templates/edit.html:81
+msgid "Fr"
+msgstr "Fr"
+
+#: sapns/templates/edit.html:81
+msgid "Sa"
+msgstr "Sa"
+
+#: sapns/templates/edit.html:82
+msgid "January"
+msgstr "January"
+
+#: sapns/templates/edit.html:82
+msgid "February"
+msgstr "February"
+
+#: sapns/templates/edit.html:82
+msgid "March"
+msgstr "March"
+
+#: sapns/templates/edit.html:83
+msgid "April"
+msgstr "April"
+
+#: sapns/templates/edit.html:83
+msgid "May"
+msgstr "May"
+
+#: sapns/templates/edit.html:83
+msgid "June"
+msgstr "June"
+
+#: sapns/templates/edit.html:84
+msgid "July"
+msgstr "July"
+
+#: sapns/templates/edit.html:84
+msgid "August"
+msgstr "August"
+
+#: sapns/templates/edit.html:84
+msgid "September"
+msgstr "September"
+
+#: sapns/templates/edit.html:85
+msgid "October"
+msgstr "October"
+
+#: sapns/templates/edit.html:85
+msgid "November"
+msgstr "November"
+
+#: sapns/templates/edit.html:85
+msgid "December"
+msgstr "December"
+
+#: sapns/templates/edit.html:141 sapns/templates/order/insert.html:165
+#: sapns/templates/order/reference.html:119
+#: sapns/templates/users/user_edit.html:43
 msgid "Save"
-msgstr ""
+msgstr "Save"
 
-#: sapns/templates/grid.html:65
+#: sapns/templates/edit.html:183
+msgid "none"
+msgstr "none"
+
+#: sapns/templates/edit.html:190
+msgid "list"
+msgstr "list"
+
+#: sapns/templates/edit.html:193
+msgid "edit"
+msgstr "edit"
+
+#: sapns/templates/grid.html:63
 msgid "You must select a row before click on this action"
-msgstr ""
+msgstr "You must select a row before click on this action"
 
 #: sapns/templates/grid.html:94
 msgid "Search..."
-msgstr ""
+msgstr "Search..."
 
-#: sapns/templates/grid.html:126
+#: sapns/templates/grid.html:134
 msgid "No results"
-msgstr ""
+msgstr "No results"
 
-#: sapns/templates/grid.html:135
+#: sapns/templates/grid.html:146
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
-msgstr ""
-
-#: sapns/templates/grid.html:140
-msgid "All"
-msgstr ""
+msgstr "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 
 #: sapns/templates/grid.html:153
-msgid "page 1"
-msgstr ""
+msgid "All"
+msgstr "All"
 
-#: sapns/templates/grid.html:166 sapns/templates/grid.html:186
-#: sapns/templates/grid.html:201
-#, python-format
+#: sapns/templates/grid.html:167
+msgid "page 1"
+msgstr "page 1"
+
+#: sapns/templates/grid.html:181 sapns/templates/grid.html:202
+#: sapns/templates/grid.html:218
+#, fuzzy, python-format
 msgid "page %(p)d"
-msgstr ""
+msgstr "page %(p)d"
+
+#: sapns/templates/header.html:5
+msgid "logout"
+msgstr "logout"
 
 #: sapns/templates/index.html:32
 msgid "Shortcuts"
-msgstr ""
+msgstr "Shortcuts"
 
-#: sapns/templates/index.html:53
+#: sapns/templates/index.html:49
+msgid "up"
+msgstr "up"
+
+#: sapns/templates/index.html:54
 msgid "Utilities"
-msgstr ""
+msgstr "Utilities"
 
-#: sapns/templates/index.html:57
+#: sapns/templates/index.html:58
 msgid "Views"
+msgstr "Views"
+
+#: sapns/templates/index.html:62
+msgid "Users"
+msgstr "Users"
+
+#: sapns/templates/order/insert.html:115
+msgid "Title class"
+msgstr "Title class"
+
+#: sapns/templates/order/insert.html:138
+#, python-format
+msgid "%s required"
+msgstr "%s required"
+
+#: sapns/templates/order/insert.html:145
+#, python-format
+msgid "%s visible"
 msgstr ""
 
-#: sapns/templates/shortcuts/list.html:15
-msgid "One"
-msgstr ""
+#: sapns/templates/order/insert.html:151
+#: sapns/templates/order/reference.html:104
+#: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
+#: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
+msgid "Up"
+msgstr "Up"
 
-#: sapns/templates/shortcuts/list.html:21
-msgid "Two"
-msgstr ""
+#: sapns/templates/order/insert.html:156
+#: sapns/templates/order/reference.html:110
+#: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
+#: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
+msgid "Down"
+msgstr "Down"
 
-#: sapns/templates/shortcuts/list.html:27
-msgid "Three"
-msgstr ""
+#: sapns/templates/shortcuts/list.html:25
+msgid "Insertion order"
+msgstr "Insertion order"
+
+#: sapns/templates/shortcuts/list.html:37
+msgid "Reference order"
+msgstr "Reference order"
+
+#: sapns/templates/users/index.html:17
+msgid "Permission"
+msgstr "Permission"
+
+#: sapns/templates/users/index.html:21
+msgid "Roles"
+msgstr "Roles"
+
+#: sapns/templates/users/user_edit.html:26
+msgid "Password"
+msgstr "Password"
+
+#: sapns/templates/users/user_edit.html:33
+msgid "Copy from"
+msgstr "Copy from"
 
 #: sapns/templates/util/index.html:24
 msgid "Extract model"
-msgstr ""
+msgstr "Extract model"
 
 #: sapns/templates/util/index.html:28
 msgid "Code model"
-msgstr ""
+msgstr "Code model"
 
 #: sapns/templates/util/index.html:33
 msgid "Update meta-data"
-msgstr ""
+msgstr "Update meta-data"
 
 #: sapns/templates/util/tables.html:12 sapns/templates/util/tables.html:48
 msgid "Source of this model"
-msgstr ""
+msgstr "Source of this model"
 
 #: sapns/templates/util/tables.html:20
 msgid "Name"
-msgstr ""
+msgstr "Name"
 
 #: sapns/templates/util/tables.html:21
 msgid "Type"
-msgstr ""
+msgstr "Type"
 
 #: sapns/templates/util/tables.html:22
 msgid "Primary key/References"
-msgstr ""
+msgstr "Primary key/References"
 
 #: sapns/templates/views/columns.html:2
 msgid "Columns"
-msgstr ""
+msgstr "Columns"
 
 #: sapns/templates/views/columns.html:5
 msgid "Add column"
-msgstr ""
+msgstr "Add column"
 
 #: sapns/templates/views/columns.html:12 sapns/templates/views/header.html:6
 msgid "Title"
-msgstr ""
+msgstr "Title"
 
 #: sapns/templates/views/columns.html:14 sapns/templates/views/filters.html:12
 #: sapns/templates/views/order.html:12
 msgid "Definition"
-msgstr ""
+msgstr "Definition"
 
 #: sapns/templates/views/columns.html:16 sapns/templates/views/header.html:24
 #: sapns/templates/views/relations.html:14
 msgid "Alias"
-msgstr ""
+msgstr "Alias"
 
 #: sapns/templates/views/columns.html:18
 msgid "Align"
-msgstr ""
+msgstr "Align"
 
 #: sapns/templates/views/columns.html:21
 msgid "center"
-msgstr ""
+msgstr "center"
 
 #: sapns/templates/views/columns.html:22
 msgid "left"
-msgstr ""
+msgstr "left"
 
 #: sapns/templates/views/columns.html:23
 msgid "right"
-msgstr ""
+msgstr "right"
 
 #: sapns/templates/views/columns.html:26
 msgid "Remove column"
-msgstr ""
-
-#: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
-#: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
-msgid "Up"
-msgstr ""
-
-#: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
-#: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
-msgid "Down"
-msgstr ""
+msgstr "Remove column"
 
 #: sapns/templates/views/filters.html:2
 msgid "Filters"
-msgstr ""
+msgstr "Filters"
 
 #: sapns/templates/views/filters.html:5
 msgid "Add filter"
-msgstr ""
+msgstr "Add filter"
 
 #: sapns/templates/views/filters.html:14
 msgid "Remove filter"
-msgstr ""
+msgstr "Remove filter"
 
 #: sapns/templates/views/header.html:2
 msgid "View"
-msgstr ""
+msgstr "View"
 
 #: sapns/templates/views/header.html:12
 msgid "Code"
-msgstr ""
+msgstr "Code"
 
 #: sapns/templates/views/header.html:18 sapns/templates/views/relations.html:12
 msgid "Table"
-msgstr ""
+msgstr "Table"
 
 #: sapns/templates/views/header.html:31
 msgid "Save view"
-msgstr ""
+msgstr "Save view"
 
 #: sapns/templates/views/header.html:41
 msgid "Show view"
-msgstr ""
+msgstr "Show view"
 
 #: sapns/templates/views/order.html:2
 msgid "Order"
-msgstr ""
+msgstr "Order"
 
 #: sapns/templates/views/order.html:5
 msgid "Add order"
-msgstr ""
+msgstr "Add order"
 
 #: sapns/templates/views/order.html:14
 msgid "Remove order"
-msgstr ""
+msgstr "Remove order"
 
 #: sapns/templates/views/relations.html:2
 msgid "Relations"
-msgstr ""
+msgstr "Relations"
 
 #: sapns/templates/views/relations.html:5
 msgid "Add relation"
-msgstr ""
+msgstr "Add relation"
 
 #: sapns/templates/views/relations.html:16
 msgid "Condition"
-msgstr ""
+msgstr "Condition"
 
 #: sapns/templates/views/relations.html:18
 msgid "Remove relation"
-msgstr ""
+msgstr "Remove relation"
 
-#~ msgid "Show table/view"
-#~ msgstr ""
-
-#~ msgid "Students"
-#~ msgstr ""
-
-#~ msgid "Clients"
+#~ msgid "subir"
 #~ msgstr ""
 

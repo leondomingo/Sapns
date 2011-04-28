@@ -16,8 +16,6 @@
                 
             $('#' + grid_id + ' .sp_search_form').append(params);
             
-            //alert($('#' + grid_id + ' .sp_search_txt').val());
-            
             // submit the search
             $('#' + grid_id + ' .sp_search_form').submit();
         }
@@ -79,7 +77,8 @@
 </script>
 {% endmacro %}
 
-{% macro show(page, _, q, grid, show_ids, link=None, came_from=None, with_search=True, with_pager=True) %}
+{% macro show(page, _, q, grid, show_ids, link=None, came_from=None, 
+    with_search=True, with_pager=True, can_edit=False) %}
 <!-- Grid -->
 <div id="{{grid.name}}">
 {% if grid.caption %}
@@ -119,7 +118,13 @@
         {% for cell in row %}
         <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};
             width: {{grid.cols[loop.index0].width}}px;"
-            title="{{grid.cols[loop.index0].title}}">{{cell|escape}}</td>
+            title="{{grid.cols[loop.index0].title}}">
+            {% if can_edit and loop.index0 == 0 %}
+            <a href="/edit?cls={{grid.cls}}&id={{cell}}">{{cell|escape}}</a>
+            {% else %}
+            {{cell|escape}}
+            {% endif %}
+        </td>
         {% endfor %}
         </tr>
     {% else %}
@@ -137,7 +142,10 @@
 <!-- Grid pager -->
 <div class="sp_grid_pager">
     <!-- <div> -->
-      <div class="sp_grid_pager_desc">{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.totalp)}}</div>
+      <div class="sp_grid_pager_desc">
+        {{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, 
+            total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.totalp)}}
+      </div>
       <select class="sp_button sp_grid_rp">
           <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
           <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
@@ -155,7 +163,8 @@
         <input type="hidden" name="pag_n" value="{{1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input class="sp_button sp_grid_pag_back" type="submit" value="|<<" title="{{_('page 1')}}"/>
+        <input class="sp_button sp_grid_pag_back" type="submit" value="|<<" 
+            title="{{_('page 1')}}"/>
     </form>
     
     {# {% if grid.pag_n-1 > 0 %} #}
@@ -205,7 +214,7 @@
         <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|" 
+        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|"
             title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
 </div>

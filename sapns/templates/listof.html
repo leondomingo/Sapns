@@ -14,5 +14,6 @@
 {% block middle %}
     {{super()}}
     {{grid_html.js_functions(_)}}
-    {{grid_html.show(page, _, q, grid, show_ids, link=link, came_from=came_from)}}
+    {{grid_html.show(page, _, q, grid, show_ids, link=link, 
+        came_from=came_from, can_edit=True)}}
 {% endblock %}
