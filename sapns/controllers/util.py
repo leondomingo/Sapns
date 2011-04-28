@@ -98,7 +98,7 @@ class UtilController(BaseController):
                 sc_project = data_ex.by_order(1)
                 
             # data exploration/project
-            tables = self.extract_model()['tables']
+            tables = self.extract_model(all=True)['tables']
             
             for i, tbl in enumerate(tables):
                 
@@ -121,8 +121,14 @@ class UtilController(BaseController):
                     DBSession.add(act_table)
                     DBSession.flush()
                     
+                # project
+                sc_parent = sc_project.shortcut_id
+                if cls.name.startswith('sp_'):
+                    # sapns
+                    sc_parent = sc_sapns.shortcut_id
+                    
                 sc_table = DBSession.query(SapnsShortcut).\
-                        filter(and_(SapnsShortcut.parent_id == sc_project.shortcut_id,
+                        filter(and_(SapnsShortcut.parent_id == sc_parent,
                                     SapnsShortcut.action_id == act_table.action_id,
                                     SapnsShortcut.user_id == us.user_id,
                                     )).\
@@ -177,7 +183,7 @@ class UtilController(BaseController):
         
         logger = logging.getLogger(__name__ + '/update_metadata')
         
-        tables = self.extract_model()['tables']
+        tables = self.extract_model(all=True)['tables']
         tables_id = {}
         pending_attr = {}
         for tbl in tables:
@@ -294,10 +300,25 @@ class UtilController(BaseController):
         meta = MetaData(bind=DBSession.bind, reflect=True)
         logger.info('Connected to "%s"' % meta.bind)
         
+        def sp_cmp(x, y):
+            """Alphabetical order but sp_* tables before any other table."""
+            
+            if x.startswith('sp_'):
+                if y.startswith('sp_'):
+                    return cmp(x, y)
+                
+                else:
+                    return -1
+                
+            else:
+                if y.startswith('sp_'):
+                    return 1
+                
+                else:
+                    return cmp(x, y)
+        
         tables = []
-        for tbl in sorted(meta.sorted_tables, 
-                          # table name alphabetical order
-                          cmp=lambda x,y: cmp(x.name, y.name)):
+        for tbl in sorted(meta.sorted_tables, cmp=sp_cmp):
             
             if not tbl.name.startswith('sp_') or all:
                 
