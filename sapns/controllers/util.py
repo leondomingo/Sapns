@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Views management controller"""
+"""Utilities controller"""
 
 # turbogears imports
 from tg import expose, url, response, config
@@ -24,6 +24,7 @@ from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
     SapnsShortcut, SapnsAction, SapnsPrivilege, SapnsAttrPrivilege
 
 class UtilController(BaseController):
+    
     allow_only = authorize.has_any_permission('manage', 'utilities')
     
     @expose('message.html')
@@ -138,7 +139,7 @@ class UtilController(BaseController):
                 if not sc_table:
                     sc_table = SapnsShortcut()
                     sc_table.title = tbl['name']
-                    sc_table.parent_id = sc_project.shortcut_id
+                    sc_table.parent_id = sc_parent
                     sc_table.user_id = us.user_id
                     sc_table.action_id = act_table.action_id
                     sc_table.order = i
@@ -303,19 +304,19 @@ class UtilController(BaseController):
         def sp_cmp(x, y):
             """Alphabetical order but sp_* tables before any other table."""
             
-            if x.startswith('sp_'):
-                if y.startswith('sp_'):
-                    return cmp(x, y)
+            if x.name.startswith('sp_'):
+                if y.name.startswith('sp_'):
+                    return cmp(x.name, y.name)
                 
                 else:
                     return -1
                 
             else:
-                if y.startswith('sp_'):
+                if y.name.startswith('sp_'):
                     return 1
                 
                 else:
-                    return cmp(x, y)
+                    return cmp(x.name, y.name)
         
         tables = []
         for tbl in sorted(meta.sorted_tables, cmp=sp_cmp):

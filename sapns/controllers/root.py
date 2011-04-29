@@ -364,7 +364,6 @@ class RootController(BaseController):
                           day_names_min=config.get('js.day_names_min'),
                           month_names=config.get('js.month_names'),
                           first_day=config.get('js.first_day'),
-                          
                           )
         
         ref = None
@@ -404,7 +403,8 @@ class RootController(BaseController):
                         value = row[attr.name] or ''
             
             attributes.append(dict(name=attr.name, title=attr.title, 
-                                   type=attr.type, value=value, vals=None))
+                                   type=attr.type, value=value, required=attr.required, 
+                                   vals=None))
             
             if attr.related_class_id:
                 # vals
