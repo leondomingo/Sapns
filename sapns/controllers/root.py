@@ -30,6 +30,7 @@ from sqlalchemy.sql.expression import and_
 import simplejson as sj
 from sapns.controllers.users import UsersController
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
+from sapns.controllers.shortcuts import ShortcutsController
 
 __all__ = ['RootController']
 
@@ -55,6 +56,8 @@ class RootController(BaseController):
     util = UtilController()
     
     users = UsersController()
+    
+    sc = ShortcutsController()
 
     @expose('index.html')
     @require(predicates.not_anonymous())
@@ -250,8 +253,8 @@ class RootController(BaseController):
 
         update = {}
         
-        if id != '': #params['id'] != '':
-            update['id'] = int(id) #params['id'])
+        if id != '':
+            update['id'] = int(id)
         
         for field_name, field_value in params.iteritems():
             m_field = re.search(r'^fld_(.+)', field_name)
@@ -295,6 +298,10 @@ class RootController(BaseController):
                             field_value = None
                         else:
                             field_value = strtotime(field_value)
+                    
+                    # string types        
+                    else:
+                        field_value = field_value.strip()
                 
                 update[field_name_] = field_value
                 

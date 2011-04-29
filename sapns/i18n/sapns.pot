@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-04-28 18:12+0200\n"
+"POT-Creation-Date: 2011-04-29 13:14+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -40,7 +40,7 @@ msgstr ""
 msgid "This class does not exist"
 msgstr ""
 
-#: sapns/controllers/root.py:377 sapns/controllers/root.py:443
+#: sapns/controllers/root.py:376 sapns/controllers/root.py:443
 msgid "Record does not exist"
 msgstr ""
 
@@ -48,68 +48,68 @@ msgstr ""
 msgid "Record was successfully deleted"
 msgstr ""
 
-#: sapns/controllers/users.py:29 sapns/templates/users/user_edit.html:8
+#: sapns/controllers/users.py:30 sapns/templates/users/user_edit.html:8
 msgid "Display name"
 msgstr ""
 
-#: sapns/controllers/users.py:30 sapns/templates/users/user_edit.html:14
+#: sapns/controllers/users.py:31 sapns/templates/users/user_edit.html:14
 msgid "User name"
 msgstr ""
 
-#: sapns/controllers/users.py:31 sapns/templates/users/user_edit.html:20
+#: sapns/controllers/users.py:32 sapns/templates/users/user_edit.html:20
 msgid "E-mail address"
 msgstr ""
 
-#: sapns/controllers/users.py:42 sapns/controllers/util.py:225
+#: sapns/controllers/users.py:43 sapns/controllers/util.py:232
 msgid "New"
 msgstr ""
 
-#: sapns/controllers/users.py:43 sapns/controllers/util.py:226
+#: sapns/controllers/users.py:44 sapns/controllers/util.py:233
 msgid "Edit"
 msgstr ""
 
-#: sapns/controllers/users.py:44 sapns/controllers/util.py:227
+#: sapns/controllers/users.py:45 sapns/controllers/util.py:234
 msgid "Delete"
 msgstr ""
 
-#: sapns/controllers/users.py:126
+#: sapns/controllers/users.py:127
 msgid "An error occurred while saving the user"
 msgstr ""
 
-#: sapns/controllers/util.py:35
+#: sapns/controllers/util.py:36
 msgid "Initialization was completed successfully"
 msgstr ""
 
-#: sapns/controllers/util.py:58
+#: sapns/controllers/util.py:59
 msgid "Dashboard"
 msgstr ""
 
-#: sapns/controllers/util.py:67
+#: sapns/controllers/util.py:68
 msgid "Data exploration"
 msgstr ""
 
-#: sapns/controllers/util.py:86
+#: sapns/controllers/util.py:87
 msgid "Project"
 msgstr ""
 
-#: sapns/controllers/util.py:117 sapns/controllers/util.py:228
+#: sapns/controllers/util.py:118 sapns/controllers/util.py:235
 msgid "List"
 msgstr ""
 
-#: sapns/controllers/util.py:172
+#: sapns/controllers/util.py:179
 msgid "The user dashboards have been created"
 msgstr ""
 
-#: sapns/controllers/util.py:197
+#: sapns/controllers/util.py:204
 #, python-format
 msgid "Class: %s"
 msgstr ""
 
-#: sapns/controllers/util.py:276
+#: sapns/controllers/util.py:283
 msgid "Process terminated"
 msgstr ""
 
-#: sapns/controllers/views.py:98
+#: sapns/controllers/views.py:99
 msgid "The view has been successfully deleted"
 msgstr ""
 
@@ -133,132 +133,136 @@ msgstr ""
 msgid "No"
 msgstr ""
 
-#: sapns/templates/edit.html:74
+#: sapns/templates/edit.html:85
+msgid "The following fields must be filled:"
+msgstr ""
+
+#: sapns/templates/edit.html:106
 msgid "Next"
 msgstr ""
 
-#: sapns/templates/edit.html:75
+#: sapns/templates/edit.html:107
 msgid "Prev"
 msgstr ""
 
-#: sapns/templates/edit.html:77
+#: sapns/templates/edit.html:109
 msgid "Sunday"
 msgstr ""
 
-#: sapns/templates/edit.html:77
+#: sapns/templates/edit.html:109
 msgid "Monday"
 msgstr ""
 
-#: sapns/templates/edit.html:77
+#: sapns/templates/edit.html:109
 msgid "Tuesday"
 msgstr ""
 
-#: sapns/templates/edit.html:78
+#: sapns/templates/edit.html:110
 msgid "Wednesday"
 msgstr ""
 
-#: sapns/templates/edit.html:78
+#: sapns/templates/edit.html:110
 msgid "Thursday"
 msgstr ""
 
-#: sapns/templates/edit.html:78
+#: sapns/templates/edit.html:110
 msgid "Friday"
 msgstr ""
 
-#: sapns/templates/edit.html:79
+#: sapns/templates/edit.html:111
 msgid "Saturday"
 msgstr ""
 
-#: sapns/templates/edit.html:80
+#: sapns/templates/edit.html:112
 msgid "Su"
 msgstr ""
 
-#: sapns/templates/edit.html:80
+#: sapns/templates/edit.html:112
 msgid "Mo"
 msgstr ""
 
-#: sapns/templates/edit.html:80
+#: sapns/templates/edit.html:112
 msgid "Tu"
 msgstr ""
 
-#: sapns/templates/edit.html:80
+#: sapns/templates/edit.html:112
 msgid "We"
 msgstr ""
 
-#: sapns/templates/edit.html:81
+#: sapns/templates/edit.html:113
 msgid "Th"
 msgstr ""
 
-#: sapns/templates/edit.html:81
+#: sapns/templates/edit.html:113
 msgid "Fr"
 msgstr ""
 
-#: sapns/templates/edit.html:81
+#: sapns/templates/edit.html:113
 msgid "Sa"
 msgstr ""
 
-#: sapns/templates/edit.html:82
+#: sapns/templates/edit.html:114
 msgid "January"
 msgstr ""
 
-#: sapns/templates/edit.html:82
+#: sapns/templates/edit.html:114
 msgid "February"
 msgstr ""
 
-#: sapns/templates/edit.html:82
+#: sapns/templates/edit.html:114
 msgid "March"
 msgstr ""
 
-#: sapns/templates/edit.html:83
+#: sapns/templates/edit.html:115
 msgid "April"
 msgstr ""
 
-#: sapns/templates/edit.html:83
+#: sapns/templates/edit.html:115
 msgid "May"
 msgstr ""
 
-#: sapns/templates/edit.html:83
+#: sapns/templates/edit.html:115
 msgid "June"
 msgstr ""
 
-#: sapns/templates/edit.html:84
+#: sapns/templates/edit.html:116
 msgid "July"
 msgstr ""
 
-#: sapns/templates/edit.html:84
+#: sapns/templates/edit.html:116
 msgid "August"
 msgstr ""
 
-#: sapns/templates/edit.html:84
+#: sapns/templates/edit.html:116
 msgid "September"
 msgstr ""
 
-#: sapns/templates/edit.html:85
+#: sapns/templates/edit.html:117
 msgid "October"
 msgstr ""
 
-#: sapns/templates/edit.html:85
+#: sapns/templates/edit.html:117
 msgid "November"
 msgstr ""
 
-#: sapns/templates/edit.html:85
+#: sapns/templates/edit.html:117
 msgid "December"
 msgstr ""
 
-#: sapns/templates/edit.html:141 sapns/templates/order/insert.html:165
+#: sapns/templates/edit.html:174 sapns/templates/order/insert.html:165
 #: sapns/templates/order/reference.html:119 sapns/templates/users/user_edit.html:43
 msgid "Save"
 msgstr ""
 
-#: sapns/templates/edit.html:183
+#: sapns/templates/edit.html:225
 msgid "none"
 msgstr ""
 
-#: sapns/templates/edit.html:190
+#: sapns/templates/edit.html:232
 msgid "list"
 msgstr ""
 
-#: sapns/templates/edit.html:193
+#: sapns/templates/edit.html:235
 msgid "edit"
 msgstr ""
 

@@ -15,6 +15,8 @@ from formencode import schema #, validators
 #from pylons import tmpl_context
 #from sapns.model import DBSession, metadata
 
+__all__ = ['ViewsController']
+
 class ViewSchema(schema.Schema):
     pass   
 

@@ -215,8 +215,7 @@
             value="{{attr.value}}"/>
         <!-- Memo -->
         {% elif attr.type == 'String' %}
-        <textarea class="sp_text_field sp_memo_field" name="{{attr.name}}">
-            {{attr.value|escape}}</textarea>
+        <textarea class="sp_text_field sp_memo_field" name="{{attr.name}}">{{attr.value|escape}}</textarea>
         <!-- Select -->
         {% elif attr.vals != None %}
         <select name="{{attr.name}}"

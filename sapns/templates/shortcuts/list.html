@@ -1,14 +1,24 @@
-<ul>
+<script type="text/javascript">
+    $(document).ready(function() {
+    	$('#shortcut_delete .sp_button').click(function() {
+    		var sc_id = $(this).parent().find('input[name=id]').val();
+    		alert('DELETE: Are you sure? ' + sc_id);
+    	});
+    	
+    	$('#shortcut_bookmark .sp_button').click(function() {
+    		var sc_id = $(this).parent().find('input[name=id]').val();
+            alert('BOOKMARK: Are you sure? ' + sc_id);
+        });
+    });
+</script>
+
+<div>
     {% for sc in shortcuts %}
-    <li>
+    <div class="sp_shortcut">
     {% if sc.action_type %}
         {% if sc.action_type == 'list' %}
-            <div style="{% if loop.index % 2 == 0 %}background-color: white;{%endif%}
-                height: 24px;">
-                
-            <div style="width: 400px; float: left;
-                margin-top: 2px;
-                padding-left: 20px;">
+            <div style="height: 24px; {% if loop.index % 2 == 0 %}background-color: white;{%endif%}">
+            <div class="sp_shortcut_title">
             <a href="{{tg.url('/list', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{sc.title}}</a>
             </div>
@@ -16,26 +26,47 @@
             <!-- actions over shortcuts -->
             
             <!-- insertion order -->
-            <div style="float: left; border: 1px solid #B4BD3C;
-                padding-left: 2px; padding-right: 2px;
-                margin-top: 2px;
-                margin-left: 5px; margin-right: 5px;">
-            
+            <div class="sp_shortcut_insertion_order">
             <a href="{{tg.url('/ins_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{_('Insertion order')}}
             </a>
             </div>
             
             <!-- reference order -->
-            <div style="border: 1px solid #B4BD3C;
-                float: left;
-                padding-left: 2px; padding-right: 2px;
-                margin-top: 2px;
-                margin-left: 5px; margin-right: 5px;">
-            
+            <div class="sp_shortcut_reference_order">
             <a href="{{tg.url('/ref_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{_('Reference order')}}
             </a>
+            </div>
+            
+            <!-- Edit -->
+            <div>
+                <form method="post" action="/sc/edit">
+                <input type="hidden" name="id" value="{{sc.id}}"/>
+                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+                <input class="sp_button" style="width: 90px; float: left;" 
+                    type="submit" value="{{_('Edit')}}"/>
+                </form>
+            </div>
+            
+            <!-- Delete -->
+            <div>
+                <form id="shortcut_delete" method="post" action="/sc/delete">
+                <input type="hidden" name="id" value="{{sc.id}}"/>
+                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+                <input class="sp_button" style="width: 90px; float: left;" 
+                    type="button" value="{{_('Delete')}}"/>
+                </form>
+            </div>
+
+            <!-- Bookmark this -->
+            <div>
+                <form id="shortcut_bookmark" method="post" action="/sc/bookmark">
+                <input type="hidden" name="id" value="{{sc.id}}"/>
+                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+                <input class="sp_button" style="width: 90px; float: left;" 
+                    type="button" value="{{_('Bookmark this')}}"/>
+                </form>
             </div>
             
             </div>
@@ -46,6 +77,6 @@
         {# This is a group #}
         <a href="{{tg.url('/', sc_parent=sc.id)}}">{{sc.title}}</a>
     {% endif %}
-    </li>
+    </div>
     {% endfor %}
-</ul>
+</div>

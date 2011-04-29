@@ -22,6 +22,8 @@ from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
 from pylons.templating import render_jinja2
 from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
     SapnsShortcut, SapnsAction, SapnsPrivilege, SapnsAttrPrivilege
+    
+__all__ = ['UtilController']
 
 class UtilController(BaseController):
     

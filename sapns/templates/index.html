@@ -2,11 +2,10 @@
 {% import 'util.html' as util %}
 
 <!-- Uncomment the next section and override the "html head" block if you want to -->
-<!-- 
 {% block head %}
     {{ super() }}
+    {{util.jquery()}}
 {% endblock %}
--->
 
 <!-- Uncomment the next section and override the "header" block if you want to -->
 <!--
@@ -30,6 +29,13 @@
     </style>
     
     <div><a href="/">{{_('Shortcuts')}}</a></div>
+        <!-- parent shortcut -->
+    {% if sc_parent %}
+    <a href="{{tg.url('/', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
+    {% else %}
+    <a href="">[  ]</a>
+    {% endif %}
+    
     {#<div>
         <a class="sc_type" href="{{tg.url('/', sc_type='list')}}">List</a>
         <a class="sc_type" href="{{tg.url('/', sc_type='bigicon')}}">Big icon</a>
@@ -45,23 +51,20 @@
     {% endif %}
     
     </div>
-    {% if sc_parent %}
-    <a href="{{tg.url('/', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
-    {% endif %}
-
-    <ul>
-    <li>
+    
+    <div>
+    <div class="sp_shortcut">
         <a href="{{tg.url('/util', came_from='/')}}">{{_('Utilities')}}</a>
-    </li>
+    </div>
     
-    <li>
+    <div class="sp_shortcut">
         <a href="{{tg.url('/views', came_from='/')}}">{{_('Views')}}</a>
-    </li>
+    </div>
     
-    <li>
+    <div class="sp_shortcut">
         <a href="{{tg.url('/users', came_from='/')}}">{{_('Users')}}</a>
-    </li>
-    </ul>
+    </div>
+    </div>
 
     {#{{curr_lang[0]}}#}
     <a href="{{tg.url('/setlang', lang='en')}}" 

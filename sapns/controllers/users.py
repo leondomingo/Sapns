@@ -17,6 +17,8 @@ import logging
 from sapns.model.sapnsmodel import SapnsUser 
 from neptuno.dataset import DataSet
 
+__all__ = ['UsersControllers']
+
 class UsersController(BaseController):
     
     allow_only = authorize.has_any_permission('manage', 'users')
