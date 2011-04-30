@@ -3,6 +3,7 @@
 {% block middle %}
     {% import 'util.html' as util %}
     {{util.jquery()}}
+    {{util.jquery_ui()}}
   
     <script type="text/javascript">
         $(document).ready(function() {
@@ -46,6 +47,12 @@
                 // recover click events
                 $('.ref_attr:last .reforder_up').click(function() { ref_up($(this)); });
                 $('.ref_attr:last .reforder_down').click(function() { ref_down($(this)); });
+                
+                if($('.ref_attr:last').attr('modified') == 'true') {
+                	$('.ref_attr:last').effect('highlight', {color: 'yellow'}, 500);
+                }
+                
+                $('.ref_attr:last').attr('modified', 'false');
             }
         }
         
@@ -58,6 +65,7 @@
                 var prev_item = $('.ref_attr:eq(' + prev_pos + ')');
                 prev_item.attr('pos', pos);
                 button.parent().parent().parent().attr('pos', prev_pos);
+                button.parent().parent().parent().attr('modified', 'true');
                 
                 // create new order
                 new_order();
@@ -74,6 +82,7 @@
                 var next_item = $('.ref_attr:eq(' + next_pos + ')');
                 next_item.attr('pos', pos);
                 button.parent().parent().parent().attr('pos', next_pos);
+                button.parent().parent().parent().attr('modified', 'true');
                 
                 // create new order
                 new_order();
@@ -87,7 +96,7 @@
 
     <div id="reference">
     {% for attr in reference %}
-    <div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}">
+    <div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
         <div style="border-bottom: 1px dotted gray;">
             <div style="float: left; width: 40px; text-align: center;">
                 <input class="attr_included" type="checkbox" 

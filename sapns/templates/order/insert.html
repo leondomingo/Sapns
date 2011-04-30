@@ -3,6 +3,7 @@
 {% block middle %}
     {% import 'util.html' as util %}
     {{util.jquery()}}
+    {{util.jquery_ui()}}
   
     <script type="text/javascript">
         $(document).ready(function() {
@@ -59,6 +60,12 @@
                 $('.ins_attr:last .insorder_up').click(function() { ins_up($(this)); });
                 $('.ins_attr:last .insorder_down').click(function() { ins_down($(this)); });
                 $('.ins_attr:last .attr_visible').click(function() { color_visible($(this)); });
+                
+                if ($('.ins_attr:last').attr('modified') == 'true') {
+                    $('.ins_attr:last').effect('highlight', {color: 'yellow'}, 300);
+                }
+                
+                $('.ins_attr:last').attr('modified', 'false');
             }
         }
         
@@ -71,6 +78,7 @@
                 var prev_item = $('.ins_attr:eq(' + prev_pos + ')');
                 prev_item.attr('pos', pos);
                 button.parent().parent().parent().attr('pos', prev_pos);
+                button.parent().parent().parent().attr('modified', 'true');
                 
                 // create new order
                 new_order();
@@ -87,6 +95,7 @@
                 var next_item = $('.ins_attr:eq(' + next_pos + ')');
                 next_item.attr('pos', pos);
                 button.parent().parent().parent().attr('pos', next_pos);
+                button.parent().parent().parent().attr('modified', 'true');
                 
                 // create new order
                 new_order();
@@ -125,7 +134,7 @@
     </div>
         
     {% for attr in insertion %}
-    <div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}">
+    <div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
         <div style="margin-top: 3px; margin-left: 15px;">
             <div class="attr_title" style="width: 78%; font-weight: bold; float: left;">
                 <input class="sp_text_field" style="width: 99%;" type="text"
