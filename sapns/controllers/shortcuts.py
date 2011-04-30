@@ -35,14 +35,14 @@ class ShortcutsController(BaseController):
         came_from = params.get('came_from', '/')
         redirect(url(came_from))
     
-    @expose()
+    @expose('json')
     def delete(self, id=None, **params):
-        came_from = params.get('came_from', '/')
-        redirect(url(came_from))
+        #came_from = params.get('came_from', '/')
+        return dict(status=True)
     
-    @expose()
+    @expose('json')
     def bookmark(self, id=None, **params):
-        came_from = params.get('came_from', '/')
-        redirect(url(came_from))
+        #came_from = params.get('came_from', '/')
+        return dict(status=True)
     
     
