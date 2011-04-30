@@ -2,7 +2,7 @@
     $(document).ready(function() {
     	// delete
     	$('.sc_delete_button').click(function() {
-    		var sc = $(this).parent().parent().parent();
+    		var sc = $(this).parent().parent();
     		var sc_id = sc.attr('sc_id');
     		
             $('#delete-confirmation').
@@ -39,7 +39,7 @@
     	
     	// bookmark
     	$('.sc_bookmark_button').click(function() {
-    		var sc = $(this).parent().parent().parent();
+    		var sc = $(this).parent().parent();
             var sc_id = sc.attr('sc_id');
             
             $('#bookmark-confirmation').dialog({
@@ -75,6 +75,7 @@
     });
 </script>
 
+<!-- dialogs (now ain't visible) -->
 <div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
   {{_('Do you want to delete this shortcut?')}}
 </div>
@@ -85,61 +86,67 @@
 
 <div>
     {% for sc in shortcuts %}
-    <div class="sp_shortcut" sc_id="{{sc.id}}"">
+    <div class="sp_shortcut" sc_id="{{sc.id}}"
+        style="{% if loop.index % 2 == 0 %}background-color: white;{%endif%}">
     {% if sc.action_type %}
         {% if sc.action_type == 'list' %}
-            <div style="height: 24px; {% if loop.index % 2 == 0 %}background-color: white;{%endif%}">
-            <div class="sp_shortcut_title">
+        <div class="sp_shortcut_title">
             <a href="{{tg.url('/list', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{sc.title}}</a>
-            </div>
-            
-            <!-- actions over shortcuts -->
-            
-            <!-- insertion order -->
-            <div class="sp_shortcut_insertion_order">
+        </div>
+        
+        <!-- actions over "list" shortcuts -->
+        
+        <!-- insertion order -->
+        <div class="sp_shortcut_insertion_order">
             <a href="{{tg.url('/ins_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{_('Insertion order')}}
             </a>
-            </div>
-            
-            <!-- reference order -->
-            <div class="sp_shortcut_reference_order">
+        </div>
+        
+        <!-- reference order -->
+        <div class="sp_shortcut_reference_order">
             <a href="{{tg.url('/ref_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
                 {{_('Reference order')}}
             </a>
-            </div>
-            
-            <!-- Edit -->
-            <div>
-                <form method="post" action="/sc/edit">
-                <input type="hidden" name="id" value="{{sc.id}}"/>
-                <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
-                <input class="sp_button" style="width: 90px; float: left;" 
-                    type="submit" value="{{_('Edit')}}"/>
-                </form>
-            </div>
-            
-            <!-- Delete -->
-            <div>
-                <input class="sp_button sc_delete_button" style="width: 90px; float: left;" 
-                    type="button" value="{{_('Delete')}}"/>
-            </div>
-
-            <!-- Bookmark this -->
-            <div>
-                <input class="sp_button sc_bookmark_button" style="width: 90px; float: left;" 
-                    type="button" value="{{_('Bookmark this')}}"/>
-            </div>
-            
-            </div>
+        </div>
         {% else %}
+        <div class="sp_shortcut_title">
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
+        </div>
         {% endif %}
     {% else %}
         {# This is a group #}
-        <a href="{{tg.url('/', sc_parent=sc.id)}}">{{sc.title}}</a>
+        <div class="sp_shortcut_title">
+            <a href="{{tg.url('/', sc_parent=sc.id)}}">{{sc.title}}</a>
+        </div>
     {% endif %}
+        <!-- general actions over shortcuts -->
+    
+        <!-- Edit -->
+        <div style="float: left;">
+            <form method="post" action="/sc/edit">
+            <input type="hidden" name="id" value="{{sc.id}}"/>
+            <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+            <input class="sp_button" style="width: 90px; float: left;"
+                title="{{_('Edit this shortcut')}}" 
+                type="submit" value="{{_('Edit')}}"/>
+            </form>
+        </div>
+        
+        <!-- Delete -->
+        <div style="float: left;">
+            <input class="sp_button sc_delete_button" style="width: 90px; float: left;"
+                title="{{_('Remove this shortcut')}}" 
+                type="button" value="{{_('Delete')}}"/>
+        </div>
+    
+        <!-- Bookmark this -->
+        <div>
+            <input class="sp_button sc_bookmark_button" style="width: 90px;"
+                title="{{_('Put this shortcut on the dashboard')}}"
+                type="button" value="{{_('Bookmark this')}}"/>
+        </div>
     </div>
     {% endfor %}
 </div>

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-30 12:48+0200\n"
+"PO-Revision-Date: 2011-04-30 20:49+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -77,13 +77,13 @@ msgstr "New"
 
 #: sapns/controllers/users.py:46
 #: sapns/controllers/util.py:235
-#: sapns/templates/shortcuts/list.html:119
+#: sapns/templates/shortcuts/list.html:133
 msgid "Edit"
 msgstr "Edit"
 
 #: sapns/controllers/users.py:47
 #: sapns/controllers/util.py:236
-#: sapns/templates/shortcuts/list.html:126
+#: sapns/templates/shortcuts/list.html:141
 msgid "Delete"
 msgstr "Delete"
 
@@ -270,8 +270,8 @@ msgid "December"
 msgstr "December"
 
 #: sapns/templates/edit.html:190
-#: sapns/templates/order/insert.html:165
-#: sapns/templates/order/reference.html:119
+#: sapns/templates/order/insert.html:174
+#: sapns/templates/order/reference.html:128
 #: sapns/templates/users/user_edit.html:43
 msgid "Save"
 msgstr "Save"
@@ -345,22 +345,22 @@ msgstr "Views"
 msgid "Users"
 msgstr "Users"
 
-#: sapns/templates/order/insert.html:115
+#: sapns/templates/order/insert.html:124
 msgid "Title class"
 msgstr "Title class"
 
-#: sapns/templates/order/insert.html:138
+#: sapns/templates/order/insert.html:147
 #, python-format
 msgid "%s required"
 msgstr "%s required"
 
-#: sapns/templates/order/insert.html:145
+#: sapns/templates/order/insert.html:154
 #, python-format
 msgid "%s visible"
 msgstr "%s visible"
 
-#: sapns/templates/order/insert.html:151
-#: sapns/templates/order/reference.html:104
+#: sapns/templates/order/insert.html:160
+#: sapns/templates/order/reference.html:113
 #: sapns/templates/views/columns.html:27
 #: sapns/templates/views/filters.html:15
 #: sapns/templates/views/order.html:15
@@ -368,8 +368,8 @@ msgstr "%s visible"
 msgid "Up"
 msgstr "Up"
 
-#: sapns/templates/order/insert.html:156
-#: sapns/templates/order/reference.html:110
+#: sapns/templates/order/insert.html:165
+#: sapns/templates/order/reference.html:119
 #: sapns/templates/views/columns.html:28
 #: sapns/templates/views/filters.html:16
 #: sapns/templates/views/order.html:16
@@ -385,32 +385,46 @@ msgstr "Ok"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: sapns/templates/shortcuts/list.html:78
+#: sapns/templates/shortcuts/list.html:79
 msgid "Delete shortcut"
 msgstr "Delete shortcut"
 
-#: sapns/templates/shortcuts/list.html:79
+#: sapns/templates/shortcuts/list.html:80
 #, fuzzy
 msgid "Do you want to delete this shortcut?"
 msgstr "Do you really want to delete this record?"
 
-#: sapns/templates/shortcuts/list.html:82
+#: sapns/templates/shortcuts/list.html:83
 msgid "Bookmark shortcut"
 msgstr "Bookmark shortcut"
 
-#: sapns/templates/shortcuts/list.html:83
+#: sapns/templates/shortcuts/list.html:84
 msgid "Do you want to bookmark this shortcut?"
 msgstr "Do you want to bookmark this shortcut?"
 
-#: sapns/templates/shortcuts/list.html:102
+#: sapns/templates/shortcuts/list.html:103
 msgid "Insertion order"
 msgstr "Insertion order"
 
-#: sapns/templates/shortcuts/list.html:109
+#: sapns/templates/shortcuts/list.html:110
 msgid "Reference order"
 msgstr "Reference order"
 
 #: sapns/templates/shortcuts/list.html:132
+#, fuzzy
+msgid "Edit this shortcut"
+msgstr "Delete shortcut"
+
+#: sapns/templates/shortcuts/list.html:140
+#, fuzzy
+msgid "Remove this shortcut"
+msgstr "Delete shortcut"
+
+#: sapns/templates/shortcuts/list.html:147
+msgid "Put this shortcut on the dashboard"
+msgstr "Put this shortcut on the dashboard"
+
+#: sapns/templates/shortcuts/list.html:148
 msgid "Bookmark this"
 msgstr "Bookmark this"
 
