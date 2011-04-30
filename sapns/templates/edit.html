@@ -82,13 +82,26 @@
             });
     		
     		if (required_attrs != '') {
-    			var alert_txt = "{{_('The following fields must be filled:')}}";
-    			alert_txt += '\n\n';
+    			var alert_msg = "{{_('The following fields must be filled:')}}";
+    			alert_msg += '<br>';
     			for (var i=0; i<required_attrs.length; i++) {
-    				alert_txt += '    ' + required_attrs[i] + '\n';
+    				alert_msg += 
+    					'<p style="margin-left: 20px; ' +
+    					    'font-size: 10px;' + 
+    					    'font-weight: bold;">' + 
+    					required_attrs[i] + 
+    					'</p>';
     			}
     			
-    			alert(alert_txt);
+    			$('#edit-dialog').
+    			    attr('title', "{{_('Required fields')}}").
+    			    html("<p style=''>" + alert_msg + "</p>").
+    			    dialog({
+    				    resizable: false,
+                        height: 250,
+                        width: 450,
+                        modal: true,
+    			    });
     		}
     		else {
     			$('#edit_form').append(params).submit();
@@ -162,6 +175,9 @@
         height: 100px;
     }
 </style>
+
+<div id="edit-dialog" style="display: none;">
+</div>
 
 <form id="edit_form" method="post" action="{{tg.url('/save')}}">
     <input type="hidden" name="cls" value="{{cls}}"/> 
