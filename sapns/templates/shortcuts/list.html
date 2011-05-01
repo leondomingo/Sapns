@@ -57,7 +57,13 @@
                                 id: sc_id,
                             },
                             success: function(res) {
-                                sc.effect('highlight', {color: 'red'}, 400);
+                            	if (res.status) {
+                            	    sc.effect('highlight', {color: 'red'}, 400);
+                            	}
+                            	else {
+                            		alert('Error!');
+                            	}
+                            	
                                 $('#bookmark-confirmation').dialog('close');
                             },
                             error: function() {
@@ -80,8 +86,8 @@
   {{_('Do you want to delete this shortcut?')}}
 </div>
 
-<div id="bookmark-confirmation" style="display: none;" title="{{_('Bookmark shortcut')}}">
-  {{_('Do you want to bookmark this shortcut?')}}
+<div id="bookmark-confirmation" style="display: none;" title="{{_('Send to dashboard')}}">
+  {{_('Do you want to send this shortcut to the dashboard?')}}
 </div>
 
 <div>
@@ -136,16 +142,18 @@
         
         <!-- Delete -->
         <div style="float: left;">
-            <input class="sp_button sc_delete_button" style="width: 90px; float: left;"
+            <input class="sp_button sc_delete_button" 
+                style="width: 90px; float: left;"
                 title="{{_('Remove this shortcut')}}" 
                 type="button" value="{{_('Delete')}}"/>
         </div>
     
-        <!-- Bookmark this -->
+        <!-- To dashboard -->
         <div>
-            <input class="sp_button sc_bookmark_button" style="width: 90px;"
+            <input class="sp_button sc_bookmark_button" 
+                style="width: 115px;"
                 title="{{_('Put this shortcut on the dashboard')}}"
-                type="button" value="{{_('Bookmark this')}}"/>
+                type="button" value="{{_('Send to dashboard')}}"/>
         </div>
     </div>
     {% endfor %}

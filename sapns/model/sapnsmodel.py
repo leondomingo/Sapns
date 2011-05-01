@@ -11,7 +11,7 @@ from pylons.i18n import ugettext as _
 from tg import config
 
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
-from sqlalchemy.sql.expression import and_, select, alias
+from sqlalchemy.sql.expression import and_, select, alias, desc
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
 from sqlalchemy.orm import relation, synonym
 
@@ -200,6 +200,39 @@ class SapnsShortcut(DeclarativeBase):
                 first()
                 
         return sc
+    
+    def next_order(self):
+        """Returns the next order for a child shortcut."""
+        
+        sc = DBSession.query(SapnsShortcut).\
+                filter(SapnsShortcut.parent_id == self.shortcut_id).\
+                order_by(desc(SapnsShortcut.order)).\
+                first()
+                
+        if not sc:
+            return 0
+        
+        else:
+            return sc.order + 1
+        
+    def add_child(self, id_user, id_shortcut):
+        
+        # the shortcut to be copied
+        sc = DBSession.query(SapnsShortcut).get(id_shortcut)
+        
+        if not sc:
+            raise Exception('It does not exist that shortcut')
+        
+        # the "copy"
+        new_sc = SapnsShortcut()
+        new_sc.user_id = id_user
+        new_sc.parent_id = self.shortcut_id
+        new_sc.order = self.next_order()
+        new_sc.title = sc.title
+        new_sc.action_id = sc.action_id
+        
+        DBSession.add(new_sc)
+        DBSession.flush()
 
 # TODO: 1-to-1 autoreference relation
 SapnsShortcut.children = \

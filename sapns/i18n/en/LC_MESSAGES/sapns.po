@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2011-04-03 20:52+0200\n"
-"PO-Revision-Date: 2011-04-30 20:49+0200\n"
+"PO-Revision-Date: 2011-05-01 01:45+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -30,10 +30,8 @@ msgstr "Welcome back, %s!"
 msgid "We hope to see you soon!"
 msgstr "We hope to see you soon!"
 
-#: sapns/controllers/root.py:153
-#: sapns/controllers/root.py:251
-#: sapns/controllers/root.py:353
-#: sapns/controllers/root.py:475
+#: sapns/controllers/root.py:153 sapns/controllers/root.py:251
+#: sapns/controllers/root.py:353 sapns/controllers/root.py:475
 #: sapns/controllers/root.py:519
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Sorry, you do not have privilege on this class"
@@ -42,8 +40,7 @@ msgstr "Sorry, you do not have privilege on this class"
 msgid "This class does not exist"
 msgstr "This class does not exist"
 
-#: sapns/controllers/root.py:383
-#: sapns/controllers/root.py:450
+#: sapns/controllers/root.py:383 sapns/controllers/root.py:450
 msgid "Record does not exist"
 msgstr "Record does not exist"
 
@@ -55,35 +52,29 @@ msgstr "Record was successfully deleted"
 msgid "Shorcuts editing"
 msgstr "Edición de favoritos"
 
-#: sapns/controllers/users.py:32
-#: sapns/templates/users/user_edit.html:8
+#: sapns/controllers/users.py:32 sapns/templates/users/user_edit.html:8
 msgid "Display name"
 msgstr "Display name"
 
-#: sapns/controllers/users.py:33
-#: sapns/templates/users/user_edit.html:14
+#: sapns/controllers/users.py:33 sapns/templates/users/user_edit.html:14
 msgid "User name"
 msgstr "User name"
 
-#: sapns/controllers/users.py:34
-#: sapns/templates/users/user_edit.html:20
+#: sapns/controllers/users.py:34 sapns/templates/users/user_edit.html:20
 msgid "E-mail address"
 msgstr "E-mail address"
 
-#: sapns/controllers/users.py:45
-#: sapns/controllers/util.py:234
+#: sapns/controllers/users.py:45 sapns/controllers/util.py:234
 msgid "New"
 msgstr "New"
 
-#: sapns/controllers/users.py:46
-#: sapns/controllers/util.py:235
-#: sapns/templates/shortcuts/list.html:133
+#: sapns/controllers/users.py:46 sapns/controllers/util.py:235
+#: sapns/templates/shortcuts/list.html:139
 msgid "Edit"
 msgstr "Edit"
 
-#: sapns/controllers/users.py:47
-#: sapns/controllers/util.py:236
-#: sapns/templates/shortcuts/list.html:141
+#: sapns/controllers/users.py:47 sapns/controllers/util.py:236
+#: sapns/templates/shortcuts/list.html:148
 msgid "Delete"
 msgstr "Delete"
 
@@ -107,8 +98,7 @@ msgstr "Data exploration"
 msgid "Project"
 msgstr "Project"
 
-#: sapns/controllers/util.py:120
-#: sapns/controllers/util.py:237
+#: sapns/controllers/util.py:120 sapns/controllers/util.py:237
 msgid "List"
 msgstr "List"
 
@@ -269,8 +259,7 @@ msgstr "November"
 msgid "December"
 msgstr "December"
 
-#: sapns/templates/edit.html:190
-#: sapns/templates/order/insert.html:174
+#: sapns/templates/edit.html:190 sapns/templates/order/insert.html:174
 #: sapns/templates/order/reference.html:128
 #: sapns/templates/users/user_edit.html:43
 msgid "Save"
@@ -288,8 +277,7 @@ msgstr "list"
 msgid "edit"
 msgstr "edit"
 
-#: sapns/templates/grid.html:63
-#: sapns/templates/grid.html:66
+#: sapns/templates/grid.html:63 sapns/templates/grid.html:66
 msgid "You must select a row before click on this action"
 msgstr "You must select a row before click on this action"
 
@@ -314,10 +302,9 @@ msgstr "All"
 msgid "page 1"
 msgstr "page 1"
 
-#: sapns/templates/grid.html:192
-#: sapns/templates/grid.html:213
+#: sapns/templates/grid.html:192 sapns/templates/grid.html:213
 #: sapns/templates/grid.html:229
-#, fuzzy
+#, fuzzy, python-format
 msgid "page %(p)d"
 msgstr "page %(p)d"
 
@@ -361,19 +348,15 @@ msgstr "%s visible"
 
 #: sapns/templates/order/insert.html:160
 #: sapns/templates/order/reference.html:113
-#: sapns/templates/views/columns.html:27
-#: sapns/templates/views/filters.html:15
-#: sapns/templates/views/order.html:15
-#: sapns/templates/views/relations.html:19
+#: sapns/templates/views/columns.html:27 sapns/templates/views/filters.html:15
+#: sapns/templates/views/order.html:15 sapns/templates/views/relations.html:19
 msgid "Up"
 msgstr "Up"
 
 #: sapns/templates/order/insert.html:165
 #: sapns/templates/order/reference.html:119
-#: sapns/templates/views/columns.html:28
-#: sapns/templates/views/filters.html:16
-#: sapns/templates/views/order.html:16
-#: sapns/templates/views/relations.html:20
+#: sapns/templates/views/columns.html:28 sapns/templates/views/filters.html:16
+#: sapns/templates/views/order.html:16 sapns/templates/views/relations.html:20
 msgid "Down"
 msgstr "Down"
 
@@ -385,48 +368,44 @@ msgstr "Ok"
 msgid "Cancel"
 msgstr "Cancel"
 
-#: sapns/templates/shortcuts/list.html:79
+#: sapns/templates/shortcuts/list.html:85
 msgid "Delete shortcut"
 msgstr "Delete shortcut"
 
-#: sapns/templates/shortcuts/list.html:80
-#, fuzzy
+#: sapns/templates/shortcuts/list.html:86
 msgid "Do you want to delete this shortcut?"
-msgstr "Do you really want to delete this record?"
+msgstr "Do you want to delete this shortcut?"
 
-#: sapns/templates/shortcuts/list.html:83
-msgid "Bookmark shortcut"
-msgstr "Bookmark shortcut"
+#: sapns/templates/shortcuts/list.html:89
+#: sapns/templates/shortcuts/list.html:156
+msgid "Send to dashboard"
+msgstr "Send to dashboard"
 
-#: sapns/templates/shortcuts/list.html:84
-msgid "Do you want to bookmark this shortcut?"
-msgstr "Do you want to bookmark this shortcut?"
+#: sapns/templates/shortcuts/list.html:90
+msgid "Do you want to send this shortcut to the dashboard?"
+msgstr "Do you want to send this shortcut to the dashboard?"
 
-#: sapns/templates/shortcuts/list.html:103
+#: sapns/templates/shortcuts/list.html:109
 msgid "Insertion order"
 msgstr "Insertion order"
 
-#: sapns/templates/shortcuts/list.html:110
+#: sapns/templates/shortcuts/list.html:116
 msgid "Reference order"
 msgstr "Reference order"
 
-#: sapns/templates/shortcuts/list.html:132
+#: sapns/templates/shortcuts/list.html:138
 #, fuzzy
 msgid "Edit this shortcut"
-msgstr "Delete shortcut"
-
-#: sapns/templates/shortcuts/list.html:140
-#, fuzzy
-msgid "Remove this shortcut"
-msgstr "Delete shortcut"
+msgstr "Edit this shortcut"
 
 #: sapns/templates/shortcuts/list.html:147
+#, fuzzy
+msgid "Remove this shortcut"
+msgstr "Remove this shortcut"
+
+#: sapns/templates/shortcuts/list.html:155
 msgid "Put this shortcut on the dashboard"
 msgstr "Put this shortcut on the dashboard"
-
-#: sapns/templates/shortcuts/list.html:148
-msgid "Bookmark this"
-msgstr "Bookmark this"
 
 #: sapns/templates/users/index.html:17
 msgid "Permission"
@@ -456,8 +435,7 @@ msgstr "Code model"
 msgid "Update meta-data"
 msgstr "Update meta-data"
 
-#: sapns/templates/util/tables.html:12
-#: sapns/templates/util/tables.html:48
+#: sapns/templates/util/tables.html:12 sapns/templates/util/tables.html:48
 msgid "Source of this model"
 msgstr "Source of this model"
 
@@ -481,19 +459,16 @@ msgstr "Columns"
 msgid "Add column"
 msgstr "Add column"
 
-#: sapns/templates/views/columns.html:12
-#: sapns/templates/views/header.html:6
+#: sapns/templates/views/columns.html:12 sapns/templates/views/header.html:6
 msgid "Title"
 msgstr "Title"
 
-#: sapns/templates/views/columns.html:14
-#: sapns/templates/views/filters.html:12
+#: sapns/templates/views/columns.html:14 sapns/templates/views/filters.html:12
 #: sapns/templates/views/order.html:12
 msgid "Definition"
 msgstr "Definition"
 
-#: sapns/templates/views/columns.html:16
-#: sapns/templates/views/header.html:24
+#: sapns/templates/views/columns.html:16 sapns/templates/views/header.html:24
 #: sapns/templates/views/relations.html:14
 msgid "Alias"
 msgstr "Alias"
@@ -538,8 +513,7 @@ msgstr "View"
 msgid "Code"
 msgstr "Code"
 
-#: sapns/templates/views/header.html:18
-#: sapns/templates/views/relations.html:12
+#: sapns/templates/views/header.html:18 sapns/templates/views/relations.html:12
 msgid "Table"
 msgstr "Table"
 
@@ -578,4 +552,3 @@ msgstr "Condition"
 #: sapns/templates/views/relations.html:18
 msgid "Remove relation"
 msgstr "Remove relation"
-

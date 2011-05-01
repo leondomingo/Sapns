@@ -2,7 +2,7 @@
 """Users management controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect
+from tg import expose, url, config, redirect, request
 
 # third party imports
 from pylons.i18n import ugettext as _
@@ -14,7 +14,7 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession
 
 import logging
-from sapns.model.sapnsmodel import SapnsUser 
+from sapns.model.sapnsmodel import SapnsUser , SapnsShortcut
 from neptuno.dataset import DataSet
 
 __all__ = ['ShortcutsController']
@@ -37,12 +37,35 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     def delete(self, id=None, **params):
-        #came_from = params.get('came_from', '/')
-        return dict(status=True)
+        
+        logger = logging.getLogger(__name__ + '/delete')
+        try:
+            logger.info('Deleting shortcut [%s]' % id)
+            
+            DBSession.query(SapnsShortcut).\
+                filter(SapnsShortcut.shortcut_id == id).\
+                delete()
+            
+            DBSession.flush()
+        
+            return dict(status=True)
+    
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
     
     @expose('json')
     def bookmark(self, id=None, **params):
-        #came_from = params.get('came_from', '/')
-        return dict(status=True)
-    
-    
+        logger = logging.getLogger(__name__ + '/bookmark')
+        try:
+            logger.info('Bookmarking shortcut [%s]' % id)
+            user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+            user.get_dashboard().add_child(user.user_id, id)
+            
+            return dict(status=True)
+            
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+        
+        
