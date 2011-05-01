@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% import 'util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{util.jquery()}}
+    {{util.jquery_ui()}}
+{% endblock %}
+
+{% block middle %}
+<div>
+{% for msg in messages %}
+<div class="sp_message_row" style="border: 1px dotted white; 
+    min-height: 23px;
+    cursor: pointer;
+    {%if not msg.read %} font-weight: bold; {% endif %}" 
+    msg_id="{{msg.id}}">
+    <div style="float: left; width: 30px; margin-left: 10px;">
+        <input type="checkbox"/>
+    </div>
+    
+    <div style="float: left; width: 250px;">
+        <span>{{msg.from_name|escape}}</span>
+    </div>
+    
+    <div style="float: left; margin-right: 10px;">
+        <span>{{msg.subject|escape}}</span>
+    </div>
+    
+    <div style="font-size: 10px; margin-top: 2px;
+        color: gray; 
+        font-weight: normal;
+        font-style: italic;">
+        <span>{{msg.body_title|escape}}...</span>
+    </div>
+    
+    <div class="sp_message_body" style="display: none;
+        font-weight: normal;
+        margin-bottom: 5px;
+        margin-left: 10px;
+        margin-right: 10px;
+        margin-top: 5px;">
+        <div style="height: 100px; background-color: white;">
+            <span style="font-family: courier;">{{msg.body|escape}}</span>
+        </div>
+        
+        <div style="height: 24px;">
+            <div style="float: left;">
+                <input class="sp_button" type="button" value="Reply"/>
+            </div>
+            
+            <div style="float: left;">
+                <input class="sp_button" type="button" value="Reply to all"/>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+    	
+    	$('.sp_message_row').click(function() {
+    		
+    		if($(this).find('.sp_message_body').css('display') == 'none') {
+    			$(this).find('.sp_message_body').fadeIn();
+    		}
+    		else {
+    			$(this).find('.sp_message_body').fadeOut();
+    		}
+    	});
+    });
+</script>
+{% endblock %}

@@ -12,7 +12,8 @@ from tg import config
 
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.sql.expression import and_, select, alias, desc
-from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime
+from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime, Date,\
+    Time, Text
 from sqlalchemy.orm import relation, synonym
 
 from sapns.model import DeclarativeBase, metadata, DBSession
@@ -164,6 +165,41 @@ class SapnsUser(User):
                 first()
                 
         return priv_atr
+    
+    def get_messages(self):
+        messages = []
+        for msg, msgto, userfrom in DBSession.query(SapnsMessage, 
+                                                    SapnsMessageTo, 
+                                                    SapnsUser).\
+                join((SapnsMessageTo, 
+                      SapnsMessageTo.message_id == SapnsMessage.message_id)).\
+                join((SapnsUser, SapnsUser.user_id == SapnsMessage.user_from_id)).\
+                filter(SapnsMessageTo.user_to_id == self.user_id):
+            
+            messages.append(dict(id=msg.message_id,
+                                 from_id=userfrom.user_id,
+                                 from_name=userfrom.display_name,
+                                 read=msgto.read, subject=msg.subject,
+                                 body=msg.body, body_title=msg.body[:30]))
+            
+        return messages
+    
+    def messages(self):
+        n = DBSession.query(SapnsMessageTo).\
+                filter(SapnsMessageTo.user_to_id == self.user_id).\
+                count()
+                
+        return n
+    
+    def unread_messages(self):
+        """Returns the number of unread messages of this users"""
+        
+        n = DBSession.query(SapnsMessageTo).\
+                filter(and_(SapnsMessageTo.user_to_id == self.user_id,
+                            SapnsMessageTo.read == False)).\
+                count()
+                
+        return n
 
 class SapnsShortcut(DeclarativeBase):
     """Shortcuts sapns base table"""
@@ -215,17 +251,17 @@ class SapnsShortcut(DeclarativeBase):
         else:
             return sc.order + 1
         
-    def add_child(self, id_user, id_shortcut):
+    def add_child(self, id_shortcut):
         
         # the shortcut to be copied
         sc = DBSession.query(SapnsShortcut).get(id_shortcut)
         
         if not sc:
-            raise Exception('It does not exist that shortcut')
+            raise Exception('It does not exist that shortcut [%s]' % id_shortcut)
         
         # the "copy"
         new_sc = SapnsShortcut()
-        new_sc.user_id = id_user
+        new_sc.user_id = self.user_id
         new_sc.parent_id = self.shortcut_id
         new_sc.order = self.next_order()
         new_sc.title = sc.title
@@ -252,7 +288,7 @@ class SapnsClass(DeclarativeBase):
     
     name = Column(Unicode(50), nullable=False)
     title = Column(Unicode(100), nullable=False)
-    description = Column(String)
+    description = Column(Text)
     
     # attributes (SapnsAttribute)
     
@@ -729,7 +765,7 @@ class SapnsViewColumn(DeclarativeBase):
     
     column_id = Column('id', Integer, autoincrement=True, primary_key=True)
     title = Column(Unicode(30), nullable=False)
-    definition = Column(String, nullable=False)
+    definition = Column(Text, nullable=False)
     alias = Column(Unicode(100), nullable=False)
     order = Column(Integer)
     
@@ -760,7 +796,7 @@ class SapnsViewRelation(DeclarativeBase):
     relation_id = Column('id', Integer, autoincrement=True, primary_key=True)
     name = Column(Unicode(30), nullable=False)
     alias = Column(Unicode(100), nullable=False)
-    condition = Column(String)
+    condition = Column(Text)
     
     view_id = Column('id_view', Integer, 
                      ForeignKey('sp_views.id',
@@ -780,7 +816,7 @@ class SapnsViewFilter(DeclarativeBase):
 
     filter_id = Column('id', Integer, autoincrement=True, primary_key=True)
     
-    definition = Column(String)
+    definition = Column(Text)
     active = Column(Boolean)
 
     view_id = Column('id_view', Integer, 
@@ -800,7 +836,7 @@ class SapnsViewOrder(DeclarativeBase):
     __tablename__ = 'sp_view_order'
     
     order_id = Column('id', Integer, autoincrement=True, primary_key=True)
-    definition = Column(String)
+    definition = Column(Text)
     sort_order = Column(Integer)
 
     view_id = Column('id_view', Integer, 
@@ -824,7 +860,7 @@ class SapnsReport(DeclarativeBase):
     code = Column(Unicode(50), nullable=False, unique=True)
     name = Column(Unicode(200), nullable=False, unique=True)
     
-    description = Column(String)
+    description = Column(Text)
 
 class SapnsReportParam(DeclarativeBase):
     
@@ -844,7 +880,7 @@ class SapnsReportParam(DeclarativeBase):
     default_value = Column(Unicode(200))
     
     sort_order = Column(Integer)
-    expression = Column(String)
+    expression = Column(Text)
     
     report_id = Column('id_report', Integer, 
                        ForeignKey('sp_reports.id',
@@ -855,3 +891,33 @@ SapnsReport.params = \
     relation(SapnsReportParam, 
              backref='report', 
              primaryjoin=SapnsReport.report_id == SapnsReportParam.report_id)
+    
+class SapnsMessage(DeclarativeBase):
+    
+    __tablename__ = 'sp_messages'
+    
+    message_id = Column('id', Integer, autoincrement=True, primary_key=True)
+    user_from_id = Column('id_user_from', Integer, 
+                         ForeignKey('sp_users.id',
+                                    onupdate='CASCADE', ondelete='SET NULL'))
+    
+    created_date = Column(Date, default=datetime.today())
+    created_time = Column(Time, default=datetime.now().time())
+    subject = Column(Unicode(100), nullable=False)
+    body = Column(Text)
+
+class SapnsMessageTo(DeclarativeBase):
+    
+    __tablename__ = 'sp_message_to'
+    
+    message_id = Column('id_message', Integer, 
+                        ForeignKey('sp_messages.id',
+                                   onupdate='CASCADE', ondelete='CASCADE'),
+                        primary_key=True)
+    
+    user_to_id = Column('id_user_to', Integer,
+                        ForeignKey('sp_users.id',
+                                   onupdate='CASCADE', ondelete='CASCADE'),
+                        primary_key=True)
+    
+    read = Column(Boolean, default=False)

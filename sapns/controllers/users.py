@@ -2,12 +2,12 @@
 """Users management controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect
+from tg import expose, url, config, redirect, require
 
 # third party imports
 from pylons.i18n import ugettext as _
 from pylons.i18n import lazy_ugettext as l_
-from repoze.what import authorize
+from repoze.what import authorize, predicates
 
 # project specific imports
 from sapns.lib.base import BaseController
@@ -21,9 +21,10 @@ __all__ = ['UsersControllers']
 
 class UsersController(BaseController):
     
-    allow_only = authorize.has_any_permission('manage', 'users')
+    allow_only = authorize.not_anonymous()
     
     @expose('users/index.html')
+    @require(predicates.has_any_permission('manage', 'users'))
     def index(self, came_from='/users'):
     
         pos = 0
@@ -81,6 +82,7 @@ class UsersController(BaseController):
                               totalp=totalp, total=ds.count, total_pag=1))
         
     @expose('users/user_edit.html')
+    @require(predicates.has_any_permission('manage', 'users'))
     def user_edit(self, **params):
         
         id = int(params['id'])
@@ -90,6 +92,7 @@ class UsersController(BaseController):
         return dict(user=user, came_from=url(came_from))
     
     @expose('users/user_edit.html')
+    @require(predicates.has_any_permission('manage', 'users'))
     def user_new(self, **params):
         came_from = params.get('came_from', '/users')
         
@@ -100,6 +103,7 @@ class UsersController(BaseController):
         return dict(user={}, other_users=other_users, came_from=url(came_from))
     
     @expose()
+    @require(predicates.has_any_permission('manage', 'users'))
     def user_save(self, **params):
         
         try:
@@ -132,6 +136,7 @@ class UsersController(BaseController):
         redirect(url('/users'))
     
     @expose()
+    @require(predicates.has_any_permission('manage', 'users'))
     def user_delete(self, **params):
         
         logger = logging.getLogger(__name__ + '/user_delete')
@@ -151,10 +156,20 @@ class UsersController(BaseController):
         redirect(url(came_from))
     
     @expose('users/permission.html')
+    @require(predicates.has_any_permission('manage', 'users'))
     def permission(self, came_from='/users'):
         return dict(came_from=url(came_from))
     
     @expose('users/roles.html')
+    @require(predicates.has_any_permission('manage', 'users'))
     def roles(self, came_from='/users'):
         return dict(came_from=url(came_from))
         
+    @expose('json')
+    def all(self):
+        users = []
+        for user in DBSession.query(SapnsUser).order_by(SapnsUser.user_name):
+            users.append(dict(id=user.user_id, display_name=user.display_name, 
+                              user_name=user.user_name))
+            
+        return dict(users=users)

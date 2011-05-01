@@ -31,6 +31,7 @@ import simplejson as sj
 from sapns.controllers.users import UsersController
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
 from sapns.controllers.shortcuts import ShortcutsController
+from sapns.controllers.messages import MessagesController
 
 __all__ = ['RootController']
 
@@ -58,6 +59,8 @@ class RootController(BaseController):
     users = UsersController()
     
     sc = ShortcutsController()
+    
+    messages = MessagesController()
 
     @expose('index.html')
     @require(predicates.not_anonymous())
@@ -66,7 +69,7 @@ class RootController(BaseController):
 
         # connected user
         user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
-
+        
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=sc_parent)
         
@@ -75,8 +78,13 @@ class RootController(BaseController):
             
         else:
             sc_parent = None
+            
+        # number of messages
+        messages = user.messages()
+        unread = user.unread_messages()
         
-        return dict(page='index', curr_lang=curr_lang, shortcuts=shortcuts, 
+        return dict(page='index', curr_lang=curr_lang, shortcuts=shortcuts,
+                    messages=messages, unread=unread, 
                     sc_type=sc_type, sc_parent=sc_parent)
         
     @expose()

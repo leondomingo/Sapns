@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Users management controller"""
+"""Shortcuts management controller"""
 
 # turbogears imports
 from tg import expose, url, config, redirect, request
@@ -60,12 +60,31 @@ class ShortcutsController(BaseController):
         try:
             logger.info('Bookmarking shortcut [%s]' % id)
             user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
-            user.get_dashboard().add_child(user.user_id, id)
+            user.get_dashboard().add_child(id)
             
             return dict(status=True)
             
         except Exception, e:
             logger.error(e)
             return dict(status=False)
+        
+    @expose('json')
+    def share(self, id_sc=None, id_user=None, **params):
+        
+        logger = logging.getLogger(__name__ + '/share')
+        try:
+            logger.info('Sharing shortcut [%s]' % id)
+            
+            user = DBSession.query(SapnsUser).get(id_user)
+            if not user:
+                raise Exception('User [%s] does not exist' % id_user)
+            
+            user.get_dashboard().add_child(id_sc)            
+            
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False) 
         
         
