@@ -36,6 +36,15 @@
         margin-left: 1%;
     }
     
+    .sp_select_text {
+        width: 90%;
+        border: 1px solid gray;
+    }
+    
+    .sp_select_text:focus {
+        border: 1px solid orange;
+    }
+    
     .sp_checkbox_field {
         margin-left: 1%;
     }
@@ -121,34 +130,34 @@
             name="{{attr.name}}">{{attr.value|escape}}</textarea>
         
         <!-- Select -->
-        {% elif attr.vals != None %}
-        <div id="{{attr.name}}"
-            related_class="{{attr.related_class}}"
-            attr_value="{{attr.value}}">
-            <input class="sp_select_text sp_text_field" type="text" disabled
-                value="{{attr.value}}" />
-            <input class="sp_button sp_select_button" type="button" value="..."/>
-        </div>
-        
-        <!--
-        <select name="{{attr.name}}"
-            related_class="{{attr.related_class}}" class="sp_select_field">
-            <option value="null" 
-                {% if attr.value == None %}selected{%endif%}>{{_('none')}}</option>
-            {% for value in attr.vals %}
-            <option value="{{value.id}}" 
-                {% if value.id == attr.value %}selected{%endif%}>{{value.title}}</value>
-            {% endfor %}
-        </select>
-        <a href="/list?cls={{attr.related_class}}" target="_blank"
-            title="{{attr.related_class}}">[{{_('list')}}]</a>
-            {% if attr.value %}
-            <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
-                target="_blank">[{{_('edit')}}]</a>
-            {% endif %}-->
-            
+        {% elif attr.related_class != None %}
+          {% if attr.vals == None %}
+          <div class="sp_select_field" name="{{attr.name}}"
+              related_class="{{attr.related_class}}"
+              value="{{attr.value}}">
+              <input class="sp_select_text" type="text" readonly
+                  value="{{attr.related_title}}" />
+              <input class="sp_button sp_select_button" type="button" value="..."/>
+          </div>
+          {#{% else %}
+          <select name="{{attr.name}}"
+              related_class="{{attr.related_class}}" class="sp_select_field">
+              <option value="null" 
+                  {% if attr.value == None %} selected {% endif %}>{{_('none')}}</option>
+              {% for value in attr.vals %}
+              <option value="{{value.id}}" 
+                  {% if value.id == attr.value %}selected{%endif%}>{{value.title}}</option>
+              {% endfor %}
+          </select>
+          <!--
+          <a href="/list?cls={{attr.related_class}}" target="_blank"
+              title="{{attr.related_class}}">[{{_('list')}}]</a>
+              {% if attr.value %}
+              <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
+                  target="_blank">[{{_('edit')}}]</a>-->
+          #}
+          {% endif %}
         {% else %}
-        
         <!-- Everything else -->
         <input class="sp_text_field" type="text" name="{{attr.name}}" 
             value="{{attr.value|escape}}"/>
@@ -222,8 +231,24 @@
                             }
                         });
                         
-                        field.attr('attr_value', id_selected);
-                        field.find('.sp_select_text').val(id_selected);
+                        if (id_selected != null) {
+                        	$.ajax({
+                        		url: "{{tg.url('/title')}}",
+                        		type: "get",
+                        		dataType: "json",
+                        		data: {
+                        			cls: related_class,
+                        			id: id_selected
+                        		},
+                        		success: function(res) {
+                        			field.find('.sp_select_text').val(res.title);
+                        		},
+                        		error: function() {
+                        		}
+                        	});
+                        }
+                        
+                        field.attr('value', id_selected);
                 		
                 		$('#edit-dialog').dialog('close');
                 	},
@@ -295,17 +320,19 @@
             // select fields
             $('.sp_select_field').each(function() {
                 
+                /*
                 var required = $(this).parent().parent().attr('required');
                 var sel_value = $(this).val();
                         
                 if (required == 'true' && sel_value == 'null') {
                     required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
                 }
+                */
                 
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + sel_value + '"/>\n';
+                        'value="' + $(this).attr('value') + '"/>\n';
             });
             
             if (required_attrs != '') {

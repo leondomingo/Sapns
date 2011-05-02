@@ -241,6 +241,12 @@ class RootController(BaseController):
     def search(self, **params):
         return self.list(**params)
     
+    @expose('json')
+    @require(predicates.not_anonymous())
+    def title(self, cls=None, id=None):
+        title = SapnsClass.object_title(cls, id)
+        return dict(title=title)        
+    
     @expose()
     def setlang(self, lang='en', came_from='/'):
         set_lang(lang)
@@ -402,7 +408,8 @@ class RootController(BaseController):
         # get attributes
         attributes = []
         for attr in DBSession.query(SapnsAttribute).\
-                join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
+                join((SapnsClass, 
+                      SapnsClass.class_id == SapnsAttribute.class_id)).\
                 join((SapnsAttrPrivilege, 
                       and_(SapnsAttrPrivilege.user_id == user.user_id,
                            SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
@@ -423,21 +430,22 @@ class RootController(BaseController):
                         value = row[attr.name] or ''
             
             attributes.append(dict(name=attr.name, title=attr.title, 
-                                   type=attr.type, value=value, required=attr.required, 
-                                   vals=None))
+                                   type=attr.type, value=value, required=attr.required,
+                                   related_class=None, vals=None))
             
             if attr.related_class_id:
                 # vals
-                attributes[-1]['vals'] = []
+                #attributes[-1]['vals'] = []
                 try:
                     rel_class = DBSession.query(SapnsClass).get(attr.related_class_id)
                     
                     # related_class
                     attributes[-1]['related_class'] = rel_class.name
+                    attributes[-1]['related_title'] = \
+                        SapnsClass.object_title(rel_class.name, value)
                     
-                    logger.info(rel_class.name)
-                    
-                    attributes[-1]['vals'] = SapnsClass.class_titles(rel_class.name)
+                    #logger.info(rel_class.name)
+                    #attributes[-1]['vals'] = SapnsClass.class_titles(rel_class.name)
                 
                 except Exception, e:
                     logger.error(e)

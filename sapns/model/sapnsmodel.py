@@ -394,7 +394,7 @@ class SapnsClass(DeclarativeBase):
         
         logger = logging.getLogger(__name__ + '/object_title')
         
-        if id_object is None:
+        if not id_object:
             return ''
         
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
