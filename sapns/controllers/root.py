@@ -235,7 +235,12 @@ class RootController(BaseController):
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
-        
+    
+    @expose('search.html')
+    @require(predicates.not_anonymous())
+    def search(self, **params):
+        return self.list(**params)
+    
     @expose()
     def setlang(self, lang='en', came_from='/'):
         set_lang(lang)
@@ -339,7 +344,7 @@ class RootController(BaseController):
         came_from = params.get('came_from', '/')
         
         redirect(url('/edit'), dict(cls=cls, id='', came_from=came_from))
-    
+        
     @expose('edit.html')
     @require(predicates.not_anonymous())
     def edit(self, cls='', id=None, came_from='/'):

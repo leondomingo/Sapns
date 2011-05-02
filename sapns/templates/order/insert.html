@@ -1,182 +1,175 @@
 {% extends 'base.html' %}
 
 {% block middle %}
-    {% import 'util.html' as util %}
-    {{util.jquery()}}
-    {{util.jquery_ui()}}
-  
-    <script type="text/javascript">
-        $(document).ready(function() {
+{% import 'util.html' as util %}
+{{util.jquery()}}
+{{util.jquery_ui()}}
 
-        $('#save_ins_order').click(function() {
-        	
-        	var atributos = [];
-            $('.ins_attr').each(function() {
-            	atributos[atributos.length] = {
-            		id: $(this).attr('id_attr'),
-                    title: $(this).find('.sp_text_field').val(),
-                    order: $(this).attr('pos'),
-                    required: $(this).find('.attr_required').attr('checked'),
-                    visible: $(this).find('.attr_visible').attr('checked')
-                };
-            });
-            
-            $('#form_insert_order input[name=title]').val($('#title_class').val());
-            $('#form_insert_order input[name=attributes]').val(JSON.stringify(atributos));
-            $('#form_insert_order').submit();
+<div id="insertion">
+
+<div class="class_title">
+    
+    <div style="margin-top: 3px; margin-left: 15px;">
+        <div class="" style="width: 78%; margin-bottom: 15px;">
+            <input id="title_class" class="sp_text_field" style="width: 99%;
+                font-weight: bold; font-size: 18px;"
+                type="text" value="{{title}}"/>
+        </div>
+    </div>
+</div>
+    
+{% for attr in insertion %}
+<div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false"
+    style="height: 30px; padding-top: 5px;">
+    <div style="margin-top: 0px; margin-left: 5px;">
+    
+        <!-- Up -->
+        <div style="clear: left; float: left; width: 50px;">
+            <input class="sp_button insorder_up" type="button"
+                title="{{attr.title|escape}}" value="{{_('Up')}}"/>
+        </div>
+        
+        <!-- Down -->
+        <div style="float: left; width: 50px; margin-right: 5px;">
+            <input class="sp_button insorder_down" type="button" 
+                title="{{attr.title|escape}}" value="{{_('Down')}}"/>
+        </div>
+        
+        <!-- Attribute -->
+        <div class="attr_title" style="float: left; width: 80%; 
+            font-weight: bold; margin-top: 2px;">
+            <input class="sp_text_field" style="width: 99%;" type="text"
+                title="{{attr.name}}" value="{{attr.title}}"/>
+        </div>
+        
+        <!-- required -->
+        <div style="float: left; width: 40px; text-align: center; margin-top: 3px;">
+            <input class="attr_required" type="checkbox" 
+                title="{{_('%s required')|format(attr.title)}}"
+                {%- if attr.required %} checked {% endif %} />
+        </div>
+        
+        <!-- visible -->
+        <div style="float: left; width: 40px; text-align: center; margin-top: 3px;">
+            <input class="attr_visible" type="checkbox" 
+                title="{{_('%s visible')|format(attr.title)}}" 
+                {%- if attr.visible %} checked {% endif %}/>
+        </div>
+    </div>
+</div>
+{% endfor %}
+</div>
+
+<div style="height: 50px; clear: left;">
+    <input id="save_ins_order" class="sp_button" style="margin-top: 20px;" 
+        type="button" value="{{_('Save')}}"/>
+</div>
+
+<form id="form_insert_order" method="post" action="{{tg.url('/ins_order_save')}}">
+    <input type="hidden" name="came_from" value="{{came_from}}"/>
+    <input type="hidden" name="attributes" value=""/>
+    <input type="hidden" name="title" value=""/>
+</form>
+    
+<script type="text/javascript">
+    $(document).ready(function() {
+
+    $('#save_ins_order').click(function() {
+        
+        var atributos = [];
+        $('.ins_attr').each(function() {
+            atributos[atributos.length] = {
+                id: $(this).attr('id_attr'),
+                title: $(this).find('.sp_text_field').val(),
+                order: $(this).attr('pos'),
+                required: $(this).find('.attr_required').attr('checked'),
+                visible: $(this).find('.attr_visible').attr('checked')
+            };
         });
         
-        function color_visible(check) {
-            if (check.attr('checked')) {
-            	check.parent().parent().find('.attr_title').
-                  find('.sp_text_field').css('background-color', 'white');
-            }
-            else {
-            	check.parent().parent().find('.attr_title').
-                  find('.sp_text_field').css('background-color', 'gray');
-            }
-        }
-        
-        $('.attr_visible').click(function() {
-        	color_visible($(this));
-        }).each(function() {
-        	color_visible($(this));
-        });
-        
-        function new_order() {
-            var new_order = [];
-            $('.ins_attr').each(function(){
-                var pos = $(this).attr('pos')*1;
-                new_order[pos] = $(this);
-                $(this).remove();
-            });
-            
-            // apply new order
-            
-            for (var i=0; i<new_order.length; i++) {
-                $('#insertion').append(new_order[i]);
-                
-                // recover click events
-                $('.ins_attr:last .insorder_up').click(function() { ins_up($(this)); });
-                $('.ins_attr:last .insorder_down').click(function() { ins_down($(this)); });
-                $('.ins_attr:last .attr_visible').click(function() { color_visible($(this)); });
-                
-                if ($('.ins_attr:last').attr('modified') == 'true') {
-                    $('.ins_attr:last').effect('highlight', {color: 'yellow'}, 300);
-                }
-                
-                $('.ins_attr:last').attr('modified', 'false');
-            }
-        }
-        
-        function ins_up (button) {
-            var pos = button.parent().parent().parent().attr('pos')*1;
-            if (pos > 0) {
-                
-                // update order
-                var prev_pos = pos - 1;
-                var prev_item = $('.ins_attr:eq(' + prev_pos + ')');
-                prev_item.attr('pos', pos);
-                button.parent().parent().parent().attr('pos', prev_pos);
-                button.parent().parent().parent().attr('modified', 'true');
-                
-                // create new order
-                new_order();
-            }
-        }
-        
-        function ins_down (button) {
-            var pos = button.parent().parent().parent().attr('pos')*1;
-            var max = $('.ins_attr:last').attr('pos')*1;
-            if (pos < max) {
-                
-                // update order
-                var next_pos = pos + 1;
-                var next_item = $('.ins_attr:eq(' + next_pos + ')');
-                next_item.attr('pos', pos);
-                button.parent().parent().parent().attr('pos', next_pos);
-                button.parent().parent().parent().attr('modified', 'true');
-                
-                // create new order
-                new_order();
-            }
-        }
-        
-        $('.insorder_up').click(function() { ins_up($(this)); });
-        $('.insorder_down').click(function() { ins_down($(this)); });
+        $('#form_insert_order input[name=title]').val($('#title_class').val());
+        $('#form_insert_order input[name=attributes]').val(JSON.stringify(atributos));
+        $('#form_insert_order').submit();
     });
-    </script>
-
-    <div id="insertion">
     
-    <!-- Header -->
-    <!--<div>
-        <div style="width: 80%; font-weight: bold; float: left; padding-left: 10px;
-            background-color: orange;">Title</div>
-        <div style="width: 80px; text-align: center; float: left;
-            background-color: blue;">Required</div>
-        <div style="float: left; width: 50px; background-color: green;">Up</div>
-        <div style="">Down</div>
-    </div>-->
+    function color_visible(check) {
+        if (check.attr('checked')) {
+            check.parent().parent().find('.attr_title').
+              find('.sp_text_field').css('background-color', 'white');
+        }
+        else {
+            check.parent().parent().find('.attr_title').
+              find('.sp_text_field').css('background-color', 'gray');
+        }
+    }
     
-    <div class="class_title">
-        <!--<div style="margin-top: 3px; margin-left: 15px; float: left;">
-            {{_('Title class')}}
-        </div>-->
+    $('.attr_visible').click(function() {
+        color_visible($(this));
+    }).each(function() {
+        color_visible($(this));
+    });
+    
+    function new_order() {
+        var new_order = [];
+        $('.ins_attr').each(function(){
+            var pos = $(this).attr('pos')*1;
+            new_order[pos] = $(this);
+            $(this).remove();
+        });
         
-        <div style="margin-top: 3px; margin-left: 15px;">
-            <div class="" style="width: 78%; margin-bottom: 15px;">
-                <input id="title_class" class="sp_text_field" style="width: 99%;
-                    font-weight: bold; font-size: 18px;"
-                    type="text" value="{{title}}"/>
-            </div>
-        </div>
-    </div>
+        // apply new order
         
-    {% for attr in insertion %}
-    <div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
-        <div style="margin-top: 3px; margin-left: 15px;">
-            <div class="attr_title" style="width: 78%; font-weight: bold; float: left;">
-                <input class="sp_text_field" style="width: 99%;" type="text"
-                    title="{{attr.name}}" value="{{attr.title}}"/>
-            </div>
+        for (var i=0; i<new_order.length; i++) {
+            $('#insertion').append(new_order[i]);
             
-            <!-- required -->
-            <div style="float: left; width: 5%; text-align: center;">
-                <input class="attr_required" type="checkbox" 
-                    title="{{_('%s required')|format(attr.title)}}"
-                    {% if attr.required %} checked="checked" {% endif %} />
-            </div>
-
-            <!-- visible -->
-            <div style="float: left; width: 5%; text-align: center;">
-                <input class="attr_visible" type="checkbox" 
-                    title="{{_('%s visible')|format(attr.title)}}"
-                    {% if attr.visible %} checked="checked" {% endif %} />
-            </div>
+            // recover click events
+            $('.ins_attr:last .insorder_up').click(function() { ins_up($(this)); });
+            $('.ins_attr:last .insorder_down').click(function() { ins_down($(this)); });
+            $('.ins_attr:last .attr_visible').click(function() { color_visible($(this)); });
             
-            <div style="float: left;">
-                <input class="sp_button insorder_up" type="button" 
-                    value="{{_('Up')}}"/>
-            </div>
+            if ($('.ins_attr:last').attr('modified') == 'true') {
+                $('.ins_attr:last').effect('highlight', {color: 'yellow'}, 300);
+            }
             
-            <div>
-                <input class="sp_button insorder_down" type="button" 
-                    value="{{_('Down')}}"/>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-    </div>
+            $('.ins_attr:last').attr('modified', 'false');
+        }
+    }
     
-    <div style="height: 50px;">
-        <input id="save_ins_order" class="sp_button" style="margin-top: 20px;" 
-            type="button" value="{{_('Save')}}"/>
-    </div>
+    function ins_up (button) {
+        var pos = button.parent().parent().parent().attr('pos')*1;
+        if (pos > 0) {
+            
+            // update order
+            var prev_pos = pos - 1;
+            var prev_item = $('.ins_attr:eq(' + prev_pos + ')');
+            prev_item.attr('pos', pos);
+            button.parent().parent().parent().attr('pos', prev_pos);
+            button.parent().parent().parent().attr('modified', 'true');
+            
+            // create new order
+            new_order();
+        }
+    }
     
-    <form id="form_insert_order" method="post" action="{{tg.url('/ins_order_save')}}">
-        <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input type="hidden" name="attributes" value=""/>
-        <input type="hidden" name="title" value=""/>
-    </form>
+    function ins_down (button) {
+        var pos = button.parent().parent().parent().attr('pos')*1;
+        var max = $('.ins_attr:last').attr('pos')*1;
+        if (pos < max) {
+            
+            // update order
+            var next_pos = pos + 1;
+            var next_item = $('.ins_attr:eq(' + next_pos + ')');
+            next_item.attr('pos', pos);
+            button.parent().parent().parent().attr('pos', next_pos);
+            button.parent().parent().parent().attr('modified', 'true');
+            
+            // create new order
+            new_order();
+        }
+    }
+    
+    $('.insorder_up').click(function() { ins_up($(this)); });
+    $('.insorder_down').click(function() { ins_down($(this)); });
+});
+</script>
 {% endblock %}

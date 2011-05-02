@@ -62,7 +62,7 @@
         		else {
         			//alert('{{_('You must select a row before click on this action')}}');
         			
-        			$('#grid_dialog').
+        			$('#grid-dialog').
         			    html("<p style='text-align: center'>{{_('You must select a row before click on this action')}}</p>"). 
         			    dialog({
         			    	resizable: false,
@@ -87,9 +87,9 @@
 {% endmacro %}
 
 {% macro show(page, _, q, grid, show_ids, link=None, came_from=None, 
-    with_search=True, with_pager=True, can_edit=False) %}
+    with_search=True, with_pager=True, with_actions=True, can_edit=False) %}
 <!-- Grid -->
-<div id="grid_dialog" style="display: none;">
+<div id="grid-dialog" style="display: none;">
 </div>
 <div id="{{grid.name}}">
 {% if grid.caption %}
@@ -231,7 +231,7 @@
 </div>
 {% endif %}
 
-{% if grid.actions %}
+{% if with_actions and grid.actions %}
 <!-- Grid actions -->
 <div class="sp_grid_actions">
     <div class="sp_grid_actions_title">Actions:</div>

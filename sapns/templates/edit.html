@@ -6,132 +6,6 @@
 {{util.jquery()}}
 {{util.jquery_ui()}}
 
-<script type="text/javascript">
-    $(document).ready(function() {
-    	
-    	$('#save_button').click(function() {
-    		
-    		var params = '';
-    		var required_attrs = [];
-    		
-    		// text
-    		$('.sp_text_field').each(function() {
-    			var required = $(this).parent().parent().attr('required');
-                var value = $(this).val();
-                        
-                if (required == 'true' && value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
-                }
-                
-    			params += 
-    				'<input type="hidden" ' + 
-    			        'name="fld_' + $(this).attr('name') + '" ' + 
-    			        'value="' + value + '"/>\n';
-            });
-    		
-    		// checkbox
-            $('.sp_checkbox_field').each(function() {
-                params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + $(this).attr('checked') + '"/>\n';
-            });
-
-    		// date
-            $('.sp_date_field').each(function() {
-            	
-            	var date_value = $(this).datepicker('getDate');
-            	
-            	if (date_value != null) {
-            		var year = date_value.getFullYear()
-              	    var month = date_value.getMonth() + 1;
-              	    var day = date_value.getDate();
-              	
-              	    date_value = year + '-' + month + '-' + day;
-            	}
-            	else {
-            		date_value = '';
-            	}
-            	
-            	var required = $(this).parent().parent().attr('required');
-                        
-                if (required == 'true' && date_value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
-                }
-            	
-                params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + date_value + '"/>\n';
-            });
-    		
-    		// select fields
-            $('.sp_select_field').each(function() {
-            	
-            	var required = $(this).parent().parent().attr('required');
-                var sel_value = $(this).val();
-                        
-                if (required == 'true' && sel_value == 'null') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
-                }
-            	
-                params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + sel_value + '"/>\n';
-            });
-    		
-    		if (required_attrs != '') {
-    			var alert_msg = "{{_('The following fields must be filled:')}}";
-    			alert_msg += '<br>';
-    			for (var i=0; i<required_attrs.length; i++) {
-    				alert_msg += 
-    					'<p style="margin-left: 20px; ' +
-    					    'font-size: 10px;' + 
-    					    'font-weight: bold;">' + 
-    					required_attrs[i] + 
-    					'</p>';
-    			}
-    			
-    			$('#edit-dialog').
-    			    attr('title', "{{_('Required fields')}}").
-    			    html("<p style=''>" + alert_msg + "</p>").
-    			    dialog({
-    				    resizable: false,
-                        height: 250,
-                        width: 450,
-                        modal: true,
-    			    });
-    		}
-    		else {
-    			$('#edit_form').append(params).submit();
-    		}
-    	});
-    	
-    	// create datepickers
-    	// with specific date format and options
-    	$('.sp_date_field').datepicker({
-    		firstDay: {{js_options.first_day}},
-    		changeMonth: true,
-    		changeYear: true,
-    		showOn: 'button',
-    		autoSize: true,
-    		nextText: "{{_('Next')}}",
-    		prevText: "{{_('Prev')}}",
-    		dateFormat: '{{js_options.date_format}}',
-    		dayNames: ["{{_('Sunday')}}", "{{_('Monday')}}", "{{_('Tuesday')}}",
-    		           "{{_('Wednesday')}}", "{{_('Thursday')}}", "{{_('Friday')}}",
-    		           "{{_('Saturday')}}"],
-    		dayNamesMin: ["{{_('Su')}}", "{{_('Mo')}}", "{{_('Tu')}}", "{{_('We')}}",
-    		              "{{_('Th')}}", "{{_('Fr')}}", "{{_('Sa')}}"],
-    		monthNames: ["{{_('January')}}", "{{_('February')}}", "{{_('March')}}", 
-    		             "{{_('April')}}", "{{_('May')}}", "{{_('June')}}",
-    		             "{{_('July')}}", "{{_('August')}}", "{{_('September')}}", 
-    		             "{{_('October')}}", "{{_('November')}}", "{{_('December')}}"]
-    	});
-    });
-</script>
-
 <style type="text/css">
     .sp_edit_panel {
         overflow: auto;
@@ -151,9 +25,9 @@
     }
     
     .sp_text_field {
-        width: 97%;
-        max-width: 97%;
-        min-width: 97%;
+        width: 90%;
+        max-width: 90%;
+        min-width: 90%;
         margin-left: 1%;
     }
     
@@ -170,14 +44,18 @@
         margin-left: 1%;
     }
     
+    .sp_time_field {
+        margin-left: 1%;
+        width: 70px;
+    }
+    
     .sp_memo_field {
         min-height: 40px;
         height: 100px;
     }
 </style>
 
-<div id="edit-dialog" style="display: none;">
-</div>
+<div id="edit-dialog" style="display: none;"></div>
 
 <form id="edit_form" method="post" action="{{tg.url('/save')}}">
     <input type="hidden" name="cls" value="{{cls}}"/> 
@@ -221,19 +99,38 @@
                 {% if attr.required %} font-weight: bold;  {% endif %}
                 margin-bottom: 2px;">{{attr.title|escape}}</div>
         <div>
+        
         <!-- Boolean -->
         {% if attr.type == 'Boolean' %}
         <input class="sp_checkbox_field" type="checkbox" name="{{attr.name}}"
             {% if attr.value %}checked{% endif %}/>
+        
         <!-- Date -->
         {% elif attr.type == 'Date' %}
         <input class="sp_date_field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>
+        
+        <!-- Time -->
+        {% elif attr.type == 'Time' %}
+        <input class="sp_time_field" type="text" name="{{attr.name}}" 
+            value="{{attr.value}}"/>            
+        
         <!-- Memo -->
         {% elif attr.type == 'String' %}
-        <textarea class="sp_text_field sp_memo_field" name="{{attr.name}}">{{attr.value|escape}}</textarea>
+        <textarea class="sp_text_field sp_memo_field" 
+            name="{{attr.name}}">{{attr.value|escape}}</textarea>
+        
         <!-- Select -->
         {% elif attr.vals != None %}
+        <div id="{{attr.name}}"
+            related_class="{{attr.related_class}}"
+            attr_value="{{attr.value}}">
+            <input class="sp_select_text sp_text_field" type="text" disabled
+                value="{{attr.value}}" />
+            <input class="sp_button sp_select_button" type="button" value="..."/>
+        </div>
+        
+        <!--
         <select name="{{attr.name}}"
             related_class="{{attr.related_class}}" class="sp_select_field">
             <option value="null" 
@@ -248,8 +145,11 @@
             {% if attr.value %}
             <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
                 target="_blank">[{{_('edit')}}]</a>
-            {% endif %}
+            {% endif %}-->
+            
         {% else %}
+        
+        <!-- Everything else -->
         <input class="sp_text_field" type="text" name="{{attr.name}}" 
             value="{{attr.value|escape}}"/>
         {% endif %}
@@ -259,4 +159,203 @@
     <div style="height: 40px;">
     </div>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+    	
+    	function click_search (button, related_class, q) {
+    		
+    		if (q == undefined) {
+    			q = $('.sp_search_text').val();
+    		}
+    		
+    		$.ajax({
+                url: "{{tg.url('/search')}}",
+                type: 'post',
+                dataType: 'html',
+                data: {
+                    cls: related_class,
+                    q: q,
+                    rp: '100'
+                },
+                success: function(res) {
+                    $('#edit-dialog').html(res);
+                    
+                    $('.sp_search_button').click(function() {
+                        click_search(button, related_class);
+                    });
+                    
+                    $('.sp_search_text').keypress(function(event) {
+                        search_kp(event, $('.sp_search_button'), related_class);
+                    }).val(q).focus();
+                },
+                error: function(res) {
+                    alert('error!');
+                    $('#edit-dialog').dialog('close');
+                }
+            });
+    	}
+    	
+    	function search_kp(event, button, related_class) {
+    		if (event.which == 13) {
+                click_search(button, related_class);
+            }
+    	}
+    	
+    	$('.sp_select_button').click(function() {
+    		var field = $(this).parent();    		
+    		var related_class = field.attr('related_class');
+    		
+    		$('#edit-dialog').dialog({
+            	title: related_class,
+            	width: 950,
+                height: 550,
+                resizable: false,
+                modal: true,
+                buttons: {
+                	"{{_('Ok')}}": function() {
+                		// get the id of the selected row
+                        var id_selected = null;
+                        $('#edit-dialog .sp_grid .sp_grid_row_id').each(function() {
+                            if ($(this).attr('checked') == true) {
+                                id_selected = $(this).attr('id_row');
+                            }
+                        });
+                        
+                        field.attr('attr_value', id_selected);
+                        field.find('.sp_select_text').val(id_selected);
+                		
+                		$('#edit-dialog').dialog('close');
+                	},
+                	"{{_('Cancel')}}": function() {
+                		$('#edit-dialog').dialog('close');
+                	}
+                }
+            });
+    		
+    		click_search($('.sp_search_button'), related_class, '');
+    	});
+        
+        $('#save_button').click(function() {
+            
+            var params = '';
+            var required_attrs = [];
+            
+            // text
+            $('.sp_text_field').each(function() {
+                var required = $(this).parent().parent().attr('required');
+                var value = $(this).val();
+                        
+                if (required == 'true' && value == '') {
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
+                }
+                
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + value + '"/>\n';
+            });
+            
+            // checkbox
+            $('.sp_checkbox_field').each(function() {
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + $(this).attr('checked') + '"/>\n';
+            });
+
+            // date
+            $('.sp_date_field').each(function() {
+                
+                var date_value = $(this).datepicker('getDate');
+                
+                if (date_value != null) {
+                    var year = date_value.getFullYear()
+                    var month = date_value.getMonth() + 1;
+                    var day = date_value.getDate();
+                
+                    date_value = year + '-' + month + '-' + day;
+                }
+                else {
+                    date_value = '';
+                }
+                
+                var required = $(this).parent().parent().attr('required');
+                        
+                if (required == 'true' && date_value == '') {
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
+                }
+                
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + date_value + '"/>\n';
+            });
+            
+            // select fields
+            $('.sp_select_field').each(function() {
+                
+                var required = $(this).parent().parent().attr('required');
+                var sel_value = $(this).val();
+                        
+                if (required == 'true' && sel_value == 'null') {
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
+                }
+                
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + sel_value + '"/>\n';
+            });
+            
+            if (required_attrs != '') {
+                var alert_msg = "{{_('The following fields must be filled:')}}";
+                alert_msg += '<br>';
+                for (var i=0; i<required_attrs.length; i++) {
+                    alert_msg += 
+                        '<p style="margin-left: 20px; ' +
+                            'font-size: 10px;' + 
+                            'font-weight: bold;">' + 
+                        required_attrs[i] + 
+                        '</p>';
+                }
+                
+                $('#edit-dialog').
+                    html("<p style=''>" + alert_msg + "</p>").
+                    dialog({
+                    	title: "{{_('Required fields')}}",
+                        resizable: false,
+                        height: 250,
+                        width: 450,
+                        modal: true,
+                    });
+            }
+            else {
+                $('#edit_form').append(params).submit();
+            }
+        });
+        
+        // create datepickers
+        // with specific date format and options
+        $('.sp_date_field').datepicker({
+            firstDay: {{js_options.first_day}},
+            changeMonth: true,
+            changeYear: true,
+            showOn: 'button',
+            autoSize: true,
+            nextText: "{{_('Next')}}",
+            prevText: "{{_('Prev')}}",
+            dateFormat: '{{js_options.date_format}}',
+            dayNames: ["{{_('Sunday')}}", "{{_('Monday')}}", "{{_('Tuesday')}}",
+                       "{{_('Wednesday')}}", "{{_('Thursday')}}", "{{_('Friday')}}",
+                       "{{_('Saturday')}}"],
+            dayNamesMin: ["{{_('Su')}}", "{{_('Mo')}}", "{{_('Tu')}}", "{{_('We')}}",
+                          "{{_('Th')}}", "{{_('Fr')}}", "{{_('Sa')}}"],
+            monthNames: ["{{_('January')}}", "{{_('February')}}", "{{_('March')}}", 
+                         "{{_('April')}}", "{{_('May')}}", "{{_('June')}}",
+                         "{{_('July')}}", "{{_('August')}}", "{{_('September')}}", 
+                         "{{_('October')}}", "{{_('November')}}", "{{_('December')}}"]
+        });
+    });
+</script>
 {% endblock %}
