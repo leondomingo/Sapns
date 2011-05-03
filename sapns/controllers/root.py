@@ -428,29 +428,33 @@ class RootController(BaseController):
                     # rest of types
                     else:
                         value = row[attr.name] or ''
+                        
+            attribute = dict(name=attr.name, title=attr.title,
+                             type=attr.type, value=value, required=attr.required,
+                             related_class=None, related_class_title='', 
+                             vals=None)
             
-            attributes.append(dict(name=attr.name, title=attr.title, 
-                                   type=attr.type, value=value, required=attr.required,
-                                   related_class=None, vals=None))
+            attributes.append(attribute)
             
             if attr.related_class_id:
                 # vals
                 #attributes[-1]['vals'] = []
+                #attribute['vals'] = []
                 try:
                     rel_class = DBSession.query(SapnsClass).get(attr.related_class_id)
                     
                     # related_class
-                    attributes[-1]['related_class'] = rel_class.name
-                    attributes[-1]['related_title'] = \
-                        SapnsClass.object_title(rel_class.name, value)
+                    attribute['related_class'] = rel_class.name
+                    attribute['related_class_title'] = rel_class.title
+                    attribute['related_title'] = SapnsClass.object_title(rel_class.name, value)
                     
                     #logger.info(rel_class.name)
                     #attributes[-1]['vals'] = SapnsClass.class_titles(rel_class.name)
                 
                 except Exception, e:
                     logger.error(e)
-                    attributes[-1]['vals'] = None
-                
+#                    attributes[-1]['vals'] = None
+                    attribute['vals'] = None
             
         return dict(cls=cls, title=class_.title, id=id, 
                     related_classes=class_.related_classes(), 

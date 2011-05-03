@@ -17,4 +17,10 @@
     {{grid_html.js_functions(_)}}
     {{grid_html.show(page, _, q, grid, show_ids, link=link, 
         came_from=came_from, can_edit=True)}}
+        
+    <script type="text/javascript">
+        $(document).ready(function() {
+        	$('.sp-search-txt').focus();
+        });
+    </script>
 {% endblock %}

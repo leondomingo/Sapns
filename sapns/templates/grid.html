@@ -2,6 +2,7 @@
 <script type="text/javascript">
     $(document).ready(function() {
     	
+    	// select a row
     	$('.sp-grid-row').click(function() {
     		var row_id = $(this).find('.sp-grid-rowid');
     		if (row_id.attr('checked') == true) {
@@ -12,6 +13,7 @@
     		}
     	});
     	
+    	// default delete action
     	function delete_action(button, id) {
     		
     		var cls = button.parent().find('input[name=cls]').val();
@@ -35,6 +37,7 @@
     							q: true
     						},
     						success: function() {
+    							// TODO: falta quitar la fila (html) del grid
     							$('#grid-dialog').dialog('close');
     						},
     						error: function() {
@@ -65,7 +68,7 @@
     	}
     	
         function search(button) {
-            
+        	
             // parent grid of this search
             var grid_id = button.parent().parent().attr('id');
 
@@ -158,9 +161,11 @@
 <div id="grid-dialog" style="display: none;">
 </div>
 <div id="{{grid.name}}">
+
 {% if grid.caption %}
 <div class="sp-grid-caption">{{grid.caption|escape}}</div>
 {% endif %}
+
 {% if with_search %}
 <form class="sp-search-form" method="post" action="{{grid.search_url}}">
     <input type="hidden" name="cls" value="{{grid.cls}}"/>

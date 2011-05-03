@@ -134,12 +134,14 @@
           {% if attr.vals == None %}
           <div class="sp-select-field" name="{{attr.name}}"
               related_class="{{attr.related_class}}"
+              related_class_title="{{attr.related_class_title}}"
               value="{{attr.value}}">
               <input class="sp-select-text" type="text" readonly
                   value="{{attr.related_title}}" />
-              <input class="sp-button sp-select-button" type="button" value="..."/>
+              <input class="sp-button sp-select-button" type="button" value="..."
+                style="font-weight: bold;"/>
               <input class="sp-button sp-empty-button" type="button" value="X"
-                style="color: red;"/>
+                style="font-weight: bold; color: red;"/>
           </div>
           {#{% else %}
           <select class="sp-select-field" name="{{attr.name}}"
@@ -221,9 +223,10 @@
     	$('.sp-select-button').click(function() {
     		var field = $(this).parent();    		
     		var related_class = field.attr('related_class');
+    		var related_class_title = field.attr('related_class_title');
     		
     		$('#edit-dialog').dialog({
-            	title: related_class,
+            	title: related_class_title,
             	width: 950,
                 height: 550,
                 resizable: false,
