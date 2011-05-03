@@ -2,7 +2,7 @@
     <div class="sp_view_caption">{{_('Order')}}</div>
     <table>
         <tr>
-            <td><input id="btn_add_order" class="sp_button" type="button" value="{{_('Add order')}}"/></td>
+            <td><input id="btn_add_order" class="sp-button" type="button" value="{{_('Add order')}}"/></td>
         </tr>
     </table>
     <!-- list of orders -->
@@ -11,9 +11,9 @@
         <tr class="order_item" pos="{{loop.index0}}">
         <td class="sp_label_field sp_order_lbl">{{_('Definition')}}</td>
         <td><input class="sp_text_field sp_order_definition" type="text" value="{{o}}"/></td>
-        <td><input class="sp_button btn_remove_order" type="button" value="{{_('Remove order')}}"/></td>
-        <td><input class="sp_button btn_up_order" type="button" value="{{_('Up')}}"/></td>
-        <td><input class="sp_button btn_down_order" type="button" value="{{_('Down')}}"/></td>
+        <td><input class="sp-button btn_remove_order" type="button" value="{{_('Remove order')}}"/></td>
+        <td><input class="sp-button btn_up_order" type="button" value="{{_('Up')}}"/></td>
+        <td><input class="sp-button btn_down_order" type="button" value="{{_('Down')}}"/></td>
         </tr>
     {% endfor %}
     </table>

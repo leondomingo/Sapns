@@ -8,7 +8,7 @@
             var grid_id = button.parent().parent().attr('id');
 
             // results per page
-            var rp = $('#' + grid_id + ' .sp_grid_rp').val();
+            var rp = $('#' + grid_id + ' .sp-grid-rp').val();
             
             // Add params to the form
             var params = 
@@ -35,7 +35,7 @@
     	});
     	
     	// Clicking on an action
-    	$('.sp_grid_action').click(function() {
+    	$('.sp-grid-action').click(function() {
     		
     		if ($(this).attr('require_id') == 'true') {
         		
@@ -44,7 +44,7 @@
         		
         		// get the id of the selected row
         		var id_selected = null;
-        		$('#' + grid_id + ' .sp_grid_row_id').each(function() {
+        		$('#' + grid_id + ' .sp-grid-rowid').each(function() {
         			if ($(this).attr('checked') == true) {
         				id_selected = $(this).attr('id_row');
         			}
@@ -78,7 +78,7 @@
     	});
     	
     	// Changing results per page
-    	$('.sp_grid_rp').change(function() {
+    	$('.sp-grid-rp').change(function() {
     		var grid_id = $(this).parent().parent().attr('id');
     		search($('#' + grid_id + ' .sp_search_btn'));
     	});
@@ -93,7 +93,7 @@
 </div>
 <div id="{{grid.name}}">
 {% if grid.caption %}
-<div class="sp_grid_caption">{{grid.caption|escape}}</div>
+<div class="sp-grid-caption">{{grid.caption|escape}}</div>
 {% endif %}
 {% if with_search %}
 <form class="sp_search_form" method="post" action="{{grid.search_url}}">
@@ -102,7 +102,7 @@
     <input type="hidden" name="show_ids" value="{{show_ids}}"/>
     <input type="hidden" name="came_from" value="{{came_from}}"/>
     <input class="sp_search_txt" name="q" type="text" value="{{q|escape}}"/>
-    <input class="sp_button sp_search_btn" type="button" value="{{_('Search...')}}"/>
+    <input class="sp-button sp_search_btn" type="button" value="{{_('Search...')}}"/>
 </form>
 {% endif %}
 
@@ -111,7 +111,7 @@
 {% endif %}
 
 <div style="overflow:auto">
-<table class="sp_grid">
+<table class="sp-grid">
     <tr>
     <td class="sp_col_title">*</td>
     <!-- Column titles -->
@@ -123,11 +123,11 @@
     <!-- Data rows -->
     {% for row in grid.data %}
         <!-- Fill in grid -->
-        <tr class="sp_grid_row">
-        <td title="{{loop.index}}"><input class="sp_grid_row_id" type="checkbox" 
+        <tr class="sp-grid-row">
+        <td title="{{loop.index}}"><input class="sp-grid-rowid" type="checkbox" 
             id_row="{{row[0]}}"/></td>
         {% for cell in row %}
-        <td class="sp_grid_cell" style="text-align: {{grid.cols[loop.index0].align}};
+        <td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}};
             width: {{grid.cols[loop.index0].width}}px;"
             title="{{grid.cols[loop.index0].title}}">
             {% if can_edit and loop.index0 == 0 %}
@@ -140,8 +140,8 @@
         </tr>
     {% else %}
         <!-- No results -->
-        <tr class="sp_grid_row" style="width: 100%;">
-            <td class="sp_grid_cell sp_grid_noresults" 
+        <tr class="sp-grid-row" style="width: 100%;">
+            <td class="sp-grid-cell sp-grid-noresults" 
                 colspan="{{grid.cols|length + 1}}">{{_('No results')}}</td>
         </tr>
     {% endfor %}
@@ -151,13 +151,13 @@
 
 {% if with_pager %}
 <!-- Grid pager -->
-<div class="sp_grid_pager">
+<div class="sp-grid-pager">
     <!-- <div> -->
-      <div class="sp_grid_pager_desc">
+      <div class="sp-grid-pager-desc">
         {{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, 
             total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.totalp)}}
       </div>
-      <select class="sp_button sp_grid_rp">
+      <select class="sp-button sp-grid-rp">
           <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
           <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
           <option value="100" {% if grid.rp == 100 %}selected{% endif %}>100</option>
@@ -174,7 +174,7 @@
         <input type="hidden" name="pag_n" value="{{1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input class="sp_button sp_grid_pag_back" type="submit" value="|<<" 
+        <input class="sp-button sp-grid-pag-back" type="submit" value="|<<" 
             title="{{_('page 1')}}"/>
     </form>
     
@@ -188,16 +188,16 @@
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% if grid.pag_n-1 > 0 %}
-        <input class="sp_button sp_grid_pag_back" type="submit" value="<<" 
+        <input class="sp-button sp-grid-pag-back" type="submit" value="<<" 
             title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
         {% else %}
-        <input class="sp_button sp_grid_pag_back" type="button" value="<<" disabled/>
+        <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled/>
         {% endif %}
     </form>
     {# {% endif %} #}
     
     <div>
-        <input class="sp_grid_current_page" type="text" value="{{grid.pag_n}}"/>
+        <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}"/>
     </div>
     
     <form method="post" action="{{grid.search_url}}" style="float: left;">
@@ -209,10 +209,10 @@
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% if grid.pag_n+1 <= grid.total_pag %}
-        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>" 
+        <input class="sp-button sp-grid-pag-forth" type="submit" value=">>" 
             title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
         {% else %}
-        <input class="sp_button sp_grid_pag_forth" type="button" value=">>" disabled/>
+        <input class="sp-button sp-grid-pag-forth" type="button" value=">>" disabled/>
         {% endif %}
     </form>
 
@@ -225,7 +225,7 @@
         <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input class="sp_button sp_grid_pag_forth" type="submit" value=">>|"
+        <input class="sp-button sp-grid-pag-forth" type="submit" value=">>|"
             title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
 </div>
@@ -233,8 +233,8 @@
 
 {% if with_actions and grid.actions %}
 <!-- Grid actions -->
-<div class="sp_grid_actions">
-    <div class="sp_grid_actions_title">Actions:</div>
+<div class="sp-grid-actions">
+    <div class="sp-grid-actions-title">Actions:</div>
     {% for act in grid.actions %}
     <div style="float: left;">
     <form method="post" action="{{act.url}}">
@@ -244,7 +244,7 @@
         {% else %}
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% endif %}
-        <input class="sp_button sp_grid_action" type="button" value="{{act.title|escape}}"
+        <input class="sp-button sp-grid_action" type="button" value="{{act.title|escape}}"
             title="{{act.url}}" url="{{act.url}}" 
             require_id="{{act.require_id|lower}}"/>
     </form>

@@ -7,11 +7,11 @@
 {{util.jquery_ui()}}
 
 <style type="text/css">
-    .sp_edit_panel {
+    .sp-edit-panel {
         overflow: auto;
     }
     
-    .sp_save_button {
+    .sp-save-button {
         position: fixed;
         right: 350px;
         width: 80px;
@@ -21,44 +21,44 @@
         border: 1px solid gray;
     }
     
-    .sp_edit_field {
+    .sp-edit-field {
     }
     
-    .sp_text_field {
+    .sp-text-field {
         width: 90%;
         max-width: 90%;
         min-width: 90%;
         margin-left: 1%;
     }
     
-    .sp_select_field {
+    .sp-select-field {
         width: 85%;
         margin-left: 1%;
     }
     
-    .sp_select_text {
+    .sp-select-text {
         width: 90%;
         border: 1px solid gray;
     }
     
-    .sp_select_text:focus {
+    .sp-select-text:focus {
         border: 1px solid orange;
     }
     
-    .sp_checkbox_field {
+    .sp-checkbox-field {
         margin-left: 1%;
     }
     
-    .sp_date_field {
+    .sp-date-field {
         margin-left: 1%;
     }
     
-    .sp_time_field {
+    .sp-time-field {
         margin-left: 1%;
         width: 70px;
     }
     
-    .sp_memo_field {
+    .sp-memo-field {
         min-height: 40px;
         height: 100px;
     }
@@ -66,14 +66,14 @@
 
 <div id="edit-dialog" style="display: none;"></div>
 
-<form id="edit_form" method="post" action="{{tg.url('/save')}}">
+<form id="edit-form" method="post" action="{{tg.url('/save')}}">
     <input type="hidden" name="cls" value="{{cls}}"/> 
     <input type="hidden" name="id" value="{{id}}"/>
 </form>
 
-<div class="sp_edit_panel">
-    <div class="sp_save_button">
-        <input id="save_button" class="sp_button" type="button" 
+<div class="sp-edit-panel">
+    <div class="sp-save-button">
+        <input id="save-button" class="sp-button" type="button" 
             value="{{_('Save')}}"/>
     </div>
     
@@ -94,54 +94,56 @@
     {% endfor %}#}
     
     {% for attr in attributes %}
-    <div class="sp_edit_field" 
+    <div class="sp-edit-field" 
         {% if attr.required %}
         required="true"
         {% else %}
         required="false" 
         {% endif %}
-        attr_title="{{attr.title}}">
+        attr-title="{{attr.title}}">
         
-        <div class="sp_label_field" 
+        <div class="sp-label-field" 
             style="margin-left: 10px; 
                 margin-top: 4px;
                 {% if attr.required %} font-weight: bold;  {% endif %}
                 margin-bottom: 2px;">{{attr.title|escape}}</div>
+
         <div>
-        
         <!-- Boolean -->
         {% if attr.type == 'Boolean' %}
-        <input class="sp_checkbox_field" type="checkbox" name="{{attr.name}}"
+        <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
             {% if attr.value %}checked{% endif %}/>
         
         <!-- Date -->
         {% elif attr.type == 'Date' %}
-        <input class="sp_date_field" type="text" name="{{attr.name}}" 
+        <input class="sp-date-field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>
         
         <!-- Time -->
         {% elif attr.type == 'Time' %}
-        <input class="sp_time_field" type="text" name="{{attr.name}}" 
+        <input class="sp-time-field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>            
         
         <!-- Memo -->
         {% elif attr.type == 'String' %}
-        <textarea class="sp_text_field sp_memo_field" 
+        <textarea class="sp-text-field sp-memo-field" 
             name="{{attr.name}}">{{attr.value|escape}}</textarea>
         
         <!-- Select -->
         {% elif attr.related_class != None %}
           {% if attr.vals == None %}
-          <div class="sp_select_field" name="{{attr.name}}"
+          <div class="sp-select-field" name="{{attr.name}}"
               related_class="{{attr.related_class}}"
               value="{{attr.value}}">
-              <input class="sp_select_text" type="text" readonly
+              <input class="sp-select-text" type="text" readonly
                   value="{{attr.related_title}}" />
-              <input class="sp_button sp_select_button" type="button" value="..."/>
+              <input class="sp-button sp-select-button" type="button" value="..."/>
+              <input class="sp-button sp-empty-button" type="button" value="X"
+                style="color: red;"/>
           </div>
           {#{% else %}
-          <select name="{{attr.name}}"
-              related_class="{{attr.related_class}}" class="sp_select_field">
+          <select class="sp-select-field" name="{{attr.name}}"
+              related_class="{{attr.related_class}}">
               <option value="null" 
                   {% if attr.value == None %} selected {% endif %}>{{_('none')}}</option>
               {% for value in attr.vals %}
@@ -159,7 +161,7 @@
           {% endif %}
         {% else %}
         <!-- Everything else -->
-        <input class="sp_text_field" type="text" name="{{attr.name}}" 
+        <input class="sp-text-field" type="text" name="{{attr.name}}" 
             value="{{attr.value|escape}}"/>
         {% endif %}
         </div>
@@ -172,10 +174,15 @@
 <script type="text/javascript">
     $(document).ready(function() {
     	
+    	$('.sp-empty-button').click(function() {
+    		$(this).parent().attr('value', '');
+    		$(this).parent().find('.sp-select-text').attr('value', '');
+    	});
+    	
     	function click_search (button, related_class, q) {
     		
     		if (q == undefined) {
-    			q = $('.sp_search_text').val();
+    			q = $('.sp-search-text').val();
     		}
     		
     		$.ajax({
@@ -190,12 +197,12 @@
                 success: function(res) {
                     $('#edit-dialog').html(res);
                     
-                    $('.sp_search_button').click(function() {
+                    $('.sp-search-button').click(function() {
                         click_search(button, related_class);
                     });
                     
-                    $('.sp_search_text').keypress(function(event) {
-                        search_kp(event, $('.sp_search_button'), related_class);
+                    $('.sp-search-text').keypress(function(event) {
+                        search_kp(event, $('.sp-search-button'), related_class);
                     }).val(q).focus();
                 },
                 error: function(res) {
@@ -211,7 +218,7 @@
             }
     	}
     	
-    	$('.sp_select_button').click(function() {
+    	$('.sp-select-button').click(function() {
     		var field = $(this).parent();    		
     		var related_class = field.attr('related_class');
     		
@@ -224,14 +231,14 @@
                 buttons: {
                 	"{{_('Ok')}}": function() {
                 		// get the id of the selected row
-                        var id_selected = null;
-                        $('#edit-dialog .sp_grid .sp_grid_row_id').each(function() {
+                        var id_selected = '';
+                        $('#edit-dialog .sp-grid .sp-grid-rowid').each(function() {
                             if ($(this).attr('checked') == true) {
                                 id_selected = $(this).attr('id_row');
                             }
                         });
                         
-                        if (id_selected != null) {
+                        if (id_selected != '') {
                         	$.ajax({
                         		url: "{{tg.url('/title')}}",
                         		type: "get",
@@ -241,11 +248,14 @@
                         			id: id_selected
                         		},
                         		success: function(res) {
-                        			field.find('.sp_select_text').val(res.title);
+                        			field.find('.sp-select-text').val(res.title);
                         		},
                         		error: function() {
                         		}
                         	});
+                        }
+                        else {
+                        	field.find('.sp-select-text').val('');
                         }
                         
                         field.attr('value', id_selected);
@@ -258,21 +268,21 @@
                 }
             });
     		
-    		click_search($('.sp_search_button'), related_class, '');
+    		click_search($('.sp-search-button'), related_class, '');
     	});
         
-        $('#save_button').click(function() {
+        $('#save-button').click(function() {
             
             var params = '';
             var required_attrs = [];
             
             // text
-            $('.sp_text_field').each(function() {
+            $('.sp-text-field').each(function() {
                 var required = $(this).parent().parent().attr('required');
                 var value = $(this).val();
                         
                 if (required == 'true' && value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
                 }
                 
                 params += 
@@ -282,7 +292,7 @@
             });
             
             // checkbox
-            $('.sp_checkbox_field').each(function() {
+            $('.sp-checkbox-field').each(function() {
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
@@ -290,7 +300,7 @@
             });
 
             // date
-            $('.sp_date_field').each(function() {
+            $('.sp-date-field').each(function() {
                 
                 var date_value = $(this).datepicker('getDate');
                 
@@ -308,7 +318,7 @@
                 var required = $(this).parent().parent().attr('required');
                         
                 if (required == 'true' && date_value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
                 }
                 
                 params += 
@@ -318,21 +328,19 @@
             });
             
             // select fields
-            $('.sp_select_field').each(function() {
+            $('.sp-select-field').each(function() {
                 
-                /*
                 var required = $(this).parent().parent().attr('required');
-                var sel_value = $(this).val();
+                var sel_value = $(this).attr('value');
                         
-                if (required == 'true' && sel_value == 'null') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr_title');
+                if (required == 'true' && sel_value == '') {
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
                 }
-                */
                 
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + $(this).attr('value') + '"/>\n';
+                        'value="' + sel_value + '"/>\n';
             });
             
             if (required_attrs != '') {
@@ -358,13 +366,13 @@
                     });
             }
             else {
-                $('#edit_form').append(params).submit();
+                $('#edit-form').append(params).submit();
             }
         });
         
         // create datepickers
         // with specific date format and options
-        $('.sp_date_field').datepicker({
+        $('.sp-date-field').datepicker({
             firstDay: {{js_options.first_day}},
             changeMonth: true,
             changeYear: true,

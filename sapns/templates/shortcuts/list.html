@@ -65,7 +65,7 @@
             <form method="post" action="/sc/edit">
             <input type="hidden" name="id" value="{{sc.id}}"/>
             <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
-            <input class="sp_button" style="width: 50px; float: left;"
+            <input class="sp-button" style="width: 50px; float: left;"
                 title="{{_('Edit this shortcut')}}" 
                 type="submit" value="{{_('Edit')}}"/>
             </form>
@@ -73,7 +73,7 @@
         
         <!-- Delete -->
         <div style="float: left;">
-            <input class="sp_button sc_delete_button" 
+            <input class="sp-button sc_delete_button" 
                 style="width: 50px; float: left;"
                 title="{{_('Remove this shortcut')}}" 
                 type="button" value="{{_('Delete')}}"/>
@@ -81,7 +81,7 @@
     
         <!-- To dashboard -->
         <div style="float: left;">
-            <input class="sp_button sc_bookmark_button" 
+            <input class="sp-button sc_bookmark_button" 
                 style="width: 105px;"
                 title="{{_('Put this shortcut on the dashboard')}}"
                 type="button" value="{{_('Send to dashboard')}}"/>
@@ -89,7 +89,7 @@
 
         <!-- Share -->        
         <div>
-            <input class="sp_button sc_share_button" 
+            <input class="sp-button sc_share_button" 
                 style="width: 60px;"
                 title=""
                 type="button" value="{{_('Share')}}"/>

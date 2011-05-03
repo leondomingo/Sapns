@@ -292,19 +292,19 @@ clear:both;
     border: 1px dotted gray;	
 }
 
-.sp_button {
+.sp-button {
     font-size: 11px;
     text-align: center;
     margin: 2px;
     /*color: #723532;*/
 }
 
-.sp_grid {
+.sp-grid {
 	margin-top: 10px;
 	background-color: #B5AFAF;
 }
 
-.sp_grid_caption {
+.sp-grid-caption {
 	font-size: 18px;
 	margin-left: 10px;
 	width: 100px;
@@ -336,34 +336,34 @@ clear:both;
 	cursor: pointer;
 }
 
-.sp_grid_row_id {
+.sp-grid-row-id {
 }
 
-.sp_grid_row {
+.sp-grid-row {
 	background-color: white;
 	border: 2px solid black;
 }
 
-.sp_grid_cell {
+.sp-grid-cell {
 	/*background-color: white;*/
 	font-family: Arial;
 	height: 45px;
 	cursor: pointer;
 }
 
-.sp_grid_noresults {
+.sp-grid-noresults {
 	text-align: center; 
 	color: maroon; 
 	font-weight: bold; 
 	font-size: 15px;
 }
 
-.sp_grid_pager {
+.sp-grid-pager {
 	border: 1px solid gray;
 	height: 30px;
 }
 
-.sp_grid_pager_desc {
+.sp-grid-pager-desc {
 	color: #F9F9F9;
 	font-family: arial;
 	/*background-color: gray;*/
@@ -376,29 +376,29 @@ clear:both;
 	height: 25px;
 }
 
-.sp_grid_current_page {
+.sp-grid-current-page {
 	width: 40px;
 	color: gray; 
 	font-weight: bold;
 	float: left;
 }
 
-.sp_grid_rp {
+.sp-grid-rp {
 	float: left;
 }
 
-.sp_grid_pag_back {
+.sp-grid-pag-back {
 	float: left;
 }
 
-.sp_grid_actions {
+.sp-grid-actions {
 	/*border: 1px solid gray;*/
 	clear: left;
 	background-color: #CCCFA5; /*#B4BD3C;*/
 	height: 25px;
 }
 
-.sp_grid_actions_title {
+.sp-grid-actions-title {
 	/*border: 1px dotted white;*/
 	width: 100px;
 	text-align: center;
@@ -409,7 +409,7 @@ clear:both;
 	font-size: 10px;
 }
 
-.sp_grid_action {
+.sp-grid-action {
 	min-width: 80px;
     margin: 2px;
 }

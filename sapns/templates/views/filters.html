@@ -2,7 +2,7 @@
     <div class="sp_view_caption">{{_('Filters')}}</div>
     <table>
         <tr>
-            <td><input id="btn_add_filter" class="sp_button" type="button" value="{{_('Add filter')}}"/></td>
+            <td><input id="btn_add_filter" class="sp-button" type="button" value="{{_('Add filter')}}"/></td>
         </tr>
     </table>
     <!-- list of filters -->
@@ -11,9 +11,9 @@
     <tr class="filter_item" pos="{{loop.index0}}">
         <td class="sp_label_field sp_filter_lbl">{{_('Definition')}}</td>
         <td><textarea class="sp_text_field sp_filter_definition">{{f|escape}}</textarea></td>
-        <td><input class="sp_button btn_remove_filter" type="button" value="{{_('Remove filter')}}"/></td>
-        <td><input class="sp_button btn_up_filter" type="button" value="{{_('Up')}}"/></td>
-        <td><input class="sp_button btn_down_filter" type="button" value="{{_('Down')}}"/></td>
+        <td><input class="sp-button btn_remove_filter" type="button" value="{{_('Remove filter')}}"/></td>
+        <td><input class="sp-button btn_up_filter" type="button" value="{{_('Up')}}"/></td>
+        <td><input class="sp-button btn_down_filter" type="button" value="{{_('Down')}}"/></td>
     </tr>
     {% endfor %}
     </table>
