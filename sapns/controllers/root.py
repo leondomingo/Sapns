@@ -177,11 +177,16 @@ class RootController(BaseController):
         except NoSuchTableError:
             view = cls
             
+        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        
+        def strtodatef(s):
+            return strtodate(s, fmt=date_fmt, no_exc=True)
+            
         ds = search(DBSession, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    show_ids=show_ids)
+                    show_ids=show_ids, strtodatef=strtodatef)
         
         # Reading global settings
-        ds.date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        ds.date_fmt = date_fmt
         ds.time_fmt = config.get('grid.time_format', default='%H:%M')
         ds.true_const = config.get('grid.true_const', default='Yes')
         ds.false_const = config.get('grid.false_const', default='No')
