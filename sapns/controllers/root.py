@@ -13,28 +13,27 @@ from sapns.model import DBSession
 import sapns.config.app_cfg as app_cfg
 
 from neptuno.postgres.search import search
+from neptuno.util import strtobool, strtodate, strtotime, datetostr
 
 from sapns.controllers.error import ErrorController
 from sapns.controllers.views import ViewsController
 from tg.controllers.util import urlencode
 from sapns.controllers.util import UtilController
+from sapns.controllers.users import UsersController
+from sapns.controllers.shortcuts import ShortcutsController
+from sapns.controllers.messages import MessagesController
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
     SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege
 
 import logging
 import re
+import simplejson as sj
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
-import simplejson as sj
-from sapns.controllers.users import UsersController
-from neptuno.util import strtobool, strtodate, strtotime, datetostr
-from sapns.controllers.shortcuts import ShortcutsController
-from sapns.controllers.messages import MessagesController
 
 __all__ = ['RootController']
-
 
 class RootController(BaseController):
     """
@@ -102,11 +101,6 @@ class RootController(BaseController):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ)
 
-#    @expose('authentication.html')
-#    def auth(self):
-#        """Display some information about auth* on this application."""
-#        return dict(page='auth')
-
     @expose('login.html')
     def login(self, came_from=url('/')):
         """Start the user login."""
@@ -121,7 +115,6 @@ class RootController(BaseController):
         """
         Redirect the user to the initially requested page on successful
         authentication or redirect her back to the login page if login failed.
-
         """
         if not request.identity:
             login_counter = request.environ['repoze.who.logins'] + 1
@@ -142,11 +135,11 @@ class RootController(BaseController):
 
     @expose('listof.html')
     @require(predicates.not_anonymous())
-    def list(self, **params):
+    def list(self, cls='', q='', **params):
 
         # picking up parameters
-        cls = params.get('cls', '')
-        q = params.get('q', '')
+        #cls = params.get('cls', '')
+        #q = params.get('q', '')
         rp = params.get('rp', 10)
         pag_n = params.get('pag_n', 1)
         caption = params.get('caption', '')
@@ -197,7 +190,7 @@ class RootController(BaseController):
         
         cols = []
         for col in ds.labels:
-            w = 120
+            w = 125
             if col == 'id':
                 w = 60
                 
@@ -260,11 +253,19 @@ class RootController(BaseController):
     @expose()
     @require(predicates.not_anonymous())
     def save(self, cls='', id='', **params):
+        """
+        IN
+          cls          <unicode>
+          id           <int>
+          params
+            came_from  <unicode>
+            fld_*      ???        Fields to be saved
+        """
         
         logger = logging.getLogger(__name__ + '/save')
         logger.info(params)
 
-        cls = SapnsClass.by_name(cls) #params['cls'])
+        cls = SapnsClass.by_name(cls)
         came_from = params.get('came_from', '/list?cls=%s' % cls.name)
         
         # does this user have permission on this table?
@@ -275,6 +276,7 @@ class RootController(BaseController):
                          dict(message=_('Sorry, you do not have privilege on this class'),
                               came_from=came_from)))
 
+        # init "update" dictionary
         update = {}
         
         if id != '':
@@ -314,7 +316,7 @@ class RootController(BaseController):
                         if field_value == '':
                             field_value = None
                         else:
-                            field_value = strtodate(field_value)
+                            field_value = strtodate(field_value, fmt='%Y-%m-%d')
                     
                     # time
                     elif attr.type == SapnsAttribute.TYPE_TIME:
@@ -334,7 +336,7 @@ class RootController(BaseController):
         meta = MetaData(bind=DBSession.bind)
         tbl = Table(cls.name, meta, autoload=True)
         
-        if update.get('id'): #, None):
+        if update.get('id'):
             logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
             tbl.update(whereclause=tbl.c.id == update['id'], values=update).execute()
             
@@ -348,12 +350,7 @@ class RootController(BaseController):
         
     @expose('edit.html')
     @require(predicates.not_anonymous())
-    def new(self, **params):
-        
-        cls = params.get('cls')
-        #id = params.get('id')
-        came_from = params.get('came_from', '/')
-        
+    def new(self, cls='', came_from='/'):
         redirect(url('/edit'), dict(cls=cls, id='', came_from=came_from))
         
     @expose('edit.html')

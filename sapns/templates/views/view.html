@@ -5,13 +5,15 @@
     {{super()}}
     <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/views.css')}}"/>
     {{util.jquery()}}
-    <!-- <script type="text/javascript" src="{{tg.url('/js/views.js')}}"></script>-->
+    {{util.jquery_ui()}}
+    {# <!-- <script type="text/javascript" src="{{tg.url('/js/views.js')}}"></script>--> #}
     <script type="text/javascript">
     {% include 'views/views.js' %}
     </script>
 {% endblock %}
 
 {% block middle %}
+<div id="views-dialog" style="display: none;"></div>
 <form id="form_view" method="post" action="/views/save">
     <input type="hidden" name="id" value="{{view.id}}"/>
     <input type="hidden" name="title"/>

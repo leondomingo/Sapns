@@ -9,13 +9,13 @@
     <table id="column_list">
         {% for col in view.columns %}
         <tr class="column_item" pos="{{loop.index0}}">
-        <td class="sp_label_field ">{{_('Title')}}</td>
-        <td><input class="sp_text_field sp_column_title" type="text" value="{{col.title}}"/></td>
-        <td class="sp_label_field ">{{_('Definition')}}</td>
-        <td><input class="sp_text_field sp_column_definition" type="text" value="{{col.definition}}"/></td>
-        <td class="sp_label_field ">{{_('Alias')}}</td>
-        <td><input class="sp_text_field sp_column_alias" type="text" value="{{col.alias}}"/></td>
-        <td class="sp_label_field ">{{_('Align')}}</td>
+        <td class="sp-label-field ">{{_('Title')}}</td>
+        <td><input class="sp-text-field sp_column_title" type="text" value="{{col.title}}"/></td>
+        <td class="sp-label-field ">{{_('Definition')}}</td>
+        <td><input class="sp-text-field sp_column_definition" type="text" value="{{col.definition}}"/></td>
+        <td class="sp-label-field ">{{_('Alias')}}</td>
+        <td><input class="sp-text-field sp_column_alias" type="text" value="{{col.alias}}"/></td>
+        <td class="sp-label-field ">{{_('Align')}}</td>
         <td>
         <select class="sp-button sp_column_align">
             <option value="center" {% if col.align == 'center' %}selected{% endif %}>{{_('center')}}</option>

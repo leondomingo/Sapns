@@ -7,11 +7,11 @@
 
 <div id="insertion">
 
-<div class="class_title">
+<div class="class-title">
     
     <div style="margin-top: 3px; margin-left: 15px;">
         <div class="" style="width: 78%; margin-bottom: 15px;">
-            <input id="title_class" class="sp_text_field" style="width: 99%;
+            <input id="title-class" class="sp-text-field" style="width: 99%;
                 font-weight: bold; font-size: 18px;"
                 type="text" value="{{title}}"/>
         </div>
@@ -19,40 +19,40 @@
 </div>
     
 {% for attr in insertion %}
-<div class="ins_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false"
+<div class="ins-attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false"
     style="height: 30px; padding-top: 5px;">
     <div style="margin-top: 0px; margin-left: 5px;">
     
-        <!-- Up -->
+        {# <!-- Up --> #}
         <div style="clear: left; float: left; width: 50px;">
-            <input class="sp-button insorder_up" type="button"
+            <input class="sp-button insorder-up" type="button"
                 title="{{attr.title|escape}}" value="{{_('Up')}}"/>
         </div>
         
-        <!-- Down -->
+        {# <!-- Down --> #}
         <div style="float: left; width: 50px; margin-right: 5px;">
-            <input class="sp-button insorder_down" type="button" 
+            <input class="sp-button insorder-down" type="button" 
                 title="{{attr.title|escape}}" value="{{_('Down')}}"/>
         </div>
         
-        <!-- Attribute -->
-        <div class="attr_title" style="float: left; width: 80%; 
+        {# <!-- Attribute --> #}
+        <div class="attr-title" style="float: left; width: 80%; margin-left: 5px; 
             font-weight: bold; margin-top: 2px;">
-            <input class="sp_text_field" style="width: 99%;" type="text"
+            <input class="sp-text-field" style="width: 99%;" type="text"
                 title="{{attr.name}}" value="{{attr.title}}"/>
         </div>
         
-        <!-- required -->
+        {# <!-- Required --> #}
         <div style="float: left; width: 40px; text-align: center; margin-top: 3px;">
-            <input class="attr_required" type="checkbox" 
-                title="{{_('%s required')|format(attr.title)}}"
+            <input class="attr-required" type="checkbox" 
+                title='{{_("\"%s\" required")|format(attr.title)}}'
                 {%- if attr.required %} checked {% endif %} />
         </div>
         
-        <!-- visible -->
+        {# <!-- Visible --> #}
         <div style="float: left; width: 40px; text-align: center; margin-top: 3px;">
-            <input class="attr_visible" type="checkbox" 
-                title="{{_('%s visible')|format(attr.title)}}" 
+            <input class="attr-visible" type="checkbox" 
+                title='{{_("\"%s\" visible")|format(attr.title)}}' 
                 {%- if attr.visible %} checked {% endif %}/>
         </div>
     </div>
@@ -61,11 +61,11 @@
 </div>
 
 <div style="height: 50px; clear: left;">
-    <input id="save_ins_order" class="sp-button" style="margin-top: 20px;" 
+    <input id="save-ins-order" class="sp-button" style="margin-top: 20px;" 
         type="button" value="{{_('Save')}}"/>
 </div>
 
-<form id="form_insert_order" method="post" action="{{tg.url('/ins_order_save')}}">
+<form id="form-ins-order" method="post" action="{{tg.url('/ins_order_save')}}">
     <input type="hidden" name="came_from" value="{{came_from}}"/>
     <input type="hidden" name="attributes" value=""/>
     <input type="hidden" name="title" value=""/>
@@ -74,64 +74,85 @@
 <script type="text/javascript">
     $(document).ready(function() {
 
-    $('#save_ins_order').click(function() {
+    $('#save-ins-order').click(function() {
         
         var atributos = [];
-        $('.ins_attr').each(function() {
+        $('.ins-attr').each(function() {
             atributos[atributos.length] = {
                 id: $(this).attr('id_attr'),
-                title: $(this).find('.sp_text_field').val(),
+                title: $(this).find('.sp-text-field').val(),
                 order: $(this).attr('pos'),
-                required: $(this).find('.attr_required').attr('checked'),
-                visible: $(this).find('.attr_visible').attr('checked')
+                required: $(this).find('.attr-required').attr('checked'),
+                visible: $(this).find('.attr-visible').attr('checked')
             };
         });
         
-        $('#form_insert_order input[name=title]').val($('#title_class').val());
-        $('#form_insert_order input[name=attributes]').val(JSON.stringify(atributos));
-        $('#form_insert_order').submit();
+        $('#form-ins-order input[name=title]').val($('#title-class').val());
+        $('#form-ins-order input[name=attributes]').val(JSON.stringify(atributos));
+        $('#form-ins-order').submit();
     });
-    
+
+    // {# when the "visible" check is unchecked, the attribute title's background turns gray #}
     function color_visible(check) {
         if (check.attr('checked')) {
-            check.parent().parent().find('.attr_title').
-              find('.sp_text_field').css('background-color', 'white');
+            check.parent().parent().find('.attr-title').
+              find('.sp-text-field').css('background-color', 'white');
         }
         else {
-            check.parent().parent().find('.attr_title').
-              find('.sp_text_field').css('background-color', 'gray');
+            check.parent().parent().find('.attr-title').
+              find('.sp-text-field').css('background-color', 'gray');
+        }
+    }
+
+    // {# when the "required" check is checked, the attribute title's font turns bolder #}
+    function font_required(check) {
+    	if (check.attr('checked')) {
+            check.parent().parent().find('.attr-title').
+              find('.sp-text-field').css('font-weight', 'bold');
+        }
+        else {
+            check.parent().parent().find('.attr-title').
+              find('.sp-text-field').css('font-weight', 'normal');
         }
     }
     
-    $('.attr_visible').click(function() {
+    // {# apply style on attribute title depending on the checks #} 
+    $('.attr-visible').click(function() {
         color_visible($(this));
     }).each(function() {
         color_visible($(this));
     });
     
+    $('.attr-required').click(function() {
+    	font_required($(this));
+    }).each(function() {
+    	font_required($(this));
+    });
+    
     function new_order() {
         var new_order = [];
-        $('.ins_attr').each(function(){
+        $('.ins-attr').each(function(){
             var pos = $(this).attr('pos')*1;
             new_order[pos] = $(this);
             $(this).remove();
         });
         
-        // apply new order
+        // {# apply new order #} 
         
         for (var i=0; i<new_order.length; i++) {
             $('#insertion').append(new_order[i]);
             
-            // recover click events
-            $('.ins_attr:last .insorder_up').click(function() { ins_up($(this)); });
-            $('.ins_attr:last .insorder_down').click(function() { ins_down($(this)); });
-            $('.ins_attr:last .attr_visible').click(function() { color_visible($(this)); });
+            // {# recover click events #} 
+            $('.ins-attr:last .insorder-up').click(function() { ins_up($(this)); });
+            $('.ins-attr:last .insorder-down').click(function() { ins_down($(this)); });
+            $('.ins-attr:last .attr-visible').click(function() { color_visible($(this)); });
+            $('.ins-attr:last .attr-required').click(function() { font_required($(this)); });
             
-            if ($('.ins_attr:last').attr('modified') == 'true') {
-                $('.ins_attr:last').effect('highlight', {color: 'yellow'}, 300);
+            if ($('.ins-attr:last').attr('modified') == 'true') {
+                $('.ins-attr:last').effect('highlight', {color: 'yellow'}, 300);
             }
             
-            $('.ins_attr:last').attr('modified', 'false');
+            $('.ins-attr:last').attr('modified', 'false');
         }
     }
     
@@ -139,37 +160,37 @@
         var pos = button.parent().parent().parent().attr('pos')*1;
         if (pos > 0) {
             
-            // update order
+            // {# update order #} 
             var prev_pos = pos - 1;
-            var prev_item = $('.ins_attr:eq(' + prev_pos + ')');
+            var prev_item = $('.ins-attr:eq(' + prev_pos + ')');
             prev_item.attr('pos', pos);
             button.parent().parent().parent().attr('pos', prev_pos);
             button.parent().parent().parent().attr('modified', 'true');
             
-            // create new order
+            // {# create new order #} 
             new_order();
         }
     }
     
     function ins_down (button) {
         var pos = button.parent().parent().parent().attr('pos')*1;
-        var max = $('.ins_attr:last').attr('pos')*1;
+        var max = $('.ins-attr:last').attr('pos')*1;
         if (pos < max) {
             
-            // update order
+            // {# update order #} 
             var next_pos = pos + 1;
-            var next_item = $('.ins_attr:eq(' + next_pos + ')');
+            var next_item = $('.ins-attr:eq(' + next_pos + ')');
             next_item.attr('pos', pos);
             button.parent().parent().parent().attr('pos', next_pos);
             button.parent().parent().parent().attr('modified', 'true');
             
-            // create new order
+            // {# create new order #} 
             new_order();
         }
     }
     
-    $('.insorder_up').click(function() { ins_up($(this)); });
-    $('.insorder_down').click(function() { ins_down($(this)); });
+    $('.insorder-up').click(function() { ins_up($(this)); });
+    $('.insorder-down').click(function() { ins_down($(this)); });
 });
 </script>
 {% endblock %}
