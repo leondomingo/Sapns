@@ -1,0 +1,64 @@
+.sp-edit-panel {
+    overflow: auto;
+}
+
+.sp-save-button {
+    position: fixed;
+    right: 350px;
+    width: 80px;
+    height: 30px;
+    text-align: center;
+    background-color: #B4BD3C;
+    border: 1px solid gray;
+}
+
+.sp-edit-field {
+}
+
+.sp-text-field {
+    width: 90%;
+    max-width: 90%;
+    min-width: 90%;
+    margin-left: 1%;
+}
+
+.sp-select-field {
+    width: 85%;
+    margin-left: 1%;
+}
+
+.sp-select-text {
+    width: 90%;
+    border: 1px solid gray;
+}
+
+.sp-select-text:focus {
+    border: 1px solid orange;
+}
+
+.sp-checkbox-field {
+    margin-left: 1%;
+}
+
+.sp-date-field {
+    margin-left: 1%;
+}
+
+.sp-time-field {
+    margin-left: 1%;
+    width: 70px;
+}
+
+.sp-memo-field {
+    min-height: 40px;
+    height: 100px;
+}
+
+.sp-search-text {
+	width: 650px;
+	border: 1px solid gray;
+}
+
+.sp-search-text:focus {
+	border: 1px solid orange;
+}
