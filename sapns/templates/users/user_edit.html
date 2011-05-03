@@ -1,47 +1,76 @@
 {% extends 'base.html' %}
+{% import 'util.html' as util %}
+
+{% block head %}
+{{super()}}
+{{util.jquery()}}
+{% endblock %}
 
 {% block middle %}
-    <form method="post" action="/users/user_save">
-    <input type="hidden" name="id" value="{{user.user_id}}"/>
+<form method="post" action="/users/user_save">
+<input type="hidden" name="id" value="{{user.user_id}}"/>
+<div>
     <div>
-        <div>
-            <div class="sp_label_field">{{_('Display name')}}</div>
-            <input class="sp_text_field" type="text" style="width: 50%;" 
-                name="display_name" value="{{user.display_name}}"/>
-        </div>
-        
-        <div>
-            <div class="sp_label_field">{{_('User name')}}</div>
-            <input class="sp_text_field" type="text" style="width: 50%;" 
-                name="user_name" value="{{user.user_name}}"/>
-        </div>
-
-        <div>
-            <div class="sp_label_field">{{_('E-mail address')}}</div>
-            <input class="sp_text_field" type="text" style="width: 50%;" 
-                name="email_address" value="{{user.email_address}}"/>
-        </div>
-        
-        <div>
-            <div class="sp_label_field">{{_('Password')}}</div>
-            <input class="sp_text_field" type="password" 
-                name="password" value=""/>
-        </div>
-        
-        {% if not user.user_id %}
-        <div>
-            <div class="sp_label_field">{{_('Copy from')}}</div>
-            <select name="copy_from">
-                {% for us in other_users %}
-                <option value="{{us.id}}">{{us.name|escape}}</option>
-                {% endfor %}
-            </select>
-        </div>
-        {% endif %}
-        
-        <div>
-            <input id="save_user_btn" type="submit" value="{{_('Save')}}"/>
-        </div>
+        <div class="sp-label-field">{{_('Display name')}}</div>
+        <input class="sp-text-field" type="text" style="width: 50%;" 
+            name="display_name" value="{{user.display_name}}"/>
     </div>
-    </form>
+    
+    <div>
+        <div class="sp-label-field">{{_('User name')}}</div>
+        <input class="sp-text-field" type="text" style="width: 50%;" 
+            name="user_name" value="{{user.user_name}}"/>
+    </div>
+
+    <div>
+        <div class="sp-label-field">{{_('E-mail address')}}</div>
+        <input class="sp-text-field" type="text" style="width: 50%;" 
+            name="email_address" value="{{user.email_address}}"/>
+    </div>
+    
+    <div>
+        <div class="sp-label-field">{{_('Password')}}</div>
+        <input class="sp-text-field" type="password" 
+            name="password" value=""/>
+    </div>
+    
+    {% if not user.user_id %}
+    <div>
+        <div class="sp-label-field">{{_('Copy from')}}</div>
+        <select name="copy_from"></select>
+    </div>
+    {% endif %}
+    
+    <div>
+        <input id="save_user_btn" type="submit" value="{{_('Save')}}"/>
+    </div>
+</div>
+</form>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+    	
+    	$('.sp-text-field:first').focus();
+    	
+    	$.ajax({
+    		url: "{{tg.url('/users/all')}}",
+    		type: "get",
+    		dataType: "json",
+    		success: function(res) {
+    			var options = '';
+    			for (var i=0; i<res.users.length; i++) {
+    				var user = res.users[i];
+    				
+    				options +=
+    					'<option value="' + user.id + '">' +
+    					   user.display_name + ' [' + user.user_name + ']</option>';
+    			}
+    			
+    			$('select[name=copy_from]').html(options);
+    		},
+    		error: function() {
+    		}
+    	});
+    });
+</script>
 {% endblock %}

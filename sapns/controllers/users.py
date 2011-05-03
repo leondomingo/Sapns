@@ -95,12 +95,7 @@ class UsersController(BaseController):
     @require(predicates.has_any_permission('manage', 'users'))
     def user_new(self, **params):
         came_from = params.get('came_from', '/users')
-        
-        other_users = []
-        for us in DBSession.query(SapnsUser):
-            other_users.append(dict(id=us.user_id, name=us.user_name))
-        
-        return dict(user={}, other_users=other_users, came_from=url(came_from))
+        return dict(user={}, came_from=url(came_from))
     
     @expose()
     @require(predicates.has_any_permission('manage', 'users'))

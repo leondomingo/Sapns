@@ -131,6 +131,8 @@
 <script type="text/javascript">
     $(document).ready(function() {
     	
+    	$('.sp-edit-field:first').find('input:first').focus();
+    	
     	// {# remove value from select-field #} 
     	$('.sp-empty-button').click(function() {
     		$(this).parent().attr('value', '');
