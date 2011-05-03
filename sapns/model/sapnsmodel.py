@@ -458,7 +458,8 @@ class SapnsClass(DeclarativeBase):
             elif ac.type == SapnsAction.TYPE_DELETE:
                 url = SapnsAction.URL_DELETE
             
-            actions.append(dict(title=_(ac.name), url=url, require_id=require_id))
+            actions.append(dict(title=_(ac.name), type=ac.type, 
+                                url=url, require_id=require_id))
     
         return actions
     

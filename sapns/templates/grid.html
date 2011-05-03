@@ -12,6 +12,58 @@
     		}
     	});
     	
+    	function delete_action(button, id) {
+    		
+    		var cls = button.parent().find('input[name=cls]').val();
+    		var url = button.attr('url');
+    		
+    		$('#grid-dialog').dialog({
+    			width: 650,
+    			height: 350,
+    			resizable: false,
+    			modal: true,
+    			title: "{{_('Delete')}}",
+    			buttons: {
+    				"{{_('Ok')}}": function() {
+    					$.ajax({
+    						url: url,
+    						type: "get",
+    						dataType: "json",
+    						data: {
+    							cls: cls,
+    							id: id,
+    							q: true
+    						},
+    						success: function() {
+    							$('#grid-dialog').dialog('close');
+    						},
+    						error: function() {
+    							$('#grid-dialog').dialog('close');
+    						},
+    					});
+    				},
+    				"{{_('Cancel')}}": function() {
+    					$('#grid-dialog').dialog('close');
+    				}
+    			}
+    		});
+    		
+            $.ajax({
+                url: url,
+                type: "get",
+                data: {
+                    cls: cls,
+                    id: id
+                },
+                success: function(res) {
+                	$('#grid-dialog').html(res);
+                },
+                error: function() {
+                	$('#grid-dialog').hide();
+                }
+            });
+    	}
+    	
         function search(button) {
             
             // parent grid of this search
@@ -66,12 +118,16 @@
         			var id_param = 
         				'<input type="hidden" name="id" value="' + id_selected + '"/>';
         				
-        			$(this).parent().append(id_param);        			
-        			$(this).parent().submit();
+        			if($(this).attr('action-type') == 'delete') {
+        				//alert('hola!');
+        				delete_action($(this), id_selected);
+        			}
+        			else {
+        				$(this).parent().append(id_param);        			
+          			    $(this).parent().submit();
+        			}
         		}
         		else {
-        			//alert('{{_('You must select a row before click on this action')}}');
-        			
         			$('#grid-dialog').
         			    html("<p style='text-align: center'>{{_('You must select a row before click on this action')}}</p>"). 
         			    dialog({
@@ -255,7 +311,7 @@
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% endif %}
         <input class="sp-button sp-grid-action" type="button" value="{{act.title|escape}}"
-            title="{{act.url}}" url="{{act.url}}" 
+            title="{{act.url}}" url="{{act.url}}" action-type="{{act.type}}" 
             require_id="{{act.require_id|lower}}"/>
     </form>
     </div>

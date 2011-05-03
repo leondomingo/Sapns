@@ -473,7 +473,7 @@ class RootController(BaseController):
         
         if not q:
             # redirect to the question page
-            return dict(cls=cls, id=id, came_from=url(came_from))
+            return dict(cls=cls, id=id, title=SapnsClass.object_title(cls, id))
             
         # delete record
         tbl.delete(tbl.c.id == id).execute()
