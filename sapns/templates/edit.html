@@ -310,7 +310,8 @@
                 for (var i=0; i<required_attrs.length; i++) {
                     alert_msg += 
                         '<p style="margin-left: 20px; ' +
-                            'font-size: 10px;' + 
+                            'font-size: 11px;' +
+                            'font-family: Arial;' +
                             'font-weight: bold;">' + 
                         required_attrs[i] + 
                         '</p>';
@@ -324,6 +325,11 @@
                         height: 250,
                         width: 450,
                         modal: true,
+                        buttons: {
+                        	"{{_('Close')}}": function() {
+                        		$('#edit-dialog').dialog('close');
+                        	}
+                        }
                     });
             }
             else {
