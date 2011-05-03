@@ -3,13 +3,16 @@
     $(document).ready(function() {
     	
     	// select a row
-    	$('.sp-grid-row').click(function() {
-    		var row_id = $(this).find('.sp-grid-rowid');
-    		if (row_id.attr('checked') == true) {
-    			row_id.attr('checked', false);
-    		}
-    		else {
-    			row_id.attr('checked', true);
+    	$('.sp-grid-cell').click(function() {
+    		
+    		if ($(this).attr('clickable') == 'true') {
+    			var row_id = $(this).parent().find('.sp-grid-rowid');    		
+    		    if (row_id.attr('checked') == true) {
+    		    	row_id.attr('checked', false);
+    		    }
+    		    else {
+    		    	row_id.attr('checked', true);
+    		    }
     		}
     	});
     	
@@ -200,10 +203,12 @@
         {% for cell in row %}
         <td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}};
             width: {{grid.cols[loop.index0].width}}px;"
-            title="{{grid.cols[loop.index0].title}}">
+            title="{{grid.cols[loop.index0].title}}"
             {% if can_edit and loop.index0 == 0 %}
+            clickable="false">
             <a href="/edit?cls={{grid.cls}}&id={{cell}}">{{cell|escape}}</a>
             {% else %}
+            clickable="true">
             {{cell|escape}}
             {% endif %}
         </td>
