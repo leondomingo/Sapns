@@ -90,7 +90,7 @@
         <!-- Share -->        
         <div>
             <input class="sp-button sc_share_button" 
-                style="width: 60px;"
+                style="width: 65px;"
                 title=""
                 type="button" value="{{_('Share')}}"/>
         </div>
@@ -101,22 +101,6 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
-        
-        $('#shortcut_actions').change(function() {
-            var action = $(this).find('option:selected').val();
-            
-            if (action == 'edit') {
-            }
-            else if (action == 'delete') {
-            }
-            else if (action == 'send-to') {
-            }
-            else if (action == 'share') {
-            }
-            
-            // select first option again
-            $(this).find('option:first').attr('selected', true);
-        });
         
         // delete
         $('.sc_delete_button').click(function() {
@@ -166,7 +150,7 @@
                 width: 300,
                 modal: true,
                 buttons: {
-                    "Ok": function() { 
+                    "{{_('Ok')}}": function() { 
                         $.ajax({
                             url: "{{tg.url('/sc/bookmark')}}",
                             type: 'post',
@@ -190,35 +174,39 @@
                             }
                         });
                     },
-                    "Cancel": function() { 
+                    "{{_('Cancel')}}": function() { 
                         $('#bookmark-confirmation').dialog('close');
                     }
                 }
             });
         });
         
-        <!-- load list of users -->
-        $.ajax({
-        	url: "{{tg.url('/users/all')}}",
-        	type: 'get',
-        	dataType: 'json',
-        	success: function(res) {
-        		var users = res.users;
-        		var options = '';
-        		for (var i=0; i<users.length; i++) {
-        			options += '<option value="' + users[i].id +'">' + 
-        			    users[i].display_name + ' [' + users[i].user_name + ']</option>';
-        		}
-        		
-        		$('#users-to-share-with').append(options);
-        	},
-        	error: function() {
-        		alert('Error!');
-        	}
-        });
-        
-        // share
+        // share 
         $('.sc_share_button').click(function() {
+        	
+        	// load list of users 
+            $.ajax({
+                url: "{{tg.url('/users/all')}}",
+                type: 'get',
+                dataType: 'json',
+                success: function(res) {
+                    var users = res.users;
+                    var options = '';
+                    for (var i=0; i<users.length; i++) {
+                        options += '<option value="' + users[i].id +'">' + 
+                            users[i].display_name + ' [' + users[i].user_name + ']</option>';
+                    }
+                    
+                    $('#users-to-share-with').append(options);
+                    
+                    // "#share-dialog" should be loaded here 
+                    // but this way works also 
+                },
+                error: function() {
+                    alert('Error!');
+                }
+            });        	
+        	
             var sc = $(this).parent().parent();
             var sc_id = sc.attr('sc_id');
         
@@ -228,7 +216,7 @@
                 width: 450,
                 modal: true,
                 buttons: {
-                    "Ok": function() {
+                    "{{_('Ok')}}": function() {
                     	
                     	var user_id = $('#users-to-share-with').find('option:selected').val();
                     	
@@ -258,7 +246,7 @@
                             }
                         });
                     },
-                    "Cancel": function() {
+                    "{{_('Cancel')}}": function() {
                     	$('#users-to-share-with').find('option:first').attr('selected', true);
                         $('#share-dialog').dialog('close');
                     }

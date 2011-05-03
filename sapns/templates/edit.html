@@ -1,69 +1,12 @@
 {% extends 'base.html' %}
+{% import 'util.html' as util %}
+
+{% block head %}
+{{super()}}
+<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}"/>
+{% endblock %}
 
 {% block middle %}
-
-{% import 'util.html' as util %}
-{{util.jquery()}}
-{{util.jquery_ui()}}
-
-<style type="text/css">
-    .sp-edit-panel {
-        overflow: auto;
-    }
-    
-    .sp-save-button {
-        position: fixed;
-        right: 350px;
-        width: 80px;
-        height: 30px;
-        text-align: center;
-        background-color: #B4BD3C;
-        border: 1px solid gray;
-    }
-    
-    .sp-edit-field {
-    }
-    
-    .sp-text-field {
-        width: 90%;
-        max-width: 90%;
-        min-width: 90%;
-        margin-left: 1%;
-    }
-    
-    .sp-select-field {
-        width: 85%;
-        margin-left: 1%;
-    }
-    
-    .sp-select-text {
-        width: 90%;
-        border: 1px solid gray;
-    }
-    
-    .sp-select-text:focus {
-        border: 1px solid orange;
-    }
-    
-    .sp-checkbox-field {
-        margin-left: 1%;
-    }
-    
-    .sp-date-field {
-        margin-left: 1%;
-    }
-    
-    .sp-time-field {
-        margin-left: 1%;
-        width: 70px;
-    }
-    
-    .sp-memo-field {
-        min-height: 40px;
-        height: 100px;
-    }
-</style>
-
 <div id="edit-dialog" style="display: none;"></div>
 
 <form id="edit-form" method="post" action="{{tg.url('/save')}}">
@@ -77,23 +20,21 @@
             value="{{_('Save')}}"/>
     </div>
     
-    <div style="font-size: 25px; margin-left: 1%;">
-        {{title}}
-    </div>
+    {# <!-- Title of the object --> #}
+    <div style="font-size: 25px; margin-left: 1%;">{{title}}</div>
 
-    {% if reference %}
+    {%- if reference %}
     <div style="margin-left: 1%; width: 97%; font-size: 15px; color: black; 
         background-color: none;">[{{reference}}]</div>
     {% endif %}
     
-    <div style="height: 10px;">
-    </div>
+    <div style="height: 10px;"></div>
     
     {#{% for rc in related_classes %}
     <div>{{rc.name}}.{{rc.attr_name}}</div>
     {% endfor %}#}
     
-    {% for attr in attributes %}
+    {%- for attr in attributes %}
     <div class="sp-edit-field" 
         {% if attr.required %}
         required="true"
@@ -109,60 +50,71 @@
                 margin-bottom: 2px;">{{attr.title|escape}}</div>
 
         <div>
-        <!-- Boolean -->
-        {% if attr.type == 'Boolean' %}
+        {# <!-- Boolean --> #}
+        {%- if attr.type == 'Boolean' %}
         <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
             {% if attr.value %}checked{% endif %}/>
         
-        <!-- Date -->
-        {% elif attr.type == 'Date' %}
+        {# <!-- Date --> #}
+        {%- elif attr.type == 'Date' %}
         <input class="sp-date-field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>
         
-        <!-- Time -->
-        {% elif attr.type == 'Time' %}
+        {# <!-- Time --> #}
+        {%- elif attr.type == 'Time' %}
         <input class="sp-time-field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>            
         
-        <!-- Memo -->
-        {% elif attr.type == 'String' %}
+        {# <!-- Memo --> #}
+        {%- elif attr.type == 'String' %}
         <textarea class="sp-text-field sp-memo-field" 
             name="{{attr.name}}">{{attr.value|escape}}</textarea>
         
-        <!-- Select -->
-        {% elif attr.related_class != None %}
-          {% if attr.vals == None %}
-          <div class="sp-select-field" name="{{attr.name}}"
-              related_class="{{attr.related_class}}"
-              related_class_title="{{attr.related_class_title}}"
-              value="{{attr.value}}">
-              <input class="sp-select-text" type="text" readonly
-                  value="{{attr.related_title}}" />
-              <input class="sp-button sp-select-button" type="button" value="..."
+        {# <!-- Select --> #}
+        {%- elif attr.related_class != None %}
+          {#{% if attr.vals == None %}#}
+        <div class="sp-select-field" name="{{attr.name}}"
+            related_class="{{attr.related_class}}"
+            related_class_title="{{attr.related_class_title}}"
+            value="{{attr.value}}">
+            
+            {# <!-- Select text --> #}
+            <input class="sp-select-text" type="text" readonly
+                value="{{attr.related_title}}" />
+                
+            {# <!-- Select button --> #}
+            <input class="sp-button sp-select-button" type="button" value="..."
+                title='{{_("Set a value for \"%s\""|format(attr.title))}}' 
                 style="font-weight: bold;"/>
-              <input class="sp-button sp-empty-button" type="button" value="X"
+                
+            {# <!-- Remove button --> #}
+            <input class="sp-button sp-empty-button" type="button" value="X"
+                title='{{_("Remove value of \"%s\""|format(attr.title))}}' 
                 style="font-weight: bold; color: red;"/>
-          </div>
-          {#{% else %}
-          <select class="sp-select-field" name="{{attr.name}}"
-              related_class="{{attr.related_class}}">
-              <option value="null" 
-                  {% if attr.value == None %} selected {% endif %}>{{_('none')}}</option>
-              {% for value in attr.vals %}
-              <option value="{{value.id}}" 
-                  {% if value.id == attr.value %}selected{%endif%}>{{value.title}}</option>
-              {% endfor %}
-          </select>
-          <!--
-          <a href="/list?cls={{attr.related_class}}" target="_blank"
-              title="{{attr.related_class}}">[{{_('list')}}]</a>
-              {% if attr.value %}
-              <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
-                  target="_blank">[{{_('edit')}}]</a>-->
-          #}
-          {% endif %}
-        {% else %}
-        <!-- Everything else -->
+            {#<!--
+            <a href="/list?cls={{attr.related_class}}" target="_blank"
+                title="{{attr.related_class}}">[{{_('list')}}]</a>
+            -->#}              
+        </div>
+        {#
+        {%- else %}
+        <select class="sp-select-field" name="{{attr.name}}"
+            related_class="{{attr.related_class}}">
+            <option value="null" 
+                {% if attr.value == None %} selected {% endif %}>{{_('none')}}</option>
+            {% for value in attr.vals %}
+            <option value="{{value.id}}" 
+                {% if value.id == attr.value %}selected{%endif%}>{{value.title}}</option>
+            {% endfor %}
+        </select>
+        <!--
+            {% if attr.value %}
+            <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
+                target="_blank">[{{_('edit')}}]</a>-->
+        {% endif %}
+        #}
+        {%- else %}
+        {# <!-- Everything else --> #}
         <input class="sp-text-field" type="text" name="{{attr.name}}" 
             value="{{attr.value|escape}}"/>
         {% endif %}
@@ -173,14 +125,19 @@
     </div>
 </div>
 
+{{util.jquery()}}
+{{util.jquery_ui()}}
+
 <script type="text/javascript">
     $(document).ready(function() {
     	
+    	// {# remove value from select-field #} 
     	$('.sp-empty-button').click(function() {
     		$(this).parent().attr('value', '');
     		$(this).parent().find('.sp-select-text').attr('value', '');
     	});
     	
+    	// {# search on select-dialog #} 
     	function click_search (button, related_class, q) {
     		
     		if (q == undefined) {
@@ -194,7 +151,7 @@
                 data: {
                     cls: related_class,
                     q: q,
-                    rp: '100'
+                    rp: '25', // {# maximun number of results in the select dialog #} 
                 },
                 success: function(res) {
                     $('#edit-dialog').html(res);
@@ -207,9 +164,10 @@
                         search_kp(event, $('.sp-search-button'), related_class);
                     }).val(q).focus();
                 },
-                error: function(res) {
+                error: function(f, status, error) {
                     alert('error!');
-                    $('#edit-dialog').dialog('close');
+                    click_search(button, related_class, '');
+                    // {# $('#edit-dialog').dialog('close'); #} 
                 }
             });
     	}
@@ -233,7 +191,7 @@
                 modal: true,
                 buttons: {
                 	"{{_('Ok')}}": function() {
-                		// get the id of the selected row
+                		// {# get the id of the selected row #} 
                         var id_selected = '';
                         $('#edit-dialog .sp-grid .sp-grid-rowid').each(function() {
                             if ($(this).attr('checked') == true) {
@@ -279,7 +237,7 @@
             var params = '';
             var required_attrs = [];
             
-            // text
+            // {# text #} 
             $('.sp-text-field').each(function() {
                 var required = $(this).parent().parent().attr('required');
                 var value = $(this).val();
@@ -294,7 +252,7 @@
                         'value="' + value + '"/>\n';
             });
             
-            // checkbox
+            // {# checkbox #} 
             $('.sp-checkbox-field').each(function() {
                 params += 
                     '<input type="hidden" ' + 
@@ -302,7 +260,7 @@
                         'value="' + $(this).attr('checked') + '"/>\n';
             });
 
-            // date
+            // {# date #} 
             $('.sp-date-field').each(function() {
                 
                 var date_value = $(this).datepicker('getDate');
@@ -330,7 +288,7 @@
                         'value="' + date_value + '"/>\n';
             });
             
-            // select fields
+            // {# select fields #} 
             $('.sp-select-field').each(function() {
                 
                 var required = $(this).parent().parent().attr('required');
@@ -373,8 +331,8 @@
             }
         });
         
-        // create datepickers
-        // with specific date format and options
+        // {# create datepickers 
+        // with specific date format and options #} 
         $('.sp-date-field').datepicker({
             firstDay: {{js_options.first_day}},
             changeMonth: true,

@@ -6,11 +6,13 @@
     {{super()}}
     {{util.jquery()}}
     {{grid_html.js_functions(_)}}    
+    {{grid_html.js_select_row(_)}}
 {% endblock %}
 
 {% block middle %}
     <!-- List of users -->
-    {{grid_html.show(None, _, '', grid, show_ids, link=None, came_from=came_from, with_search=False, with_pager=False)}}
+    {{grid_html.show(None, _, '', grid, show_ids, link=None, came_from=came_from, 
+        with_search=False, with_pager=False)}}
     
     <ul>        
         <li>

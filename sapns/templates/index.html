@@ -1,24 +1,18 @@
 {% extends 'base.html' %}
 {% import 'util.html' as util %}
 
-<!-- Uncomment the next section and override the "html head" block if you want to -->
+{# Head #}
 {% block head %}
     {{ super() }}
     {{util.jquery()}}
     {{util.jquery_ui()}}
 {% endblock %}
 
-<!-- Uncomment the next section and override the "header" block if you want to -->
-<!--
-{% block header %}
-    {{ super() }}
-{% endblock %}
--->
-
-<!-- Uncomment the next section and override the "middle" block if you want to -->
+{# Middle #}
 {% block middle %}
     {{ super() }}
     
+    {#
     <style type="text/css">
         .sc_type {
             border: 1px dotted gray;
@@ -28,9 +22,10 @@
             background-color: white;
         }
     </style>
+    #}
     
     <div><a href="/">{{_('Shortcuts')}}</a></div>
-    <!--<div>-->
+    {#<!--<div>-->#}
     
     <!-- parent shortcut -->
     <div> <!-- style="float: left; width: 400px;"> -->
@@ -105,9 +100,11 @@
         {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %}>[Español]</a>
 {% endblock %}
 
+{#
 <!-- Uncomment the next section and override the "footer" block if you want to -->
 <!-- 
 {% block footer %}
     {{ super() }}
 {% endblock %}
 -->
+#}

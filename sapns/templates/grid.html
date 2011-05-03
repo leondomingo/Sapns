@@ -1,20 +1,29 @@
+{% macro js_select_row(_) %}
+{# This function is in its own macro because the select dialog doesn't need more
+   than just this function #}
+<script type="text/javascript">
+    $(document).ready(function() {
+        
+        // select a row
+        $('.sp-grid-cell').click(function() {
+            
+            if ($(this).attr('clickable') == 'true') {
+                var row_id = $(this).parent().find('.sp-grid-rowid');           
+                if (row_id.attr('checked') == true) {
+                    row_id.attr('checked', false);
+                }
+                else {
+                    row_id.attr('checked', true);
+                }
+            }
+        });
+    });
+</script>
+{% endmacro %}
+
 {% macro js_functions(_) %}
 <script type="text/javascript">
     $(document).ready(function() {
-    	
-    	// select a row
-    	$('.sp-grid-cell').click(function() {
-    		
-    		if ($(this).attr('clickable') == 'true') {
-    			var row_id = $(this).parent().find('.sp-grid-rowid');    		
-    		    if (row_id.attr('checked') == true) {
-    		    	row_id.attr('checked', false);
-    		    }
-    		    else {
-    		    	row_id.attr('checked', true);
-    		    }
-    		}
-    	});
     	
     	// default delete action
     	function delete_action(button, id) {

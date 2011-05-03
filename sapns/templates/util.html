@@ -13,31 +13,38 @@
 {% endmacro %}
 
 {% macro jquery() %}
-<!-- JQuery 1.5.1 -->
-<!--src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"-->
+{# <!-- JQuery 1.5.1 --> #}
+{# <!--src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.1/jquery.min.js"--> #}
 <script type="text/javascript" src="/js/jquery.min.js"></script>
 {% endmacro %}
 
 {% macro jquery_ui() %}
-<!-- JQuery UI -->
+{# <!-- JQuery UI --> #}
 <script type="text/javascript" src="/js/jquery-ui.min.js"></script>
 
-<!-- Uncomment the style you like to be applied or get another at
-     http://jqueryui.com/themeroller/ -->
+{# 
+   Uncomment the style you like to be applied or get another at
+   http://jqueryui.com/themeroller/
+#}
 
-<!-- smoothness -->
+{# <!-- smoothness --> #}
 <link rel="stylesheet" type="text/css" media="screen" 
     href="/css/smoothness/jquery-ui.css"/>
 
-<!-- sunny -->
+{# sunny #}
+{#-
 <!--
 <link rel="stylesheet" type="text/css" media="screen" 
     href="/css/sunny/jquery-ui.css"/>
--->    
-    
-<!-- overcast -->
+-->
+#}    
+  
+{# <!-- overcast --> #}
+{#-
 <!--
 <link rel="stylesheet" type="text/css" media="screen" 
     href="/css/overcast/jquery-ui.css"/>
 -->
+#}
+
 {% endmacro %}
