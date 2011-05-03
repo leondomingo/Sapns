@@ -2,6 +2,16 @@
 <script type="text/javascript">
     $(document).ready(function() {
     	
+    	$('.sp-grid-row').click(function() {
+    		var row_id = $(this).find('.sp-grid-rowid');
+    		if (row_id.attr('checked') == true) {
+    			row_id.attr('checked', false);
+    		}
+    		else {
+    			row_id.attr('checked', true);
+    		}
+    	});
+    	
         function search(button) {
             
             // parent grid of this search
@@ -14,23 +24,23 @@
             var params = 
                 '<input name="rp" type="hidden" value="' + rp + '"/>';
                 
-            $('#' + grid_id + ' .sp_search_form').append(params);
+            $('#' + grid_id + ' .sp-search-form').append(params);
             
             // submit the search
-            $('#' + grid_id + ' .sp_search_form').submit();
+            $('#' + grid_id + ' .sp-search-form').submit();
         }
     	
     	// Link auto-submit with "Search..." button
-    	$('.sp_search_form .sp_search_txt').keypress(function(event) {
+    	$('.sp-search-form .sp-search-txt').keypress(function(event) {
     		// Pressed ENTER (13) in text search box
     		if (event.which == 13) {
     			var grid_id = $(this).parent().parent().attr('id');
-    			search($('#' + grid_id + ' .sp_search_btn'));
+    			search($('#' + grid_id + ' .sp-search-btn'));
     		}
     	});
 
     	// Clicking on search button
-    	$('.sp_search_form .sp_search_btn').click(function() {
+    	$('.sp-search-form .sp-search-btn').click(function() {
     		search($(this));
     	});
     	
@@ -80,7 +90,7 @@
     	// Changing results per page
     	$('.sp-grid-rp').change(function() {
     		var grid_id = $(this).parent().parent().attr('id');
-    		search($('#' + grid_id + ' .sp_search_btn'));
+    		search($('#' + grid_id + ' .sp-search-btn'));
     	});
     });
 </script>
@@ -96,13 +106,13 @@
 <div class="sp-grid-caption">{{grid.caption|escape}}</div>
 {% endif %}
 {% if with_search %}
-<form class="sp_search_form" method="post" action="{{grid.search_url}}">
+<form class="sp-search-form" method="post" action="{{grid.search_url}}">
     <input type="hidden" name="cls" value="{{grid.cls}}"/>
     <input type="hidden" name="caption" value="{{grid.caption}}"/>
     <input type="hidden" name="show_ids" value="{{show_ids}}"/>
     <input type="hidden" name="came_from" value="{{came_from}}"/>
-    <input class="sp_search_txt" name="q" type="text" value="{{q|escape}}"/>
-    <input class="sp-button sp_search_btn" type="button" value="{{_('Search...')}}"/>
+    <input class="sp-search-txt" name="q" type="text" value="{{q|escape}}"/>
+    <input class="sp-button sp-search-btn" type="button" value="{{_('Search...')}}"/>
 </form>
 {% endif %}
 
@@ -113,10 +123,10 @@
 <div style="overflow:auto">
 <table class="sp-grid">
     <tr>
-    <td class="sp_col_title">*</td>
+    <td class="sp-col-title">*</td>
     <!-- Column titles -->
     {% for col in grid.cols %}
-    <td class="sp_col_title" style="width: {{col.width}}px;">{{col.title|escape}}</td>
+    <td class="sp-col-title" style="width: {{col.width}}px;">{{col.title|escape}}</td>
     {% endfor %}
     </tr>
     
@@ -244,7 +254,7 @@
         {% else %}
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% endif %}
-        <input class="sp-button sp-grid_action" type="button" value="{{act.title|escape}}"
+        <input class="sp-button sp-grid-action" type="button" value="{{act.title|escape}}"
             title="{{act.url}}" url="{{act.url}}" 
             require_id="{{act.require_id|lower}}"/>
     </form>

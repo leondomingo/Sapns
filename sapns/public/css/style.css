@@ -310,20 +310,17 @@ clear:both;
 	width: 100px;
 }
 
-.sp_search_form {
-}
-
-.sp_search_txt {
+.sp-search-txt {
 	border: 1px solid gray;
 	width: 450px;
 }
 
-.sp_search_btn {
+.sp-search-btn {
 	float: none;
 	width: 80px;
 }
 
-.sp_col_title {
+.sp-col-title {
 	color: #F9F9F9;
 	background-color: #B4BD3C;
 	font-weight: bold;
