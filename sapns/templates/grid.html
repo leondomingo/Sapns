@@ -35,7 +35,7 @@
     			
     		var error_html =
     			"<p id='delete-error-title'>{{_('Sorry, something went wrong...')}}</p>" +
-    			"<p id='delete-error-message'></p>";
+    			"<div id='delete-error-message'></div>";
     		
     	    $('#grid-dialog').html(delete_html);
     			
@@ -83,14 +83,37 @@
     							else {
     								$('#grid-dialog').dialog('close');
     								
-    								// {# modify dialog to show error message #} 
-    								$('#grid-dialog').html(error_html).find('#delete-error-message').html(res.message);    								
-    								$('#grid-dialog').dialog({
-    									height: 240,
-    									buttons: {"{{_('Close')}}": function() {
-    										$('#grid-dialog').dialog('close');
-    									}}
-    								});
+    								var message = '';
+    								var height = 240;
+    								
+    								if (res.message != '') {
+    								    message = res.message;
+    								}
+    								else {
+    									height += 30;
+    									message = "<p style='font-size: 15px;'>{{_('This object is related with other objects in the following classes:')}}</p>";
+    									message += "<ul>";
+    									for (var i=0; i<res.rel_titles.length; i++) {
+    										var title = res.rel_titles[i].class_title;
+    										var attr_title = res.rel_titles[i].attr_title;
+    										message += '<li><span style="font-weight: bold;">' + title + '</span>' + 
+    										  ' (<span style="color: gray;">' + attr_title + '</span>)</li>';
+    										
+    										height += 10;
+    									}
+    									message += "</ul>";
+    								}
+    								
+    								// {# load message #} 
+    								$('#grid-dialog').html(error_html).find('#delete-error-message').html(message);
+    								
+    								// {# show error dialog #} 
+                                    $('#grid-dialog').dialog({
+                                        height: height,
+                                        buttons: {"{{_('Close')}}": function() {
+                                            $('#grid-dialog').dialog('close');
+                                        }}
+                                    });
     							}
     						},
     						error: function() {

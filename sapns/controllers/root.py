@@ -490,12 +490,39 @@ class RootController(BaseController):
 #            if not q:
 #                # redirect to the question page
 #                return dict(cls=cls, id=id, title=SapnsClass.object_title(cls, id))
+
+            # check objects in other classes that are related with this
+            cls = SapnsClass.by_name(cls)
+            rel_classes = cls.related_classes()
+            rel_titles = []
+            for rcls in rel_classes:
                 
-            # delete record
-            tbl.delete(tbl.c.id == id).execute()
-            DBSession.flush()
+                logger.info('Related class: "%s.%s"' % (rcls['name'], rcls['attr_name']))
+                rtbl = Table(rcls['name'], meta, autoload=True)
+                attr_name = rcls['attr_name']
+                
+                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id))
+                robj = DBSession.execute(sel).fetchone()
+                
+                #logger.info(sel)
+                #logger.info(robj)
+                                
+                if robj != None:
+                    rel_titles.append(dict(class_title=rcls['title'], 
+                                           attr_title=rcls['attr_title']))
+                    
+                else:
+                    logger.info('---No related records have been found')
+                    
+            if rel_titles:
+                return dict(status=False, message='', rel_titles=rel_titles)
             
-            return dict(status=True)
+            else:   
+                # delete record
+                tbl.delete(tbl.c.id == id).execute()
+                DBSession.flush()
+                
+                return dict(status=True)
             
 #            redirect(url('/message',
 #                         dict(message=_('Record was successfully deleted'),

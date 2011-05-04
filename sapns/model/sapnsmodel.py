@@ -542,29 +542,29 @@ class SapnsClass(DeclarativeBase):
         the relationship is built on.
         
         OUT
-          [{"id": <int>, 
-            "name": <unicode>, 
-            "title": <unicode>,
-            "attr_id": <int>, 
-            "attr_name": <unicode>,
+          [{"id":         <int>, 
+            "name":       <unicode>, 
+            "title":      <unicode>,
+            "attr_id":    <int>, 
+            "attr_name":  <unicode>,
             "attr_title": <unicode>}, ...]
         """
         
-        related_classes = []
+        rel_classes = []
         for cls, attr in DBSession.query(SapnsClass, SapnsAttribute).\
                 join((SapnsAttribute, 
                       SapnsAttribute.class_id == SapnsClass.class_id)).\
-                filter(SapnsAttribute.related_class_id == self.class_id):
+                filter(SapnsAttribute.related_class_id == self.class_id).\
+                order_by(SapnsClass.title, SapnsAttribute.insertion_order):
             
             rc = dict(id=cls.class_id, name=cls.name, title=cls.title,
                       attr_id=attr.attribute_id,
                       attr_name=attr.name, attr_title=attr.title)
             
-            related_classes.append(rc)
+            rel_classes.append(rc)
             
-        return related_classes
-                
-                
+        return rel_classes
+
 class SapnsAttribute(DeclarativeBase):
     
     """List of sapns columns in tables"""
