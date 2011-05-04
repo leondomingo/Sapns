@@ -464,31 +464,41 @@ class RootController(BaseController):
                     js_options=js_options, came_from=url(came_from))
     
     @expose('delete.html')
-    def delete(self, cls='', id=None, q=False, came_from='/'):
+    @expose('json')
+    def delete(self, cls='', id=None, came_from='/'):
         
-        # does the record exist?
-        meta = MetaData(DBSession.bind)
-        tbl = Table(cls, meta, autoload=True)
-        
-        this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
-        if not this_record:
-            # record does not exist
-            redirect(url('/message', 
-                         dict(message=_('Record does not exist'),
-                              came_from=came_from)))
-        
-        if not q:
-            # redirect to the question page
-            return dict(cls=cls, id=id, title=SapnsClass.object_title(cls, id))
+        logger = logging.getLogger(__name__ + '/delete')
+        try:
+            # does the record exist?
+            meta = MetaData(DBSession.bind)
+            tbl = Table(cls, meta, autoload=True)
             
-        # delete record
-        tbl.delete(tbl.c.id == id).execute()
+            this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
+            if not this_record:
+                return dict(status=False, message=_('Record does not exist'))
+#                # record does not exist
+#                redirect(url('/message', 
+#                             dict(message=_('Record does not exist'),
+#                                  came_from=came_from)))
+            
+#            if not q:
+#                # redirect to the question page
+#                return dict(cls=cls, id=id, title=SapnsClass.object_title(cls, id))
+                
+            # delete record
+            tbl.delete(tbl.c.id == id).execute()
+            DBSession.flush()
+            
+            return dict(status=True)
+            
+#            redirect(url('/message',
+#                         dict(message=_('Record was successfully deleted'),
+#                              came_from=url(came_from))))
         
-        redirect(url('/message',
-                     dict(message=_('Record was successfully deleted'),
-                          came_from=url(came_from))))
-        
-        redirect(url(came_from))
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, message=str(e))
+            #redirect(url(came_from))
         
     @expose('order/insert.html')
     @require(predicates.has_permission('manage'))
