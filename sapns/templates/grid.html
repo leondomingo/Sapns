@@ -3,10 +3,8 @@
    than just this function #}
 <script type="text/javascript">
     $(document).ready(function() {
-        
-        // select a row
+        // {# select a row #} 
         $('.sp-grid-cell').click(function() {
-            
             if ($(this).attr('clickable') == 'true') {
                 var row_id = $(this).parent().find('.sp-grid-rowid');           
                 if (row_id.attr('checked') == true) {
@@ -32,16 +30,38 @@
     		var url = button.attr('url');
     		
     		var delete_html = 
-    			"<p style='text-align: center; font-size: 20px;'>{{_('Do you really want to delete this record?')}}</p>";
+    			"<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
+    			"<p id='object-title'></p>";
     			
     		var error_html =
-    			"<p style='text-align: left; font-size: 18px; " +
-    			    "color: red; font-weight: bold;'>{{_('Sorry, something went wrong...')}}</p>" +
-    			"<p id='message' style='text-align: justify; font-size: 10px;'></p>";
+    			"<p id='delete-error-title'>{{_('Sorry, something went wrong...')}}</p>" +
+    			"<p id='delete-error-message'></p>";
     		
-    		$('#grid-dialog').html(delete_html).dialog({
+    	    $('#grid-dialog').html(delete_html);
+    			
+    	    // {# get object's title #} 
+    	    var title = '';
+    		$.ajax({
+    			url: "/title",
+    			type: "get",
+    			dataType: "json",
+    			data: {
+    				cls: cls,
+    				id: id,    		
+    			},
+    			success: function(res) {
+    				if (res.status) {
+    					$('#grid-dialog #object-title').html(res.title);
+    				}
+    			},
+    		    error: function() {
+    		    	// {# alert('error!'); #} 
+    		    }
+    		});
+
+    		$('#grid-dialog').dialog({
     			width: 650,
-    			height: 190,
+    			height: 210,
     			resizable: false,
     			modal: true,
     			title: "{{_('Delete')}}",
@@ -61,13 +81,12 @@
       							    $('#grid-dialog').dialog('close');
     							}
     							else {
-    								//$('#grid-dialog').html(error_html);
     								$('#grid-dialog').dialog('close');
     								
     								// {# modify dialog to show error message #} 
-    								$('#grid-dialog').html(error_html).find('#message').html(res.message);    								
+    								$('#grid-dialog').html(error_html).find('#delete-error-message').html(res.message);    								
     								$('#grid-dialog').dialog({
-    									height: 230,
+    									height: 240,
     									buttons: {"{{_('Close')}}": function() {
     										$('#grid-dialog').dialog('close');
     									}}
@@ -75,9 +94,14 @@
     							}
     						},
     						error: function() {
-    							//$('#grid-dialog').html(error_html);
     							$('#grid-dialog').dialog('close');
-    							$('#grid-dialog').html(error_html).dialog();
+    							$('#grid-dialog').html(error_html).dialog({
+    								buttons: {
+    									"{{_('Close')}}": function() {
+    										$('#grid-dialog').dialog('close');
+    									}
+    								}
+    							});
     						},
     					});
     				},
@@ -86,24 +110,6 @@
     				}
     			}
     		});
-    		
-    		// {# load #} 
-    		/*
-            $.ajax({
-                url: url,
-                type: "get",
-                data: {
-                    cls: cls,
-                    id: id
-                },
-                success: function(res) {
-                	$('#grid-dialog').html(res);
-                },
-                error: function() {
-                	$('#grid-dialog').hide();
-                }
-            });
-    		*/
     	}
     	
         function search(button) {

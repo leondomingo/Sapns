@@ -484,3 +484,30 @@ clear:both;
 	font-size: 10px;
 	color: navy;
 }
+
+/* Standard deletion */
+
+#object-title {
+	color: gray; 
+	font-size: 13px;
+	font-style: italic;
+}
+
+#delete-question {
+	text-align: left;
+	font-size: 20px;
+}
+
+#delete-error-title {
+	text-align: left; 
+	font-size: 20px;
+	color: #D62A2A; 
+	font-weight: bold;'
+}
+
+#delete-error-message {
+	text-align: justify;
+	font-size: 12px;
+	padding: 3px;
+	font-family: arial;
+}

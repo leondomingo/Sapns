@@ -211,7 +211,9 @@
                         			id: id_selected
                         		},
                         		success: function(res) {
-                        			field.find('.sp-select-text').val(res.title);
+                        			if (res.status) {
+                        				field.find('.sp-select-text').val(res.title);
+                        			}
                         		},
                         		error: function() {
                         		}

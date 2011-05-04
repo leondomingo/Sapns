@@ -242,8 +242,14 @@ class RootController(BaseController):
     @expose('json')
     @require(predicates.not_anonymous())
     def title(self, cls=None, id=None):
-        title = SapnsClass.object_title(cls, id)
-        return dict(title=title)        
+        logger = logging.getLogger(__name__ + '/title')
+        try:
+            title = SapnsClass.object_title(cls, id)
+            return dict(status=True, title=title)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, message=str(e))        
     
     @expose()
     def setlang(self, lang='en', came_from='/'):
