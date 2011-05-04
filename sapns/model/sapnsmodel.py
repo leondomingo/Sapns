@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-  Modelo de datos básico de sapns 
-"""
+
+"""Sapns basic data model"""
+
 import os
 import sys
 from datetime import datetime
@@ -26,6 +26,7 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
            'SapnsShortcut', 'SapnsUser', 'SapnsView', 'SapnsViewColumn',
            'SapnsViewFilter', 'SapnsViewOrder', 'SapnsViewRelation',
+           'SapnsMessage', 'SapnsMessageTo',
           ]
 
 # inherited class from "User"
@@ -196,7 +197,7 @@ class SapnsUser(User):
         
         n = DBSession.query(SapnsMessageTo).\
                 filter(and_(SapnsMessageTo.user_to_id == self.user_id,
-                            SapnsMessageTo.read == False)).\
+                            SapnsMessageTo.is_read == False)).\
                 count()
                 
         return n
@@ -607,16 +608,20 @@ SapnsClass.attributes = \
 
 class SapnsPrivilege(DeclarativeBase):
     
-    __tablename__ = 'sp_privilege'
+    __tablename__ = 'sp_privileges'
+    __table_args__ = (UniqueConstraint('id_user', 'id_class'), {})
+    
+    privilege_id = Column('id', Integer, primary_key=True, autoincrement=True)
     
     user_id = Column('id_user', Integer, 
-                     ForeignKey('sp_users.id', 
-                                onupdate='CASCADE', ondelete='CASCADE'), 
-                     primary_key=True, nullable=False)
+                     ForeignKey('sp_users.id',
+                                onupdate='CASCADE', ondelete='CASCADE'),
+                     nullable=False)
     
     class_id = Column('id_class', Integer, 
-                      ForeignKey('sp_classes.id', onupdate='CASCADE', ondelete='CASCADE'), 
-                      primary_key=True, nullable=False)
+                      ForeignKey('sp_classes.id', 
+                                 onupdate='CASCADE', ondelete='CASCADE'), 
+                      nullable=False)
     
     @staticmethod
     def has_privilege(id_user, id_class):
@@ -648,17 +653,20 @@ class SapnsPrivilege(DeclarativeBase):
 
 class SapnsAttrPrivilege(DeclarativeBase):
     
-    __tablename__ = 'sp_attr_privilege'
+    __tablename__ = 'sp_attr_privileges'
+    __table_args__ = (UniqueConstraint('id_user', 'id_attribute'), {})
+    
+    attr_privilege_id = Column('id', Integer, primary_key=True, autoincrement=True)
     
     user_id = Column('id_user', Integer, 
                      ForeignKey('sp_users.id', 
                                 onupdate='CASCADE', ondelete='CASCADE'), 
-                     primary_key=True, nullable=False)
+                     nullable=False)
     
     attribute_id = Column('id_attribute', Integer, 
                           ForeignKey('sp_attributes.id',
                                      onupdate='CASCADE', ondelete='CASCADE'), 
-                          primary_key=True, nullable=False)
+                          nullable=False)
     
     access = Column(Unicode(15)) # denied, read-only, read/write
     
@@ -714,10 +722,7 @@ class SapnsAttrPrivilege(DeclarativeBase):
         DBSession.flush()
 
 class SapnsAction(DeclarativeBase):
-    
-    """
-    List of available actions in Sapns
-    """
+    """List of available actions in Sapns"""
     
     __tablename__ = 'sp_actions'
     
@@ -747,10 +752,7 @@ class SapnsAction(DeclarativeBase):
     URL_DELETE = '/delete'
     
 class SapnsView(DeclarativeBase):
-    
-    """
-    Views in Sapns
-    """
+    """Views in Sapns"""
     
     __tablename__ = 'sp_views'
     
@@ -759,7 +761,6 @@ class SapnsView(DeclarativeBase):
     code = Column(Unicode(30), nullable=False)
 
 class SapnsViewColumn(DeclarativeBase):
-    
     """View columns in Sapns"""
     
     __tablename__ = 'sp_view_columns'
@@ -789,15 +790,16 @@ SapnsView.columns = \
              primaryjoin=SapnsView.view_id == SapnsViewColumn.view_id)
     
 class SapnsViewRelation(DeclarativeBase):
-    
     """View joins in Sapns"""
     
     __tablename__ = 'sp_view_relations'
     
     relation_id = Column('id', Integer, autoincrement=True, primary_key=True)
+    
     name = Column(Unicode(30), nullable=False)
     alias = Column(Unicode(100), nullable=False)
     condition = Column(Text)
+    is_inner = Column(Boolean, default=False)
     
     view_id = Column('id_view', Integer, 
                      ForeignKey('sp_views.id',
@@ -810,7 +812,6 @@ SapnsView.relations = \
              primaryjoin=SapnsView.view_id == SapnsViewRelation.view_id)
     
 class SapnsViewFilter(DeclarativeBase):
-    
     """'Where' clauses in Sapns views"""
     
     __tablename__ = 'sp_view_filters'
@@ -831,7 +832,6 @@ SapnsView.filters = \
              primaryjoin=SapnsView.view_id == SapnsViewFilter.view_id)
 
 class SapnsViewOrder(DeclarativeBase):
-    
     """Sort order in Sapns views"""
     
     __tablename__ = 'sp_view_order'
@@ -851,7 +851,6 @@ SapnsView.orders = \
              primaryjoin=SapnsView.view_id == SapnsViewOrder.view_id)
     
 class SapnsReport(DeclarativeBase):
-    
     """Sapns reports (probably in JasperReports, for starters)"""
     
     __tablename__ = 'sp_reports'
@@ -864,7 +863,6 @@ class SapnsReport(DeclarativeBase):
     description = Column(Text)
 
 class SapnsReportParam(DeclarativeBase):
-    
     """Sapns param list: so we know what to request from the user when we launch the report"""
     
     __tablename__ = 'sp_report_parameters' 
@@ -894,6 +892,7 @@ SapnsReport.params = \
              primaryjoin=SapnsReport.report_id == SapnsReportParam.report_id)
     
 class SapnsMessage(DeclarativeBase):
+    """Internal messages between users"""
     
     __tablename__ = 'sp_messages'
     
@@ -910,15 +909,18 @@ class SapnsMessage(DeclarativeBase):
 class SapnsMessageTo(DeclarativeBase):
     
     __tablename__ = 'sp_message_to'
+    __table_args__ = (UniqueConstraint('id_message', 'id_user_to'), {})
+    
+    messageto_id = Column('id', Integer, primary_key=True, autoincrement=True)
     
     message_id = Column('id_message', Integer, 
                         ForeignKey('sp_messages.id',
                                    onupdate='CASCADE', ondelete='CASCADE'),
-                        primary_key=True)
+                        )
     
     user_to_id = Column('id_user_to', Integer,
                         ForeignKey('sp_users.id',
                                    onupdate='CASCADE', ondelete='CASCADE'),
-                        primary_key=True)
+                        )
     
-    read = Column(Boolean, default=False)
+    is_read = Column(Boolean, default=False)
