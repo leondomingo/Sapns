@@ -6,6 +6,7 @@
     {{ super() }}
     {{util.jquery()}}
     {{util.jquery_ui()}}
+    {{util.jquery_jstree()}}
 {% endblock %}
 
 {# Middle #}
@@ -92,6 +93,9 @@
         <span class="sp_messages">{{messages}} messages</span>
     </div>
     </div>
+    
+    <div id="tree-test">
+    </div>
 
     {#{{curr_lang[0]}}#}
     <a href="{{tg.url('/setlang', lang='en')}}" 
@@ -108,3 +112,20 @@
 {% endblock %}
 -->
 #}
+
+<script type="text/javascript">
+    $(document).ready(function(){
+    	$('#tree-test').jstree({
+    		plugins: ['json_data'],
+    		json_data:
+    		{ 
+    		    data : "node_title", 
+    		    // omit `attr` if not needed; the `attr` object gets passed to the jQuery `attr` function
+    		    attr : { id : "node_identificator", some-other-attribute : "attribute_value" }, 
+    		    // `state` and `children` are only used for NON-leaf nodes
+    		    state: "closed", // or "open", defaults to "closed"
+    		    children: [ /* an array of child nodes objects */ ]
+    		}    			
+    	});
+    });
+</script>
