@@ -474,7 +474,15 @@ class RootController(BaseController):
     def delete(self, cls='', id=None, came_from='/'):
         
         logger = logging.getLogger(__name__ + '/delete')
+        rel_tables = []
         try:
+            user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+            
+            # check privilege on this class
+            if not user.has_privilege(cls):
+                return dict(status=False,
+                            message=_('Sorry, you do not have privilege on this class'))
+            
             # does the record exist?
             meta = MetaData(DBSession.bind)
             tbl = Table(cls, meta, autoload=True)
@@ -482,19 +490,10 @@ class RootController(BaseController):
             this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
             if not this_record:
                 return dict(status=False, message=_('Record does not exist'))
-#                # record does not exist
-#                redirect(url('/message', 
-#                             dict(message=_('Record does not exist'),
-#                                  came_from=came_from)))
-            
-#            if not q:
-#                # redirect to the question page
-#                return dict(cls=cls, id=id, title=SapnsClass.object_title(cls, id))
 
-            # check objects in other classes that are related with this
+            # look for objects in other classes that are related with this
             cls = SapnsClass.by_name(cls)
             rel_classes = cls.related_classes()
-            rel_titles = []
             for rcls in rel_classes:
                 
                 logger.info('Related class: "%s.%s"' % (rcls['name'], rcls['attr_name']))
@@ -504,34 +503,23 @@ class RootController(BaseController):
                 sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id))
                 robj = DBSession.execute(sel).fetchone()
                 
-                #logger.info(sel)
-                #logger.info(robj)
-                                
                 if robj != None:
-                    rel_titles.append(dict(class_title=rcls['title'], 
+                    rel_tables.append(dict(class_title=rcls['title'],
                                            attr_title=rcls['attr_title']))
                     
                 else:
-                    logger.info('---No related records have been found')
+                    logger.info('---No related objects have been found')
                     
-            if rel_titles:
-                return dict(status=False, message='', rel_titles=rel_titles)
+            # delete record
+            tbl.delete(tbl.c.id == id).execute()
+            DBSession.flush()
             
-            else:   
-                # delete record
-                tbl.delete(tbl.c.id == id).execute()
-                DBSession.flush()
-                
-                return dict(status=True)
+            # success!
+            return dict(status=True)
             
-#            redirect(url('/message',
-#                         dict(message=_('Record was successfully deleted'),
-#                              came_from=url(came_from))))
-        
         except Exception, e:
             logger.error(e)
-            return dict(status=False, message=str(e))
-            #redirect(url(came_from))
+            return dict(status=False, message=str(e), rel_tables=rel_tables)
         
     @expose('order/insert.html')
     @require(predicates.has_permission('manage'))

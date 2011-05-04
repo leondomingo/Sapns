@@ -34,7 +34,7 @@
     			"<p id='object-title'></p>";
     			
     		var error_html =
-    			"<p id='delete-error-title'>{{_('Sorry, something went wrong...')}}</p>" +
+    			"<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
     			"<div id='delete-error-message'></div>";
     		
     	    $('#grid-dialog').html(delete_html);
@@ -83,24 +83,28 @@
     							else {
     								$('#grid-dialog').dialog('close');
     								
-    								var message = '';
-    								var height = 240;
+    								var message = "<p style='color: gray;'>" + res.message + "</p>";
+    								/*var height = 275;
+    								var MAX_HEIGHT = 250;*/
     								
-    								if (res.message != '') {
-    								    message = res.message;
-    								}
-    								else {
-    									height += 30;
-    									message = "<p style='font-size: 15px;'>{{_('This object is related with other objects in the following classes:')}}</p>";
+    							    if (res.rel_tables != undefined && res.rel_tables.length > 0) {
+    									//height += 35;
+    									message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
     									message += "<ul>";
-    									for (var i=0; i<res.rel_titles.length; i++) {
-    										var title = res.rel_titles[i].class_title;
-    										var attr_title = res.rel_titles[i].attr_title;
+    									
+    									for (var i=0; i<res.rel_tables.length; i++) {
+    										var title = res.rel_tables[i].class_title;
+    										var attr_title = res.rel_tables[i].attr_title;
     										message += '<li><span style="font-weight: bold;">' + title + '</span>' + 
     										  ' (<span style="color: gray;">' + attr_title + '</span>)</li>';
     										
-    										height += 10;
+    										//height += 13;
     									}
+    									
+    									/*if (height > MAX_HEIGHT) {
+    										height = MAX_HEIGHT;
+    									}*/
+    									
     									message += "</ul>";
     								}
     								
@@ -109,7 +113,8 @@
     								
     								// {# show error dialog #} 
                                     $('#grid-dialog').dialog({
-                                        height: height,
+                                    	width: 700,
+                                        height: 250,
                                         buttons: {"{{_('Close')}}": function() {
                                             $('#grid-dialog').dialog('close');
                                         }}

@@ -507,8 +507,7 @@ clear:both;
 
 #delete-error-message {
 	text-align: justify;
-	font-size: 12px;
-	padding: 3px;
+	font-size: 15px;
 	font-family: arial;
-	/*background-color: yellow;*/
+	padding: 3px;
 }
