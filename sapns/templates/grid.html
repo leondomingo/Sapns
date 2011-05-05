@@ -84,11 +84,8 @@
     								$('#grid-dialog').dialog('close');
     								
     								var message = "<p style='color: gray;'>" + res.message + "</p>";
-    								/*var height = 275;
-    								var MAX_HEIGHT = 250;*/
-    								
-    							    if (res.rel_tables != undefined && res.rel_tables.length > 0) {
-    									//height += 35;
+
+    								if (res.rel_tables != undefined && res.rel_tables.length > 0) {
     									message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
     									message += "<ul>";
     									
@@ -97,13 +94,7 @@
     										var attr_title = res.rel_tables[i].attr_title;
     										message += '<li><span style="font-weight: bold;">' + title + '</span>' + 
     										  ' (<span style="color: gray;">' + attr_title + '</span>)</li>';
-    										
-    										//height += 13;
     									}
-    									
-    									/*if (height > MAX_HEIGHT) {
-    										height = MAX_HEIGHT;
-    									}*/
     									
     									message += "</ul>";
     								}
@@ -142,32 +133,32 @@
     	
         function search(button) {
         	
-            // parent grid of this search
+            // {# parent grid of this search #} 
             var grid_id = button.parent().parent().attr('id');
 
-            // results per page
+            // {# results per page #} 
             var rp = $('#' + grid_id + ' .sp-grid-rp').val();
             
-            // Add params to the form
+            // {# Add params to the form #} 
             var params = 
                 '<input name="rp" type="hidden" value="' + rp + '"/>';
                 
             $('#' + grid_id + ' .sp-search-form').append(params);
             
-            // submit the search
+            // {# submit the search #} 
             $('#' + grid_id + ' .sp-search-form').submit();
         }
     	
-    	// Link auto-submit with "Search..." button
+    	// {# Link auto-submit with "Search..." button #} 
     	$('.sp-search-form .sp-search-txt').keypress(function(event) {
-    		// Pressed ENTER (13) in text search box
+    		// {# Pressed ENTER (13) in text search box #} 
     		if (event.which == 13) {
     			var grid_id = $(this).parent().parent().attr('id');
     			search($('#' + grid_id + ' .sp-search-btn'));
     		}
     	});
 
-    	// Clicking on search button
+    	// {# Clicking on search button #} 
     	$('.sp-search-form .sp-search-btn').click(function() {
     		search($(this));
     	});
@@ -198,7 +189,6 @@
         				'<input type="hidden" name="id" value="' + id_selected + '"/>';
         				
         			if($(this).attr('action-type') == 'delete') {
-        				//alert('hola!');
         				delete_action($(this), selected_row, id_selected);
         			}
         			else {
@@ -260,14 +250,14 @@
 <div style="overflow:auto">
 <table class="sp-grid">
     <tr>
-    <td class="sp-col-title">*</td>
-    <!-- Column titles -->
+    <td class="sp-col-title">#</td>
+    {# <!-- Column titles --> #}
     {% for col in grid.cols %}
     <td class="sp-col-title" style="width: {{col.width}}px;">{{col.title|escape}}</td>
     {% endfor %}
     </tr>
     
-    <!-- Data rows -->
+    {# <!-- Data rows --> #}
     {% for row in grid.data %}
         <!-- Fill in grid -->
         <tr class="sp-grid-row">
@@ -279,7 +269,7 @@
             title="{{grid.cols[loop.index0].title}}"
             {% if can_edit and loop.index0 == 0 %}
             clickable="false">
-            <a href="/edit?cls={{grid.cls}}&id={{cell}}">{{cell|escape}}</a>
+            <a href="/edit?cls={{grid.cls}}&id={{cell}}" target="_blank">{{cell|escape}}</a>
             {% else %}
             clickable="true">
             {{cell|escape}}
@@ -288,7 +278,7 @@
         {% endfor %}
         </tr>
     {% else %}
-        <!-- No results -->
+        {# <!-- No results --> #}
         <tr class="sp-grid-row" style="width: 100%;">
             <td class="sp-grid-cell sp-grid-noresults" 
                 colspan="{{grid.cols|length + 1}}">{{_('No results')}}</td>
@@ -299,22 +289,20 @@
 </div>
 
 {% if with_pager %}
-<!-- Grid pager -->
+{# <!-- Grid pager --> #}
 <div class="sp-grid-pager">
-    <!-- <div> -->
-      <div class="sp-grid-pager-desc">
+    <div class="sp-grid-pager-desc">
         {{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, 
             total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.totalp)}}
-      </div>
-      <select class="sp-button sp-grid-rp">
-          <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
-          <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
-          <option value="100" {% if grid.rp == 100 %}selected{% endif %}>100</option>
-          <option value="0"   {% if grid.rp == 0 %}selected{% endif %}>{{_('All')}}</option>
-      </select>
-    <!-- </div> -->
-
-    <!-- First page -->
+    </div>
+    <select class="sp-button sp-grid-rp">
+        <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
+        <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if grid.rp == 100 %}selected{% endif %}>100</option>
+        <option value="0"   {% if grid.rp == 0 %}selected{% endif %}>{{_('All')}}</option>
+    </select>
+    
+    {# <!-- First page --> #}
     <form method="post" action="{{grid.search_url}}">
         <input type="hidden" name="cls" value="{{grid.cls}}"/>
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
@@ -365,7 +353,7 @@
         {% endif %}
     </form>
 
-    <!-- Last page -->    
+    {# <!-- Last page --> #}    
     <form method="post" action="{{grid.search_url}}">
         <input type="hidden" name="cls" value="{{grid.cls}}"/>
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
@@ -381,7 +369,7 @@
 {% endif %}
 
 {% if with_actions and grid.actions %}
-<!-- Grid actions -->
+{# <!-- Grid actions --> #}
 <div class="sp-grid-actions">
     <div class="sp-grid-actions-title">Actions:</div>
     {% for act in grid.actions %}
