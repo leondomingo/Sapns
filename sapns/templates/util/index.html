@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% import 'util.html' as util %}
+{% import 'dashboard/util.html' as util %}
 
 <!-- Uncomment the next section and override the "html_head" block if you want to -->
 <!-- 
@@ -21,15 +21,17 @@
     
     <ul>
     <li>
-        <a href="{{tg.url('/util/extract_model')}}">{{_('Extract model')}}</a>
+        <a href="{{tg.url('/dashboard/util/extract_model')}}">{{_('Extract model')}}</a>
     </li>
 
     <li>
-        <a href="{{tg.url('/util/code_model', app_name=tg.config.get('app.name', 'Sapns'))}}">{{_('Code model')}}</a>
+        <a href="{{tg.url('/dashboard/util/code_model', params=dict(
+            app_name=tg.config.get('app.name', 'Sapns')))}}">{{_('Code model')}}</a>
     </li>
     
     <li>
-        <a href="{{tg.url('/util/update_metadata', came_from=tg.url('/util'))}}">
+        <a href="{{tg.url('/dashboard/util/update_metadata', params=dict(
+            came_from=tg.url('/util')))}}">
         {{_('Update meta-data')}}
         </a>
     </li>

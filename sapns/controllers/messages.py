@@ -28,4 +28,4 @@ class MessagesController(BaseController):
         user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
         messages = user.get_messages()
         
-        return dict(page='messages', came_from='/', messages=messages)
+        return dict(page='messages', came_from='/dashboard', messages=messages)

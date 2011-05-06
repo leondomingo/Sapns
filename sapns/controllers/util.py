@@ -43,7 +43,7 @@ class UtilController(BaseController):
         return dict(page='util', came_from=came_from)
     
     @expose('message.html')
-    def create_dashboards(self, came_from='/util'):
+    def create_dashboards(self, came_from='/dashboard/util'):
         
         logger = logging.getLogger(__name__ + '/create_dashboards')
         
@@ -182,7 +182,7 @@ class UtilController(BaseController):
                     came_from=url(came_from))
     
     @expose('message.html')
-    def update_metadata(self, came_from='/util'):
+    def update_metadata(self, came_from='/dashboard/util'):
         
         logger = logging.getLogger(__name__ + '/update_metadata')
         
@@ -406,5 +406,5 @@ class UtilController(BaseController):
                     
                 tables.append(t)
                 
-        return dict(page='extract_model', came_from=url('/util'), 
+        return dict(page='extract_model', came_from=url('/dashboard/util'), 
                     tables=tables)

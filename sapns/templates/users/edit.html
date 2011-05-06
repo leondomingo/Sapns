@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% import 'util.html' as util %}
+{% import 'dashboard/util.html' as util %}
 
 {% block head %}
 {{super()}}
@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block middle %}
-<form method="post" action="/users/user_save">
+<form method="post" action="/dashboard/users/save">
 <input type="hidden" name="id" value="{{user.user_id}}"/>
 <div>
     <div>
@@ -53,7 +53,7 @@
     	$('.sp-text-field:first').focus();
     	
     	$.ajax({
-    		url: "{{tg.url('/users/all')}}",
+    		url: "{{tg.url('/dashboard/users/all')}}",
     		type: "get",
     		dataType: "json",
     		success: function(res) {

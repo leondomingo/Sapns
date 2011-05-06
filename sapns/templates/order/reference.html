@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block middle %}
-    {% import 'util.html' as util %}
+    {% import 'dashboard/util.html' as util %}
     {{util.jquery()}}
     {{util.jquery_ui()}}
   
@@ -128,7 +128,7 @@
             type="button" value="{{_('Save')}}"/>
     </div>
     
-    <form id="form_ref_order" method="post" action="{{tg.url('/ref_order_save')}}">
+    <form id="form_ref_order" method="post" action="{{tg.url('/dashboard/ref_order_save')}}">
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         <input type="hidden" name="attributes" value=""/>
     </form>

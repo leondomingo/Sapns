@@ -1,9 +1,9 @@
 {% extends 'base.html' %}
-{% import 'util.html' as util %}
+{% import 'dashboard/util.html' as util %}
 
 {# Head #}
 {% block head %}
-    {{ super() }}
+    {{super()}}
     {{util.jquery()}}
     {{util.jquery_ui()}}
     {{util.jquery_jstree()}}
@@ -11,97 +11,21 @@
 
 {# Middle #}
 {% block middle %}
-    {{ super() }}
-    
-    {#
-    <style type="text/css">
-        .sc_type {
-            border: 1px dotted gray;
-            margin-left: 5px;
-            margin-right: 5px;
-            float: left;
-            background-color: white;
-        }
-    </style>
-    #}
-    
-    <div><a href="/" style="font-size: 20px;">&lt;{{_('Dashboard')}}&gt;</a></div>
-    {#<!--<div>-->#}
-    
-    <!-- parent shortcut -->
-    <div> <!-- style="float: left; width: 400px;"> -->
-    {% if sc_parent %}
-    <a href="{{tg.url('/', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
-    {% else %}
-    <a href="">[  ]</a>
-    {% endif %}
-    </div>
-    
-    {#
-    <!-- shortcut actions -->
-    <!--
-    <div style="">
-        <select id="shortcut_actions">
-            <option value="">{{_('(action)')}}</option> 
-            <option value="edit">{{_('Edit')}}</option>
-            <option value="delete">{{_('Delete')}}</option>
-            <option value="send-to">{{_('Send to dashboard')}}</option>
-            <option value="share">{{_('Share')}}</option>
-        </select>
-    </div>
-    </div>
-    -->
-    #}
-    
-    {#
-    <!--
-    <div>
-        <a class="sc_type" href="{{tg.url('/', sc_type='list')}}">List</a>
-        <a class="sc_type" href="{{tg.url('/', sc_type='bigicon')}}">Big icon</a>
-        <a class="sc_type" style="float: none;" 
-            href="{{tg.url('/', sc_type='smallicon')}}">Small icon</a>
-    </div>
-    -->
-    #}
-    
-    <div style="border: 1px solid white; height: 300px; overflow: auto;">
-    {% if sc_type == 'list' %}
-        {% include 'shortcuts/list.html' %}
-    {% elif sc_type == 'bigicon' %}
-        {% include 'shortcuts/bigicon.html' %}
-    {% endif %}
-    
+    {{super()}}
+    <div style="height: 550px; background-color: white; padding: 10px;">
+    <h1 style="color: #B4BD3C;">{{_('Welcome to Sapns!')}}</h1>
+    <p>{{_('You can start ')}}<a href="/dashboard">{{_('here')}}</a>.</p>
+    <p>{{_('username: ')}}<span style="font-weight: bold; font-style: italic;">manager</span><br>
+    {{('password: ')}}<span style="font-weight: bold; font-style: italic;">manager</span></p>
     </div>
     
     <div>
-    <div class="sp_shortcut">
-        <a href="{{tg.url('/util', came_from='/')}}">{{_('Utilities')}}</a>
+    <div style="float: left;">
+    <a href="{{tg.url('/setlang', params=dict(lang='en'))}}" 
+        {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %}>[English]</a></div>    
+    <div><a href="{{tg.url('/setlang', params=dict(lang='es'))}}"
+        {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %}>[Español]</a></div>
     </div>
-    
-    <div class="sp_shortcut">
-        <a href="{{tg.url('/views', came_from='/')}}">{{_('Views')}}</a>
-    </div>
-    
-    <div class="sp_shortcut">
-        <a href="{{tg.url('/users', came_from='/')}}">{{_('Users')}}</a>
-    </div>
-    
-    <div class="sp_shortcut">
-        <a href="/messages">{{_('Messages')}}</a>
-        <span class="sp_messages" 
-            style="{% if unread > 0 %} font-weight: bold; {% endif %}">{{unread}} / </span>
-        <span class="sp_messages">{{messages}} messages</span>
-    </div>
-    </div>
-    
-    <div id="tree-test">
-    </div>
-
-    {#{{curr_lang[0]}}#}
-    <a href="{{tg.url('/setlang', lang='en')}}" 
-        {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %}>[English]</a>    
-    <a href="{{tg.url('/setlang', lang='es')}}"
-        {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %}>[Español]</a>
 {% endblock %}
 
 {#
@@ -112,20 +36,3 @@
 {% endblock %}
 -->
 #}
-
-<script type="text/javascript">
-    $(document).ready(function(){
-    	$('#tree-test').jstree({
-    		plugins: ['json_data'],
-    		json_data:
-    		{ 
-    		    data : "node_title", 
-    		    // omit `attr` if not needed; the `attr` object gets passed to the jQuery `attr` function
-    		    attr : { id : "node_identificator", some-other-attribute : "attribute_value" }, 
-    		    // `state` and `children` are only used for NON-leaf nodes
-    		    state: "closed", // or "open", defaults to "closed"
-    		    children: [ /* an array of child nodes objects */ ]
-    		}    			
-    	});
-    });
-</script>

@@ -8,7 +8,8 @@
 {% block middle %}
     <div>
         <a style="font-size: 9px;" 
-            href="{{tg.url('/util/code_model', file_name=tg.config.get('app.name', 'Sapns')+'.model.py.txt')}}">
+            href="{{tg.url('/dashboard/util/code_model', params=dict(
+                file_name=tg.config.get('app.name', 'Sapns')+'.model.py.txt'))}}">
             [{{_('Source of this model')}}]
         </a>
     </div>
@@ -44,7 +45,8 @@
     
     <div>
         <a style="font-size: 9px;" 
-            href="{{tg.url('/util/code_model', file_name=tg.config.get('app.name', 'Sapns')+'.model.py.txt')}}">
+            href="{{tg.url('/dashboard/util/code_model', params=dict(
+                file_name=tg.config.get('app.name', 'Sapns')+'.model.py.txt'))}}">
             [{{_('Source of this model')}}]
         </a>
     </div>
