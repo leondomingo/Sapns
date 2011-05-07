@@ -1,38 +1,60 @@
-{% extends 'base.html' %}
-{% import 'dashboard/util.html' as util %}
-
-{# Head #}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
 {% block head %}
-    {{super()}}
-    {{util.jquery()}}
-    {{util.jquery_ui()}}
-    {{util.jquery_jstree()}}
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>{{tg.config.get('app.name', 'Sapns')}} - 
+    {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
 {% endblock %}
-
-{# Middle #}
-{% block middle %}
-    {{super()}}
-    <div style="height: 550px; background-color: white; padding: 10px;">
-    <h1 style="color: #B4BD3C;">{{_('Welcome to Sapns!')}}</h1>
-    <p>{{_('You can start ')}}<a href="/dashboard">{{_('here')}}</a>.</p>
-    <p>{{_('username: ')}}<span style="font-weight: bold; font-style: italic;">manager</span><br>
-    {{('password: ')}}<span style="font-weight: bold; font-style: italic;">manager</span></p>
+<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
+</head>
+<body>
+    <div style="height: 60px;"></div>
+    
+    <style type="text/css">
+        .sapns-color {
+            color: #B4BD3C;
+        }
+        
+        .sapns-name {
+            color: #B4BD3C;
+            font-weight: bold;
+        }
+    </style>
+    
+    <div style="height: 550px; background-color: white; padding: 20px; font-size: 15px; text-align: justify;">
+    <h1 class="sapns-color">Welcome to Sapns!</h1>
+    <p><span class="sapns-name">Sapns</span> is an open source project that pretends
+    to be a <span style="font-style: italic;">one-size, fits-all</span> system for management web apps. Regardless the
+    application you want to build, <span class="sapns-name">Sapns</span> will help you in that task with a set of tools,
+    so you can manage data (and more) from the very first moment.</p>
+    
+    <p>You can start <a href="/dashboard">here</a> with following login data:</p>
+    <p style="margin-left: 20px;">username: <span style="font-weight: bold; font-style: italic;">manager</span><br>
+    password: <span style="font-weight: bold; font-style: italic;">manager</span></p>
+    
+    <p>If you want to read more about <span class="sapns-name">Sapns</span> 
+    project, please go <a href="http://www.sapns.org" target="_blank">here</a>.</p>
+    
+    <br><br><br><br><br><br><br><br><br><br>
+    
+    <p>Enjoy the experience!</p>
+    <p style="font-size: 14px; color: gray;"><span class="sapns-name">Sapns</span> team</p>
     </div>
     
-    <div>
+    <div style="height: 20px; background-color: #B4BD3C; padding-top: 5px;">
+    <div style="float: left; margin-left: 10px;margin-right: 5px;"> 
+        <a href="{{tg.url('/setlang', params=dict(lang='en'))}}">
+            <img {% if curr_lang[0] == 'en' %} src="{{tg.url('/images/flags/uk.jpg')}}"
+            {% else %} src="/images/flags/uk-disabled.jpg" {% endif %};
+            title="english"/>
+            </a></div>    
     <div style="float: left;">
-    <a href="{{tg.url('/setlang', params=dict(lang='en'))}}" 
-        {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %}>[English]</a></div>    
-    <div><a href="{{tg.url('/setlang', params=dict(lang='es'))}}"
-        {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %}>[Español]</a></div>
+        <a href="{{tg.url('/setlang', params=dict(lang='es'))}}">
+            <img {% if curr_lang[0] == 'es' %} src="{{tg.url('/images/flags/spain.jpg')}}"
+            {% else %} src="/images/flags/spain-disabled.jpg" {% endif %};
+            title="español"/>
+            </a></div>
     </div>
-{% endblock %}
-
-{#
-<!-- Uncomment the next section and override the "footer" block if you want to -->
-<!-- 
-{% block footer %}
-    {{ super() }}
-{% endblock %}
--->
-#}
+</body>
+</html>

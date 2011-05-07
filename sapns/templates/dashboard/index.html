@@ -14,7 +14,7 @@
     {{super()}}
     
     {#
-    <style type="text/css">
+    <!--<style type="text/css">
         .sc_type {
             border: 1px dotted gray;
             margin-left: 5px;
@@ -22,19 +22,21 @@
             float: left;
             background-color: white;
         }
-    </style>
+    </style>-->
     #}
     
-    <div><a href="/dashboard" style="font-size: 20px;">&lt;{{_('Dashboard')}}&gt;</a></div>
+    <div style="height: 30px; margin-top: 10px; margin-left: 20px; font-size: 20px;">
+        <a href="/dashboard">{{_('Dashboard')}}</a>
+    </div>
     {#<!--<div>-->#}
     
     <!-- parent shortcut -->
-    <div> <!-- style="float: left; width: 400px;"> -->
-    {% if sc_parent %}
-    <a href="{{tg.url('/dashboard', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
-    {% else %}
-    <a href="">[  ]</a>
-    {% endif %}
+    <div style="margin-left: 20px;"> <!-- style="float: left; width: 400px;"> -->
+        {% if sc_parent %}
+        <a href="{{tg.url('/dashboard', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
+        {% else %}
+        <a href="">[  ]</a>
+        {% endif %}
     </div>
     
     {#
@@ -101,10 +103,14 @@
     </div>
 
     {#{{curr_lang[0]}}#}
+    {#
+    <!--
     <a href="{{tg.url('/setlang', lang='en')}}" 
         {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %}>[English]</a>    
     <a href="{{tg.url('/setlang', lang='es')}}"
         {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %}>[Español]</a>
+    -->
+    #}
 {% endblock %}
 
 {#

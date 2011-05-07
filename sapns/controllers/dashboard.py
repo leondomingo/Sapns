@@ -68,7 +68,7 @@ class DashboardController(BaseController):
         messages = user.messages()
         unread = user.unread_messages()
         
-        return dict(page=None, curr_lang=curr_lang, shortcuts=shortcuts,
+        return dict(page='dashboard', curr_lang=curr_lang, shortcuts=shortcuts,
                     messages=messages, unread=unread, 
                     sc_type=sc_type, sc_parent=sc_parent)
         

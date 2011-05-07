@@ -747,9 +747,9 @@ class SapnsAction(DeclarativeBase):
     TYPE_GROUP = 'group'
     
     # default URL
-    URL_NEW = '/new'
-    URL_EDIT = '/edit'
-    URL_DELETE = '/delete'
+    URL_NEW = '/dashboard/new'
+    URL_EDIT = '/dashboard/edit'
+    URL_DELETE = '/dashboard/delete'
     
 class SapnsView(DeclarativeBase):
     """Views in Sapns"""
