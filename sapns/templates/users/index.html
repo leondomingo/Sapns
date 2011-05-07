@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
-{% import 'util.html' as util %}
-{% import 'grid.html' as grid_html %}
+{% import 'dashboard/util.html' as util %}
+{% import 'dashboard/grid.html' as grid_html %}
 
 {% block head %}
     {{super()}}
@@ -16,11 +16,13 @@
     
     <ul>        
         <li>
-            <a href="{{tg.url('/users/permission', came_from=tg.url('/users'))}}">{{_('Permission')}}</a>
+            <a href="{{tg.url('/dashoard/users/permission', 
+                params=dict(came_from=tg.url('/users')))}}">{{_('Permission')}}</a>
         </li>
         
         <li>
-            <a href="{{tg.url('/users/roles', came_from=tg.url('/users'))}}">{{_('Roles')}}</a>
+            <a href="{{tg.url('/dashboard/users/roles', 
+                params=dict(came_from=tg.url('/users')))}}">{{_('Roles')}}</a>
         </li>
     </ul>
 {% endblock %}

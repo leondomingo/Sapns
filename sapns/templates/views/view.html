@@ -1,12 +1,11 @@
 {% extends 'base.html' %}
-{% import 'util.html' as util %}
+{% import 'dashboard/util.html' as util %}
 
 {% block head %}
     {{super()}}
     <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/views.css')}}"/>
     {{util.jquery()}}
     {{util.jquery_ui()}}
-    {# <!-- <script type="text/javascript" src="{{tg.url('/js/views.js')}}"></script>--> #}
     <script type="text/javascript">
     {% include 'views/views.js' %}
     </script>
@@ -14,7 +13,7 @@
 
 {% block middle %}
 <div id="views-dialog" style="display: none;"></div>
-<form id="form_view" method="post" action="/views/save">
+<form id="form_view" method="post" action="/dashboard/views/save">
     <input type="hidden" name="id" value="{{view.id}}"/>
     <input type="hidden" name="title"/>
     <input type="hidden" name="code"/>    

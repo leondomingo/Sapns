@@ -31,7 +31,8 @@
     {% if sc.action_type %}
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url('/list', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
+            <a href="{{tg.url('/dashboard/list', params=dict(
+                cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
                 {{sc.title}}</a>
         </div>
         
@@ -39,14 +40,16 @@
         
         {# <!-- insertion order --> #}
         <div class="sp-shortcut-ins-order">
-            <a href="{{tg.url('/ins_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
+            <a href="{{tg.url('/dashboard/ins_order', params=dict(
+                cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
                 {{_('Insertion order')}}
             </a>
         </div>
         
         {# <!-- reference order --> #}
         <div class="sp-shortcut-ref-order">
-            <a href="{{tg.url('/ref_order', cls=sc.cls, came_from='/?sc_parent=%d' % sc.parent)}}">
+            <a href="{{tg.url('/dashboard/ref_order', params=dict(
+                cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
                 {{_('Reference order')}}
             </a>
         </div>
@@ -58,7 +61,7 @@
     {% else %}
         {# <!-- This is a group --> #}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url('/', sc_parent=sc.id)}}">&lt;{{sc.title}}&gt;</a>
+            <a href="{{tg.url('/dashboard', params=dict(sc_parent=sc.id))}}">&lt;{{sc.title}}&gt;</a>
         </div>
         
         <div class="sp-shortcut-ins-order" style="color: gray;">*</div>
@@ -68,9 +71,9 @@
     
         {# <!-- Edit --> #}
         <div style="float: left;">
-            <form method="post" action="/sc/edit">
+            <form method="post" action="/dashboard/sc/edit">
             <input type="hidden" name="id" value="{{sc.id}}"/>
-            <input type="hidden" name="came_from" value="{{'/?sc_parent=%d' % sc.parent}}"/>
+            <input type="hidden" name="came_from" value="{{'/dashboard/?sc_parent=%d' % sc.parent}}"/>
             <input class="sp-button" style="width: 50px; float: left;"
                 title="{{_('Edit this shortcut')}}" 
                 type="submit" value="{{_('Edit')}}"/>
@@ -126,7 +129,7 @@
                 buttons: {
                     "{{_('Ok')}}": function() {
                         $.ajax({
-                            url: "{{tg.url('/sc/delete')}}",
+                            url: "{{tg.url('/dashboard/sc/delete')}}",
                             type: 'post',
                             dataType: 'json',
                             data: {
@@ -165,7 +168,7 @@
                 buttons: {
                     "{{_('Ok')}}": function() { 
                         $.ajax({
-                            url: "{{tg.url('/sc/bookmark')}}",
+                            url: "{{tg.url('/dashboard/sc/bookmark')}}",
                             type: 'post',
                             dataType: 'json',
                             data: {
@@ -199,7 +202,7 @@
         	
         	// {# load list of users #} 
             $.ajax({
-                url: "{{tg.url('/users/all')}}",
+                url: "{{tg.url('/dashboard/users/all')}}",
                 type: 'get',
                 dataType: 'json',
                 success: function(res) {
@@ -237,7 +240,7 @@
                     	var user_id = $('#users-to-share-with').find('option:selected').val();
                     	
                         $.ajax({
-                            url: "{{tg.url('/sc/share')}}",
+                            url: "{{tg.url('/dashboard/sc/share')}}",
                             type: 'post',
                             dataType: 'json',
                             data: {

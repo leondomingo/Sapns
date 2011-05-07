@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% import 'util.html' as util %}
+{% import 'dashboard/util.html' as util %}
 
 {% block head %}
 {{super()}}
@@ -9,7 +9,7 @@
 {% block middle %}
 <div id="edit-dialog" style="display: none;"></div>
 
-<form id="edit-form" method="post" action="{{tg.url('/save')}}">
+<form id="edit-form" method="post" action="{{tg.url('/dashboard/save')}}">
     <input type="hidden" name="cls" value="{{cls}}"/> 
     <input type="hidden" name="id" value="{{id}}"/>
 </form>
@@ -109,7 +109,7 @@
         </select>
         <!--
             {% if attr.value %}
-            <a href="/edit?cls={{attr.related_class}}&id={{attr.value}}" 
+            <a href="/dashboard/edit?cls={{attr.related_class}}&id={{attr.value}}" 
                 target="_blank">[{{_('edit')}}]</a>-->
         {% endif %}
         #}
@@ -147,7 +147,7 @@
     		}
     		
     		$.ajax({
-                url: "{{tg.url('/search')}}",
+                url: "{{tg.url('/dashboard/search')}}",
                 type: 'post',
                 dataType: 'html',
                 data: {
@@ -203,7 +203,7 @@
                         
                         if (id_selected != '') {
                         	$.ajax({
-                        		url: "{{tg.url('/title')}}",
+                        		url: "{{tg.url('/dashboard/title')}}",
                         		type: "get",
                         		dataType: "json",
                         		data: {

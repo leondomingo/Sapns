@@ -25,7 +25,7 @@ class UsersController(BaseController):
     
     @expose('users/index.html')
     @require(predicates.has_any_permission('manage', 'users'))
-    def index(self, came_from='/users'):
+    def index(self, came_from='/dashboard'):
     
         pos = 0
 
@@ -43,9 +43,9 @@ class UsersController(BaseController):
                            ))
             
         actions = []
-        actions.append(dict(title=_('New'), url='/users/user_new', require_id=False))
-        actions.append(dict(title=_('Edit'), url='/users/user_edit', require_id=True))
-        actions.append(dict(title=_('Delete'), url='/users/user_delete', require_id=True))
+        actions.append(dict(title=_('New'), url='/dashboard/users/new', require_id=False))
+        actions.append(dict(title=_('Edit'), url='/dashboard/users/edit', require_id=True))
+        actions.append(dict(title=_('Delete'), url='/dashboard/users/delete', require_id=True))
         
         # Reading global settings
         ds.date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
@@ -76,30 +76,30 @@ class UsersController(BaseController):
                     link=None,
                     grid=dict(caption=None, name='users_list',
                               cls='', 
-                              search_url=url('/users'), 
+                              search_url=url('/dashboard/users'), 
                               cols=cols, data=data, 
                               actions=actions, pag_n=1, rp=0, pos=0,
                               totalp=totalp, total=ds.count, total_pag=1))
         
-    @expose('users/user_edit.html')
+    @expose('users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
-    def user_edit(self, **params):
+    def edit(self, **params):
         
         id = int(params['id'])
-        came_from = params.get('came_from', '/users')
+        came_from = params.get('came_from', '/dashboard/users')
         
         user = DBSession.query(SapnsUser).get(id)
         return dict(user=user, came_from=url(came_from))
     
-    @expose('users/user_edit.html')
+    @expose('users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
-    def user_new(self, **params):
-        came_from = params.get('came_from', '/users')
+    def new(self, **params):
+        came_from = params.get('came_from', '/dashboard/users')
         return dict(user={}, came_from=url(came_from))
     
     @expose()
     @require(predicates.has_any_permission('manage', 'users'))
-    def user_save(self, **params):
+    def save(self, **params):
         
         try:
             new_user = False
@@ -125,19 +125,19 @@ class UsersController(BaseController):
         
         except:
             redirect(url('/message', 
-                         dict(message=_('An error occurred while saving the user'),
-                              came_from='/users')))
+                         params=dict(message=_('An error occurred while saving the user'),
+                                     came_from='/dashboard/users')))
 
-        redirect(url('/users'))
+        redirect(url('/dashboard/users'))
     
     @expose()
     @require(predicates.has_any_permission('manage', 'users'))
-    def user_delete(self, **params):
+    def delete(self, **params):
         
-        logger = logging.getLogger(__name__ + '/user_delete')
+        logger = logging.getLogger(__name__ + '/delete')
         try:
             id = int(params['id'])
-            came_from = params.get('came_from', '/users')
+            came_from = params.get('came_from', '/dashboard/users')
             
             DBSession.query(SapnsUser).\
                 filter(SapnsUser.user_id == id).\
@@ -152,12 +152,12 @@ class UsersController(BaseController):
     
     @expose('users/permission.html')
     @require(predicates.has_any_permission('manage', 'users'))
-    def permission(self, came_from='/users'):
+    def permission(self, came_from='/dashboard/users'):
         return dict(came_from=url(came_from))
     
     @expose('users/roles.html')
     @require(predicates.has_any_permission('manage', 'users'))
-    def roles(self, came_from='/users'):
+    def roles(self, came_from='/dashboard/users'):
         return dict(came_from=url(came_from))
         
     @expose('json')

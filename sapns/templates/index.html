@@ -1,131 +1,60 @@
-{% extends 'base.html' %}
-{% import 'util.html' as util %}
-
-{# Head #}
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
 {% block head %}
-    {{ super() }}
-    {{util.jquery()}}
-    {{util.jquery_ui()}}
-    {{util.jquery_jstree()}}
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>{{tg.config.get('app.name', 'Sapns')}} - 
+    {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
 {% endblock %}
-
-{# Middle #}
-{% block middle %}
-    {{ super() }}
+<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
+</head>
+<body>
+    <div style="height: 60px;"></div>
     
-    {#
     <style type="text/css">
-        .sc_type {
-            border: 1px dotted gray;
-            margin-left: 5px;
-            margin-right: 5px;
-            float: left;
-            background-color: white;
+        .sapns-color {
+            color: #B4BD3C;
+        }
+        
+        .sapns-name {
+            color: #B4BD3C;
+            font-weight: bold;
         }
     </style>
-    #}
     
-    <div><a href="/" style="font-size: 20px;">&lt;{{_('Dashboard')}}&gt;</a></div>
-    {#<!--<div>-->#}
+    <div style="height: 550px; background-color: white; padding: 20px; font-size: 15px; text-align: justify;">
+    <h1 class="sapns-color">Welcome to Sapns!</h1>
+    <p><span class="sapns-name">Sapns</span> is an open source project that pretends
+    to be a <span style="font-style: italic;">one-size, fits-all</span> system for management web apps. Regardless the
+    application you want to build, <span class="sapns-name">Sapns</span> will help you in that task with a set of tools,
+    so you can manage data (and more) from the very first moment.</p>
     
-    <!-- parent shortcut -->
-    <div> <!-- style="float: left; width: 400px;"> -->
-    {% if sc_parent %}
-    <a href="{{tg.url('/', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
-    {% else %}
-    <a href="">[  ]</a>
-    {% endif %}
+    <p>You can start <a href="/dashboard">here</a> with following login data:</p>
+    <p style="margin-left: 20px;">username: <span style="font-weight: bold; font-style: italic;">manager</span><br>
+    password: <span style="font-weight: bold; font-style: italic;">manager</span></p>
+    
+    <p>If you want to read more about <span class="sapns-name">Sapns</span> 
+    project, please go <a href="http://www.sapns.org" target="_blank">here</a>.</p>
+    
+    <br><br><br><br><br><br><br><br><br><br>
+    
+    <p>Enjoy the experience!</p>
+    <p style="font-size: 14px; color: gray;"><span class="sapns-name">Sapns</span> team</p>
     </div>
     
-    {#
-    <!-- shortcut actions -->
-    <!--
-    <div style="">
-        <select id="shortcut_actions">
-            <option value="">{{_('(action)')}}</option> 
-            <option value="edit">{{_('Edit')}}</option>
-            <option value="delete">{{_('Delete')}}</option>
-            <option value="send-to">{{_('Send to dashboard')}}</option>
-            <option value="share">{{_('Share')}}</option>
-        </select>
+    <div style="height: 20px; background-color: #B4BD3C; padding-top: 5px;">
+    <div style="float: left; margin-left: 10px;margin-right: 5px;"> 
+        <a href="{{tg.url('/setlang', params=dict(lang='en'))}}">
+            <img {% if curr_lang[0] == 'en' %} src="{{tg.url('/images/flags/uk.jpg')}}"
+            {% else %} src="/images/flags/uk-disabled.jpg" {% endif %};
+            title="english"/>
+            </a></div>    
+    <div style="float: left;">
+        <a href="{{tg.url('/setlang', params=dict(lang='es'))}}">
+            <img {% if curr_lang[0] == 'es' %} src="{{tg.url('/images/flags/spain.jpg')}}"
+            {% else %} src="/images/flags/spain-disabled.jpg" {% endif %};
+            title="español"/>
+            </a></div>
     </div>
-    </div>
-    -->
-    #}
-    
-    {#
-    <!--
-    <div>
-        <a class="sc_type" href="{{tg.url('/', sc_type='list')}}">List</a>
-        <a class="sc_type" href="{{tg.url('/', sc_type='bigicon')}}">Big icon</a>
-        <a class="sc_type" style="float: none;" 
-            href="{{tg.url('/', sc_type='smallicon')}}">Small icon</a>
-    </div>
-    -->
-    #}
-    
-    <div style="border: 1px solid white; height: 300px; overflow: auto;">
-    {% if sc_type == 'list' %}
-        {% include 'shortcuts/list.html' %}
-    {% elif sc_type == 'bigicon' %}
-        {% include 'shortcuts/bigicon.html' %}
-    {% endif %}
-    
-    </div>
-    
-    <div>
-    <div class="sp_shortcut">
-        <a href="{{tg.url('/util', came_from='/')}}">{{_('Utilities')}}</a>
-    </div>
-    
-    <div class="sp_shortcut">
-        <a href="{{tg.url('/views', came_from='/')}}">{{_('Views')}}</a>
-    </div>
-    
-    <div class="sp_shortcut">
-        <a href="{{tg.url('/users', came_from='/')}}">{{_('Users')}}</a>
-    </div>
-    
-    <div class="sp_shortcut">
-        <a href="/messages">{{_('Messages')}}</a>
-        <span class="sp_messages" 
-            style="{% if unread > 0 %} font-weight: bold; {% endif %}">{{unread}} / </span>
-        <span class="sp_messages">{{messages}} messages</span>
-    </div>
-    </div>
-    
-    <div id="tree-test">
-    </div>
-
-    {#{{curr_lang[0]}}#}
-    <a href="{{tg.url('/setlang', lang='en')}}" 
-        {% if curr_lang[0] == 'en' %} style="color: navy;" {% endif %}>[English]</a>    
-    <a href="{{tg.url('/setlang', lang='es')}}"
-        {% if curr_lang[0] == 'es' %} style="color: navy;" {% endif %}>[Español]</a>
-{% endblock %}
-
-{#
-<!-- Uncomment the next section and override the "footer" block if you want to -->
-<!-- 
-{% block footer %}
-    {{ super() }}
-{% endblock %}
--->
-#}
-
-<script type="text/javascript">
-    $(document).ready(function(){
-    	$('#tree-test').jstree({
-    		plugins: ['json_data'],
-    		json_data:
-    		{ 
-    		    data : "node_title", 
-    		    // omit `attr` if not needed; the `attr` object gets passed to the jQuery `attr` function
-    		    attr : { id : "node_identificator", some-other-attribute : "attribute_value" }, 
-    		    // `state` and `children` are only used for NON-leaf nodes
-    		    state: "closed", // or "open", defaults to "closed"
-    		    children: [ /* an array of child nodes objects */ ]
-    		}    			
-    	});
-    });
-</script>
+</body>
+</html>
