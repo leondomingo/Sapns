@@ -1,4 +1,4 @@
-{% import 'grid.html' as grid_html %}
+{% import 'dashboard/grid.html' as grid_html %}
 {{grid_html.js_select_row(_)}}
 
 <div>
@@ -6,7 +6,7 @@
         <input class="sp-search-text" type="text" value=""/>
         <input class="sp-search-button" type="button" value="{{_('Search..')}}"/>
     </div>
-    
+
 {{grid_html.show(page, _, q, grid, True, with_search=False, can_edit=False,
     with_pager=False, with_actions=False)}}
 </div>

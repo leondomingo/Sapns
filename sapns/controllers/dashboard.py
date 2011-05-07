@@ -79,10 +79,11 @@ class DashboardController(BaseController):
     @expose('dashboard/listof.html')
     @require(predicates.not_anonymous())
     def list(self, cls='', q='', **params):
+        
+        logger = logging.getLogger(__name__ + '/list')
+        logger.info('params=%s' % params)
 
         # picking up parameters
-        #cls = params.get('cls', '')
-        #q = params.get('q', '')
         rp = params.get('rp', 10)
         pag_n = params.get('pag_n', 1)
         caption = params.get('caption', '')
@@ -90,7 +91,7 @@ class DashboardController(BaseController):
         came_from = params.get('came_from', '/dashboard')
         
         # does this user have permission on this table?
-        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        user = DBSession.query(SapnsUser).get(int(request.identity['user'].user_id))
         
         if not user.has_privilege(cls):
             redirect(url('/message', 
@@ -117,6 +118,8 @@ class DashboardController(BaseController):
         
         def strtodatef(s):
             return strtodate(s, fmt=date_fmt, no_exc=True)
+        
+        logger.info('search...%s / q=%s' % (view, q))
             
         ds = search(DBSession, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     show_ids=show_ids, strtodatef=strtodatef)
@@ -172,8 +175,7 @@ class DashboardController(BaseController):
                                                              pag_n=pag_n,
                                                              caption=caption, 
                                                              show_ids=show_ids)),
-                    grid=dict(caption=caption, name=cls,
-                              cls=cls,
+                    grid=dict(caption=caption, name=cls, cls=cls,
                               search_url=url('/dashboard/list'), 
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
@@ -182,6 +184,9 @@ class DashboardController(BaseController):
     @expose('dashboard/search.html')
     @require(predicates.not_anonymous())
     def search(self, **params):
+        logger = logging.getLogger(__name__ + '/search')
+        logger.info(params)
+        
         return self.list(**params)
     
     @expose('json')
