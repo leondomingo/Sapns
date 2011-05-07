@@ -5,25 +5,23 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>{{tg.config.get('app.name', 'Sapns')}} - 
     {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
+    
+<style type="text/css">
+    .sapns-color {
+        color: #B4BD3C;
+    }
+    
+    .sapns-name {
+        color: #B4BD3C;
+        font-weight: bold;
+    }
+</style>
 {% endblock %}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
 </head>
 <body>
-    <div style="height: 60px;"></div>
-    
-    <style type="text/css">
-        .sapns-color {
-            color: #B4BD3C;
-        }
-        
-        .sapns-name {
-            color: #B4BD3C;
-            font-weight: bold;
-        }
-    </style>
-    
-    <div style="height: 650px; background-color: white; padding: 20px; font-size: 15px; 
-        text-align: justify;">
+    <div style="height: 670px; background-color: white; padding: 20px; 
+        font-size: 15px; margin-top: 60px; text-align: justify;">
     <h1 class="sapns-color">Welcome to Sapns!</h1>
     <p><span class="sapns-name">Sapns</span> is an open source project built on top of 
     <a href="http://www.turbogears.org" target="_blank">Turbogears</a> that pretends
