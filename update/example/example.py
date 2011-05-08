@@ -9,5 +9,5 @@ from config import CONFIG
 sys.path = sys.path + CONFIG['paths']
 
 if __name__ == '__main__':
-    # TODO: Aquí las operaciones de actualización
+    # TODO: Updates here
     pass

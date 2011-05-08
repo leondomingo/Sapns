@@ -11,12 +11,12 @@ from nucleo.config import CONFIGURACION
 
 current_path = os.path.dirname(os.path.abspath(__file__))
 
-def actualizar(modo='post'):
+def make_update(mode='post'):
     
-    if not modo.lower() in ['pre', 'post']:
-        raise Exception('Modo "%s" incorrecto' % modo)
+    if not mode.lower() in ['pre', 'post']:
+        raise Exception('Wrong "%s" mode' % mode)
 
-    sys.stdout.write('Actualizando en modo [%s]\n' % modo)
+    sys.stdout.write('Updating in mode [%s]\n' % mode)
 
     # leer actualizaciones realizadas
     # 6729 post
@@ -37,7 +37,7 @@ def actualizar(modo='post'):
                     current_issue = '%s %s' % (m_issue.group(1),
                                                m_issue.group(2))
                     
-                    if m_issue.group(2) == modo.lower() and \
+                    if m_issue.group(2) == mode.lower() and \
                     current_issue not in realizados:
                         # 6729 post
                         realizados.append('%s %s' % (m_issue.group(1), 
@@ -68,29 +68,28 @@ def actualizar(modo='post'):
                 # 6729    post    ./issue_6729/issue_6729.sql
                 # ===========================================
                 # 6729 post
-                current_issue = '%s %s' % (m_issue.group(1), 
-                                           m_issue.group(2))
+                current_issue = '%s %s' % (m_issue.group(1), m_issue.group(2))
                 
                 if current_issue in realizados or \
-                m_issue.group(2).lower() != modo.lower():
-                    sys.stderr.write('Saltando actualización [%s] \n' % current_issue)
+                m_issue.group(2).lower() != mode.lower():
+                    sys.stderr.write('Skipping [%s] \n' % current_issue)
 
                 else:
-                    sys.stdout.write('Actualizando [%s]\n' % current_issue)
+                    sys.stdout.write('Updating [%s]\n' % current_issue)
                     
-                    # obtener extensión del fichero de actualización
+                    # get update file extension
                     ext = os.path.splitext(m_issue.group(3))[1]
                     try:
                         if ext == '.py':
-                            # ejecutar Python
-                            sys.stdout.write('Ejecutando Python...\n')
+                            # Python
+                            sys.stdout.write('Executing Python script...\n')
                             sp.check_call([sys.executable, 
                                            os.path.join(current_path,
                                                         m_issue.group(3))])
 
                         elif ext == '.sql':
-                            # ejecutar SQL
-                            sys.stdout.write('Ejecutando SQL...\n')
+                            # SQL
+                            sys.stdout.write('Executing SQL script...\n')
                             os.environ['PGPASSWORD'] = CONFIGURACION['password']
                             sp.check_call([os.path.join(CONFIG['pg_path'], 'psql'),
                                            '-h', CONFIGURACION['host'], 
@@ -114,4 +113,4 @@ if __name__ == '__main__':
     if len(sys.argv) > 1:
         modo = sys.argv[1]
 
-    actualizar(modo)
+    make_update(modo)
