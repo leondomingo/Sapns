@@ -5,16 +5,34 @@ import os
 import sys
 import re
 import subprocess as sp
-from config import CONFIG
-sys.path = sys.path + CONFIG['paths']
-from nucleo.config import CONFIGURACION
+from argparse import ArgumentParser
 
-current_path = os.path.dirname(os.path.abspath(__file__))
+from tg import config
+from paste.deploy import appconfig
+from sapns.model import DBSession
+from sapns.config.environment import load_environment
 
-def make_update(mode='post'):
+current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'update')
+
+def load_config(filename):
+    conf = appconfig('config:' + os.path.abspath(filename))
+    load_environment(conf.global_conf, conf.local_conf)
+
+def parse_args():
+    parser = ArgumentParser(description=__doc__)
+    parser.add_argument('conf_file', help='configuration to use')
+    parser.add_argument('-m', '--mode')
+
+    return parser.parse_args()
+
+def make_update():
+    
+    args = parse_args()
+    mode = args.mode or 'post'
+    load_config(args.conf_file)
     
     if not mode.lower() in ['pre', 'post']:
-        raise Exception('Wrong "%s" mode' % mode)
+        raise Exception('"%s": Wrong mode' % mode)
 
     sys.stdout.write('Updating in mode [%s]\n' % mode)
 
@@ -34,8 +52,7 @@ def make_update(mode='post'):
                 m_issue = re.search(r'^([\w./-]+)\s+(pre|post)', linea)
                 if m_issue:
                     # 6729 post
-                    current_issue = '%s %s' % (m_issue.group(1),
-                                               m_issue.group(2))
+                    current_issue = '%s %s' % (m_issue.group(1), m_issue.group(2))
                     
                     if m_issue.group(2) == mode.lower() and \
                     current_issue not in realizados:
@@ -46,6 +63,22 @@ def make_update(mode='post'):
         finally:
             f_done.close()
 
+    CONFIGURACION = {}
+    m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', str(DBSession.bind))
+    if m_session:
+        CONFIGURACION['user'] = m_session.group(1)
+        CONFIGURACION['password'] = m_session.group(2)
+        CONFIGURACION['host'] = m_session.group(3)
+        CONFIGURACION['port'] = m_session.group(4)
+        CONFIGURACION['db'] = m_session.group(5)
+        
+    else:
+        raise Exception('It was not possible to get connection data!')
+    
+    CONFIGURACION['pg_path'] = config.get('pg_path')
+    
+    print CONFIGURACION
+    
     # realizar actualizaciones pendientes
     # actualizaciones a realizar
     f_todo = file(TODO, 'rb')
@@ -83,20 +116,29 @@ def make_update(mode='post'):
                         if ext == '.py':
                             # Python
                             sys.stdout.write('Executing Python script...\n')
-                            sp.check_call([sys.executable, 
-                                           os.path.join(current_path,
-                                                        m_issue.group(3))])
+                            
+                            call = [sys.executable, 
+                                    os.path.join(current_path, m_issue.group(3))]
+                            
+                            sp.check_call(call)
 
                         elif ext == '.sql':
                             # SQL
                             sys.stdout.write('Executing SQL script...\n')
                             os.environ['PGPASSWORD'] = CONFIGURACION['password']
-                            sp.check_call([os.path.join(CONFIG['pg_path'], 'psql'),
-                                           '-h', CONFIGURACION['host'], 
-                                           '-U', CONFIGURACION['user'],
-                                           '-d', CONFIGURACION['db'],
-                                           '-f', os.path.join(current_path,
-                                                              m_issue.group(3))])
+                            
+                            call = [os.path.join(CONFIGURACION['pg_path'], 'psql'),
+                                    '-h', CONFIGURACION['host'], 
+                                    '-U', CONFIGURACION['user'],
+                                    '-d', CONFIGURACION['db'],
+                                    '-f', os.path.join(current_path, m_issue.group(3))]
+                            
+                            if CONFIGURACION['port']:
+                                call.append('-p')
+                                # ":<port>"
+                                call.append(CONFIGURACION['port'][1:])
+                            
+                            sp.check_call(call)
 
                         # registrar en fichero de actualizaciones realizadas
                         f_done.write('%s\n' % current_issue)
@@ -109,8 +151,4 @@ def make_update(mode='post'):
         f_done.close()
 
 if __name__ == '__main__':
-    modo = 'post'
-    if len(sys.argv) > 1:
-        modo = sys.argv[1]
-
-    make_update(modo)
+    make_update()
