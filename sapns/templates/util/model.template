@@ -17,7 +17,15 @@ class {{table.class_name}}(DeclarativeBase):
 
 
 {%- for col in table.columns %}
-    {{col.name}} = Column('{{col.name}}', {{col.type_name}}
+    {{col.name}} = Column('{{col.name}}',  
+    {%- if col.type_name == 'int' %} Integer
+    {%- elif col.type_name == 'float' %} Numeric
+    {%- elif col.type_name == 'str' %} Unicode
+    {%- elif col.type_name == 'memo' %} Text
+    {%- elif col.type_name == 'bool' %} Boolean
+    {%- elif col.type_name == 'date' %} Date
+    {%- elif col.type_name == 'time' %} Time
+    {%- elif col.type_name == 'datetime' %} DateTime {% endif %}
     {%- if col.length != None %}({{col.length}}){% endif %}
     {%- if col.prec != None %}({{col.prec}}, {{col.scale}}){% endif %}
     {%- if col.pk == True %}, primary_key=True{% endif %} 

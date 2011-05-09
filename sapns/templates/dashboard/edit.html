@@ -51,22 +51,22 @@
 
         <div>
         {# <!-- Boolean --> #}
-        {%- if attr.type == 'Boolean' %}
+        {%- if attr.type == 'bool' %}
         <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
             {% if attr.value %}checked{% endif %}/>
         
         {# <!-- Date --> #}
-        {%- elif attr.type == 'Date' %}
+        {%- elif attr.type == 'date' %}
         <input class="sp-date-field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>
         
         {# <!-- Time --> #}
-        {%- elif attr.type == 'Time' %}
+        {%- elif attr.type == 'time' %}
         <input class="sp-time-field" type="text" name="{{attr.name}}" 
             value="{{attr.value}}"/>            
         
         {# <!-- Memo --> #}
-        {%- elif attr.type == 'String' %}
+        {%- elif attr.type == 'memo' %}
         <textarea class="sp-text-field sp-memo-field" 
             name="{{attr.name}}">{{attr.value|escape}}</textarea>
         
