@@ -14,6 +14,7 @@
     .sapns-name {
         color: #B4BD3C;
         font-weight: bold;
+        font-size: 16px;
     }
 </style>
 {% endblock %}
@@ -21,19 +22,25 @@
 </head>
 <body>
     <div style="background-color: #B4BD3C; height: 60px; padding: 20px;
-        margin-top: 30px;">
-        <h1 style="color: white;">Welcome to Sapns!</h1>    
+        border: 2px solid white;
+        margin-top: 20px;">
+        <h1 style="color: white; font-style: normal;">Welcome to Sapns!</h1>    
     </div>
     
-    <div style="height: 630px; background-color: white; padding: 20px; 
+    <div style="height: 610px; background-color: white; padding: 20px;
+        overflow: auto;
+        border: 2px solid white; 
         font-size: 15px; text-align: justify;">
     
-    <p><span class="sapns-name">Sapns</span> is an open source project released under the ????
+    <p><span class="sapns-name">Sapns</span> is an open source project released under the 
+    <a href="http://www.gnu.org/copyleft/gpl.html" target="_blank">GPL</a> (don't know yet...)
     license, and built on top of <a href="http://www.turbogears.org" target="_blank">Turbogears</a>.
     It pretends to be a <span style="font-style: italic;">one-size, fits-all</span> system for 
-    management-data web apps. Regardless the application you want to build, <span class="sapns-name">Sapns</span> 
+    <span style="font-weight: bold;">intensive data-management</span> web apps. Regardless the application you want to build, <span class="sapns-name">Sapns</span> 
     will help you in that task with a set of tools, so you can manage data (and more) 
     from the very first moment.</p>
+    
+    <p>(intensive data-management explanation)</p>
     
     <p><span class="sapns-name">Sapns</span> makes use of (and loves) other open projects:</p>
     <ul>
@@ -43,7 +50,7 @@
         <li><a href="http://jinja.pocoo.org/" target="_blank">Jinja2</a> to write templates</li>
         <li><a href="http://jquery.com/" target="_blank">jQuery</a> to improve user interface</li>
     </ul>
-    
+
     <p>Not part of <span class="sapns-name">Sapns</span> but very useful too:
     <ul>
         <li><a href="http://httpd.apache.org/" target="_blank">Apache</a> to serve apps</li>
@@ -62,14 +69,13 @@
     
     <p>If you want to read more about <span class="sapns-name">Sapns</span> 
     project, please go <a href="http://www.sapns.org" target="_blank">here</a>.</p>
-    
-    <br>
-    
+
     <p>Enjoy the experience!</p>
     <p style="font-size: 14px; color: gray;"><span class="sapns-name">Sapns</span> team</p>
     </div>
     
-    <div style="height: 20px; background-color: #B4BD3C; padding-top: 5px;">
+    <div style="height: 20px; background-color: #B4BD3C; padding-top: 5px;
+        border: 2px solid white;">
     <div style="float: left; margin-left: 10px;margin-right: 5px;"> 
         <a href="{{tg.url('/setlang', params=dict(lang='en'))}}">
             <img {% if curr_lang[0] == 'en' %} src="{{tg.url('/images/flags/uk.jpg')}}"
