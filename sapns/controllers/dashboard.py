@@ -252,7 +252,7 @@ class DashboardController(BaseController):
                             field_value = int(field_value)
                     
                     # numeric
-                    elif attr.type == SapnsAttribute.TYPE_NUMERIC:
+                    elif attr.type == SapnsAttribute.TYPE_FLOAT:
                         if field_value == '':
                             field_value = None
                         else:

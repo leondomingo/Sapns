@@ -255,7 +255,7 @@ class UtilController(BaseController):
                     attr.title = col['name'].replace('_', ' ').title()
                     attr.class_id = klass.class_id
                     attr.type = col['type_name']
-                    if attr.type == 'Unicode' and not first_ref:
+                    if attr.type == SapnsAttribute.TYPE_STRING and not first_ref:
                         attr.reference_order = 0
                         first_ref = True
                         
@@ -355,34 +355,34 @@ class UtilController(BaseController):
                     
                     type_name = '---'
                     if isinstance(c.type, INTEGER):
-                        type_name = 'Integer'
+                        type_name = SapnsAttribute.TYPE_INTEGER
                         
                     elif isinstance(c.type, NUMERIC):
-                        type_name = 'Numeric'
+                        type_name = SapnsAttribute.TYPE_FLOAT
                         col['prec'] = c.type.precision
                         col['scale'] = c.type.scale
                         
                     elif isinstance(c.type, BIGINT):
-                        type_name = 'Integer'
+                        type_name = SapnsAttribute.TYPE_INTEGER
 
                     elif isinstance(c.type, DATE):
-                        type_name = 'Date'
+                        type_name = SapnsAttribute.TYPE_DATE
                         
                     elif isinstance(c.type, TIME):
-                        type_name = 'Time'
+                        type_name = SapnsAttribute.TYPE_TIME
                         
                     elif isinstance(c.type, TIMESTAMP):
-                        type_name = 'DateTime'
+                        type_name = SapnsAttribute.TYPE_DATETIME
 
                     elif isinstance(c.type, VARCHAR):
-                        type_name = 'Unicode'
+                        type_name = SapnsAttribute.TYPE_STRING
                         col['length'] = c.type.length
                         
                     elif isinstance(c.type, TEXT):
-                        type_name = 'String'
+                        type_name = SapnsAttribute.TYPE_MEMO
                         
                     elif isinstance(c.type, BOOLEAN):
-                        type_name = 'Boolean'
+                        type_name = SapnsAttribute.TYPE_BOOLEAN
                         
                     elif isinstance(c.type, BLOB):
                         type_name = 'blob'

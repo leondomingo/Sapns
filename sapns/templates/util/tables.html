@@ -24,13 +24,13 @@
         {% for col in table.columns %}
         <div class="col_name">{{col.name}}</div>
         <div class="col_type" style="color: 
-            {%- if col.type_name == 'Integer' %}green
-            {%- elif col.type_name == 'Numeric' %}maroon
-            {%- elif col.type_name == 'Date' %}brown
-            {%- elif col.type_name == 'Time' %}red
-            {%- elif col.type_name == 'Unicode' %}olive
-            {%- elif col.type_name == 'String' %}navy
-            {%- elif col.type_name == 'Boolean' -%}blue          
+            {%- if col.type_name == 'int' %}green
+            {%- elif col.type_name == 'float' %}maroon
+            {%- elif col.type_name == 'date' %}brown
+            {%- elif col.type_name == 'time' %}red
+            {%- elif col.type_name == 'str' %}olive
+            {%- elif col.type_name == 'memo' %}navy
+            {%- elif col.type_name == 'bool' -%}blue          
             {%- else %}orange{%- endif %};">{{col.type_name}}</div>
         {% if col.fk_table != None %}
         <div class="col_ref">[{{col.fk_table}}]</div>

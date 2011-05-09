@@ -293,6 +293,12 @@ class SapnsClass(DeclarativeBase):
     
     # attributes (SapnsAttribute)
     
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.title)
+    
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
+    
     @staticmethod
     def by_name(class_name):
         """
@@ -585,14 +591,15 @@ class SapnsAttribute(DeclarativeBase):
                               ForeignKey('sp_classes.id',
                                          onupdate='CASCADE', ondelete='SET NULL'))
     
-    TYPE_INTEGER = 'Integer'
-    TYPE_BOOLEAN = 'Boolean'
-    TYPE_NUMERIC = 'Numeric'
-    TYPE_UNICODE = 'Unicode'
-    TYPE_STRING = 'String' # memo type
-    TYPE_DATE = 'Date'
-    TYPE_TIME = 'Time'
-    TYPE_DATETIME = 'DateTime'
+    TYPE_INTEGER = 'int'
+    TYPE_BOOLEAN = 'bool'
+    TYPE_FLOAT = 'float'
+    TYPE_STRING = 'str'
+    TYPE_MEMO = 'memo'
+    TYPE_DATE = 'date'
+    TYPE_TIME = 'time'
+    TYPE_DATETIME = 'datetime'
+    TYPE_IMAGE = 'img'
     
     type = Column(Unicode(20), nullable=False)
     required = Column(Boolean, DefaultClause('false'), default=False)
@@ -600,6 +607,12 @@ class SapnsAttribute(DeclarativeBase):
     insertion_order = Column(Integer)
     visible = Column(Boolean, DefaultClause('true'), default=True)
     #is_collection = Column(Boolean, DefaultClause('false'), default=False)
+    
+    def __unicode__(self):
+        return u'<%s> %s %s (%s)' % (unicode(self.class_), self.title, self.name)
+    
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
     
 SapnsClass.attributes = \
     relation(SapnsAttribute,
