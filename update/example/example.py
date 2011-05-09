@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 
-import os
+from os.path import join, dirname, abspath
 import sys
-current_path = os.path.dirname(os.path.abspath(__file__))
-# directorio superior a este
-sys.path.append(os.path.split(current_path)[0])
-from config import CONFIG
-sys.path = sys.path + CONFIG['paths']
+
+sapns_path = join(dirname(abspath(__file__)), '../..')
+sys.path.append(sapns_path)
+
+from paste.deploy import appconfig
+from sapns.config.environment import load_environment
+from sapns.model import DBSession
+# more imports here...
+
+def load_config(filename):
+    conf = appconfig('config:' + abspath(filename))
+    load_environment(conf.global_conf, conf.local_conf)
 
 if __name__ == '__main__':
+    load_config(sys.argv[1])
     # TODO: Updates here
-    pass

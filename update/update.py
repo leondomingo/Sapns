@@ -7,12 +7,14 @@ import re
 import subprocess as sp
 from argparse import ArgumentParser
 
+current_path = os.path.dirname(os.path.abspath(__file__))
+upper_path = os.path.split(current_path)[0]
+sys.path.append(upper_path)
+
 from tg import config
 from paste.deploy import appconfig
 from sapns.model import DBSession
 from sapns.config.environment import load_environment
-
-current_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'update')
 
 def load_config(filename):
     conf = appconfig('config:' + os.path.abspath(filename))
@@ -30,13 +32,31 @@ def make_update():
     args = parse_args()
     mode = args.mode or 'post'
     load_config(args.conf_file)
+
+    sys.stdout.write('Loading settings...')
+    CONFIGURACION = {}
+    # postgresql://postgres:mypassword@localhost:5432/mydb
+    m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', str(DBSession.bind))
+    if m_session:
+        CONFIGURACION['user'] = m_session.group(1)
+        CONFIGURACION['password'] = m_session.group(2)
+        CONFIGURACION['host'] = m_session.group(3)
+        CONFIGURACION['port'] = m_session.group(4)
+        CONFIGURACION['db'] = m_session.group(5)
+        
+        sys.stdout.write('OK\n')
+        
+    else:
+        raise Exception('It was not possible to get connection data!')
+    
+    CONFIGURACION['pg_path'] = config.get('pg_path', '/usr/bin/')
     
     if not mode.lower() in ['pre', 'post']:
         raise Exception('"%s": Wrong mode' % mode)
 
-    sys.stdout.write('Updating in mode [%s]\n' % mode)
+    sys.stdout.write('Updating in [%s] mode\n' % mode)
 
-    # leer actualizaciones realizadas
+    # read already-done updates
     # 6729 post
     # 7832 pre
     # ...
@@ -63,27 +83,10 @@ def make_update():
         finally:
             f_done.close()
 
-    CONFIGURACION = {}
-    m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', str(DBSession.bind))
-    if m_session:
-        CONFIGURACION['user'] = m_session.group(1)
-        CONFIGURACION['password'] = m_session.group(2)
-        CONFIGURACION['host'] = m_session.group(3)
-        CONFIGURACION['port'] = m_session.group(4)
-        CONFIGURACION['db'] = m_session.group(5)
-        
-    else:
-        raise Exception('It was not possible to get connection data!')
-    
-    CONFIGURACION['pg_path'] = config.get('pg_path')
-    
-    print CONFIGURACION
-    
-    # realizar actualizaciones pendientes
-    # actualizaciones a realizar
+    # updates to be done
     f_todo = file(TODO, 'rb')
     
-    # actualizaciones realizadas
+    # already-done updates
     f_done = file(DONE, 'a')
     try:
         for linea in f_todo:
@@ -108,7 +111,7 @@ def make_update():
                     sys.stderr.write('Skipping [%s] \n' % current_issue)
 
                 else:
-                    sys.stdout.write('Updating [%s]\n' % current_issue)
+                    sys.stdout.write('[%s] ' % current_issue)
                     
                     # get update file extension
                     ext = os.path.splitext(m_issue.group(3))[1]
@@ -118,7 +121,9 @@ def make_update():
                             sys.stdout.write('Executing Python script...\n')
                             
                             call = [sys.executable, 
-                                    os.path.join(current_path, m_issue.group(3))]
+                                    os.path.join(current_path, m_issue.group(3)),
+                                    args.conf_file,
+                                    ]
                             
                             sp.check_call(call)
 
@@ -139,8 +144,8 @@ def make_update():
                                 call.append(CONFIGURACION['port'][1:])
                             
                             sp.check_call(call)
-
-                        # registrar en fichero de actualizaciones realizadas
+                            
+                        # register update
                         f_done.write('%s\n' % current_issue)
 
                     except Exception, e:
