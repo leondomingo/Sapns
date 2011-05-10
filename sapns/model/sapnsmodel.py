@@ -4,7 +4,8 @@
 
 import os
 import sys
-from datetime import datetime
+import shutil
+import datetime as dt
 
 from pylons.i18n import ugettext as _
 
@@ -27,6 +28,7 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsShortcut', 'SapnsUser', 'SapnsView', 'SapnsViewColumn',
            'SapnsViewFilter', 'SapnsViewOrder', 'SapnsViewRelation',
            'SapnsMessage', 'SapnsMessageTo',
+           'SapnsRepo', 'SapnsDoc', 'SapnsDocType', 'SapnsAssignedDoc',
           ]
 
 # inherited class from "User"
@@ -201,6 +203,22 @@ class SapnsUser(User):
                 count()
                 
         return n
+    
+    def register_doc(self, pathtofile, title, id_repo, id_doctype):
+        
+        # create a new doc
+        new_doc = SapnsDoc()
+        new_doc.repo_id = id_repo
+        new_doc.doctype_id = id_doctype
+        new_doc.title = title
+        new_doc.filename = os.path.basename(pathtofile)
+        new_doc.author_id = self.user_id
+        
+        DBSession.add(new_doc)
+        DBSession.flush()
+        
+        dst_path = os.path.join(new_doc.repo.path, '%d' % new_doc.doc_id)
+        shutil.copy(pathtofile, dst_path)
 
 class SapnsShortcut(DeclarativeBase):
     """Shortcuts sapns base table"""
@@ -914,8 +932,8 @@ class SapnsMessage(DeclarativeBase):
                          ForeignKey('sp_users.id',
                                     onupdate='CASCADE', ondelete='SET NULL'))
     
-    created_date = Column(Date, default=datetime.today())
-    created_time = Column(Time, default=datetime.now().time())
+    created_date = Column(Date, default=dt.date.today())
+    created_time = Column(Time, default=dt.datetime.now().time())
     subject = Column(Unicode(100), nullable=False)
     body = Column(Text)
 
@@ -937,3 +955,91 @@ class SapnsMessageTo(DeclarativeBase):
                         )
     
     is_read = Column(Boolean, default=False)
+    
+class SapnsRepo(DeclarativeBase):
+    
+    __tablename__ = 'sp_repos'
+    
+    repo_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode(50), nullable=False)
+    path = Column(Unicode(255))
+    
+    def __unicode__(self):
+        return u'%s (%s)' % (self.name, self.path)
+    
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
+    
+class SapnsDoc(DeclarativeBase):
+    
+    __tablename__ = 'sp_docs'
+    
+    doc_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    title = Column(Unicode(200), nullable=False)
+    filename = Column(Unicode(200))
+    repo_id = Column('id_repo', Integer, 
+                     ForeignKey('sp_repos.id',
+                                onupdate='CASCADE', ondelete='SET NULL'))
+    
+    author_id = Column('id_author', Integer,
+                       ForeignKey('sp_users.id',
+                                  onupdate='CASCADE', ondelete='SET NULL'))
+    
+    doctype_id = Column('id_doctype', Integer, 
+                        ForeignKey('sp_doctypes.id',
+                                   onupdate='CASCADE', ondelete='SET NULL'))
+    
+    def __unicode__(self):
+        return u'%s' % self.title
+    
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
+
+SapnsRepo.docs = \
+    relation(SapnsDoc,
+             backref='repo', 
+             primaryjoin=SapnsRepo.repo_id == SapnsDoc.repo_id)
+    
+SapnsUser.authored_docs = \
+    relation(SapnsDoc,
+             backref='author',
+             primaryjoin=SapnsUser.user_id == SapnsDoc.author_id)
+    
+class SapnsDocType(DeclarativeBase):
+    
+    __tablename__ = 'sp_doctypes'
+    
+    doctype_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode(80), nullable=False)
+    description = Column(Text)
+    
+    docs = relation(SapnsDoc, 
+                    backref='doctype', 
+                    primaryjoin=doctype_id == SapnsDoc.doctype_id)
+    
+    def __unicode__(self):
+        return u'%s' % self.description
+    
+    def __repr__(self):
+        return unicode(self).encode('utf-8')
+    
+class SapnsAssignedDoc(DeclarativeBase):
+    
+    __tablename__ = 'sp_assigned_docs'
+    
+    assigneddoc_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    
+    class_id = Column('id_class', Integer, 
+                      ForeignKey('sp_classes.id',
+                                 onupdate='CASCADE', ondelete='SET NULL'))
+    
+    doc_id = Column('id_doc', Integer, 
+                    ForeignKey('sp_docs.id',
+                               onupdate='CASCADE', ondelete='CASCADE'))
+    
+    object_id = Column(Integer)
+    
+SapnsDoc.assigned_docs = \
+    relation(SapnsAssignedDoc,
+             backref='doc',
+             primaryjoin=SapnsDoc.doc_id == SapnsAssignedDoc.doc_id)
