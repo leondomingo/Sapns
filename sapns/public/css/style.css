@@ -368,7 +368,7 @@ clear:both;
 	text-align: center;
 	float: left;
 	height: 30px;
-	vertical-align: center;
+	vertical-align: middle;
 	margin-top: 5px;
 	height: 25px;
 }
@@ -502,7 +502,7 @@ clear:both;
 	text-align: left; 
 	font-size: 20px;
 	color: #D62A2A; 
-	font-weight: bold;'
+	font-weight: bold;
 }
 
 #delete-error-message {

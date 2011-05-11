@@ -16,14 +16,42 @@
         font-weight: bold;
         font-size: 16px;
     }
+    
+    #welcome {
+        background-color: #B4BD3C; 
+        height: 60px; 
+        padding: 20px;
+        border: 2px solid white;
+        margin-top: 20px;
+    }    
+</style>
+
+<style type="text/css" media="print">
+    .sapns-name {
+        color: green;
+        font-weight: bold;
+        font-size: 20px;
+    }
+    
+    a {
+        text-decoration: none;
+        color: black;
+    }
+    
+    #welcome {
+        background-color: black;
+        color: white; 
+        height: 60px; 
+        padding: 20px;
+        border: 2px solid white;
+        margin-top: 20px;
+    }
 </style>
 {% endblock %}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
 </head>
 <body>
-    <div style="background-color: #B4BD3C; height: 60px; padding: 20px;
-        border: 2px solid white;
-        margin-top: 20px;">
+    <div id="welcome" >
         <h1 style="color: white; font-style: normal;">Welcome to Sapns!</h1>    
     </div>
     
