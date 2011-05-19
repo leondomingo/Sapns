@@ -1,18 +1,18 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect, config
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
+from tg import expose, flash, require, url, request, redirect #, config
+from pylons.i18n import ugettext as _ #, lazy_ugettext as l_
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
-import sapns.config.app_cfg as app_cfg
+#from sapns.model import DBSession
+#import sapns.config.app_cfg as app_cfg
 
 from sapns.controllers.error import ErrorController
 from sapns.controllers.dashboard import DashboardController
-from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut
+#from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut
 
 __all__ = ['RootController']
 
@@ -28,7 +28,6 @@ class RootController(BaseController):
 
     Keep in mind that WSGI applications shouldn't be mounted directly: They
     must be wrapped around with :class:`tg.controllers.WSGIAppController`.
-
     """
     
     error = ErrorController()

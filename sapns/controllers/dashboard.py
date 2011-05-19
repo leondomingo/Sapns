@@ -78,7 +78,7 @@ class DashboardController(BaseController):
 
     @expose('dashboard/listof.html')
     @require(predicates.not_anonymous())
-    def list(self, cls='', q='', **params):
+    def list(self, cls, q='', **params):
         
         logger = logging.getLogger(__name__ + '/list')
         logger.info('params=%s' % params)
