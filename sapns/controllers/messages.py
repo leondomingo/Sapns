@@ -11,7 +11,7 @@ from repoze.what import authorize
 
 # project specific imports
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
+from sapns.model import DBSession as dbs
 
 import logging
 from sapns.model.sapnsmodel import SapnsUser
@@ -25,7 +25,7 @@ class MessagesController(BaseController):
     @expose('messages/index.html')
     def index(self):
         
-        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         messages = user.get_messages()
         
         return dict(page='messages', came_from='/dashboard', messages=messages)

@@ -17,7 +17,7 @@ from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime, Date,\
     Time, Text
 from sqlalchemy.orm import relation, synonym
 
-from sapns.model import DeclarativeBase, metadata, DBSession
+from sapns.model import DeclarativeBase, metadata, DBSession as dbs
 from sapns.model.auth import User
 
 import logging
@@ -35,7 +35,7 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
 class SapnsUser(User):
     
     def get_dashboard(self):
-        dboard = DBSession.query(SapnsShortcut).\
+        dboard = dbs.query(SapnsShortcut).\
                     filter(and_(SapnsShortcut.user_id == self.user_id,
                                 SapnsShortcut.parent_id == None)).\
                     first()
@@ -43,7 +43,7 @@ class SapnsUser(User):
         return dboard
     
     def get_dataexploration(self):
-        data_exploration = DBSession.query(SapnsShortcut).\
+        data_exploration = dbs.query(SapnsShortcut).\
                 filter(and_(SapnsShortcut.parent_id == self.get_dashboard().shortcut_id,
                             SapnsShortcut.order == 0,
                             )).\
@@ -59,7 +59,7 @@ class SapnsUser(User):
             id_parent = self.get_dashboard().shortcut_id
             
         shortcuts = []
-        for sc, ac, cl in DBSession.query(SapnsShortcut, 
+        for sc, ac, cl in dbs.query(SapnsShortcut, 
                                           SapnsAction,
                                           SapnsClass).\
                 outerjoin((SapnsAction,
@@ -97,7 +97,7 @@ class SapnsUser(User):
             # shortcuts
             logger.info('Copying shortcuts')
             parents = {}
-            for sc in DBSession.query(SapnsShortcut).\
+            for sc in dbs.query(SapnsShortcut).\
                     filter(SapnsShortcut.user_id == other_id):
                 
                 sc_copy = SapnsShortcut()
@@ -107,36 +107,36 @@ class SapnsUser(User):
                 sc_copy.action_id = sc.action_id
                 sc_copy.order = sc.order
                 
-                DBSession.add(sc_copy)
-                DBSession.flush()
+                dbs.add(sc_copy)
+                dbs.flush()
                 
                 parents[sc.shortcut_id] = sc_copy.shortcut_id
                 
             logger.info('Updating parents')
-            for sc_copy in DBSession.query(SapnsShortcut).\
+            for sc_copy in dbs.query(SapnsShortcut).\
                     filter(and_(SapnsShortcut.user_id == self.user_id,
                                 SapnsShortcut.parent_id != None)):
 
                 # update parent shortcut
                 sc_copy.parent_id = parents[sc_copy.parent_id]
-                DBSession.add(sc_copy)
-                DBSession.flush()
+                dbs.add(sc_copy)
+                dbs.flush()
                 
             # privileges (on classes)
             logger.info('Copying privileges')
-            for priv in DBSession.query(SapnsPrivilege).\
+            for priv in dbs.query(SapnsPrivilege).\
                     filter(SapnsPrivilege.user_id == other_id):
 
                 priv_copy = SapnsPrivilege()
                 priv_copy.class_id = priv.class_id
                 priv_copy.user_id = self.user_id
                 
-                DBSession.add(priv_copy)
-                DBSession.flush()
+                dbs.add(priv_copy)
+                dbs.flush()
             
             # attribute privileges
             logger.info('Copying attribute privileges')
-            for ap in DBSession.query(SapnsAttrPrivilege).\
+            for ap in dbs.query(SapnsAttrPrivilege).\
                     filter(SapnsAttrPrivilege.user_id == other_id):
                 
                 ap_copy = SapnsAttrPrivilege()
@@ -144,14 +144,14 @@ class SapnsUser(User):
                 ap_copy.attribute_id = ap.attribute_id
                 ap_copy.access = ap.access
                 
-                DBSession.add(ap_copy)
-                DBSession.flush()
+                dbs.add(ap_copy)
+                dbs.flush()
                 
         except Exception, e:
             logger.error(e)
     
     def has_privilege(self, cls):
-        priv = DBSession.query(SapnsPrivilege).\
+        priv = dbs.query(SapnsPrivilege).\
                 join((SapnsClass, 
                       SapnsClass.class_id == SapnsPrivilege.class_id)).\
                 filter(and_(SapnsPrivilege.user_id == self.user_id, 
@@ -161,7 +161,7 @@ class SapnsUser(User):
         return priv != None
     
     def attr_privilege(self, id_attribute):
-        priv_atr = DBSession.query(SapnsAttrPrivilege).\
+        priv_atr = dbs.query(SapnsAttrPrivilege).\
                 filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
                             SapnsAttrPrivilege.attribute_id == id_attribute,
                             )).\
@@ -171,7 +171,7 @@ class SapnsUser(User):
     
     def get_messages(self):
         messages = []
-        for msg, msgto, userfrom in DBSession.query(SapnsMessage, 
+        for msg, msgto, userfrom in dbs.query(SapnsMessage, 
                                                     SapnsMessageTo, 
                                                     SapnsUser).\
                 join((SapnsMessageTo, 
@@ -188,7 +188,7 @@ class SapnsUser(User):
         return messages
     
     def messages(self):
-        n = DBSession.query(SapnsMessageTo).\
+        n = dbs.query(SapnsMessageTo).\
                 filter(SapnsMessageTo.user_to_id == self.user_id).\
                 count()
                 
@@ -197,7 +197,7 @@ class SapnsUser(User):
     def unread_messages(self):
         """Returns the number of unread messages of this users"""
         
-        n = DBSession.query(SapnsMessageTo).\
+        n = dbs.query(SapnsMessageTo).\
                 filter(and_(SapnsMessageTo.user_to_id == self.user_id,
                             SapnsMessageTo.is_read == False)).\
                 count()
@@ -214,8 +214,8 @@ class SapnsUser(User):
         new_doc.filename = os.path.basename(pathtofile)
         new_doc.author_id = self.user_id
         
-        DBSession.add(new_doc)
-        DBSession.flush()
+        dbs.add(new_doc)
+        dbs.flush()
         
         dst_path = os.path.join(new_doc.repo.path, '%d' % new_doc.doc_id)
         shutil.copy(pathtofile, dst_path)
@@ -249,7 +249,7 @@ class SapnsShortcut(DeclarativeBase):
     
     def by_order(self, order):
         """Return a 'child' shortcut (of this) with the indicated 'order'"""
-        sc = DBSession.query(SapnsShortcut).\
+        sc = dbs.query(SapnsShortcut).\
                 filter(and_(SapnsShortcut.parent_id == self.shortcut_id,
                             SapnsShortcut.order == order)).\
                 first()
@@ -259,7 +259,7 @@ class SapnsShortcut(DeclarativeBase):
     def next_order(self):
         """Returns the next order for a child shortcut."""
         
-        sc = DBSession.query(SapnsShortcut).\
+        sc = dbs.query(SapnsShortcut).\
                 filter(SapnsShortcut.parent_id == self.shortcut_id).\
                 order_by(desc(SapnsShortcut.order)).\
                 first()
@@ -273,7 +273,7 @@ class SapnsShortcut(DeclarativeBase):
     def add_child(self, id_shortcut):
         
         # the shortcut to be copied
-        sc = DBSession.query(SapnsShortcut).get(id_shortcut)
+        sc = dbs.query(SapnsShortcut).get(id_shortcut)
         
         if not sc:
             raise Exception('It does not exist that shortcut [%s]' % id_shortcut)
@@ -286,8 +286,8 @@ class SapnsShortcut(DeclarativeBase):
         new_sc.title = sc.title
         new_sc.action_id = sc.action_id
         
-        DBSession.add(new_sc)
-        DBSession.flush()
+        dbs.add(new_sc)
+        dbs.flush()
 
 # TODO: 1-to-1 autoreference relation
 SapnsShortcut.children = \
@@ -327,7 +327,7 @@ class SapnsClass(DeclarativeBase):
         OUT
           <SapnsClass>
         """
-        cls = DBSession.query(SapnsClass).\
+        cls = dbs.query(SapnsClass).\
             filter(SapnsClass.name == class_name).\
             first()
             
@@ -343,7 +343,7 @@ class SapnsClass(DeclarativeBase):
         def __class_title(class_name, qry=None, attr=None):
             
             try:
-                meta = MetaData(bind=DBSession.bind)
+                meta = MetaData(bind=dbs.bind)
                 cls = SapnsClass.by_name(class_name)
                 tbl = alias(Table(cls.name, meta, autoload=True))
                 
@@ -367,7 +367,7 @@ class SapnsClass(DeclarativeBase):
                         types.append(r['type'])
                         
                     else:
-                        rel_class = DBSession.query(SapnsClass).get(r['related_class_id'])
+                        rel_class = dbs.query(SapnsClass).get(r['related_class_id'])
                         names_rel, types_rel, qry = \
                             __class_title(rel_class.name, qry=qry, attr=tbl.c[r['name']])
 
@@ -390,7 +390,7 @@ class SapnsClass(DeclarativeBase):
         logger.info(sel)
         
         titles = []
-        for row in DBSession.execute(sel):
+        for row in dbs.execute(sel):
             
             cols = []
             for n, t in zip(names[1:], types[1:]):
@@ -424,10 +424,10 @@ class SapnsClass(DeclarativeBase):
         
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
-        meta = MetaData(bind=DBSession.bind)
+        meta = MetaData(bind=dbs.bind)
         cls = SapnsClass.by_name(class_name)
         tbl = Table(cls.name, meta, autoload=True)
-        row = DBSession.execute(tbl.select(whereclause=tbl.c.id == id_object)).fetchone()
+        row = dbs.execute(tbl.select(whereclause=tbl.c.id == id_object)).fetchone()
         ref = []
         for r in cls.reference():
             
@@ -449,7 +449,7 @@ class SapnsClass(DeclarativeBase):
                 
             else:
                 # related attribute
-                rel_class = DBSession.query(SapnsClass).get(r['related_class_id'])
+                rel_class = dbs.query(SapnsClass).get(r['related_class_id'])
                 rel_ref = SapnsClass.object_title(rel_class.name, row[r['name']])
                 
                 ref.append(rel_ref)
@@ -465,7 +465,7 @@ class SapnsClass(DeclarativeBase):
         """
         
         actions = []
-        for ac in DBSession.query(SapnsAction).\
+        for ac in dbs.query(SapnsAction).\
                 filter(and_(SapnsAction.class_id == self.class_id,
                             SapnsAction.type != SapnsAction.TYPE_LIST,
                             )).\
@@ -498,7 +498,7 @@ class SapnsClass(DeclarativeBase):
         """
         
         ins = []
-        for attr in DBSession.query(SapnsAttribute).\
+        for attr in dbs.query(SapnsAttribute).\
                 filter(SapnsAttribute.class_id == self.class_id).\
                 order_by(SapnsAttribute.insertion_order).\
                 all():
@@ -527,7 +527,7 @@ class SapnsClass(DeclarativeBase):
             cond_all = SapnsAttribute.reference_order != None
         
         ref = []
-        for attr in DBSession.query(SapnsAttribute).\
+        for attr in dbs.query(SapnsAttribute).\
                 filter(and_(SapnsAttribute.class_id == self.class_id,
                             cond_all)).\
                 order_by(SapnsAttribute.reference_order).\
@@ -552,7 +552,7 @@ class SapnsClass(DeclarativeBase):
           <SapnsAttribute>
         """
         
-        attr = DBSession.query(SapnsAttribute).\
+        attr = dbs.query(SapnsAttribute).\
                 filter(and_(SapnsAttribute.class_id == self.class_id,
                             SapnsAttribute.name == attr_name,
                             )).\
@@ -575,7 +575,7 @@ class SapnsClass(DeclarativeBase):
         """
         
         rel_classes = []
-        for cls, attr in DBSession.query(SapnsClass, SapnsAttribute).\
+        for cls, attr in dbs.query(SapnsClass, SapnsAttribute).\
                 join((SapnsAttribute, 
                       SapnsAttribute.class_id == SapnsClass.class_id)).\
                 filter(SapnsAttribute.related_class_id == self.class_id).\
@@ -656,7 +656,7 @@ class SapnsPrivilege(DeclarativeBase):
     
     @staticmethod
     def has_privilege(id_user, id_class):
-        priv = DBSession.query(SapnsPrivilege).\
+        priv = dbs.query(SapnsPrivilege).\
                 filter(and_(SapnsPrivilege.user_id == id_user,
                             SapnsPrivilege.class_id == id_class,
                             ))
@@ -669,18 +669,18 @@ class SapnsPrivilege(DeclarativeBase):
         priv.user = id_user
         priv.class_ = id_class
         
-        DBSession.add(priv)
-        DBSession.flush()
+        dbs.add(priv)
+        dbs.flush()
         
     @staticmethod
     def remove_privilege(id_user, id_class):
-        DBSession.query(SapnsPrivilege).\
+        dbs.query(SapnsPrivilege).\
             filter(and_(SapnsPrivilege.user_id == id_user,
                         SapnsPrivilege.class_id == id_class,
                         )).\
             delete()
             
-        DBSession.flush()
+        dbs.flush()
 
 class SapnsAttrPrivilege(DeclarativeBase):
     
@@ -708,7 +708,7 @@ class SapnsAttrPrivilege(DeclarativeBase):
     @staticmethod
     def get_privilege(id_user, id_attribute):
         
-        priv = DBSession.query(SapnsAttrPrivilege).\
+        priv = dbs.query(SapnsAttrPrivilege).\
                 filter(and_(SapnsAttrPrivilege.user_id == id_user,
                             SapnsAttrPrivilege.attribute_id == id_attribute
                             ))
@@ -739,18 +739,18 @@ class SapnsAttrPrivilege(DeclarativeBase):
         else:
             priv.access = access
             
-        DBSession.add(priv)
-        DBSession.flush()
+        dbs.add(priv)
+        dbs.flush()
         
     @staticmethod
     def remove_privilege(id_user, id_attribute):
-        DBSession.query(SapnsAttrPrivilege).\
+        dbs.query(SapnsAttrPrivilege).\
             filter(and_(SapnsAttrPrivilege.user_id == id_user,
                         SapnsAttrPrivilege.attribute_id == id_attribute,
                         )).\
             delete()
             
-        DBSession.flush()
+        dbs.flush()
 
 class SapnsAction(DeclarativeBase):
     """List of available actions in Sapns"""

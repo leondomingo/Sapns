@@ -11,7 +11,7 @@ from repoze.what import authorize
 
 # project specific imports
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
+from sapns.model import DBSession as dbs
 
 import logging
 from sapns.model.sapnsmodel import SapnsUser , SapnsShortcut
@@ -42,11 +42,11 @@ class ShortcutsController(BaseController):
         try:
             logger.info('Deleting shortcut [%s]' % id)
             
-            DBSession.query(SapnsShortcut).\
+            dbs.query(SapnsShortcut).\
                 filter(SapnsShortcut.shortcut_id == id).\
                 delete()
             
-            DBSession.flush()
+            dbs.flush()
         
             return dict(status=True)
     
@@ -59,7 +59,7 @@ class ShortcutsController(BaseController):
         logger = logging.getLogger(__name__ + '/bookmark')
         try:
             logger.info('Bookmarking shortcut [%s]' % id)
-            user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             user.get_dashboard().add_child(id)
             
             return dict(status=True)
@@ -75,7 +75,7 @@ class ShortcutsController(BaseController):
         try:
             logger.info('Sharing shortcut [%s]' % id)
             
-            user = DBSession.query(SapnsUser).get(id_user)
+            user = dbs.query(SapnsUser).get(id_user)
             if not user:
                 raise Exception('User [%s] does not exist' % id_user)
             

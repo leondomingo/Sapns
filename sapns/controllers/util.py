@@ -11,7 +11,7 @@ from repoze.what import authorize
 
 # project specific imports
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
+from sapns.model import DBSession as dbs
 
 import logging
 from sqlalchemy.schema import MetaData
@@ -47,7 +47,7 @@ class UtilController(BaseController):
         
         logger = logging.getLogger(__name__ + '/create_dashboards')
         
-        for us in DBSession.query(SapnsUser):
+        for us in dbs.query(SapnsUser):
             
             logger.info('Creating dashboard for "%s"' % us.display_name)
             
@@ -61,8 +61,8 @@ class UtilController(BaseController):
                 dboard.title = unicode(l_('Dashboard'))
                 dboard.order = 0
                 
-                DBSession.add(dboard)
-                DBSession.flush()
+                dbs.add(dboard)
+                dbs.flush()
                 
                 # data exploration
                 
@@ -72,8 +72,8 @@ class UtilController(BaseController):
                 data_ex.user_id = us.user_id
                 data_ex.order = 0
                 
-                DBSession.add(data_ex)
-                DBSession.flush()
+                dbs.add(data_ex)
+                dbs.flush()
                 
                 # Data exploration/Sapns
                 sc_sapns = SapnsShortcut()
@@ -82,7 +82,7 @@ class UtilController(BaseController):
                 sc_sapns.user_id = us.user_id
                 sc_sapns.order = 0
                 
-                DBSession.add(sc_sapns)
+                dbs.add(sc_sapns)
                 
                 # Data exploration/Project
                 sc_project = SapnsShortcut()
@@ -91,8 +91,8 @@ class UtilController(BaseController):
                 sc_project.user_id = us.user_id
                 sc_project.order = 1
                 
-                DBSession.add(sc_project)
-                DBSession.flush()
+                dbs.add(sc_project)
+                dbs.flush()
                 
             else:
                 logger.info('Dashboard already exists')
@@ -105,12 +105,12 @@ class UtilController(BaseController):
             
             for i, tbl in enumerate(tables):
                 
-                cls = DBSession.query(SapnsClass).\
+                cls = dbs.query(SapnsClass).\
                         filter(SapnsClass.name == tbl['name']).\
                         first()
                 
                 # look for this table action
-                act_table = DBSession.query(SapnsAction).\
+                act_table = dbs.query(SapnsAction).\
                                 filter(and_(SapnsAction.type == SapnsAction.TYPE_LIST,
                                             SapnsAction.class_id == cls.class_id)).\
                                 first()
@@ -121,8 +121,8 @@ class UtilController(BaseController):
                     act_table.type = SapnsAction.TYPE_LIST
                     act_table.class_id = cls.class_id
                     
-                    DBSession.add(act_table)
-                    DBSession.flush()
+                    dbs.add(act_table)
+                    dbs.flush()
                     
                 # project
                 sc_parent = sc_project.shortcut_id
@@ -130,7 +130,7 @@ class UtilController(BaseController):
                     # sapns
                     sc_parent = sc_sapns.shortcut_id
                     
-                sc_table = DBSession.query(SapnsShortcut).\
+                sc_table = dbs.query(SapnsShortcut).\
                         filter(and_(SapnsShortcut.parent_id == sc_parent,
                                     SapnsShortcut.action_id == act_table.action_id,
                                     SapnsShortcut.user_id == us.user_id,
@@ -146,22 +146,22 @@ class UtilController(BaseController):
                     sc_table.action_id = act_table.action_id
                     sc_table.order = i
     
-                    DBSession.add(sc_table)
-                    DBSession.flush()
+                    dbs.add(sc_table)
+                    dbs.flush()
                 
                     # privileges
                     priv = SapnsPrivilege()
                     priv.user_id = us.user_id
                     priv.class_id = cls.class_id
                 
-                    DBSession.add(priv)
-                    DBSession.flush()
+                    dbs.add(priv)
+                    dbs.flush()
                     
                 else:
                     logger.info('Shortcut for "%s" already exists' % cls.title)
                 
                 # attribute privileges
-                for attr in DBSession.query(SapnsAttribute).\
+                for attr in dbs.query(SapnsAttribute).\
                         filter(SapnsAttribute.class_id == cls.class_id).\
                         all():
                     
@@ -172,8 +172,8 @@ class UtilController(BaseController):
                         priv_attr.attribute_id = attr.attribute_id
                         priv_attr.access = SapnsAttrPrivilege.ACCESS_READWRITE
                         
-                        DBSession.add(priv_attr)
-                        DBSession.flush()
+                        dbs.add(priv_attr)
+                        dbs.flush()
                         
                     else:
                         logger.info('Privilege for "%s" already exists' % attr.title)
@@ -193,7 +193,7 @@ class UtilController(BaseController):
             
             logger.info('Table: %s' % tbl['name'])
             
-            klass = DBSession.query(SapnsClass).\
+            klass = dbs.query(SapnsClass).\
                         filter(SapnsClass.name == tbl['name']).\
                         first()
             
@@ -206,8 +206,8 @@ class UtilController(BaseController):
                 desc = unicode(l_('Class: %s'))
                 klass.description =  desc % tbl['name']
                 
-                DBSession.add(klass)
-                DBSession.flush()
+                dbs.add(klass)
+                dbs.flush()
                 
             else:
                 logger.warning('.....already exists')
@@ -216,7 +216,7 @@ class UtilController(BaseController):
                 
             # create an action
             def create_action(name, type_):
-                action = DBSession.query(SapnsAction).\
+                action = dbs.query(SapnsAction).\
                             filter(and_(SapnsAction.class_id == klass.class_id,
                                         SapnsAction.type == type_)).\
                             first()
@@ -227,8 +227,8 @@ class UtilController(BaseController):
                     action.type = type_
                     action.class_id = klass.class_id
                     
-                    DBSession.add(action)
-                    DBSession.flush()
+                    dbs.add(action)
+                    dbs.flush()
                     
             # create standard actions
             create_action(unicode(l_('New')), SapnsAction.TYPE_NEW)
@@ -241,7 +241,7 @@ class UtilController(BaseController):
                 
                 logger.info('Column: %s' % col['name'])
                 
-                attr = DBSession.query(SapnsAttribute).\
+                attr = dbs.query(SapnsAttribute).\
                         filter(and_(SapnsAttribute.name == col['name'],
                                     SapnsAttribute.class_id == klass.class_id, 
                                     )).\
@@ -264,8 +264,8 @@ class UtilController(BaseController):
                     attr.insertion_order = i
                     attr.is_collection = False
                     
-                    DBSession.add(attr)
-                    DBSession.flush()
+                    dbs.add(attr)
+                    dbs.flush()
                     
                 else:
                     logger.warning('.....already exists')
@@ -276,11 +276,11 @@ class UtilController(BaseController):
             
         # update related classes
         for attr_id, fk_table in pending_attr.iteritems():
-            attr = DBSession.query(SapnsAttribute).get(attr_id)
+            attr = dbs.query(SapnsAttribute).get(attr_id)
             attr.related_class_id = tables_id[fk_table]
             
-            DBSession.add(attr)
-            DBSession.flush()
+            dbs.add(attr)
+            dbs.flush()
 
         return dict(message=_('Process terminated'), came_from=url(came_from))
     
@@ -300,7 +300,7 @@ class UtilController(BaseController):
         
         logger = logging.getLogger(__name__ + '/extract_model')
         
-        meta = MetaData(bind=DBSession.bind, reflect=True)
+        meta = MetaData(bind=dbs.bind, reflect=True)
         logger.info('Connected to "%s"' % meta.bind)
         
         def sp_cmp(x, y):

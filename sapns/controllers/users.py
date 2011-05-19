@@ -11,7 +11,7 @@ from repoze.what import authorize, predicates
 
 # project specific imports
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
+from sapns.model import DBSession as dbs
 
 import logging
 from sapns.model.sapnsmodel import SapnsUser 
@@ -35,7 +35,7 @@ class UsersController(BaseController):
                       ('e_mail', _('E-mail address'), ''),
                       ])
         
-        for us in DBSession.query(SapnsUser).order_by(SapnsUser.user_id):
+        for us in dbs.query(SapnsUser).order_by(SapnsUser.user_id):
             ds.append(dict(id=us.user_id,
                            display_name=us.display_name, 
                            user_name=us.user_name,
@@ -88,7 +88,7 @@ class UsersController(BaseController):
         id = int(params['id'])
         came_from = params.get('came_from', '/dashboard/users')
         
-        user = DBSession.query(SapnsUser).get(id)
+        user = dbs.query(SapnsUser).get(id)
         return dict(user=user, came_from=url(came_from))
     
     @expose('users/edit.html')
@@ -104,7 +104,7 @@ class UsersController(BaseController):
         try:
             new_user = False
             if params['id']:
-                user = DBSession.query(SapnsUser).get(params['id'])
+                user = dbs.query(SapnsUser).get(params['id'])
             else:
                 new_user = True
                 user = SapnsUser()
@@ -116,8 +116,8 @@ class UsersController(BaseController):
             if params['password'] != '':
                 user.password = params['password']
                 
-            DBSession.add(user)
-            DBSession.flush()
+            dbs.add(user)
+            dbs.flush()
             
             # copy shortcuts and privileges form another user
             if new_user:
@@ -139,11 +139,11 @@ class UsersController(BaseController):
             id = int(params['id'])
             came_from = params.get('came_from', '/dashboard/users')
             
-            DBSession.query(SapnsUser).\
+            dbs.query(SapnsUser).\
                 filter(SapnsUser.user_id == id).\
                 delete()
                 
-            DBSession.flush()
+            dbs.flush()
 
         except Exception, e:
             logger.error(e)
@@ -163,7 +163,7 @@ class UsersController(BaseController):
     @expose('json')
     def all(self):
         users = []
-        for user in DBSession.query(SapnsUser).order_by(SapnsUser.user_name):
+        for user in dbs.query(SapnsUser).order_by(SapnsUser.user_name):
             users.append(dict(id=user.user_id, display_name=user.display_name, 
                               user_name=user.user_name))
             

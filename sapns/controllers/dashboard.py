@@ -7,7 +7,7 @@ from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
-from sapns.model import DBSession
+from sapns.model import DBSession as dbs
 import sapns.config.app_cfg as app_cfg
 
 from neptuno.postgres.search import search
@@ -53,13 +53,13 @@ class DashboardController(BaseController):
         curr_lang = get_lang()
 
         # connected user
-        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=sc_parent)
         
         if sc_parent:
-            sc_parent = DBSession.query(SapnsShortcut).get(sc_parent).parent_id
+            sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
             
         else:
             sc_parent = None
@@ -91,7 +91,7 @@ class DashboardController(BaseController):
         came_from = params.get('came_from', '/dashboard')
         
         # does this user have permission on this table?
-        user = DBSession.query(SapnsUser).get(int(request.identity['user'].user_id))
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         
         if not user.has_privilege(cls):
             redirect(url('/message', 
@@ -104,7 +104,7 @@ class DashboardController(BaseController):
         
         pos = (pag_n-1) * rp
 
-        meta = MetaData(bind=DBSession.bind)
+        meta = MetaData(bind=dbs.bind)
         
         try:
             # TODO: cambiar "vista_busqueda_" por "_view_"
@@ -121,7 +121,7 @@ class DashboardController(BaseController):
         
         logger.info('search...%s / q=%s' % (view, q))
             
-        ds = search(DBSession, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
+        ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     show_ids=show_ids, strtodatef=strtodatef)
         
         # Reading global settings
@@ -145,7 +145,7 @@ class DashboardController(BaseController):
                              align='center'))
         
         # actions for this class
-        class_ = DBSession.query(SapnsClass).\
+        class_ = dbs.query(SapnsClass).\
                     filter(SapnsClass.name == cls).\
                     first()
                     
@@ -220,7 +220,7 @@ class DashboardController(BaseController):
         came_from = params.get('came_from', '/dashboard/list?cls=%s' % cls.name)
         
         # does this user have permission on this table?
-        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         if not user.has_privilege(cls.name):
             redirect(url('/message', 
@@ -284,7 +284,7 @@ class DashboardController(BaseController):
                 
         logger.info(update)
                 
-        meta = MetaData(bind=DBSession.bind)
+        meta = MetaData(bind=dbs.bind)
         tbl = Table(cls.name, meta, autoload=True)
         
         if update.get('id'):
@@ -295,7 +295,7 @@ class DashboardController(BaseController):
             logger.info('Inserting new object in "%s"' % cls.name)
             tbl.insert(values=update).execute()
             
-        DBSession.flush()
+        dbs.flush()
         
         redirect(url(came_from))
         
@@ -314,7 +314,7 @@ class DashboardController(BaseController):
         user = request.identity['user']
         
         # does this user have privilege on this class?
-        priv_class = DBSession.query(SapnsPrivilege, SapnsClass).\
+        priv_class = dbs.query(SapnsPrivilege, SapnsClass).\
                 join((SapnsClass, 
                       SapnsClass.class_id == SapnsPrivilege.class_id)).\
                 filter(and_(SapnsPrivilege.user_id == user.user_id, 
@@ -328,7 +328,7 @@ class DashboardController(BaseController):
             
         __, class_ = priv_class
         
-        meta = MetaData(DBSession.bind)
+        meta = MetaData(dbs.bind)
         try:
             tbl = Table(cls, meta, autoload=True)
             
@@ -349,7 +349,7 @@ class DashboardController(BaseController):
         ref = None
         row = None
         if id:
-            row = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
+            row = dbs.execute(tbl.select(tbl.c.id == id)).fetchone()
             if not row:
                 # row does not exist
                 redirect(url('/message',
@@ -361,7 +361,7 @@ class DashboardController(BaseController):
             
         # get attributes
         attributes = []
-        for attr in DBSession.query(SapnsAttribute).\
+        for attr in dbs.query(SapnsAttribute).\
                 join((SapnsClass, 
                       SapnsClass.class_id == SapnsAttribute.class_id)).\
                 join((SapnsAttrPrivilege, 
@@ -395,7 +395,7 @@ class DashboardController(BaseController):
                 #attributes[-1]['vals'] = []
                 #attribute['vals'] = []
                 try:
-                    rel_class = DBSession.query(SapnsClass).get(attr.related_class_id)
+                    rel_class = dbs.query(SapnsClass).get(attr.related_class_id)
                     
                     # related_class
                     attribute['related_class'] = rel_class.name
@@ -422,7 +422,7 @@ class DashboardController(BaseController):
         logger = logging.getLogger(__name__ + '/delete')
         rel_tables = []
         try:
-            user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             
             # check privilege on this class
             if not user.has_privilege(cls):
@@ -430,10 +430,10 @@ class DashboardController(BaseController):
                             message=_('Sorry, you do not have privilege on this class'))
             
             # does the record exist?
-            meta = MetaData(DBSession.bind)
+            meta = MetaData(dbs.bind)
             tbl = Table(cls, meta, autoload=True)
             
-            this_record = DBSession.execute(tbl.select(tbl.c.id == id)).fetchone()
+            this_record = dbs.execute(tbl.select(tbl.c.id == id)).fetchone()
             if not this_record:
                 return dict(status=False, message=_('Record does not exist'))
 
@@ -447,7 +447,7 @@ class DashboardController(BaseController):
                 attr_name = rcls['attr_name']
                 
                 sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id))
-                robj = DBSession.execute(sel).fetchone()
+                robj = dbs.execute(sel).fetchone()
                 
                 if robj != None:
                     rel_tables.append(dict(class_title=rcls['title'],
@@ -458,7 +458,7 @@ class DashboardController(BaseController):
                     
             # delete record
             tbl.delete(tbl.c.id == id).execute()
-            DBSession.flush()
+            dbs.flush()
             
             # success!
             return dict(status=True)
@@ -471,7 +471,7 @@ class DashboardController(BaseController):
     @require(predicates.has_permission('manage'))
     def ins_order(self, cls='', came_from='/dashboard'):
         
-        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # check privilege on this class
         if not user.has_privilege(cls):
@@ -494,20 +494,20 @@ class DashboardController(BaseController):
         
         for attr in attributes:
             
-            attribute = DBSession.query(SapnsAttribute).get(attr['id'])
+            attribute = dbs.query(SapnsAttribute).get(attr['id'])
             attribute.title = attr['title']
             attribute.insertion_order = attr['order']
             attribute.required = attr['required']
             attribute.visible = attr['visible']
             
-            DBSession.add(attribute)
+            dbs.add(attribute)
             
             if not title_saved:
                 title_saved = True
                 attribute.class_.title = title
-                DBSession.add(attribute.class_)
+                dbs.add(attribute.class_)
             
-            DBSession.flush()
+            dbs.flush()
         
         redirect(url(came_from))
     
@@ -515,7 +515,7 @@ class DashboardController(BaseController):
     @require(predicates.has_permission('manage'))
     def ref_order(self, cls='', came_from='/dashboard'):
         
-        user = DBSession.query(SapnsUser).get(request.identity['user'].user_id)
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # check privilege on this class
         if not user.has_privilege(cls):
@@ -535,10 +535,10 @@ class DashboardController(BaseController):
         attributes = sj.loads(attributes)
         
         for attr in attributes:
-            attribute = DBSession.query(SapnsAttribute).get(attr['id'])
+            attribute = dbs.query(SapnsAttribute).get(attr['id'])
             
             attribute.reference_order = attr['order']
-            DBSession.add(attribute)
-            DBSession.flush()
+            dbs.add(attribute)
+            dbs.flush()
         
         redirect(url(came_from))
