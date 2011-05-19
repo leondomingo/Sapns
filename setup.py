@@ -48,12 +48,13 @@ setup(
                    'repoze.who-testutil >= 1.0',
                    ],
     package_data={'sapns': ['i18n/*/LC_MESSAGES/*.mo',
-                                 'templates/*/*',
-                                 'public/*/*']},
+                            'templates/*/*',
+                            'public/*/*']},
     message_extractors={'sapns': [
             ('**.py', 'python', None),
             #('templates/**.mako', 'mako', None),
             ('templates/**.html', 'jinja2', None),
+            ('templates/**.js', 'jinja2', None),
             ('public/**', 'ignore', None)]},
 
     entry_points="""
