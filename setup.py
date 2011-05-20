@@ -25,7 +25,6 @@ setup(
         "TurboGears2 >= 2.1",
         "zope.sqlalchemy >= 0.4",
         "repoze.tm2 >= 1.0a5",
-        
         "repoze.what-quickstart",
         "repoze.what >= 1.0.8",
         "repoze.what-quickstart",
