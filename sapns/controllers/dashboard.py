@@ -33,9 +33,7 @@ from sapns.controllers.messages import MessagesController
 __all__ = ['DashboardController']
 
 class DashboardController(BaseController):
-    """
-    DashboardController
-    """
+    """DashboardController manage raw-data editing"""
     
     views = ViewsController()
     
@@ -203,7 +201,7 @@ class DashboardController(BaseController):
     
     @expose()
     @require(predicates.not_anonymous())
-    def save(self, cls='', id='', **params):
+    def save(self, cls, id='', **params):
         """
         IN
           cls          <unicode>
@@ -232,12 +230,20 @@ class DashboardController(BaseController):
         
         if id != '':
             update['id'] = int(id)
+            
+        READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
+                           SapnsAttrPrivilege.ACCESS_DENIED]
         
         for field_name, field_value in params.iteritems():
             m_field = re.search(r'^fld_(.+)', field_name)
             if m_field:
                 field_name_ = m_field.group(1) 
                 attr = cls.attr_by_name(field_name_)
+                
+                # skipping "read-only" and "denied" attributes
+                acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
+                if acc in READONLY_DENIED:
+                    continue
                 
                 # null values
                 if field_value == 'null':
@@ -307,7 +313,7 @@ class DashboardController(BaseController):
         
     @expose('dashboard/edit.html')
     @require(predicates.not_anonymous())
-    def edit(self, cls='', id=None, came_from='/dashboard'):
+    def edit(self, cls, id=None, came_from='/dashboard'):
         
         logger = logging.getLogger(__name__ + '/edit')
         
@@ -361,7 +367,7 @@ class DashboardController(BaseController):
             
         # get attributes
         attributes = []
-        for attr in dbs.query(SapnsAttribute).\
+        for attr, attr_priv in dbs.query(SapnsAttribute, SapnsAttrPrivilege).\
                 join((SapnsClass, 
                       SapnsClass.class_id == SapnsAttribute.class_id)).\
                 join((SapnsAttrPrivilege, 
@@ -369,8 +375,7 @@ class DashboardController(BaseController):
                            SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
                 filter(and_(SapnsClass.name == cls,
                             SapnsAttribute.visible == True)).\
-                order_by(SapnsAttribute.insertion_order).\
-                all():
+                order_by(SapnsAttribute.insertion_order):
             
             value = ''
             if row:
@@ -385,7 +390,8 @@ class DashboardController(BaseController):
                         
             attribute = dict(name=attr.name, title=attr.title,
                              type=attr.type, value=value, required=attr.required,
-                             related_class=None, related_class_title='', 
+                             related_class=None, related_class_title='',
+                             read_only=attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY, 
                              vals=None)
             
             attributes.append(attribute)

@@ -659,7 +659,8 @@ class SapnsPrivilege(DeclarativeBase):
         priv = dbs.query(SapnsPrivilege).\
                 filter(and_(SapnsPrivilege.user_id == id_user,
                             SapnsPrivilege.class_id == id_class,
-                            ))
+                            )).\
+                first()
                 
         return priv != None
     
@@ -711,7 +712,8 @@ class SapnsAttrPrivilege(DeclarativeBase):
         priv = dbs.query(SapnsAttrPrivilege).\
                 filter(and_(SapnsAttrPrivilege.user_id == id_user,
                             SapnsAttrPrivilege.attribute_id == id_attribute
-                            ))
+                            )).\
+                first()
                 
         return priv
     
@@ -729,7 +731,6 @@ class SapnsAttrPrivilege(DeclarativeBase):
     def add_privilege(id_user, id_attribute, access):
         
         priv = SapnsAttrPrivilege.get_privilege(id_user, id_attribute)
-
         if priv is None:
             priv = SapnsAttrPrivilege()
             priv.user_id = id_user

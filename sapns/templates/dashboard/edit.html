@@ -53,21 +53,25 @@
         {# <!-- Boolean --> #}
         {%- if attr.type == 'bool' %}
         <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
-            {% if attr.value %}checked{% endif %}/>
+            {% if attr.read_only %} disabled {% endif %}
+            {% if attr.value %} checked {% endif %}/>
         
         {# <!-- Date --> #}
         {%- elif attr.type == 'date' %}
-        <input class="sp-date-field" type="text" name="{{attr.name}}" 
+        <input class="sp-date-field" type="text" name="{{attr.name}}"
+            {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}"/>
         
         {# <!-- Time --> #}
         {%- elif attr.type == 'time' %}
-        <input class="sp-time-field" type="text" name="{{attr.name}}" 
+        <input class="sp-time-field" type="text" name="{{attr.name}}"
+            {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}"/>            
         
         {# <!-- Memo --> #}
         {%- elif attr.type == 'memo' %}
-        <textarea class="sp-text-field sp-memo-field" 
+        <textarea class="sp-text-field sp-memo-field"
+            {% if attr.read_only %} disabled {% endif %} 
             name="{{attr.name}}">{{attr.value|escape}}</textarea>
         
         {# <!-- Select --> #}
@@ -85,12 +89,14 @@
             {# <!-- Select button --> #}
             <input class="sp-button sp-select-button" type="button" value="..."
                 title='{{_("Set a value for \"%s\""|format(attr.title))}}' 
-                style="font-weight: bold;"/>
+                style="font-weight: bold;"
+                {% if attr.read_only %} disabled {% endif %} />
                 
             {# <!-- Remove button --> #}
             <input class="sp-button sp-empty-button" type="button" value="X"
                 title='{{_("Remove value of \"%s\""|format(attr.title))}}' 
-                style="font-weight: bold; color: red;"/>
+                style="font-weight: bold; color: red;"
+                {% if attr.read_only %} disabled {% endif %} />
             {#<!--
             <a href="/list?cls={{attr.related_class}}" target="_blank"
                 title="{{attr.related_class}}">[{{_('list')}}]</a>
@@ -116,7 +122,8 @@
         {%- else %}
         {# <!-- Everything else --> #}
         <input class="sp-text-field" type="text" name="{{attr.name}}" 
-            value="{{attr.value|escape}}"/>
+            value="{{attr.value|escape}}"
+            {% if attr.read_only %} disabled {% endif %} />
         {% endif %}
         </div>
     </div>
@@ -343,24 +350,31 @@
         
         // {# create datepickers 
         // with specific date format and options #} 
-        $('.sp-date-field').datepicker({
-            firstDay: {{js_options.first_day}},
-            changeMonth: true,
-            changeYear: true,
-            showOn: 'button',
-            autoSize: true,
-            nextText: "{{_('Next')}}",
-            prevText: "{{_('Prev')}}",
-            dateFormat: '{{js_options.date_format}}',
-            dayNames: ["{{_('Sunday')}}", "{{_('Monday')}}", "{{_('Tuesday')}}",
-                       "{{_('Wednesday')}}", "{{_('Thursday')}}", "{{_('Friday')}}",
-                       "{{_('Saturday')}}"],
-            dayNamesMin: ["{{_('Su')}}", "{{_('Mo')}}", "{{_('Tu')}}", "{{_('We')}}",
-                          "{{_('Th')}}", "{{_('Fr')}}", "{{_('Sa')}}"],
-            monthNames: ["{{_('January')}}", "{{_('February')}}", "{{_('March')}}", 
-                         "{{_('April')}}", "{{_('May')}}", "{{_('June')}}",
-                         "{{_('July')}}", "{{_('August')}}", "{{_('September')}}", 
-                         "{{_('October')}}", "{{_('November')}}", "{{_('December')}}"]
+        $('.sp-date-field').each(function() {
+        	if (!$(this).attr('disabled')) {
+        		$(this).datepicker({
+        		    firstDay: {{js_options.first_day}},
+        		    changeMonth: true,
+        		    changeYear: true,
+        		    showOn: 'button',
+        		    autoSize: true,
+        		    nextText: "{{_('Next')}}",
+        		    prevText: "{{_('Prev')}}",
+        		    dateFormat: '{{js_options.date_format}}',
+        		    dayNames: ["{{_('Sunday')}}", "{{_('Monday')}}", "{{_('Tuesday')}}",
+        		               "{{_('Wednesday')}}", "{{_('Thursday')}}", "{{_('Friday')}}",
+        		               "{{_('Saturday')}}"],
+        		    dayNamesMin: ["{{_('Su')}}", "{{_('Mo')}}", "{{_('Tu')}}", "{{_('We')}}",
+        		                  "{{_('Th')}}", "{{_('Fr')}}", "{{_('Sa')}}"],
+        		    monthNames: ["{{_('January')}}", "{{_('February')}}", "{{_('March')}}",
+        		                 "{{_('April')}}", "{{_('May')}}", "{{_('June')}}",
+                                 "{{_('July')}}", "{{_('August')}}", "{{_('September')}}", 
+                                 "{{_('October')}}", "{{_('November')}}", "{{_('December')}}"]
+               });
+        	}
+        	else {
+        		$(this).css('width', '110px');
+        	}
         });
     });
 </script>
