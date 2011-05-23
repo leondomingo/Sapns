@@ -22,7 +22,7 @@ class MessagesController(BaseController):
     
     allow_only = authorize.not_anonymous()
     
-    @expose('messages/index.html')
+    @expose('sapns/messages/index.html')
     def index(self):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)

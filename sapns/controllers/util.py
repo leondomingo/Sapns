@@ -29,7 +29,7 @@ class UtilController(BaseController):
     
     allow_only = authorize.has_any_permission('manage', 'utilities')
     
-    @expose('message.html')
+    @expose('sapns/message.html')
     def init(self):
         set_lang('en')
         self.update_metadata()
@@ -38,11 +38,11 @@ class UtilController(BaseController):
         return dict(message=_('Initialization was completed successfully'),
                     came_from=url('/'))
     
-    @expose('util/index.html')
+    @expose('sapns/util/index.html')
     def index(self, came_from='/'):
         return dict(page='util', came_from=came_from)
     
-    @expose('message.html')
+    @expose('sapns/message.html')
     def create_dashboards(self, came_from='/dashboard/util'):
         
         logger = logging.getLogger(__name__ + '/create_dashboards')
@@ -181,7 +181,7 @@ class UtilController(BaseController):
         return dict(message=_('The user dashboards have been created'), 
                     came_from=url(came_from))
     
-    @expose('message.html')
+    @expose('sapns/message.html')
     def update_metadata(self, came_from='/dashboard/util'):
         
         logger = logging.getLogger(__name__ + '/update_metadata')
@@ -291,11 +291,11 @@ class UtilController(BaseController):
             response.headerlist.append(('Content-Disposition', 
                                         'attachment;filename=%s' % file_name))
 
-        return render_jinja2('util/model.template',
+        return render_jinja2('sapns/util/model.template',
                              extra_vars=dict(app_name=app_name,
                                              tables=mdl['tables']))
     
-    @expose('util/tables.html')
+    @expose('sapns/util/tables.html')
     def extract_model(self, all=False):
         
         logger = logging.getLogger(__name__ + '/extract_model')

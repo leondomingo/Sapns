@@ -13,14 +13,11 @@ convert them into boolean, for example, you should use the
  
 """
 
-from tg import config
 from tg.configuration import AppConfig
-
 import sapns
 from sapns import model
 from sapns.lib import app_globals, helpers
 import neptuno.util as np_util
-from routes.mapper import Mapper
 
 class CustomConfig(AppConfig):
     
@@ -56,16 +53,25 @@ class CustomConfig(AppConfig):
             base_config = MyAppConfig()
 
         """
+        
+        from tg.configuration import config
+        from routes.mapper import Mapper
 
         map = Mapper(directory=config['pylons.paths']['controllers'],
                      always_scan=config['debug'])
 
         # Setup a default route for the root of object dispatch
-        map.connect('*url', controller='root', action='routes_placeholder')
+        controller_ = 'root'
+        root_folder = config.get('app.root_folder')
+        if root_folder:
+            controller_ = '%s/root' % root_folder
+
+        map.connect('*url', controller=controller_, action='routes_placeholder')
 
         config['routes.map'] = map
     
     def setup_jinja_renderer(self):
+        
         from tg.configuration import config, warnings
         from jinja2 import ChoiceLoader, Environment, FileSystemLoader
         from tg.render import render_jinja
@@ -89,6 +95,7 @@ class CustomConfig(AppConfig):
         self.render_functions.jinja = render_jinja
  
     def add_jinja_filter(self, func, func_name=None):
+        
         from tg.configuration import config
  
         if not func_name:
