@@ -13,14 +13,57 @@ convert them into boolean, for example, you should use the
  
 """
 
+from tg import config
 from tg.configuration import AppConfig
 
 import sapns
 from sapns import model
 from sapns.lib import app_globals, helpers
 import neptuno.util as np_util
+from routes.mapper import Mapper
 
 class CustomConfig(AppConfig):
+    
+    def setup_routes(self):
+        """Setup the default TG2 routes
+
+        Override this and setup your own routes maps if you want to use
+        custom routes.
+
+        It is recommended that you keep the existing application routing in
+        tact, and just add new connections to the mapper above the routes_placeholder
+        connection.  Lets say you want to add a pylons controller SamplesController,
+        inside the controllers/samples.py file of your application.  You would
+        augment the app_cfg.py in the following way::
+
+            from routes import Mapper
+            from tg.configuration import AppConfig
+
+            class MyAppConfig(AppConfig):
+                def setup_routes(self):
+                    map = Mapper(directory=config['pylons.paths']['controllers'],
+                                always_scan=config['debug'])
+
+                    # Add a Samples route
+                    map.connect('/samples/', controller='samples', action=index)
+
+                    # Setup a default route for the root of object dispatch
+                    map.connect('*url', controller='root', action='routes_placeholder')
+
+                    config['routes.map'] = map
+
+
+            base_config = MyAppConfig()
+
+        """
+
+        map = Mapper(directory=config['pylons.paths']['controllers'],
+                     always_scan=config['debug'])
+
+        # Setup a default route for the root of object dispatch
+        map.connect('*url', controller='root', action='routes_placeholder')
+
+        config['routes.map'] = map
     
     def setup_jinja_renderer(self):
         from tg.configuration import config, warnings
