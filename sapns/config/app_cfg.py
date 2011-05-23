@@ -16,11 +16,12 @@ convert them into boolean, for example, you should use the
 from tg import config
 from tg.configuration import AppConfig
 
+from routes.mapper import Mapper
+
 import sapns
 from sapns import model
 from sapns.lib import app_globals, helpers
 import neptuno.util as np_util
-from routes.mapper import Mapper
 
 class CustomConfig(AppConfig):
     
@@ -61,7 +62,12 @@ class CustomConfig(AppConfig):
                      always_scan=config['debug'])
 
         # Setup a default route for the root of object dispatch
-        map.connect('*url', controller='root', action='routes_placeholder')
+        controller_ = 'root'
+        root_folder = config['app.root_folder']
+        if root_folder:
+            controller_ = '%s/root' % root_folder
+
+        map.connect('*url', controller=controller_, action='routes_placeholder')
 
         config['routes.map'] = map
     
