@@ -24,11 +24,11 @@ class ViewsController(BaseController):
     
     allow_only = authorize.has_any_permission('manage', 'views')
     
-    @expose('views/index.html')
+    @expose('sapns/views/index.html')
     def index(self, came_from='/'):
         return dict(page='views', came_from=url(came_from))
     
-    @expose('views/view.html')
+    @expose('sapns/views/view.html')
     def edit(self, id=None, came_from='/'):
         
         # TODO: cargar datos de la vista con ese "id"
@@ -69,7 +69,7 @@ class ViewsController(BaseController):
                 
         return dict(page='views/edit', came_from=came_from, view=view)
 
-    @expose('views/view.html')
+    @expose('sapns/views/view.html')
     def error_handler(self, **kw):
         view = dict(id=kw['id'],
                     title=kw['title'],
@@ -89,13 +89,13 @@ class ViewsController(BaseController):
         #id = validators.Int().to_python(kw['id'])
         redirect(url('/views/edit'))
         
-    @expose('views/share.html')
+    @expose('sapns/views/share.html')
     def share(self, **kw):
         came_from = kw.get('came_from', url('/views'))
         # TODO: views/share
         return dict(page='views/share', came_from=came_from)
     
-    @expose('message.html')
+    @expose('sapns/message.html')
     def delete(self, id_view=None, came_from='/views'):
         
         return dict(message=_('The view has been successfully deleted'),

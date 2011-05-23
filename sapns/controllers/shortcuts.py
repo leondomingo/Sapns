@@ -23,7 +23,7 @@ class ShortcutsController(BaseController):
     
     allow_only = authorize.not_anonymous()
     
-    @expose('shortcuts/edit.html')
+    @expose('sapns/shortcuts/edit.html')
     def edit(self, id=None, **params):
         came_from = params.get('came_from', '/')
         page = _('Shorcuts editing')

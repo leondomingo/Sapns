@@ -23,7 +23,7 @@ class UsersController(BaseController):
     
     allow_only = authorize.not_anonymous()
     
-    @expose('users/index.html')
+    @expose('sapns/users/index.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def index(self, came_from='/dashboard'):
     
@@ -81,7 +81,7 @@ class UsersController(BaseController):
                               actions=actions, pag_n=1, rp=0, pos=0,
                               totalp=totalp, total=ds.count, total_pag=1))
         
-    @expose('users/edit.html')
+    @expose('sapns/users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def edit(self, **params):
         
@@ -91,7 +91,7 @@ class UsersController(BaseController):
         user = dbs.query(SapnsUser).get(id)
         return dict(user=user, came_from=url(came_from))
     
-    @expose('users/edit.html')
+    @expose('sapns/users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def new(self, **params):
         came_from = params.get('came_from', '/dashboard/users')
@@ -150,12 +150,12 @@ class UsersController(BaseController):
         
         redirect(url(came_from))
     
-    @expose('users/permission.html')
+    @expose('sapns/users/permission.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def permission(self, came_from='/dashboard/users'):
         return dict(came_from=url(came_from))
     
-    @expose('users/roles.html')
+    @expose('sapns/users/roles.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def roles(self, came_from='/dashboard/users'):
         return dict(came_from=url(came_from))

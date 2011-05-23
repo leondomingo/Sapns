@@ -34,7 +34,7 @@ class RootController(BaseController):
     
     dashboard = DashboardController()
 
-    @expose('index.html')
+    @expose('sapns/index.html')
     def index(self):
         curr_lang = get_lang()
         return dict(curr_lang=curr_lang)
@@ -43,18 +43,18 @@ class RootController(BaseController):
     def init(self):
         redirect(url('/dashboard/util/init'))
         
-    @expose('message.html')
+    @expose('sapns/message.html')
     @require(predicates.not_anonymous())
     def message(self, message='Error!', came_from='/'):
         return dict(message=message, came_from=url(came_from))
 
-    @expose('environ.html')
+    @expose('sapns/environ.html')
     @require(predicates.has_permission('manage'))
     def environ(self):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ)
 
-    @expose('login.html')
+    @expose('sapns/login.html')
     def login(self, came_from=url('/')):
         """Start the user login."""
         login_counter = request.environ['repoze.who.logins']

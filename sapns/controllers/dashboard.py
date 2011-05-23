@@ -45,7 +45,7 @@ class DashboardController(BaseController):
     
     messages = MessagesController()
 
-    @expose('dashboard/index.html')
+    @expose('sapns/dashboard/index.html')
     @require(predicates.not_anonymous())
     def index(self, sc_type='list', sc_parent=None):
         curr_lang = get_lang()
@@ -74,7 +74,7 @@ class DashboardController(BaseController):
     def init(self):
         redirect(url('/dashboard/util/init'))
 
-    @expose('dashboard/listof.html')
+    @expose('sapns/dashboard/listof.html')
     @require(predicates.not_anonymous())
     def list(self, cls, q='', **params):
         
@@ -179,7 +179,7 @@ class DashboardController(BaseController):
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
     
-    @expose('dashboard/search.html')
+    @expose('sapns/dashboard/search.html')
     @require(predicates.not_anonymous())
     def search(self, **params):
         logger = logging.getLogger(__name__ + '/search')
@@ -305,13 +305,13 @@ class DashboardController(BaseController):
         
         redirect(url(came_from))
         
-    @expose('dashboard/edit.html')
+    @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
     def new(self, cls='', came_from='/dashboard'):
         redirect(url('/dashboard/edit'), 
                  params=dict(cls=cls, id='', came_from=came_from))
         
-    @expose('dashboard/edit.html')
+    @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
     def edit(self, cls, id=None, came_from='/dashboard'):
         
@@ -421,7 +421,7 @@ class DashboardController(BaseController):
                     attributes=attributes, reference=ref, 
                     js_options=js_options, came_from=url(came_from))
     
-    @expose('dashboard/delete.html')
+    @expose('sapns/dashboard/delete.html')
     @expose('json')
     def delete(self, cls='', id=None, came_from='/dashboard'):
         
@@ -473,7 +473,7 @@ class DashboardController(BaseController):
             logger.error(e)
             return dict(status=False, message=str(e), rel_tables=rel_tables)
         
-    @expose('order/insert.html')
+    @expose('sapns/order/insert.html')
     @require(predicates.has_permission('manage'))
     def ins_order(self, cls='', came_from='/dashboard'):
         
@@ -517,7 +517,7 @@ class DashboardController(BaseController):
         
         redirect(url(came_from))
     
-    @expose('order/reference.html')
+    @expose('sapns/order/reference.html')
     @require(predicates.has_permission('manage'))
     def ref_order(self, cls='', came_from='/dashboard'):
         

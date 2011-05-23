@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-{% import 'dashboard/util.html' as util %}
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
 
 {# Head #}
 {% block head %}
@@ -68,9 +68,9 @@
     
     <div style="border: 1px solid white; height: 300px; overflow: auto;">
     {% if sc_type == 'list' %}
-        {% include 'shortcuts/list.html' %}
+        {% include 'sapns/shortcuts/list.html' %}
     {% elif sc_type == 'bigicon' %}
-        {% include 'shortcuts/bigicon.html' %}
+        {% include 'sapns/shortcuts/bigicon.html' %}
     {% endif %}
     
     </div>
