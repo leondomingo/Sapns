@@ -13,6 +13,7 @@ from repoze.what import authorize
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 
+import re
 import logging
 from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
@@ -408,3 +409,56 @@ class UtilController(BaseController):
                 
         return dict(page='extract_model', came_from=url('/dashboard/util'), 
                     tables=tables)
+        
+    @expose(content_type='text/plain')
+    def generate_key(self, fmt=None, n=1):
+        """
+        IN
+          fmt (optional=[8]-[4]-[4]-[4]-[12])
+          
+          The format of the key to be generated.
+          [n] represents a key of length n and we can define a key in different
+          parts like this:
+          [4]-[2]-[8] would produce a key like this xxxx-xx-xxxxxxxx
+          
+          Anything outside [n] is taken literally, so we can use different characters
+          for our key.
+          [5]#[5]![2] would produce a key like this xxxxx#xxxxx!xx
+          
+          The key characters are: A-Z, a-z, 0-9
+          
+          n <int> (optional=1)
+          The number of keys to be generated
+          
+        OUT
+          The generated key following the corresponding format (fmt).
+        """
+        
+        import random
+        random.seed()
+        
+        def _generate_key(l):
+            """generate a l-length key"""
+            pop = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+            r = ''
+            for i in xrange(l):
+                r += random.choice(pop)
+                
+            return r
+        
+        if not fmt:
+            fmt = '[8]-[4]-[4]-[4]-[12]'
+            
+        # substitution function
+        def sub_f(m):
+            """generate a n-length key for a [n] text"""
+            l = int(m.group(1))
+            return _generate_key(l)
+            
+        # generate n keys with the same "fmt" format
+        r = []
+        for i in xrange(int(n)):
+            # replace every [n] with the corresponding n-length key
+            r.append(re.sub(r'\[(\d+)\]', sub_f, fmt))
+            
+        return '\n'.join(r)
