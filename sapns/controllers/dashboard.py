@@ -215,7 +215,7 @@ class DashboardController(BaseController):
         logger.info(params)
 
         cls = SapnsClass.by_name(cls)
-        came_from = params.get('came_from', '/dashboard/list?cls=%s' % cls.name)
+        came_from = params.get('came_from') #, '/dashboard/list?cls=%s' % cls.name)
         
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -302,8 +302,16 @@ class DashboardController(BaseController):
             tbl.insert(values=update).execute()
             
         dbs.flush()
-        
-        redirect(url(came_from))
+
+        # come back        
+        logger.info('came_from = %s' % came_from)
+        if came_from:
+            redirect(url(came_from))
+            
+        else:
+            redirect(url('/message', 
+                         params=dict(message=_('The record has been successfully saved'),
+                                     came_from='')))
         
     @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
