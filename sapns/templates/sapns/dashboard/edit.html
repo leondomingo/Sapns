@@ -12,6 +12,7 @@
 <form id="edit-form" method="post" action="{{tg.url('/dashboard/save')}}">
     <input type="hidden" name="cls" value="{{cls}}"/> 
     <input type="hidden" name="id" value="{{id}}"/>
+    <input type="hidden" name="came_from" value="{{came_from}}"/>
 </form>
 
 <div class="sp-edit-panel">
@@ -297,6 +298,21 @@
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
                         'value="' + date_value + '"/>\n';
+            });
+            
+            // {# time #} 
+            $('.sp-time-field').each(function() {
+                var required = $(this).parent().parent().attr('required');
+                var value = $(this).val();
+                        
+                if (required == 'true' && value == '') {
+                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
+                }
+                
+                params += 
+                    '<input type="hidden" ' + 
+                        'name="fld_' + $(this).attr('name') + '" ' + 
+                        'value="' + value + '"/>\n';
             });
             
             // {# select fields #} 
