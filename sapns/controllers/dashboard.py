@@ -315,9 +315,14 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
-    def new(self, cls='', came_from='/dashboard'):
-        redirect(url('/dashboard/edit'), 
-                 params=dict(cls=cls, id='', came_from=came_from))
+    def new(self, cls, came_from='/dashboard', **kw):
+        
+        if not kw:
+            kw = {}
+            
+        kw['came_from'] = came_from
+            
+        redirect(url('/dashboard/edit/%s' % cls), params=kw)
         
     @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
