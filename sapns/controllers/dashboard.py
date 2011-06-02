@@ -358,13 +358,23 @@ class DashboardController(BaseController):
             
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
+        default_values_ro = {}
         default_values = {}
         for field_name, value in params.iteritems():
-            m = re.search(r'^_(\w+)$', field_name, re.I | re.U)
+            # default read-only values (_xxxx)
+            m = re.search(r'^_([a-z]\w+)$', field_name, re.I | re.U)
             if m:
-                logger.info('Default value: %s = %s' % (m.group(1), params[field_name]))
-                default_values[m.group(1)] = params[field_name]
-        
+                logger.info('Default value (read-only): %s = %s' % (m.group(1), params[field_name]))
+                default_values_ro[m.group(1)] = params[field_name]
+                
+            else:
+                # default read/write values (__xxxx)
+                # depends on privilege of this attribute
+                m = re.search(r'^__([a-z]\w+)$', field_name, re.I | re.U)
+                if m:
+                    logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
+                    default_values[m.group(1)] = params[field_name]
+                
         ref = None
         row = None
         if id:
@@ -392,9 +402,12 @@ class DashboardController(BaseController):
             
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
-            if attr.name in default_values:
-                value = default_values[attr.name]
+            if attr.name in default_values_ro:
+                value = default_values_ro[attr.name]
                 read_only = True
+                
+            elif attr.name in default_values:
+                value = default_values[attr.name]
 
             elif row:
                 if row[attr.name]:
