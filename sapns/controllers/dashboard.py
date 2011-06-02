@@ -321,7 +321,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
-    def edit(self, cls, id=None, came_from='/dashboard'):
+    def edit(self, cls, id=None, came_from='/dashboard', **params):
         
         logger = logging.getLogger(__name__ + '/edit')
         
@@ -353,12 +353,12 @@ class DashboardController(BaseController):
             
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
-        # js options
-        js_options = dict(date_format=config.get('js.date_format', default='mm-dd-yy'),
-                          day_names_min=config.get('js.day_names_min'),
-                          month_names=config.get('js.month_names'),
-                          first_day=config.get('js.first_day'),
-                          )
+        default_values = {}
+        for field_name, value in params.iteritems():
+            m = re.search(r'^_(\w+)$', field_name, re.I | re.U)
+            if m:
+                logger.info('Default value: %s = %s' % (m.group(1), params[field_name]))
+                default_values[m.group(1)] = params[field_name]
         
         ref = None
         row = None
@@ -386,7 +386,12 @@ class DashboardController(BaseController):
                 order_by(SapnsAttribute.insertion_order):
             
             value = ''
-            if row:
+            read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
+            if attr.name in default_values:
+                value = default_values[attr.name]
+                read_only = True
+
+            elif row:
                 if row[attr.name]:
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
@@ -399,8 +404,7 @@ class DashboardController(BaseController):
             attribute = dict(name=attr.name, title=attr.title,
                              type=attr.type, value=value, required=attr.required,
                              related_class=None, related_class_title='',
-                             read_only=attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY, 
-                             vals=None)
+                             read_only=read_only, vals=None)
             
             attributes.append(attribute)
             
@@ -427,7 +431,7 @@ class DashboardController(BaseController):
         return dict(cls=cls, title=class_.title, id=id, 
                     related_classes=class_.related_classes(), 
                     attributes=attributes, reference=ref, 
-                    js_options=js_options, came_from=url(came_from))
+                    came_from=url(came_from))
     
     @expose('sapns/dashboard/delete.html')
     @expose('json')

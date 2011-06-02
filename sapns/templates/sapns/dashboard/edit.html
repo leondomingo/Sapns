@@ -85,7 +85,9 @@
             
             {# <!-- Select text --> #}
             <input class="sp-select-text" type="text" readonly
-                value="{{attr.related_title}}" />
+                value="{{attr.related_title}}" 
+                {% if attr.read_only %} disabled {% endif %}
+                />
                 
             {# <!-- Select button --> #}
             <input class="sp-button sp-select-button" type="button" value="..."
@@ -94,10 +96,12 @@
                 {% if attr.read_only %} disabled {% endif %} />
                 
             {# <!-- Remove button --> #}
+            {% if not attr.read_only %}
             <input class="sp-button sp-empty-button" type="button" value="X"
                 title='{{_("Remove value of \"%s\""|format(attr.title))}}' 
                 style="font-weight: bold; color: red;"
                 {% if attr.read_only %} disabled {% endif %} />
+            {% endif %}
             {#<!--
             <a href="/list?cls={{attr.related_class}}" target="_blank"
                 title="{{attr.related_class}}">[{{_('list')}}]</a>
@@ -135,6 +139,7 @@
 
 {{util.jquery()}}
 {{util.jquery_ui()}}
+{{util.dateformat()}}
 
 <script type="text/javascript">
     $(document).ready(function() {
@@ -366,17 +371,25 @@
         
         // {# create datepickers 
         // with specific date format and options #} 
+        
+        // {# date format settings #} 
+        var first_day = "{{tg.config.get('js.first_day', '1')}}";
+        // "datepicker" setting 
+        var date_fmt0 = "{{tg.config.get('js.date_format', 'mm/dd/yyyy')}}";
+        // "format date library" setting 
+        var date_fmt1 = "{{tg.config.get('js.date_format2', 'mm/dd/yyyy')}}";
+        
         $('.sp-date-field').each(function() {
         	if (!$(this).attr('disabled')) {
         		$(this).datepicker({
-        		    firstDay: {{js_options.first_day}},
+        		    firstDay: first_day,
         		    changeMonth: true,
         		    changeYear: true,
         		    showOn: 'button',
         		    autoSize: true,
         		    nextText: "{{_('Next')}}",
         		    prevText: "{{_('Prev')}}",
-        		    dateFormat: '{{js_options.date_format}}',
+        		    dateFormat: date_fmt0,
         		    dayNames: ["{{_('Sunday')}}", "{{_('Monday')}}", "{{_('Tuesday')}}",
         		               "{{_('Wednesday')}}", "{{_('Thursday')}}", "{{_('Friday')}}",
         		               "{{_('Saturday')}}"],
@@ -389,7 +402,8 @@
                });
         	}
         	else {
-        		$(this).css('width', '110px');
+        		var date_value = new Date($(this).val()).format(date_fmt1);
+        		$(this).css('width', '85px').val(date_value);
         	}
         });
     });
