@@ -228,7 +228,7 @@ class DashboardController(BaseController):
         # init "update" dictionary
         update = {}
         
-        if id != '':
+        if id:
             update['id'] = int(id)
             
         READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
@@ -326,7 +326,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit.html')
     @require(predicates.not_anonymous())
-    def edit(self, cls, id=None, came_from='/dashboard', **params):
+    def edit(self, cls, id='', came_from='/dashboard', **params):
         
         logger = logging.getLogger(__name__ + '/edit')
         
@@ -423,6 +423,8 @@ class DashboardController(BaseController):
                              type=attr.type, value=value, required=attr.required,
                              related_class=None, related_class_title='',
                              read_only=read_only, vals=None)
+            
+            logger.info('%s = %s' % (attr.name, repr(value)))
             
             attributes.append(attribute)
             
