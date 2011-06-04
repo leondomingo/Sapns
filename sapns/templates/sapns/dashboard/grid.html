@@ -306,36 +306,34 @@
         <option value="0"   {% if grid.rp == 0 %}selected{% endif %}>{{_('All')}}</option>
     </select>
     
-    {# <!-- First page --> #}
-    <form method="post" action="{{grid.search_url + grid.cls}}">
+    {% macro form_newpage(pag_n, fl=False) %}
+    <form method="post" action="{{grid.search_url + grid.cls}}"
+        {% if fl %} style="float: left;" {% endif %}>
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
-        <input type="hidden" name="pag_n" value="{{1}}"/>
+        <input type="hidden" name="pag_n" value="{{pag_n}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
-        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
+        <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"/>
+        <input type="hidden" name="parent_id" value="{{parent_id or ''}}"/>
+    {% endmacro %}
+    
+    <!-- {# first page #} -->
+    {{form_newpage(1)}}
         <input class="sp-button sp-grid-pag-back" type="submit" value="|<<" 
             title="{{_('page 1')}}"/>
     </form>
     
+    <!-- {# previous page #} -->
     {# {% if grid.pag_n-1 > 0 %} #}
-    <form method="post" action="{{grid.search_url + grid.cls}}">
-        <input type="hidden" name="caption" value="{{grid.caption}}"/>
-        <input type="hidden" name="q" value="{{q}}"/>
-        <input type="hidden" name="rp" value="{{grid.rp}}"/>
-        <input type="hidden" name="pag_n" value="{{grid.pag_n-1}}"/>
-        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
-        <input type="hidden" name="came_from" value="{{came_from}}"/>
+    {{form_newpage(grid.pag_n-1)}}
         {% if grid.pag_n-1 > 0 %}
         <input class="sp-button sp-grid-pag-back" type="submit" value="<<" 
             title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
         {% else %}
         <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled/>
         {% endif %}
-        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
-        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
     </form>
     {# {% endif %} #}
     
@@ -343,15 +341,8 @@
         <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}"/>
     </div>
     
-    <form method="post" action="{{grid.search_url + grid.cls}}" style="float: left;">
-        <input type="hidden" name="caption" value="{{grid.caption}}"/>
-        <input type="hidden" name="q" value="{{q}}"/>
-        <input type="hidden" name="rp" value="{{grid.rp}}"/>
-        <input type="hidden" name="pag_n" value="{{grid.pag_n+1}}"/>
-        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
-        <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
-        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
+    <!-- {# next page #} -->
+    {{form_newpage(grid.pag_n+1, fl=True)}}
         {% if grid.pag_n+1 <= grid.total_pag %}
         <input class="sp-button sp-grid-pag-forth" type="submit" value=">>" 
             title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
@@ -360,16 +351,8 @@
         {% endif %}
     </form>
 
-    {# <!-- Last page --> #}    
-    <form method="post" action="{{grid.search_url + grid.cls}}">
-        <input type="hidden" name="caption" value="{{grid.caption}}"/>
-        <input type="hidden" name="q" value="{{q}}"/>
-        <input type="hidden" name="rp" value="{{grid.rp}}"/>
-        <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
-        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
-        <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
-        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
+    <!-- {# last page #} -->
+    {{form_newpage(grid.total_pag)}}
         <input class="sp-button sp-grid-pag-forth" type="submit" value=">>|"
             title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
