@@ -9,8 +9,7 @@
 {% block middle %}
 <div id="edit-dialog" style="display: none;"></div>
 
-<form id="edit-form" method="post" action="{{tg.url('/dashboard/save')}}">
-    <input type="hidden" name="cls" value="{{cls}}"/> 
+<form id="edit-form" method="post" action="{{tg.url('/dashboard/save/%s' % cls)}}">
     <input type="hidden" name="id" value="{{id}}"/>
     <input type="hidden" name="came_from" value="{{came_from}}"/>
 </form>

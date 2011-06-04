@@ -233,8 +233,7 @@
 {% endif %}
 
 {% if with_search %}
-<form class="sp-search-form" method="post" action="{{grid.search_url}}">
-    <input type="hidden" name="cls" value="{{grid.cls}}"/>
+<form class="sp-search-form" method="post" action="{{grid.search_url + grid.cls}}">
     <input type="hidden" name="caption" value="{{grid.caption}}"/>
     <input type="hidden" name="show_ids" value="{{show_ids}}"/>
     <input type="hidden" name="came_from" value="{{came_from}}"/>
@@ -269,7 +268,7 @@
             title="{{grid.cols[loop.index0].title}}"
             {% if can_edit and loop.index0 == 0 %}
             clickable="false">
-            <a href="/dashboard/edit?cls={{grid.cls}}&id={{cell}}&came_from=" 
+            <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from=" 
                 target="_blank">{{cell|escape}}</a>
             {% else %}
             clickable="true">
@@ -304,8 +303,7 @@
     </select>
     
     {# <!-- First page --> #}
-    <form method="post" action="{{grid.search_url}}">
-        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+    <form method="post" action="{{grid.search_url + grid.cls}}">
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
@@ -317,8 +315,7 @@
     </form>
     
     {# {% if grid.pag_n-1 > 0 %} #}
-    <form method="post" action="{{grid.search_url}}">
-        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+    <form method="post" action="{{grid.search_url + grid.cls}}">
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
@@ -338,8 +335,7 @@
         <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}"/>
     </div>
     
-    <form method="post" action="{{grid.search_url}}" style="float: left;">
-        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+    <form method="post" action="{{grid.search_url + grid.cls}}" style="float: left;">
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>
@@ -355,8 +351,7 @@
     </form>
 
     {# <!-- Last page --> #}    
-    <form method="post" action="{{grid.search_url}}">
-        <input type="hidden" name="cls" value="{{grid.cls}}"/>
+    <form method="post" action="{{grid.search_url + grid.cls}}">
         <input type="hidden" name="caption" value="{{grid.caption}}"/>
         <input type="hidden" name="q" value="{{q}}"/>
         <input type="hidden" name="rp" value="{{grid.rp}}"/>

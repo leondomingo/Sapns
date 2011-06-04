@@ -169,12 +169,11 @@ class DashboardController(BaseController):
                     q=q,
                     show_ids=show_ids,
                     came_from=url(came_from),
-                    link='/dashboard/list?' + urlencode(dict(cls=cls, q=q, rp=rp, 
-                                                             pag_n=pag_n,
-                                                             caption=caption, 
-                                                             show_ids=show_ids)),
+                    link=('/dashboard/list/%s/?' % cls) + \
+                        urlencode(dict(q=q, rp=rp, pag_n=pag_n,
+                                       caption=caption, show_ids=show_ids)),
                     grid=dict(caption=caption, name=cls, cls=cls,
-                              search_url=url('/dashboard/list'), 
+                              search_url=url('/dashboard/list/'), 
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
