@@ -636,6 +636,11 @@ SapnsClass.attributes = \
     relation(SapnsAttribute,
              backref='class_',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.class_id)
+    
+SapnsClass.related_attributes = \
+    relation(SapnsAttribute,
+             backref='related_class',
+             primaryjoin=SapnsClass.class_id == SapnsAttribute.related_class_id)
 
 class SapnsPrivilege(DeclarativeBase):
     

@@ -87,6 +87,9 @@ class DashboardController(BaseController):
         caption = params.get('caption', '')
         show_ids = params.get('show_ids', 'false')
         came_from = params.get('came_from', '/dashboard')
+        # collections
+        ch_attr = params.get('ch_attr')
+        parent_id = params.get('parent_id')
         
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
@@ -118,9 +121,21 @@ class DashboardController(BaseController):
             return strtodate(s, fmt=date_fmt, no_exc=True)
         
         logger.info('search...%s / q=%s' % (view, q))
+        
+        # collection
+        col = None
+        if ch_attr and parent_id:
+            col = (cls, ch_attr, parent_id,)
+            cls_ = SapnsClass.by_name(cls)
             
+            p_cls = cls_.attr_by_name(ch_attr).related_class
+            p_title = SapnsClass.object_title(p_cls.name, parent_id)
+            
+            caption = _('%s of [%s]' % (cls_.title, p_title))
+            
+        # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    show_ids=show_ids, strtodatef=strtodatef)
+                    show_ids=show_ids, strtodatef=strtodatef, collection=col) 
         
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -165,13 +180,20 @@ class DashboardController(BaseController):
         if rp and totalp > rp:
             totalp = rp
             
+        link_data = dict(q=q, rp=rp, pag_n=pag_n, caption=caption, 
+                         show_ids=show_ids)
+        
+        if ch_attr and parent_id:
+            link_data['ch_attr'] = ch_attr
+            link_data['parent_id'] = parent_id
+            
         return dict(page='list',
                     q=q,
                     show_ids=show_ids,
                     came_from=url(came_from),
-                    link=('/dashboard/list/%s/?' % cls) + \
-                        urlencode(dict(q=q, rp=rp, pag_n=pag_n,
-                                       caption=caption, show_ids=show_ids)),
+                    # collection
+                    ch_attr=ch_attr, parent_id=parent_id,
+                    link=('/dashboard/list/%s/?' % cls) + urlencode(link_data),
                     grid=dict(caption=caption, name=cls, cls=cls,
                               search_url=url('/dashboard/list/'), 
                               cols=cols, data=data, 

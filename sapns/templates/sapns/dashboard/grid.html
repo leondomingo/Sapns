@@ -222,7 +222,8 @@
 {% endmacro %}
 
 {% macro show(page, _, q, grid, show_ids, link=None, came_from=None, 
-    with_search=True, with_pager=True, with_actions=True, can_edit=False) %}
+    with_search=True, with_pager=True, with_actions=True, can_edit=False,
+    ch_attr=None, parent_id=None) %}
 <!-- Grid -->
 <div id="grid-dialog" style="display: none;">
 </div>
@@ -238,6 +239,9 @@
     <input type="hidden" name="show_ids" value="{{show_ids}}"/>
     <input type="hidden" name="came_from" value="{{came_from}}"/>
     <input class="sp-search-txt" name="q" type="text" value="{{q|escape}}"/>
+    <!-- {# collections #} -->
+    <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
+    <input type="hidden" name="parent_id" value="{{parent_id}}"/>
     <input class="sp-button sp-search-btn" type="button" value="{{_('Search...')}}"/>
 </form>
 {% endif %}
@@ -310,6 +314,8 @@
         <input type="hidden" name="pag_n" value="{{1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
+        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
+        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
         <input class="sp-button sp-grid-pag-back" type="submit" value="|<<" 
             title="{{_('page 1')}}"/>
     </form>
@@ -328,6 +334,8 @@
         {% else %}
         <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled/>
         {% endif %}
+        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
+        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
     </form>
     {# {% endif %} #}
     
@@ -342,6 +350,8 @@
         <input type="hidden" name="pag_n" value="{{grid.pag_n+1}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
+        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
+        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
         {% if grid.pag_n+1 <= grid.total_pag %}
         <input class="sp-button sp-grid-pag-forth" type="submit" value=">>" 
             title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
@@ -358,6 +368,8 @@
         <input type="hidden" name="pag_n" value="{{grid.total_pag}}"/>
         <input type="hidden" name="show_ids" value="{{show_ids}}"/>
         <input type="hidden" name="came_from" value="{{came_from}}"/>
+        <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
+        <input type="hidden" name="parent_id" value="{{parent_id}}"/>
         <input class="sp-button sp-grid-pag-forth" type="submit" value=">>|"
             title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
     </form>
