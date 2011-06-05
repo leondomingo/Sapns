@@ -122,11 +122,15 @@ class DashboardController(BaseController):
         
         logger.info('search...%s / q=%s' % (view, q))
         
+        cls_ = SapnsClass.by_name(cls)
+        
+        # related classes
+        rel_classes = cls_.related_classes()
+        
         # collection
         col = None
         if ch_attr and parent_id:
             col = (cls, ch_attr, parent_id,)
-            cls_ = SapnsClass.by_name(cls)
             
             p_cls = cls_.attr_by_name(ch_attr).related_class
             p_title = SapnsClass.object_title(p_cls.name, parent_id)
@@ -158,11 +162,7 @@ class DashboardController(BaseController):
                              align='center'))
         
         # actions for this class
-        class_ = dbs.query(SapnsClass).\
-                    filter(SapnsClass.name == cls).\
-                    first()
-                    
-        actions = class_.sorted_actions()
+        actions = cls_.sorted_actions()
         
         # total number of pages
         total_pag = 1
@@ -193,6 +193,8 @@ class DashboardController(BaseController):
                     came_from=url(came_from),
                     # collection
                     ch_attr=ch_attr, parent_id=parent_id,
+                    # related classes
+                    rel_classes=rel_classes,
                     link=('/dashboard/list/%s/?' % cls) + urlencode(link_data),
                     grid=dict(caption=caption, name=cls, cls=cls,
                               search_url=url('/dashboard/list/'), 

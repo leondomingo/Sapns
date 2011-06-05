@@ -131,6 +131,21 @@
     		});
     	}
     	
+    	function selected_id(grid) {
+            // {# get the id of the selected row #} 
+            var selected_row = null;
+            var id_selected = null;
+            $('#' + grid + ' .sp-grid-row ').each(function() {
+                var rowid = $(this).find('.sp-grid-rowid');
+                if (rowid.attr('checked') == true) {
+                    id_selected = rowid.attr('id_row');
+                    selected_row = $(this);
+                }
+            });
+            
+            return id_selected;
+    	}
+    	
         function search(button) {
         	
             // {# parent grid of this search #} 
@@ -171,16 +186,8 @@
         		// {# parent grid of this action #} 
         		var grid_id = $(this).parent().parent().parent().parent().attr('id');
         		
-        		// {# get the id of the selected row #} 
-        		var selected_row = null;
-        		var id_selected = null;
-        		$('#' + grid_id + ' .sp-grid-row ').each(function() {
-        			var rowid = $(this).find('.sp-grid-rowid');
-        			if (rowid.attr('checked') == true) {
-        				id_selected = rowid.attr('id_row');
-        				selected_row = $(this);
-        			}
-        		});
+        		// {# get the id of the selected row #}
+        		var id_selected = selected_id(grid_id);
         		
         		// {# if there's a selected row, go to the corresponding location #} 
         		if (id_selected != null) {
@@ -217,13 +224,36 @@
     		var grid_id = $(this).parent().parent().attr('id');
     		search($('#' + grid_id + ' .sp-search-btn'));
     	});
+    	
+    	$('#rel-classes-show').click(function() {
+    		
+    		var grid = $(this).parent().parent();
+    		var id_selected = selected_id(grid.attr('id'));
+    		
+    		if (id_selected != null) {
+    			
+    			var option = $('#rel-classes-sel option:selected');
+    			
+    			var params = '';
+    			params += '<input type="hidden" name="cls" ' + 
+    			    'value="' + option.attr('cls') + '"/>\n';
+    			 
+    			params += '<input type="hidden" name="ch_attr" ' +
+    			    'value="' + option.attr('ch_attr') + '"/>\n';
+    			    
+    			params += '<input type="hidden" name="parent_id" ' + 
+    			    'value="' + id_selected + '"/>\n';
+    			
+    			$('#rel-classes-form').html(params).submit();
+    		}
+    	});
     });
 </script>
 {% endmacro %}
 
 {% macro show(page, _, q, grid, show_ids, link=None, came_from=None, 
     with_search=True, with_pager=True, with_actions=True, can_edit=False,
-    ch_attr=None, parent_id=None) %}
+    rel_classes=None, ch_attr=None, parent_id=None) %}
 <!-- Grid -->
 <div id="grid-dialog" style="display: none;">
 </div>
@@ -240,8 +270,8 @@
     <input type="hidden" name="came_from" value="{{came_from}}"/>
     <input class="sp-search-txt" name="q" type="text" value="{{q|escape}}"/>
     <!-- {# collections #} -->
-    <input type="hidden" name="ch_attr" value="{{ch_attr}}"/>
-    <input type="hidden" name="parent_id" value="{{parent_id}}"/>
+    <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"/>
+    <input type="hidden" name="parent_id" value="{{parent_id or ''}}"/>
     <input class="sp-button sp-search-btn" type="button" value="{{_('Search...')}}"/>
 </form>
 {% endif %}
@@ -378,6 +408,20 @@
     </form>
     </div>
     {% endfor %}
+</div>
+{% endif %}
+
+{% if rel_classes %}
+<div id="rel-classes" style="clear: left;">
+<select id="rel-classes-sel">
+{% for rc in rel_classes %}
+<option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>
+{% endfor %}
+</select>
+<input id="rel-classes-show" type="button" value="{{_('Show')}}"/>
+<form id="rel-classes-form" method="post" action="/dashboard/list/grupos" 
+    target="_blank">
+</form>
 </div>
 {% endif %}
 </div>
