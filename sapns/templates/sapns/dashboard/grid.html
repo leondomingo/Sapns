@@ -225,6 +225,7 @@
     		search($('#' + grid_id + ' .sp-search-btn'));
     	});
     	
+    	// {# show related class #} 
     	$('#rel-classes-show').click(function() {
     		
     		var grid = $(this).parent().parent();
@@ -234,17 +235,16 @@
     			
     			var option = $('#rel-classes-sel option:selected');
     			
+    			var action = "/dashboard/list/" + option.attr('cls');
+    			
     			var params = '';
-    			params += '<input type="hidden" name="cls" ' + 
-    			    'value="' + option.attr('cls') + '"/>\n';
-    			 
     			params += '<input type="hidden" name="ch_attr" ' +
     			    'value="' + option.attr('ch_attr') + '"/>\n';
     			    
     			params += '<input type="hidden" name="parent_id" ' + 
     			    'value="' + id_selected + '"/>\n';
-    			
-    			$('#rel-classes-form').html(params).submit();
+    			    
+    			$('#rel-classes-form').attr('action', action).html(params).submit();
     		}
     	});
     });
@@ -419,7 +419,7 @@
 {% endfor %}
 </select>
 <input id="rel-classes-show" type="button" value="{{_('Show')}}"/>
-<form id="rel-classes-form" method="post" action="/dashboard/list/grupos" 
+<form id="rel-classes-form" method="post" action="" 
     target="_blank">
 </form>
 </div>
