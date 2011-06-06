@@ -143,7 +143,7 @@
                 }
             });
             
-            return id_selected;
+            return selected_row;
     	}
     	
         function search(button) {
@@ -180,14 +180,24 @@
     	
     	// {# Clicking on an action #} 
     	$('.sp-grid-action').click(function() {
+
+            // {# parent grid of this action #} 
+            var grid_id = $(this).parent().parent().parent().parent().attr('id');
+            
+            // child attribute 
+            var ch_attr = $('#' + grid_id + ' .sp-search-form input[name=ch_attr]').val();
+            if (ch_attr != '') {
+                var parent_id = $('#' + grid_id + ' .sp-search-form input[name=parent_id]').val(); 
+                $(this).parent().append('<input type="hidden"' +
+                    ' name="_' + ch_attr + '"' + 
+                    ' value="' + parent_id + '"/>');
+            }
     		
     		if ($(this).attr('require_id') == 'true') {
         		
-        		// {# parent grid of this action #} 
-        		var grid_id = $(this).parent().parent().parent().parent().attr('id');
-        		
         		// {# get the id of the selected row #}
-        		var id_selected = selected_id(grid_id);
+        		var selected_row = selected_id(grid_id);
+        		var id_selected = selected_row.find('.sp-grid-rowid').attr('id_row');
         		
         		// {# if there's a selected row, go to the corresponding location #} 
         		if (id_selected != null) {
@@ -229,7 +239,7 @@
     	$('#rel-classes-show').click(function() {
     		
     		var grid = $(this).parent().parent();
-    		var id_selected = selected_id(grid.attr('id'));
+    		var id_selected = selected_id(grid.attr('id')).find('.sp-grid-rowid').attr('id_row');    		
     		
     		if (id_selected != null) {
     			
