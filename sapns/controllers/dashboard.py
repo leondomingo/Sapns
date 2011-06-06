@@ -144,6 +144,7 @@ class DashboardController(BaseController):
         # Reading global settings
         ds.date_fmt = date_fmt
         ds.time_fmt = config.get('grid.time_format', default='%H:%M')
+        ds.datetime_fmt = config.get('grid.datetime_format', default='%m/%d/%Y %H:%M')
         ds.true_const = config.get('grid.true_const', default='Yes')
         ds.false_const = config.get('grid.false_const', default='No')
         
