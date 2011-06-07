@@ -423,6 +423,8 @@
 
 {% if rel_classes %}
 <div id="rel-classes" style="clear: left;">
+<div style="float: left; color: gray; margin-top: 3px; width: 102px;
+    text-align: center;">{{_('Related info')}}</div>
 <select id="rel-classes-sel">
 {% for rc in rel_classes %}
 <option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>

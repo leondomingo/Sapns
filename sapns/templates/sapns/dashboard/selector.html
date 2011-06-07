@@ -1,0 +1,137 @@
+{% macro selector_field(_, name, value, rel_title, title, rc, rc_title, read_only=False) %}
+<div id="sf_{{name}}" class="sp-select-field" name="{{name}}"
+    related_class="{{rc}}"
+    related_class_title="{{rc_title}}"
+    value="{{value}}">
+    
+    <!-- {# Select text #} -->
+    <input id="st_{{name}}" class="sp-select-text" type="text" readonly
+        value="{{rel_title}}" 
+        {% if read_only %} disabled {% endif %} />
+        
+    <!-- {# Select button #} -->
+    <input id="sb_{{name}}" class="sp-button sp-select-button" type="button" value="..."
+        title='{{_("Set a value for \"%s\""|format(title))}}' 
+        style="font-weight: bold;"
+        {% if read_only %} disabled {% endif %} />
+        
+    <!-- {# Remove button #} -->
+    {% if not read_only %}
+    <input id="rb_{{name}}" class="sp-button sp-empty-button" type="button" value="X"
+        title='{{_("Remove value of \"%s\""|format(title))}}' 
+        style="font-weight: bold; color: red;" />
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro selector_field_js(tg, _) %}
+
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        // {# remove value from select-field #} 
+        $('.sp-empty-button').click(function() {
+            $(this).parent().attr('value', '');
+            $(this).parent().find('.sp-select-text').attr('value', '');
+        });
+        
+        // {# search on select-dialog #} 
+        function click_search (button, related_class, q) {
+            
+            if (q == undefined) {
+                q = $('.sp-search-text').val();
+            }
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/search')}}",
+                type: 'post',
+                dataType: 'html',
+                data: {
+                    cls: related_class,
+                    q: q,
+                    rp: '25', // {# maximun number of results in the select dialog #} 
+                },
+                success: function(res) {
+                    $('#edit-dialog').html(res);
+                    
+                    $('.sp-search-button').click(function() {
+                        click_search(button, related_class);
+                    });
+                    
+                    $('.sp-search-text').keypress(function(event) {
+                        search_kp(event, $('.sp-search-button'), related_class);
+                    }).val(q).focus();
+                },
+                error: function(f, status, error) {
+                    alert('error!');
+                    click_search(button, related_class, '');
+                    // {# $('#edit-dialog').dialog('close'); #} 
+                }
+            });
+        }
+        
+        function search_kp(event, button, related_class) {
+            if (event.which == 13) {
+                click_search(button, related_class);
+            }
+        }
+        
+        $('.sp-select-button').click(function() {
+            var field = $(this).parent();           
+            var related_class = field.attr('related_class');
+            var related_class_title = field.attr('related_class_title');
+            
+            $('#edit-dialog').dialog({
+                title: related_class_title,
+                width: 950,
+                height: 550,
+                resizable: false,
+                modal: true,
+                buttons: {
+                    "{{_('Ok')}}": function() {
+                        // {# get the id of the selected row #} 
+                        var id_selected = '';
+                        $('#edit-dialog .sp-grid .sp-grid-rowid').each(function() {
+                            if ($(this).attr('checked') == true) {
+                                id_selected = $(this).attr('id_row');
+                            }
+                        });
+                        
+                        if (id_selected != '') {
+                            $.ajax({
+                                url: "{{tg.url('/dashboard/title')}}",
+                                type: "get",
+                                dataType: "json",
+                                data: {
+                                    cls: related_class,
+                                    id: id_selected
+                                },
+                                success: function(res) {
+                                    if (res.status) {
+                                        field.find('.sp-select-text').val(res.title);
+                                    }
+                                },
+                                error: function() {
+                                }
+                            });
+                        }
+                        else {
+                            field.find('.sp-select-text').val('');
+                        }
+                        
+                        field.attr('value', id_selected);
+                        
+                        $('#edit-dialog').dialog('close');
+                    },
+                    "{{_('Cancel')}}": function() {
+                        $('#edit-dialog').dialog('close');
+                    }
+                }
+            });
+            
+            click_search($('.sp-search-button'), related_class, '');
+        });
+    });
+</script>
+{% endmacro %}

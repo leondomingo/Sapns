@@ -1,9 +1,14 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
+{% import 'sapns/dashboard/selector.html' as s %}
 
 {% block head %}
-{{super()}}
-<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}"/>
+    {{ super() }}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}"/>
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.dateformat() }}
+    {{ s.selector_field_js(tg, _) }}
 {% endblock %}
 
 {% block middle %}
@@ -20,7 +25,7 @@
             value="{{_('Save')}}"/>
     </div>
     
-    {# <!-- Title of the object --> #}
+    <!-- {# Title of the object #} -->
     <div style="font-size: 25px; margin-left: 1%;">{{title}}</div>
 
     {%- if reference %}
@@ -30,9 +35,21 @@
     
     <div style="height: 10px;"></div>
     
-    {#{% for rc in related_classes %}
-    <div>{{rc.name}}.{{rc.attr_name}}</div>
-    {% endfor %}#}
+    {% if id %}
+    <div style="margin-left: 10px;">
+        <div style="float: left; color: gray; margin-top: 3px; 
+            width: 102px; text-align: center;">{{_('Related info')}}</div>
+        <select id="rel-classes-sel" style="float: left;">
+        {% for rc in related_classes %}
+        <option ch_attr="{{rc.attr_name}}" cls="{{rc.name}}">{{rc.title}} ({{rc.attr_title}})</option>
+        {% endfor %}
+        </select>
+        <input id="rel-classes-show" type="button" value="{{_('Show')}}" />
+        <form id="rel-classes-form" method="post" action="" target="_blank">
+            <input type="hidden" name="parent_id" value="{{id}}" />
+        </form>
+    </div>
+    {% endif %}
     
     {%- for attr in attributes %}
     <div class="sp-edit-field" 
@@ -50,79 +67,36 @@
                 margin-bottom: 2px;">{{attr.title|escape}}</div>
 
         <div>
-        {# <!-- Boolean --> #}
+        <!-- {# Boolean #} -->
         {%- if attr.type == 'bool' %}
         <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value %} checked {% endif %}/>
         
-        {# <!-- Date --> #}
+        <!-- {# Date #} -->
         {%- elif attr.type == 'date' %}
         <input class="sp-date-field" type="text" name="{{attr.name}}"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}"/>
         
-        {# <!-- Time --> #}
+        <!-- {# Time #} -->
         {%- elif attr.type == 'time' %}
         <input class="sp-time-field" type="text" name="{{attr.name}}"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}"/>            
         
-        {# <!-- Memo --> #}
+        <!-- {# Memo #} -->
         {%- elif attr.type == 'memo' %}
         <textarea class="sp-text-field sp-memo-field"
             {% if attr.read_only %} disabled {% endif %} 
             name="{{attr.name}}">{{attr.value|escape}}</textarea>
         
-        {# <!-- Select --> #}
         {%- elif attr.related_class != None %}
-          {#{% if attr.vals == None %}#}
-        <div class="sp-select-field" name="{{attr.name}}"
-            related_class="{{attr.related_class}}"
-            related_class_title="{{attr.related_class_title}}"
-            value="{{attr.value}}">
-            
-            {# <!-- Select text --> #}
-            <input class="sp-select-text" type="text" readonly
-                value="{{attr.related_title}}" 
-                {% if attr.read_only %} disabled {% endif %}
-                />
-                
-            {# <!-- Select button --> #}
-            <input class="sp-button sp-select-button" type="button" value="..."
-                title='{{_("Set a value for \"%s\""|format(attr.title))}}' 
-                style="font-weight: bold;"
-                {% if attr.read_only %} disabled {% endif %} />
-                
-            {# <!-- Remove button --> #}
-            {% if not attr.read_only %}
-            <input class="sp-button sp-empty-button" type="button" value="X"
-                title='{{_("Remove value of \"%s\""|format(attr.title))}}' 
-                style="font-weight: bold; color: red;"
-                {% if attr.read_only %} disabled {% endif %} />
-            {% endif %}
-            {#<!--
-            <a href="/list?cls={{attr.related_class}}" target="_blank"
-                title="{{attr.related_class}}">[{{_('list')}}]</a>
-            -->#}              
-        </div>
-        {#
-        {%- else %}
-        <select class="sp-select-field" name="{{attr.name}}"
-            related_class="{{attr.related_class}}">
-            <option value="null" 
-                {% if attr.value == None %} selected {% endif %}>{{_('none')}}</option>
-            {% for value in attr.vals %}
-            <option value="{{value.id}}" 
-                {% if value.id == attr.value %}selected{%endif%}>{{value.title}}</option>
-            {% endfor %}
-        </select>
-        <!--
-            {% if attr.value %}
-            <a href="/dashboard/edit?cls={{attr.related_class}}&id={{attr.value}}" 
-                target="_blank">[{{_('edit')}}]</a>-->
-        {% endif %}
-        #}
+        <!-- {# Select #} -->
+        {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
+            attr.title, attr.related_class, attr.related_class_title, 
+            read_only=attr.read_only) }}
+             
         {%- else %}
         {# <!-- Everything else --> #}
         <input class="sp-text-field" type="text" name="{{attr.name}}" 
@@ -136,117 +110,10 @@
     </div>
 </div>
 
-{{util.jquery()}}
-{{util.jquery_ui()}}
-{{util.dateformat()}}
-
 <script type="text/javascript">
     $(document).ready(function() {
     	
-    	$('.sp-edit-field:first').find('input:first').focus();
-    	
-    	// {# remove value from select-field #} 
-    	$('.sp-empty-button').click(function() {
-    		$(this).parent().attr('value', '');
-    		$(this).parent().find('.sp-select-text').attr('value', '');
-    	});
-    	
-    	// {# search on select-dialog #} 
-    	function click_search (button, related_class, q) {
-    		
-    		if (q == undefined) {
-    			q = $('.sp-search-text').val();
-    		}
-    		
-    		$.ajax({
-                url: "{{tg.url('/dashboard/search')}}",
-                type: 'post',
-                dataType: 'html',
-                data: {
-                    cls: related_class,
-                    q: q,
-                    rp: '25', // {# maximun number of results in the select dialog #} 
-                },
-                success: function(res) {
-                    $('#edit-dialog').html(res);
-                    
-                    $('.sp-search-button').click(function() {
-                        click_search(button, related_class);
-                    });
-                    
-                    $('.sp-search-text').keypress(function(event) {
-                        search_kp(event, $('.sp-search-button'), related_class);
-                    }).val(q).focus();
-                },
-                error: function(f, status, error) {
-                    alert('error!');
-                    click_search(button, related_class, '');
-                    // {# $('#edit-dialog').dialog('close'); #} 
-                }
-            });
-    	}
-    	
-    	function search_kp(event, button, related_class) {
-    		if (event.which == 13) {
-                click_search(button, related_class);
-            }
-    	}
-    	
-    	$('.sp-select-button').click(function() {
-    		var field = $(this).parent();    		
-    		var related_class = field.attr('related_class');
-    		var related_class_title = field.attr('related_class_title');
-    		
-    		$('#edit-dialog').dialog({
-            	title: related_class_title,
-            	width: 950,
-                height: 550,
-                resizable: false,
-                modal: true,
-                buttons: {
-                	"{{_('Ok')}}": function() {
-                		// {# get the id of the selected row #} 
-                        var id_selected = '';
-                        $('#edit-dialog .sp-grid .sp-grid-rowid').each(function() {
-                            if ($(this).attr('checked') == true) {
-                                id_selected = $(this).attr('id_row');
-                            }
-                        });
-                        
-                        if (id_selected != '') {
-                        	$.ajax({
-                        		url: "{{tg.url('/dashboard/title')}}",
-                        		type: "get",
-                        		dataType: "json",
-                        		data: {
-                        			cls: related_class,
-                        			id: id_selected
-                        		},
-                        		success: function(res) {
-                        			if (res.status) {
-                        				field.find('.sp-select-text').val(res.title);
-                        			}
-                        		},
-                        		error: function() {
-                        		}
-                        	});
-                        }
-                        else {
-                        	field.find('.sp-select-text').val('');
-                        }
-                        
-                        field.attr('value', id_selected);
-                		
-                		$('#edit-dialog').dialog('close');
-                	},
-                	"{{_('Cancel')}}": function() {
-                		$('#edit-dialog').dialog('close');
-                	}
-                }
-            });
-    		
-    		click_search($('.sp-search-button'), related_class, '');
-    	});
+    	$('.sp-edit-field:first').find('input:first').focus();    	
         
         $('#save-button').click(function() {
             
@@ -404,6 +271,20 @@
         		var date_value = new Date($(this).val()).format(date_fmt1);
         		$(this).css('width', '85px').val(date_value);
         	}
+        });
+        
+        // {# show related class #} 
+        $('#rel-classes-show').click(function() {
+        	
+        	var option = $('#rel-classes-sel option:selected');
+        	var action = "/dashboard/list/" + option.attr('cls');
+        	
+        	var params = '';
+        	params += '<input type="hidden" name="parent_id" value="{{id}}" />\n';
+        	params += '<input type="hidden" name="ch_attr" ' +
+        	   'value="' + option.attr('ch_attr') + '"/>\n';
+        	   
+        	$('#rel-classes-form').attr('action', action).html(params).submit();
         });
     });
 </script>
