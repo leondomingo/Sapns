@@ -29,6 +29,26 @@
 <script type="text/javascript">
 
     $(document).ready(function() {
+    	
+    	// {# load titles of empty selector fields #} 
+    	$('.sp-select-field').each(function() {
+    		var cls = $(this).attr('related_class');
+    		var value = $(this).attr('value');
+    		var text = $(this).find('.sp-select-text');
+    		var related_title = text.val();
+    		if (value != '' && related_title == '') {
+    			var url = "{{tg.url('/dashboard/title/')}}" + cls + "/" + value;
+    			
+    			$.ajax({
+    				url: url,
+    				success: function(data) {
+    					if (data.status) {
+    						text.val(data.title);
+    					}
+    				}
+    			});
+    		}
+    	});
 
         // {# remove value from select-field #} 
         $('.sp-empty-button').click(function() {

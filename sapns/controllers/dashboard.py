@@ -213,7 +213,7 @@ class DashboardController(BaseController):
     
     @expose('json')
     @require(predicates.not_anonymous())
-    def title(self, cls=None, id=None):
+    def title(self, cls, id):
         logger = logging.getLogger(__name__ + '/title')
         try:
             title = SapnsClass.object_title(cls, id)
