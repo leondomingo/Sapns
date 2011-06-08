@@ -1,4 +1,4 @@
-{% macro date_field(tg, _) %}
+{% macro date_field(tg, _, selector) %}
 
 // {# date format settings #} 
 var first_day = "{{tg.config.get('js.first_day', '1')}}";
@@ -7,7 +7,7 @@ var date_fmt0 = "{{tg.config.get('js.date_format', 'mm/dd/yyyy')}}";
 // "format date library" setting 
 var date_fmt1 = "{{tg.config.get('js.date_format2', 'mm/dd/yyyy')}}";
 
-$('.sp-date-field').each(function() {
+$("{{selector}}").each(function() {
 	if (!$(this).attr('disabled')) {
 		$(this).datepicker({
 		    firstDay: first_day,
