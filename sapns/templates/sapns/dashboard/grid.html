@@ -6,7 +6,13 @@
         // {# select a row #} 
         $('.sp-grid-cell').click(function() {
             if ($(this).attr('clickable') == 'true') {
-                var row_id = $(this).parent().find('.sp-grid-rowid');           
+                var row_id = $(this).parent().find('.sp-grid-rowid');
+                $('.sp-grid-rowid').each(function() {
+                	if ($(this) != row_id) {
+                		$(this).attr('checked', false);
+                	}
+                });
+                
                 if (row_id.attr('checked') == true) {
                     row_id.attr('checked', false);
                 }
