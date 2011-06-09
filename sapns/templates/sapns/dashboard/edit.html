@@ -36,7 +36,7 @@
     
     <div style="height: 10px;"></div>
     
-    {% if id %}
+    {% if id and related_classes|length > 0 %}
     <div style="margin-left: 10px;">
         <div style="float: left; color: gray; margin-top: 3px; 
             width: 102px; text-align: center;">{{_('Related info')}}</div>
