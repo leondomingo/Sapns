@@ -208,14 +208,21 @@
         		// {# if there's a selected row, go to the corresponding location #} 
         		if (id_selected != null) {
         			
-        			var id_param = 
-        				'<input type="hidden" name="id" value="' + id_selected + '"/>';
-        				
         			if($(this).attr('action-type') == 'delete') {
         				delete_action($(this), selected_row, id_selected);
         			}
         			else {
-        				$(this).parent().append(id_param);        			
+        				// "process" actions 
+        				if ($(this).attr('action-type') == 'process') {
+        					$(this).parent().attr('action') += id_selected;
+        				}
+        				else {
+                            var id_param = 
+                                '<input type="hidden" name="id" value="' + id_selected + '"/>';
+        					
+        					$(this).parent().append(id_param);
+        				}
+        				        			
           			    $(this).parent().submit();
         			}
         		}
@@ -419,7 +426,7 @@
         <input type="hidden" name="came_from" value="{{came_from}}"/>
         {% endif %}
         <input class="sp-button sp-grid-action" type="button" value="{{act.title|escape}}"
-            title="{{act.url}}" url="{{act.url}}" action-type="{{act.type}}" 
+            title="{{act.url}}" url="{{act.url}}" action-type="{{act.type}}"
             require_id="{{act.require_id|lower}}"/>
     </form>
     </div>

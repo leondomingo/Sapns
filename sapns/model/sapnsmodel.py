@@ -472,6 +472,9 @@ class SapnsClass(DeclarativeBase):
                 all():
             
             url = ac.url
+            if url[-1] != '/':
+                url += '/'
+                
             require_id = True
             if ac.type == SapnsAction.TYPE_NEW:
                 url = SapnsAction.URL_NEW
