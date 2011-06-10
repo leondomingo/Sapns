@@ -472,7 +472,7 @@ class SapnsClass(DeclarativeBase):
                 all():
             
             url = ac.url
-            if url[-1] != '/':
+            if url and url[-1] != '/':
                 url += '/'
                 
             require_id = True

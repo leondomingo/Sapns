@@ -214,15 +214,22 @@
         			else {
         				// "process" actions 
         				if ($(this).attr('action-type') == 'process') {
-        					$(this).parent().attr('action') += id_selected;
+        					// build the url like this:  
+        					//  "/foo/bar/123" 
+        					//  where "/foo/bar/" is the url of the action and 
+        					//  "123" is the id of the selected row 
+        					$(this).parent().attr('action', $(this).parent().attr('action0') + id_selected);
         				}
         				else {
+        					// other "action types" 
+        					$(this).parent().attr('action', $(this).parent().attr('action0'));
                             var id_param = 
                                 '<input type="hidden" name="id" value="' + id_selected + '"/>';
         					
         					$(this).parent().append(id_param);
         				}
-        				        			
+        				
+        				// submit action form 
           			    $(this).parent().submit();
         			}
         		}
@@ -238,7 +245,9 @@
         		}
     		}
     		else {
-    			$(this).parent().submit();
+    			$(this).parent().
+    			  attr('action', $(this).parent().attr('action0')).
+    			  submit();
     		}
     	});
     	
@@ -413,12 +422,12 @@
 {% endif %}
 
 {% if with_actions and grid.actions %}
-{# <!-- Grid actions --> #}
+<!-- {# Grid actions #} -->
 <div class="sp-grid-actions">
     <div class="sp-grid-actions-title">Actions:</div>
     {% for act in grid.actions %}
     <div style="float: left;">
-    <form method="post" action="{{act.url}}">
+    <form class="action-form" method="post" action0="{{act.url}}">
         <input type="hidden" name="cls" value="{{grid.cls}}"/>
         {% if link != None %}
         <input type="hidden" name="came_from" value="{{link}}"/>
