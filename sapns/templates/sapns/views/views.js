@@ -332,7 +332,7 @@ $(document).ready(function() {
 
 			if (this_alias != '') {
 				if (column_aliases.indexOf(this_alias) == -1) {
-					column_aliases[column_aliases.length] = this_alias;
+					column_aliases.push(this_alias);
 				}
 				else {
 					error = true;
@@ -364,7 +364,7 @@ $(document).ready(function() {
 		
 		var this_alias = $('#view_table_alias').val().toLowerCase();
 		if (this_alias != '') {
-			table_aliases[table_aliases.length] = this_alias;
+			table_aliases.push(this_alias);
 		}
 		
 		if (relation_items[0].table == '') {
@@ -387,7 +387,7 @@ $(document).ready(function() {
 			var this_alias = $(this).find('.sp_relation_alias').val().toLowerCase();
 			if (this_alias != '') {
 				if (table_aliases.indexOf(this_alias) == -1) {
-					table_aliases[table_aliases.length] = this_alias;
+					table_aliases.push(this_alias);
 				}
 				else {
 					error = true;

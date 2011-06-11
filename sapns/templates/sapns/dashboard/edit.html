@@ -127,7 +127,7 @@
                 var value = $(this).val();
                         
                 if (required == 'true' && value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
+                    required_attrs.push($(this).parent().parent().attr('attr-title'));
                 }
                 
                 params += 
@@ -163,7 +163,7 @@
                 var required = $(this).parent().parent().attr('required');
                         
                 if (required == 'true' && date_value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
+                    required_attrs.push($(this).parent().parent().attr('attr-title'));
                 }
                 
                 params += 
@@ -178,7 +178,7 @@
                 var value = $(this).val();
                         
                 if (required == 'true' && value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
+                    required_attrs.push($(this).parent().parent().attr('attr-title'));
                 }
                 
                 params += 
@@ -194,7 +194,7 @@
                 var sel_value = $(this).attr('value');
                         
                 if (required == 'true' && sel_value == '') {
-                    required_attrs[required_attrs.length] = $(this).parent().parent().attr('attr-title');
+                    required_attrs.push($(this).parent().parent().attr('attr-title'));
                 }
                 
                 params += 

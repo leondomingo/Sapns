@@ -78,13 +78,13 @@
         
         var atributos = [];
         $('.ins-attr').each(function() {
-            atributos[atributos.length] = {
+            atributos.push({
                 id: $(this).attr('id_attr'),
                 title: $(this).find('.sp-text-field').val(),
                 order: $(this).attr('pos'),
                 required: $(this).find('.attr-required').attr('checked'),
                 visible: $(this).find('.attr-visible').attr('checked')
-            };
+            });
         });
         
         $('#form-ins-order input[name=title]').val($('#title-class').val());

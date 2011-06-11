@@ -21,10 +21,10 @@
             	
             	i++;
             	
-                atributos[atributos.length] = {
+                atributos.push({
                 	id: $(this).parent().parent().parent().attr('id_attr'),
                     order: pos
-                };
+                });
             });
             
             $('#form_ref_order input[name=attributes]').val(JSON.stringify(atributos));
