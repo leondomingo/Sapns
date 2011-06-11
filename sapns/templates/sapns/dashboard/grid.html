@@ -218,7 +218,9 @@
         					//  "/foo/bar/123" 
         					//  where "/foo/bar/" is the url of the action and 
         					//  "123" is the id of the selected row 
-        					$(this).parent().attr('action', $(this).parent().attr('action0') + id_selected);
+        					$(this).parent().
+        					    attr('target', '_blank').
+        					    attr('action', $(this).parent().attr('action0') + id_selected);
         				}
         				else {
         					// other "action types" 
