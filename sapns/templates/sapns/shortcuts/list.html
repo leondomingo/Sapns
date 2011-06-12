@@ -1,4 +1,4 @@
-{# <!-- dialogs (now ain't visible) --> #}
+<!-- {# dialogs (now ain't visible) #} -->
 <div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
   <p>{{_('Do you want to delete this shortcut?')}}</p>
   <p id="sp-shortcut-title" style="font-weight: bold;"></p>  
@@ -15,62 +15,88 @@
     <select id="users-to-share-with"></select>
 </div>
 
+<form id="order-form" action="" method="post" target="_blank">
+    <input type="hidden" name="came_from" />
+</form>
+
 <div>
     {% for sc in shortcuts %}
     <div class="sp_shortcut" sc_id="{{sc.id}}" sc_parent="{{sc.parent}}"
-        style="{% if loop.index % 2 == 0 %}background-color: white;{%endif%}">
+        cls="{{sc.cls}}"
+        style="{% if loop.index % 2 == 0 %}background-color: white;{% endif %}">
         
-        {#
-        <!--
+        <!--{#
         <div style="float: left;">
             <input type="checkbox"/>
         </div>
-        -->
-        #}
+        #}-->
         
     {% if sc.action_type %}
+        <!-- List -->
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url('/dashboard/list', params=dict(
-                cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
+            <a target="_blank" href="{{tg.url('/dashboard/list', params=dict(
+                cls=sc.cls, came_from=''))}}">
                 {{sc.title}}</a>
         </div>
         
-        {# <!-- actions over "list" shortcuts --> #}
+        <!-- {# actions over "list" shortcuts #} -->
+        <select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>
         
-        {# <!-- insertion order --> #}
-        <div class="sp-shortcut-ins-order">
+        <!-- {# insertion order #} -->
+        <option value="ins-order">{{_('Insertion order')}}</option>
+        <!--{#<div class="sp-shortcut-ins-order">
             <a href="{{tg.url('/dashboard/ins_order', params=dict(
                 cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
                 {{_('Insertion order')}}
             </a>
-        </div>
+        </div>#}-->
         
-        {# <!-- reference order --> #}
-        <div class="sp-shortcut-ref-order">
+        <!-- {# reference order #} -->
+        <option value="ref-order">{{_('Reference order')}}</option>
+        <!--{#<div class="sp-shortcut-ref-order">
             <a href="{{tg.url('/dashboard/ref_order', params=dict(
                 cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
                 {{_('Reference order')}}
             </a>
         </div>
+        #}-->
+        <!-- Process -->
+        {% elif sc.action_type == 'process' %}
+        <div class="sp-shortcut-title">
+            <a href="{{tg.url(sc.url, params=dict(
+                cls=sc.cls, came_from=''))}}" target="_blank">
+                {{sc.title}}</a>
+        </div>
+        
+        <select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>
+
+        <!--{#<div class="sp-shortcut-ins-order" style="color: gray;">&nbsp;</div>
+        <div class="sp-shortcut-ref-order" style="color: gray;">&nbsp;</div>#}-->
         {% else %}
         <div class="sp-shortcut-title">
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
         </div>
         {% endif %}
     {% else %}
-        {# <!-- This is a group --> #}
+        <!-- {# This is a group #} -->
         <div class="sp-shortcut-title">
-            <a href="{{tg.url('/dashboard', params=dict(sc_parent=sc.id))}}">&lt;{{sc.title}}&gt;</a>
+            <a href="{{tg.url('/dashboard', 
+                params=dict(sc_parent=sc.id))}}">&lt;{{sc.title}}&gt;</a>
         </div>
-        
-        <div class="sp-shortcut-ins-order" style="color: gray;">*</div>
-        <div class="sp-shortcut-ref-order" style="color: gray;">*</div>
+        <select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>
+        <!--{#<div class="sp-shortcut-ins-order" style="color: gray;">&nbsp;</div>
+        <div class="sp-shortcut-ref-order" style="color: gray;">&nbsp;</div>#}-->
     {% endif %}
-        {# <!-- general actions over shortcuts --> #}
+        <!-- {# general actions over shortcuts #} -->
     
-        {# <!-- Edit --> #}
-        <div style="float: left;">
+        <!-- {# Edit #} -->
+        <option value="edit" 
+            title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>
+        <!--{# <div style="float: left;">
             <form method="post" action="/dashboard/sc/edit">
             <input type="hidden" name="id" value="{{sc.id}}"/>
             <input type="hidden" name="came_from" value="{{'/dashboard/?sc_parent=%d' % sc.parent}}"/>
@@ -78,31 +104,45 @@
                 title="{{_('Edit this shortcut')}}" 
                 type="submit" value="{{_('Edit')}}"/>
             </form>
-        </div>
+        </div> #}-->
         
-        {# <!-- Delete --> #}
+        <!-- {# Delete #} -->
+        <option value="delete" 
+            title="{{_('Remove this shortcut')}}">{{_('Delete')}}</option>
+        <!-- {#
         <div style="float: left;">
             <input class="sp-button sc_delete_button" 
                 style="width: 50px; float: left;"
                 title="{{_('Remove this shortcut')}}" 
                 type="button" value="{{_('Delete')}}"/>
         </div>
+        #} -->
     
-        {# <!-- To dashboard --> #}
+        <!-- {# To dashboard #} -->
+        <option value="to-dashboard"
+            title="{{_('Put this shortcut on the dashboard')}}">{{_('Send to dashboard')}}</option>
+        <!-- {#
         <div style="float: left;">
             <input class="sp-button sc_bookmark_button" 
                 style="width: 110px;"
                 title="{{_('Put this shortcut on the dashboard')}}"
                 type="button" value="{{_('Send to dashboard')}}"/>
         </div>
+        #} -->
 
-        {# <!-- Share --> #}        
+        <!-- {# Share #} -->
+        <option value="share"
+            title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>
+        <!-- {#
         <div>
             <input class="sp-button sc_share_button" 
                 style="width: 65px;"
                 title=""
                 type="button" value="{{_('Share')}}"/>
         </div>
+        #}-->
+        
+        </select>
         
     </div>
     {% endfor %}
@@ -110,10 +150,41 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+    	
+    	$('.sp-select-shortcut').change(function() {
+    		var opc = $(this).find('option:selected').val();
+    		var sc = $(this).parent();
+    		if (opc == 'delete') {
+    			delete_shortcut(sc);
+    		}
+    		else if (opc == 'to-dashboard') {
+    			sendto_dashboard(sc);
+    		}
+    		else if (opc == 'share') {
+    			share_shortcut(sc);
+    		}
+    		else if (opc == 'ins-order') {
+    			ins_order(sc);
+    		}
+    		else if (opc == 'ref-order') {
+    			ref_order(sc);
+    		}
+    		
+    		$(this).find('option:first').attr('selected', true);
+    	});
+    	
+    	function ins_order(sc) {
+    		var cls = sc.attr('cls');
+    		$('#order-form').attr('action', "/dashboard/ins_order/" + cls).submit();
+    	}
+    	
+    	function ref_order(sc) {
+    		var cls = sc.attr('cls');
+    		$('#order-form').attr('action', "/dashboard/ref_order/" + cls).submit();
+    	}
         
-        // delete
-        $('.sc_delete_button').click(function() {
-            var sc = $(this).parent().parent();
+        // delete 
+        function delete_shortcut(sc) {
             var sc_id = sc.attr('sc_id');
             
             var sc_title = sc.find('a').html();
@@ -150,11 +221,10 @@
                     }
                 }
             });
-        });
+        }
         
         // {# bookmark #} 
-        $('.sc_bookmark_button').click(function() {
-            var sc = $(this).parent().parent();
+        function sendto_dashboard(sc) {
             var sc_id = sc.attr('sc_id');
             
             var sc_title = sc.find('a').html();            
@@ -195,10 +265,10 @@
                     }
                 }
             });
-        });
+        }
         
         // {# share #} 
-        $('.sc_share_button').click(function() {
+        function share_shortcut(sc) {
         	
         	// {# load list of users #} 
             $.ajax({
@@ -223,7 +293,6 @@
                 }
             });        	
         	
-            var sc = $(this).parent().parent();
             var sc_id = sc.attr('sc_id');
             var sc_title = sc.find('a').html();
             
@@ -271,6 +340,6 @@
                     }
                 }
             });
-        });
+        }
     });
 </script>

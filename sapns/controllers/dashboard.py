@@ -36,13 +36,9 @@ class DashboardController(BaseController):
     """DashboardController manage raw-data editing"""
     
     views = ViewsController()
-    
     util = UtilController()
-    
     users = UsersController()
-    
     sc = ShortcutsController()
-    
     messages = MessagesController()
 
     @expose('sapns/dashboard/index.html')
@@ -86,7 +82,11 @@ class DashboardController(BaseController):
         pag_n = params.get('pag_n', 1)
         caption = params.get('caption', '')
         show_ids = params.get('show_ids', 'false')
-        came_from = params.get('came_from', '/dashboard')
+        
+        came_from = params.get('came_from')
+        if came_from:
+            came_from = url(came_from)
+            
         # collections
         ch_attr = params.get('ch_attr')
         parent_id = params.get('parent_id')
@@ -189,9 +189,7 @@ class DashboardController(BaseController):
             link_data['parent_id'] = parent_id
             
         return dict(page='list',
-                    q=q,
-                    show_ids=show_ids,
-                    came_from=url(came_from),
+                    q=q, show_ids=show_ids, came_from=came_from,
                     # collection
                     ch_attr=ch_attr, parent_id=parent_id,
                     # related classes
@@ -549,7 +547,7 @@ class DashboardController(BaseController):
                     title=class_.title, came_from=url(came_from))
 
     @expose()
-    def ins_order_save(self, attributes='', title='', came_from='/dashboard'):
+    def ins_order_save(self, attributes='', title='', came_from=''):
         
         # save insertion order
         attributes = sj.loads(attributes)
@@ -573,11 +571,16 @@ class DashboardController(BaseController):
             
             dbs.flush()
         
-        redirect(url(came_from))
+        if came_from:
+            redirect(url(came_from))
+            
+        else:
+            redirect(url('/message', 
+                         params=dict(message='Ok', came_from='')))
     
     @expose('sapns/order/reference.html')
     @require(predicates.has_permission('manage'))
-    def ref_order(self, cls='', came_from='/dashboard'):
+    def ref_order(self, cls, came_from=''):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
@@ -590,10 +593,10 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='reference order', reference=class_.reference(all=True), 
-                    came_from=url(came_from))
+                    came_from=came_from)
     
     @expose()
-    def ref_order_save(self, attributes='', came_from='/dashboard'):
+    def ref_order_save(self, attributes='', came_from=''):
         
         # save reference order
         attributes = sj.loads(attributes)
@@ -605,4 +608,9 @@ class DashboardController(BaseController):
             dbs.add(attribute)
             dbs.flush()
         
-        redirect(url(came_from))
+        if came_from:
+            redirect(url(came_from))
+            
+        else:
+            redirect(url('/message', 
+                         params=dict(message='Ok', came_from='')))

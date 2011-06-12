@@ -268,7 +268,7 @@ class SapnsShortcut(DeclarativeBase):
             return 0
         
         else:
-            return sc.order + 1
+            return (sc.order or 0) + 1
         
     def add_child(self, id_shortcut):
         

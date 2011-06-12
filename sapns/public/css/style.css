@@ -458,6 +458,10 @@ clear:both;
     padding-left: 20px;
 }
 
+.sp-select-shortcut {
+    width: 200px;
+}
+
 .sp-shortcut-ins-order {
     float: left; 
     border: 1px solid #B4BD3C;
