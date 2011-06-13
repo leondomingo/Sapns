@@ -461,7 +461,10 @@ class SapnsClass(DeclarativeBase):
         Returns a list of actions associated with this class.
         
         OUT
-          [{"title": <unicode>, "url": <unicode>, "require_id": <bool>}, ...]
+          [{"title":      <unicode>, 
+            "url":        <unicode>, 
+            "require_id": <bool>, 
+            "type":       <unicode>}, ...]
         """
         
         actions = []

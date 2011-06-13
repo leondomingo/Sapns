@@ -15,7 +15,7 @@ from neptuno.util import strtobool, strtodate, strtotime, datetostr
 
 from tg.controllers.util import urlencode
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
-    SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege
+    SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege, SapnsAction
 
 import logging
 import re
@@ -164,7 +164,13 @@ class DashboardController(BaseController):
         
         # actions for this class
         actions = cls_.sorted_actions()
-        
+        actions = [act for act in actions \
+                   if act['type'] in [SapnsAction.TYPE_NEW,
+                                      SapnsAction.TYPE_EDIT,
+                                      SapnsAction.TYPE_DELETE,
+                                      SapnsAction.TYPE_PROCESS,
+                                     ]]
+
         # total number of pages
         total_pag = 1
         if rp > 0:

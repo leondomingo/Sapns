@@ -75,10 +75,21 @@
 
         <!--{#<div class="sp-shortcut-ins-order" style="color: gray;">&nbsp;</div>
         <div class="sp-shortcut-ref-order" style="color: gray;">&nbsp;</div>#}-->
+        <!-- Object -->
+        {% elif sc.action_type == 'object' %}
+        <div class="sp-shortcut-title">
+            <a target="_blank" href="{{tg.url(sc.url)}}" target="_blank">{{sc.title}}</a>
+        </div>
+        
+        <select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>
         {% else %}
         <div class="sp-shortcut-title">
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
         </div>
+        
+        <select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>
         {% endif %}
     {% else %}
         <!-- {# This is a group #} -->
