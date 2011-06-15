@@ -13,7 +13,7 @@ def bootstrap(command, conf, vars):
         # user
         u = model.User()
         u.user_name = u'manager'
-        u.display_name = u'Superuser of the system'
+        u.display_name = u'Superuser Of The System'
         u.email_address = u'manager@somedomain.com'
         u.password = u'manager'
     
@@ -60,7 +60,7 @@ def bootstrap(command, conf, vars):
         # user
         u1 = model.User()
         u1.user_name = u'user'
-        u1.display_name = u'Common user'
+        u1.display_name = u'Common User'
         u1.email_address = u'common.user@somedomain.com'
         u1.password = u'user'
     

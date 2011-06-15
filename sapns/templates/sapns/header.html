@@ -1,7 +1,17 @@
 <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
 <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
+{#{{request.identity.user.user_name}}#}
 {% if request.identity %}
-<div class="sp_logout">
-    <a href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
-</div>
+    <div class="sp_logout">
+        <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
+            <a href="/dashboard/edit/sp_users/{{request.identity.user.user_id}}?came_from="
+                target="_blank" title="{{_('Click here to edit user data')}}">
+                {{request.identity.user.display_name}}
+            </a>
+        </div>
+        <div class="sp-logout-btn">
+            <a title="{{_('Click here to logout')}}" 
+                href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
+        </div>
+    </div>
 {% endif %}
