@@ -284,17 +284,47 @@
     			$('#rel-classes-form').attr('action', action).html(params).submit();
     		}
     	});
+    	
+    	// {# export button #} 
+    	$('#btn-export').click(function() {
+    		var sel = $('#select-export');
+    		var grid = sel.parent().parent();
+    		
+    		var cls = grid.attr('cls');
+    		var q = grid.find('.sp-search-form input[name=q]').val();
+    		
+    		if (sel.val() == 'csv') {
+    			var type = 'csv';
+    			var url = '/dashboard/tocsv';
+    		}
+    		else if (sel.val() == 'excel') {
+    			var type = 'excel';
+    			var url = '/dashboard/toxls';
+    		}
+    		// TODO other formats...
+    		
+    		var form_html =
+    			'<form action="' + url + '" method="get" >' +
+    			    '<input type="hidden" name="cls" value="' + cls + '" />' +
+    			    '<input type="hidden" name="q" value="' + q + '" />' +
+    			'</form>';
+    			
+    		$(form_html).appendTo('body').submit().remove();
+    		
+    		// reset the select 
+    		sel.find('option:first').attr('selected', true);
+    	});
     });
 </script>
 {% endmacro %}
 
 {% macro show(page, _, q, grid, show_ids, link=None, came_from=None, 
     with_search=True, with_pager=True, with_actions=True, can_edit=False,
-    rel_classes=None, ch_attr=None, parent_id=None) %}
+    rel_classes=None, ch_attr=None, parent_id=None, exportable=True) %}
 <!-- Grid -->
 <div id="grid-dialog" style="display: none;">
 </div>
-<div id="{{grid.name}}">
+<div id="{{grid.name}}" cls="{{grid.cls}}">
 
 {% if grid.caption %}
 <div class="sp-grid-caption">{{grid.caption|escape}}</div>
@@ -315,6 +345,18 @@
 
 {% if link %}
 <div style="font-size: 9px;"><a href="{{link}}">[this search]</a></div>
+{% endif %}
+
+<!-- export to CSV, Excel, ... -->
+{% if exportable %}
+<div id="grid-export" style="background-color: none; height: 25px; padding-left: 85%;">
+    <select id="select-export" style="height: 20px; font-size: 10px;">
+        <option value="">{{_('(format)')}}</option>
+        <option value="csv">CSV</option>
+        <option value="excel">Excel</option>
+    </select>
+    <button id="btn-export" class="sp-button">{{_('Export')}}</button>
+</div>
 {% endif %}
 
 <div style="overflow:auto">

@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Dashboard Controller"""
 
-from tg import expose, require, url, request, redirect, config
+from tg import response, expose, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
@@ -20,6 +20,7 @@ from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
 import logging
 import re
 import simplejson as sj
+import tempfile
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
@@ -214,6 +215,56 @@ class DashboardController(BaseController):
         logger.info(params)
         
         return self.list(**params)
+    
+    def export(self, cls, q=''):
+        
+        meta = MetaData(bind=dbs.bind)
+        
+        try:
+            # TODO: cambiar "vista_busqueda_" por "_view_"
+            Table('vista_busqueda_%s' % cls, meta, autoload=True)
+            view = 'vista_busqueda_%s' % cls
+            
+        except NoSuchTableError:
+            view = cls
+            
+        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        
+        def strtodatef(s):
+            return strtodate(s, fmt=date_fmt, no_exc=True)
+        
+        # get dataset
+        return search(dbs, view, q=q.encode('utf-8'), rp=0) #strtodatef=strtodatef, collection=col) 
+    
+    @expose(content_type='text/csv')
+    @require(predicates.not_anonymous())
+    def tocsv(self, cls, q=''):
+        ds = self.export(cls, q=q)
+        
+        response.headerlist.append(('Content-Disposition',
+                                    'attachment;filename=%s.csv' % cls))
+        
+        return ds.to_csv()
+    
+    @expose(content_type='application/excel')
+    @require(predicates.not_anonymous())
+    def toxls(self, cls, q=''):
+        ds = self.export(cls, q=q)
+
+        response.headerlist.append(('Content-Disposition',
+                                    'attachment;filename=%s.xls' % cls))
+        
+        _, name = tempfile.mkstemp(suffix='.xls', prefix='export_')
+        
+        # generate XLS content into the temporary file
+        ds.to_xls(cls.capitalize().replace('_', ' '), name)
+        
+        f_xls = file(name, 'rb')
+        try:
+            return f_xls.read()
+        
+        finally:
+            f_xls.close()
     
     @expose('json')
     @require(predicates.not_anonymous())
