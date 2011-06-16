@@ -110,8 +110,10 @@ class DashboardController(BaseController):
         
         try:
             # TODO: cambiar "vista_busqueda_" por "_view_"
-            Table('vista_busqueda_%s' % cls, meta, autoload=True)
-            view = 'vista_busqueda_%s' % cls
+            prefix = config.get('views_prefix', '_view_')
+            view_name = '%s%s' % (prefix, cls)
+            Table(view_name, meta, autoload=True)
+            view = view_name
             
         except NoSuchTableError:
             view = cls
