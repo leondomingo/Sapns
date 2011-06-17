@@ -218,30 +218,55 @@ class DashboardController(BaseController):
         
         return self.list(**params)
     
-    def export(self, cls, q=''):
+    def export(self, cls, **kw):
+        """
+        IN
+          cls          <unicode>
+          kw
+            q          <unicode>
+            ch_attr    <unicode>
+            parent_id  <int>
+        """
         
         meta = MetaData(bind=dbs.bind)
         
+        # parameters
+        # q
+        q = kw.get('q', '')
+        
+        # collections
+        ch_attr = kw.get('ch_attr')
+        parent_id = kw.get('parent_id')
+        
+        # collection
+        col = None
+        if ch_attr and parent_id:
+            col = (cls, ch_attr, parent_id,)
+            
         try:
             # TODO: cambiar "vista_busqueda_" por "_view_"
-            Table('vista_busqueda_%s' % cls, meta, autoload=True)
-            view = 'vista_busqueda_%s' % cls
+            prefix = config.get('views_prefix', '_view_')
+            view_name = '%s%s' % (prefix, cls)
+            Table(view_name, meta, autoload=True)
+            view = view_name
             
         except NoSuchTableError:
             view = cls
-            
+        
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
         def strtodatef(s):
             return strtodate(s, fmt=date_fmt, no_exc=True)
         
         # get dataset
-        return search(dbs, view, q=q.encode('utf-8'), rp=0) #strtodatef=strtodatef, collection=col) 
+        ds = search(dbs, view, q=q.encode('utf-8'), rp=0, collection=col)
+        
+        return ds 
     
     @expose(content_type='text/csv')
     @require(predicates.not_anonymous())
-    def tocsv(self, cls, q=''):
-        ds = self.export(cls, q=q)
+    def tocsv(self, cls, **kw):
+        ds = self.export(cls, **kw)
         
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.csv' % cls))
@@ -250,8 +275,8 @@ class DashboardController(BaseController):
     
     @expose(content_type='application/excel')
     @require(predicates.not_anonymous())
-    def toxls(self, cls, q=''):
-        ds = self.export(cls, q=q)
+    def toxls(self, cls, **kw):
+        ds = self.export(cls, **kw)
 
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.xls' % cls))

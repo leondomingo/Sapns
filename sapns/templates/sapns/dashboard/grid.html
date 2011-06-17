@@ -288,12 +288,23 @@
     	// {# export button #} 
     	$('#btn-export').click(function() {
     		var sel = $('#select-export');
+    		
+    		if (sel.val() == '') {
+    			// nothing selected 
+    			return;
+    		}
+    		
     		var grid = sel.parent().parent();
     		
     		var cls = grid.attr('cls');
     		var q = grid.find('.sp-search-form input[name=q]').val();
     		
-    		if (sel.val() == 'csv') {
+    	    //<input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"/>
+    	    var ch_attr = grid.find('.sp-search-form input[name=ch_attr]').val();
+    	    //<input type="hidden" name="parent_id" value="{{parent_id or ''}}"/> 
+    	    var parent_id = grid.find('.sp-search-form input[name=parent_id]').val();
+    		
+    	    if (sel.val() == 'csv') {
     			var type = 'csv';
     			var url = '/dashboard/tocsv';
     		}
@@ -307,6 +318,8 @@
     			'<form action="' + url + '" method="get" >' +
     			    '<input type="hidden" name="cls" value="' + cls + '" />' +
     			    '<input type="hidden" name="q" value="' + q + '" />' +
+    			    '<input type="hidden" name="ch_attr" value="' + ch_attr + '" />' +
+    			    '<input type="hidden" name="parent_id" value="' + parent_id + '" />' +
     			'</form>';
     			
     		$(form_html).appendTo('body').submit().remove();
