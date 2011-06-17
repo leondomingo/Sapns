@@ -12,7 +12,7 @@ from pylons.i18n import ugettext as _
 from tg import config
 
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
-from sqlalchemy.sql.expression import and_, select, alias, desc
+from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime, Date,\
     Time, Text
 from sqlalchemy.orm import relation, synonym
@@ -414,48 +414,62 @@ class SapnsClass(DeclarativeBase):
                     
         return titles
     
+    class ObjectTitle(object):
+         
+        def __init__(self, class_name):
+            self.class_name = class_name
+            self.date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+            
+            meta = MetaData(bind=dbs.bind)
+            self.cls = SapnsClass.by_name(class_name)
+            tbl = Table(self.cls.name, meta, autoload=True)
+            self.sel = \
+                select([tbl],
+                       from_obj=tbl,
+                       whereclause=tbl.c.id == bindparam('id_object'))
+                
+            self.related_class = {}
+         
+        def title(self, id_object):
+             
+            if not id_object:
+                return ''
+             
+            row = dbs.execute(self.sel, params=dict(id_object=id_object)).fetchone()
+            ref = []
+            for r in self.cls.reference():
+                
+                if not r['related_class_id']:
+                    
+                    value = row[r['name']]
+                    if value:
+                        if r['type'] == SapnsAttribute.TYPE_DATE:
+                            value = datetostr(value, fmt=self.date_fmt)
+                            
+                        else:
+                            value = unicode(value)
+                    else:
+                        value = '' 
+                    
+                    ref.append(value)
+                    
+                else:
+                    if not self.related_class.has_key(r['related_class_id']):
+                        # related attribute
+                        rel_class = dbs.query(SapnsClass).get(r['related_class_id'])
+                        ot = SapnsClass.ObjectTitle(rel_class.name)
+                        self.related_class[r['related_class_id']] = ot
+                    else:
+                        ot = self.related_class[r['related_class_id']]
+                        
+                    ref.append(ot.title(row[r['name']]))
+                    
+            return '.'.join(ref)
+    
     @staticmethod
     def object_title(class_name, id_object):
-        
-        logger = logging.getLogger(__name__ + '/object_title')
-        
-        if not id_object:
-            return ''
-        
-        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
-        
-        meta = MetaData(bind=dbs.bind)
-        cls = SapnsClass.by_name(class_name)
-        tbl = Table(cls.name, meta, autoload=True)
-        row = dbs.execute(tbl.select(whereclause=tbl.c.id == id_object)).fetchone()
-        ref = []
-        for r in cls.reference():
-            
-            logger.info(r['name'])
-            
-            if not r['related_class_id']:
-                
-                value = row[r['name']]
-                if value:
-                    if r['type'] == SapnsAttribute.TYPE_DATE:
-                        value = datetostr(value, fmt=date_fmt)
-                        
-                    else:
-                        value = unicode(value)
-                else:
-                    value = '' 
-                
-                ref.append(value)
-                
-            else:
-                # related attribute
-                rel_class = dbs.query(SapnsClass).get(r['related_class_id'])
-                rel_ref = SapnsClass.object_title(rel_class.name, row[r['name']])
-                
-                ref.append(rel_ref)
-                
-        return '.'.join(ref)
-
+        return SapnsClass.ObjectTitle(class_name).title(id_object)
+    
     def sorted_actions(self):
         """
         Returns a list of actions associated with this class.
