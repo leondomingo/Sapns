@@ -484,7 +484,7 @@
 {% if with_actions and grid.actions %}
 <!-- {# Grid actions #} -->
 <div class="sp-grid-actions">
-    <div class="sp-grid-actions-title">Actions:</div>
+    <div class="sp-grid-actions-title">{{_('Actions')}}:</div>
     {% for act in grid.actions %}
     <div style="float: left;">
     <form class="action-form" method="post" action0="{{act.url}}" target="_blank">
@@ -508,14 +508,13 @@
 
 {% if rel_classes %}
 <div id="rel-classes" style="clear: left;">
-<div style="float: left; color: gray; margin-top: 3px; width: 102px;
-    text-align: center;">{{_('Related info')}}</div>
-<select id="rel-classes-sel">
+<div class="sp-grid-relatedinfo-title">{{_('Related info')}}</div>
+<select id="rel-classes-sel" style="font-size: 11px;">
 {% for rc in rel_classes %}
 <option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>
 {% endfor %}
 </select>
-<input id="rel-classes-show" type="button" value="{{_('Show')}}"/>
+<input id="rel-classes-show" class="sp-button" type="button" value="{{_('Show')}}"/>
 <form id="rel-classes-form" method="post" action="" 
     target="_blank">
 </form>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-06-17 11:47+0200\n"
+"POT-Creation-Date: 2011-06-17 15:11+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,9 +16,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: sapns/controllers/dashboard.py:100 sapns/controllers/dashboard.py:307
-#: sapns/controllers/dashboard.py:428 sapns/controllers/dashboard.py:551
-#: sapns/controllers/dashboard.py:600 sapns/controllers/dashboard.py:649
+#: sapns/controllers/dashboard.py:100 sapns/controllers/dashboard.py:332
+#: sapns/controllers/dashboard.py:453 sapns/controllers/dashboard.py:576
+#: sapns/controllers/dashboard.py:625 sapns/controllers/dashboard.py:674
 msgid "Sorry, you do not have privilege on this class"
 msgstr ""
 
@@ -27,15 +27,15 @@ msgstr ""
 msgid "%s of [%s]"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:396
+#: sapns/controllers/dashboard.py:421
 msgid "The record has been successfully saved"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:439
+#: sapns/controllers/dashboard.py:464
 msgid "This class does not exist"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:468 sapns/controllers/dashboard.py:559
+#: sapns/controllers/dashboard.py:493 sapns/controllers/dashboard.py:584
 msgid "Record does not exist"
 msgstr ""
 
@@ -269,12 +269,12 @@ msgid "Save"
 msgstr ""
 
 #: sapns/templates/sapns/dashboard/edit.html:42
-#: sapns/templates/sapns/dashboard/grid.html:499
+#: sapns/templates/sapns/dashboard/grid.html:511
 msgid "Related info"
 msgstr ""
 
 #: sapns/templates/sapns/dashboard/edit.html:48
-#: sapns/templates/sapns/dashboard/grid.html:505
+#: sapns/templates/sapns/dashboard/grid.html:517
 msgid "Show"
 msgstr ""
 
@@ -322,40 +322,44 @@ msgstr ""
 msgid "You must select a row before click on this action"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:342
+#: sapns/templates/sapns/dashboard/grid.html:355
 msgid "Search..."
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:354
+#: sapns/templates/sapns/dashboard/grid.html:367
 msgid "(format)"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:358
+#: sapns/templates/sapns/dashboard/grid.html:371
 msgid "Export"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:397
+#: sapns/templates/sapns/dashboard/grid.html:410
 msgid "No results"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:408
+#: sapns/templates/sapns/dashboard/grid.html:421
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:415
+#: sapns/templates/sapns/dashboard/grid.html:428
 msgid "All"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:434
+#: sapns/templates/sapns/dashboard/grid.html:447
 msgid "page 1"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/grid.html:442
-#: sapns/templates/sapns/dashboard/grid.html:457
-#: sapns/templates/sapns/dashboard/grid.html:466
+#: sapns/templates/sapns/dashboard/grid.html:455
+#: sapns/templates/sapns/dashboard/grid.html:470
+#: sapns/templates/sapns/dashboard/grid.html:479
 #, python-format
 msgid "page %(p)d"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/grid.html:487
+msgid "Actions"
 msgstr ""
 
 #: sapns/templates/sapns/dashboard/index.html:34
