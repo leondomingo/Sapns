@@ -7,7 +7,7 @@ html {
 
 body {
 	text-align: left;
-	width: 1024px; /*960px;*/
+	width: 1000px;
 	margin: 0 auto;
 	padding: 0;
 	font-size: 12px;
@@ -280,12 +280,12 @@ clear:both;
 .sp_app_subtitle {
 	font-size: 12px;
 	text-align: left;
-	color: #723532; /*#EFE76E;*/
+	color: #723532;
 	margin-left: 10px;
 }
 
 .sp_logout {
-    margin-left: 70%; 
+    margin-left: 67%; 
     width: 300px;
     border: 1px solid;
     background-color: #CCCFA5;
