@@ -38,14 +38,13 @@
     
     {% if id and related_classes|length > 0 %}
     <div style="margin-left: 10px;">
-        <div style="float: left; color: gray; margin-top: 3px; 
-            width: 102px; text-align: center;">{{_('Related info')}}</div>
-        <select id="rel-classes-sel" style="float: left;">
+        <div id="rel-classes-title">{{_('Related info')}}</div>
+        <select id="rel-classes-sel">
         {% for rc in related_classes %}
         <option ch_attr="{{rc.attr_name}}" cls="{{rc.name}}">{{rc.title}} ({{rc.attr_title}})</option>
         {% endfor %}
         </select>
-        <input id="rel-classes-show" type="button" value="{{_('Show')}}" />
+        <button id="rel-classes-show" class="sp-button">{{_('Show')}}"</button>
         <form id="rel-classes-form" method="post" action="" target="_blank">
             <input type="hidden" name="parent_id" value="{{id}}" />
         </form>

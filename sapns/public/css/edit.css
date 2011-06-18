@@ -2,6 +2,21 @@
     overflow: auto;
 }
 
+#rel-classes-title {
+    float: left; 
+    color: gray; 
+    margin-top: 3px;
+    font-size: 11px; 
+    width: 160px; 
+    text-align: center;
+}
+
+#rel-classes-sel {
+	float: left; 
+	font-size: 11px; 
+	margin-top: 2px;
+}
+
 .sp-save-button {
     position: fixed;
     right: 350px;
