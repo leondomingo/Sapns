@@ -86,6 +86,8 @@ class RootController(BaseController):
         redirect(came_from)
 
     @expose()
-    def setlang(self, lang='en', came_from='/'):
+    def setlang(self, lang='en', **kw):
         set_lang(lang)
-        redirect(came_from)
+        came_from = kw.get('came_from')
+        if came_from:
+            redirect(url(came_from))
