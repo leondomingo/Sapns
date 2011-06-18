@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-06-17 15:11+0200\n"
+"POT-Creation-Date: 2011-06-18 20:10+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,12 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: sapns/controllers/dashboard.py:100
-#: sapns/controllers/dashboard.py:332
-#: sapns/controllers/dashboard.py:453
-#: sapns/controllers/dashboard.py:576
-#: sapns/controllers/dashboard.py:625
-#: sapns/controllers/dashboard.py:674
+#: sapns/controllers/dashboard.py:100 sapns/controllers/dashboard.py:332
+#: sapns/controllers/dashboard.py:453 sapns/controllers/dashboard.py:576
+#: sapns/controllers/dashboard.py:625 sapns/controllers/dashboard.py:674
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
@@ -39,24 +36,20 @@ msgstr "El registro se ha guardado correctamente"
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/dashboard.py:493
-#: sapns/controllers/dashboard.py:584
+#: sapns/controllers/dashboard.py:493 sapns/controllers/dashboard.py:584
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
-#: sapns/controllers/root.py:62
-#: sapns/controllers/myapp/root.py:66
+#: sapns/controllers/root.py:62 sapns/controllers/myapp/root.py:66
 msgid "Wrong credentials"
 msgstr "Credenciales incorrectas"
 
-#: sapns/controllers/root.py:76
-#: sapns/controllers/myapp/root.py:80
+#: sapns/controllers/root.py:76 sapns/controllers/myapp/root.py:80
 #, python-format
 msgid "Welcome back, %s!"
 msgstr "¡Bienvenido, %s!"
 
-#: sapns/controllers/root.py:85
-#: sapns/controllers/myapp/root.py:89
+#: sapns/controllers/root.py:85 sapns/controllers/myapp/root.py:89
 msgid "We hope to see you soon!"
 msgstr "¡Esperamos verte pronto!"
 
@@ -64,34 +57,28 @@ msgstr "¡Esperamos verte pronto!"
 msgid "Shorcuts editing"
 msgstr "Edición de favoritos"
 
-#: sapns/controllers/users.py:33
-#: sapns/templates/sapns/users/edit.html:14
+#: sapns/controllers/users.py:33 sapns/templates/sapns/users/edit.html:14
 msgid "Display name"
 msgstr "Nombre"
 
-#: sapns/controllers/users.py:34
-#: sapns/templates/sapns/users/edit.html:20
+#: sapns/controllers/users.py:34 sapns/templates/sapns/users/edit.html:20
 msgid "User name"
 msgstr "Nombre de usuario"
 
-#: sapns/controllers/users.py:35
-#: sapns/templates/sapns/users/edit.html:26
+#: sapns/controllers/users.py:35 sapns/templates/sapns/users/edit.html:26
 msgid "E-mail address"
 msgstr "E-mail"
 
-#: sapns/controllers/users.py:46
-#: sapns/controllers/util.py:235
+#: sapns/controllers/users.py:46 sapns/controllers/util.py:235
 msgid "New"
 msgstr "Nuevo"
 
-#: sapns/controllers/users.py:47
-#: sapns/controllers/util.py:236
+#: sapns/controllers/users.py:47 sapns/controllers/util.py:236
 #: sapns/templates/sapns/shortcuts/list.html:109
 msgid "Edit"
 msgstr "Editar"
 
-#: sapns/controllers/users.py:48
-#: sapns/controllers/util.py:237
+#: sapns/controllers/users.py:48 sapns/controllers/util.py:237
 #: sapns/templates/sapns/dashboard/grid.html:73
 #: sapns/templates/sapns/shortcuts/list.html:122
 msgid "Delete"
@@ -105,8 +92,7 @@ msgstr "Ocurrió un error mientras se guardaba el usuario"
 msgid "Initialization was completed successfully"
 msgstr "La inicialización se completó con éxito"
 
-#: sapns/controllers/util.py:62
-#: sapns/templates/sapns/dashboard/index.html:27
+#: sapns/controllers/util.py:62 sapns/templates/sapns/dashboard/index.html:27
 msgid "Dashboard"
 msgstr "Escritorio"
 
@@ -118,8 +104,7 @@ msgstr "Exploración de datos"
 msgid "Project"
 msgstr "Proyecto"
 
-#: sapns/controllers/util.py:121
-#: sapns/controllers/util.py:238
+#: sapns/controllers/util.py:121 sapns/controllers/util.py:238
 msgid "List"
 msgstr "Lista"
 
@@ -140,18 +125,15 @@ msgstr "Proceso terminado"
 msgid "The view has been successfully deleted"
 msgstr "La vista ha sido borrada correctamente"
 
-#: sapns/templates/myapp/base.html:29
-#: sapns/templates/sapns/base.html:20
+#: sapns/templates/myapp/base.html:29 sapns/templates/sapns/base.html:20
 msgid "You are in"
 msgstr "Estás en"
 
-#: sapns/templates/myapp/base.html:33
-#: sapns/templates/sapns/base.html:24
+#: sapns/templates/myapp/base.html:33 sapns/templates/sapns/base.html:24
 msgid "return"
 msgstr "volver"
 
-#: sapns/templates/myapp/header.html:5
-#: sapns/templates/sapns/header.html:14
+#: sapns/templates/myapp/header.html:5 sapns/templates/sapns/header.html:14
 msgid "logout"
 msgstr "salir"
 
@@ -326,11 +308,8 @@ msgid "Ok"
 msgstr "Aceptar"
 
 #: sapns/templates/sapns/dashboard/grid.html:95
-msgid ""
-"For your information this object is related with other objects in the "
-"following classes:"
-msgstr "Para tu información este objeto está relacionado con otros objetos en las"
-" siguientes clases:"
+msgid "For your information this object is related with other objects in the following classes:"
+msgstr "Para tu información este objeto está relacionado con otros objetos en las siguientes clases:"
 
 #: sapns/templates/sapns/dashboard/grid.html:133
 #: sapns/templates/sapns/dashboard/selector.html:147
@@ -363,8 +342,7 @@ msgstr "No hay resultados"
 #: sapns/templates/sapns/dashboard/grid.html:421
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
-msgstr "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta "
-"%(pos1)d"
+msgstr "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta %(pos1)d"
 
 #: sapns/templates/sapns/dashboard/grid.html:428
 msgid "All"

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-06-17 15:11+0200\n"
+"POT-Creation-Date: 2011-06-18 20:10+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,12 +17,9 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: sapns/controllers/dashboard.py:100
-#: sapns/controllers/dashboard.py:332
-#: sapns/controllers/dashboard.py:453
-#: sapns/controllers/dashboard.py:576
-#: sapns/controllers/dashboard.py:625
-#: sapns/controllers/dashboard.py:674
+#: sapns/controllers/dashboard.py:100 sapns/controllers/dashboard.py:332
+#: sapns/controllers/dashboard.py:453 sapns/controllers/dashboard.py:576
+#: sapns/controllers/dashboard.py:625 sapns/controllers/dashboard.py:674
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Sorry, you do not have privilege on this class"
 
@@ -39,24 +36,20 @@ msgstr "The record has been successfully saved"
 msgid "This class does not exist"
 msgstr "This class does not exist"
 
-#: sapns/controllers/dashboard.py:493
-#: sapns/controllers/dashboard.py:584
+#: sapns/controllers/dashboard.py:493 sapns/controllers/dashboard.py:584
 msgid "Record does not exist"
 msgstr "Record does not exist"
 
-#: sapns/controllers/root.py:62
-#: sapns/controllers/myapp/root.py:66
+#: sapns/controllers/root.py:62 sapns/controllers/myapp/root.py:66
 msgid "Wrong credentials"
 msgstr "Wrong credentials"
 
-#: sapns/controllers/root.py:76
-#: sapns/controllers/myapp/root.py:80
+#: sapns/controllers/root.py:76 sapns/controllers/myapp/root.py:80
 #, python-format
 msgid "Welcome back, %s!"
 msgstr "Welcome back, %s!"
 
-#: sapns/controllers/root.py:85
-#: sapns/controllers/myapp/root.py:89
+#: sapns/controllers/root.py:85 sapns/controllers/myapp/root.py:89
 msgid "We hope to see you soon!"
 msgstr "We hope to see you soon!"
 
@@ -64,34 +57,28 @@ msgstr "We hope to see you soon!"
 msgid "Shorcuts editing"
 msgstr "Shortcuts editing"
 
-#: sapns/controllers/users.py:33
-#: sapns/templates/sapns/users/edit.html:14
+#: sapns/controllers/users.py:33 sapns/templates/sapns/users/edit.html:14
 msgid "Display name"
 msgstr "Display name"
 
-#: sapns/controllers/users.py:34
-#: sapns/templates/sapns/users/edit.html:20
+#: sapns/controllers/users.py:34 sapns/templates/sapns/users/edit.html:20
 msgid "User name"
 msgstr "User name"
 
-#: sapns/controllers/users.py:35
-#: sapns/templates/sapns/users/edit.html:26
+#: sapns/controllers/users.py:35 sapns/templates/sapns/users/edit.html:26
 msgid "E-mail address"
 msgstr "E-mail address"
 
-#: sapns/controllers/users.py:46
-#: sapns/controllers/util.py:235
+#: sapns/controllers/users.py:46 sapns/controllers/util.py:235
 msgid "New"
 msgstr "New"
 
-#: sapns/controllers/users.py:47
-#: sapns/controllers/util.py:236
+#: sapns/controllers/users.py:47 sapns/controllers/util.py:236
 #: sapns/templates/sapns/shortcuts/list.html:109
 msgid "Edit"
 msgstr "Edit"
 
-#: sapns/controllers/users.py:48
-#: sapns/controllers/util.py:237
+#: sapns/controllers/users.py:48 sapns/controllers/util.py:237
 #: sapns/templates/sapns/dashboard/grid.html:73
 #: sapns/templates/sapns/shortcuts/list.html:122
 msgid "Delete"
@@ -105,8 +92,7 @@ msgstr "An error occurred while saving the user"
 msgid "Initialization was completed successfully"
 msgstr "Initialization was completed successfully"
 
-#: sapns/controllers/util.py:62
-#: sapns/templates/sapns/dashboard/index.html:27
+#: sapns/controllers/util.py:62 sapns/templates/sapns/dashboard/index.html:27
 msgid "Dashboard"
 msgstr "Dashboard"
 
@@ -118,8 +104,7 @@ msgstr "Data exploration"
 msgid "Project"
 msgstr "Project"
 
-#: sapns/controllers/util.py:121
-#: sapns/controllers/util.py:238
+#: sapns/controllers/util.py:121 sapns/controllers/util.py:238
 msgid "List"
 msgstr "List"
 
@@ -140,18 +125,15 @@ msgstr "Process terminated"
 msgid "The view has been successfully deleted"
 msgstr "The view has been successfully deleted"
 
-#: sapns/templates/myapp/base.html:29
-#: sapns/templates/sapns/base.html:20
+#: sapns/templates/myapp/base.html:29 sapns/templates/sapns/base.html:20
 msgid "You are in"
 msgstr "You are in"
 
-#: sapns/templates/myapp/base.html:33
-#: sapns/templates/sapns/base.html:24
+#: sapns/templates/myapp/base.html:33 sapns/templates/sapns/base.html:24
 msgid "return"
 msgstr "return"
 
-#: sapns/templates/myapp/header.html:5
-#: sapns/templates/sapns/header.html:14
+#: sapns/templates/myapp/header.html:5 sapns/templates/sapns/header.html:14
 msgid "logout"
 msgstr "logout"
 
@@ -326,11 +308,8 @@ msgid "Ok"
 msgstr "Ok"
 
 #: sapns/templates/sapns/dashboard/grid.html:95
-msgid ""
-"For your information this object is related with other objects in the "
-"following classes:"
-msgstr "For your information this object is related with other objects in the "
-"following classes:"
+msgid "For your information this object is related with other objects in the following classes:"
+msgstr "For your information this object is related with other objects in the following classes:"
 
 #: sapns/templates/sapns/dashboard/grid.html:133
 #: sapns/templates/sapns/dashboard/selector.html:147
