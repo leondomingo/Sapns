@@ -1,0 +1,41 @@
+#modwsgi script for sapns
+
+#1.Point to this script in your apache config file.
+#Default location for all apps is:
+#Debian:  /path/to/sapns
+
+#2. Make sure apache user own the folder.
+#Debian: chown -R www-data:www-data /path/to/sapns
+
+import sys
+
+#3. start of virtualenv (enabled by default).
+#Please comment out until 4 if you don't use virtualenv. 
+#Make sure root owns the virtualenv folder. Example:(root:root)
+#Create virtualenv if you didn't create it yet:
+#mkdir /usr/local/pythonenv
+#virtualenv --no-site-packages /usr/local/pythonenv/BASELINE
+
+prev_sys_path = list(sys.path)
+
+import site 
+site.addsitedir('/path/to/environment/lib/python2.6/site-packages')
+#End of virtualenv
+
+#4. Your website file location.
+import os, sys
+sys.path.append('/path/to/sapns/')
+
+#5. Set the environment variable PYTHON_EGG_CACHE to an appropriate directory where the Apache user has write permission and into which it can unpack egg files.
+os.environ['PYTHON_EGG_CACHE'] = '/path/to/sapns/python-eggs'
+
+#6.[Optional]If you want to enable logging you need to initialize logging. You also need to setup logger handlers in your production.ini. When done uncomment next two lines.
+#from paste.script.util.logging_config import fileConfig
+#fileConfig('/path/to/sapns/production.ini')
+
+#7. Load your application production.ini file.
+from paste.deploy import loadapp
+#application = loadapp('config:/home/leon/workspace/ateneatg2/production.ini')
+application = loadapp('config:/home/leon/workspace/ateneatg2/development.ini')
+
+#8.[Optional] If you want to test modwsgi only, uncomment section 3 in your /usr/local/turbogears/exampletg/apache/exampletg
