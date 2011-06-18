@@ -35,7 +35,6 @@ os.environ['PYTHON_EGG_CACHE'] = '/path/to/sapns/python-eggs'
 
 #7. Load your application production.ini file.
 from paste.deploy import loadapp
-#application = loadapp('config:/home/leon/workspace/ateneatg2/production.ini')
-application = loadapp('config:/home/leon/workspace/ateneatg2/development.ini')
+application = loadapp('config:/path/to/sapns/production.ini')
 
 #8.[Optional] If you want to test modwsgi only, uncomment section 3 in your /usr/local/turbogears/exampletg/apache/exampletg
