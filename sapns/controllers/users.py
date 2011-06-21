@@ -82,14 +82,17 @@ class UsersController(BaseController):
                               totalp=totalp, total=ds.count, total_pag=1))
         
     @expose('sapns/users/edit.html')
-    @require(predicates.has_any_permission('manage', 'users'))
-    def edit(self, **params):
+    @require(predicates.not_anonymous())
+    def edit(self, id, **params):
         
-        id = int(params['id'])
-        came_from = params.get('came_from', '/dashboard/users')
+        id_user = int(id)
         
-        user = dbs.query(SapnsUser).get(id)
-        return dict(user=user, came_from=url(came_from))
+        came_from = params.get('came_from')
+        if came_from:
+            came_from = url(came_from)
+        
+        user = dbs.query(SapnsUser).get(id_user)
+        return dict(user=user, came_from=came_from)
     
     @expose('sapns/users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
@@ -101,6 +104,10 @@ class UsersController(BaseController):
     @require(predicates.has_any_permission('manage', 'users'))
     def save(self, **params):
         
+        came_from = params.get('came_from')
+        if came_from:
+            came_from = url(came_from)
+            
         try:
             new_user = False
             if params['id']:
@@ -126,18 +133,33 @@ class UsersController(BaseController):
         except:
             redirect(url('/message', 
                          params=dict(message=_('An error occurred while saving the user'),
-                                     came_from='/dashboard/users')))
+                                     came_from=came_from)))
 
-        redirect(url('/dashboard/users'))
+        if came_from:
+            redirect(came_from)
+            
+        else:
+            redirect(url('/message',
+                         params=dict(message='User was updated successfully',
+                                     came_from='')))
+            
+        
     
     @expose()
     @require(predicates.has_any_permission('manage', 'users'))
     def delete(self, **params):
         
+        came_from = params.get('came_from')
+        if came_from:
+            came_from = url(came_from)
+        
+        user_name = ''
         logger = logging.getLogger(__name__ + '/delete')
         try:
             id = int(params['id'])
-            came_from = params.get('came_from', '/dashboard/users')
+            
+            user = dbs.query(SapnsUser).get(id)
+            user_name = user.display_name
             
             dbs.query(SapnsUser).\
                 filter(SapnsUser.user_id == id).\
@@ -147,8 +169,15 @@ class UsersController(BaseController):
 
         except Exception, e:
             logger.error(e)
+            redirect(url('/message', 
+                         params=dict(message=unicode(e), came_from='')))
         
-        redirect(url(came_from))
+        if came_from:
+            redirect(came_from)
+            
+        else:
+            redirect(url('/message', params=dict(message='User "%s" was successfully deleted' % user_name,
+                                                 came_from='')))
     
     @expose('sapns/users/permission.html')
     @require(predicates.has_any_permission('manage', 'users'))
