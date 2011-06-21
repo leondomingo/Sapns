@@ -58,7 +58,7 @@
             href="{{tg.url('/', sc_type='smallicon')}}">Small icon</a>
     </div> #} -->
     
-    <div style="border: 1px solid white; height: 300px; overflow: auto;">
+    <div id="sc-container">
     {% if sc_type == 'list' %}
         {% include 'sapns/shortcuts/list.html' %}
     {% elif sc_type == 'bigicon' %}

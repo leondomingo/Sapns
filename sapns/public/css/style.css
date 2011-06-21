@@ -289,6 +289,7 @@ clear:both;
     width: 300px;
     border: 1px solid;
     background-color: #CCCFA5;
+    border-radius: 10px;
 }
 
 .sp-logout-user {
@@ -304,10 +305,15 @@ clear:both;
 	text-align: center;
 	background-color: white;
     border: 2px solid gray;
+    border-radius: 10px;
     width: 90px;
     margin-left: 205px;
     font-family: Arial;
-    /*cursor: pointer;*/
+    height: 14px;
+}
+
+.sp-logout-btn:hover {
+	background-color: orange;
 }
 
 .sp-button {
@@ -477,11 +483,26 @@ clear:both;
 	padding: 20px;
 }
 
+#sc-container {
+	border: 1px solid white;
+	border-radius: 10px; 
+	height: 430px; 
+	overflow: auto;
+	margin-top: 10px;
+	margin-left: 3px;
+	margin-right: 3px;
+}
+
 .sp_shortcut {
 	margin-left: 20px;
 	margin-right: 20px;
     margin-top: 5px;
     margin-bottom: 2px;
+    border-radius: 10px;
+}
+
+.sp_shortcut: hover {
+	background-color: orange;
 }
     
 .sp-shortcut-title {

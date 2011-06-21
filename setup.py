@@ -1,11 +1,4 @@
 # -*- coding: utf-8 -*-
-#quckstarted Options:
-#
-# sqlalchemy: True
-# auth:       sqlalchemy
-# mako:       False
-#
-#
 
 try:
     from setuptools import setup, find_packages
