@@ -1,5 +1,8 @@
+{% import 'sapns/dashboard/util.html' as util %}
 {% import 'sapns/dashboard/grid.html' as grid_html %}
-{{grid_html.js_select_row(_)}}
+
+{{ util.qtip() }}
+{{ grid_html.js_select_row(_) }}
 
 <div>
     <div class="sp-search">

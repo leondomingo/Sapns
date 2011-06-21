@@ -29,6 +29,26 @@
 <script type="text/javascript">
     $(document).ready(function() {
     	
+    	$('.sp-grid-cell').qtip({
+    		content: {
+    			text: false
+    		},
+    		position: {
+    			corner: {
+    				target: "bottomMiddle"
+    			}
+    		},
+    		style: {
+    			color: "white",
+    			"background-color": "gray",
+    			border: {
+    				width: 1,
+    				color: "orange",
+    				radius: 3
+    			}
+    		}
+    	});
+    	
     	// {# default DELETE action #} 
     	function delete_action(button, selected_row, id) {
     		
@@ -391,14 +411,18 @@
         {% for cell in row %}
         <td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}};
             width: {{grid.cols[loop.index0].width}}px;"
-            title="{{grid.cols[loop.index0].title}}"
+            title="{{cell|escape}}"
             {% if can_edit and loop.index0 == 0 %}
             clickable="false">
             <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from=" 
                 target="_blank">{{cell|escape}}</a>
             {% else %}
             clickable="true">
-            {{cell|escape}}
+            {% if ('%s'|format(cell))|length > 30 %}
+                {{cell[:30]|escape}}...
+            {% else %}
+                {{cell|escape}}
+            {% endif %}
             {% endif %}
         </td>
         {% endfor %}
