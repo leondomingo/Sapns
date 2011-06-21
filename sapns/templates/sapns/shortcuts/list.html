@@ -25,18 +25,12 @@
         cls="{{sc.cls}}"
         style="{% if loop.index % 2 == 0 %}background-color: white;{% endif %}">
         
-        <!--{#
-        <div style="float: left;">
-            <input type="checkbox"/>
-        </div>
-        #}-->
-        
     {% if sc.action_type %}
         <!-- List -->
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
             <a target="_blank" href="{{tg.url('/dashboard/list/%s' % sc.cls)}}">
-                {{sc.title}}
+                {{sc.title|escape}}
             </a>
         </div>
         
@@ -46,39 +40,24 @@
         
         <!-- {# insertion order #} -->
         <option value="ins-order">{{_('Insertion order')}}</option>
-        <!--{#<div class="sp-shortcut-ins-order">
-            <a href="{{tg.url('/dashboard/ins_order', params=dict(
-                cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
-                {{_('Insertion order')}}
-            </a>
-        </div>#}-->
-        
+
         <!-- {# reference order #} -->
         <option value="ref-order">{{_('Reference order')}}</option>
-        <!--{#<div class="sp-shortcut-ref-order">
-            <a href="{{tg.url('/dashboard/ref_order', params=dict(
-                cls=sc.cls, came_from='/dashboard/?sc_parent=%d' % sc.parent))}}">
-                {{_('Reference order')}}
-            </a>
-        </div>
-        #}-->
+        
         <!-- Process -->
         {% elif sc.action_type == 'process' %}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url(sc.url, params=dict(
-                cls=sc.cls, came_from=''))}}" target="_blank">
-                {{sc.title}}</a>
+            <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}" 
+                target="_blank">{{sc.title|escape}}</a>
         </div>
         
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
 
-        <!--{#<div class="sp-shortcut-ins-order" style="color: gray;">&nbsp;</div>
-        <div class="sp-shortcut-ref-order" style="color: gray;">&nbsp;</div>#}-->
         <!-- Object -->
         {% elif sc.action_type == 'object' %}
         <div class="sp-shortcut-title">
-            <a target="_blank" href="{{tg.url(sc.url)}}" target="_blank">{{sc.title}}</a>
+            <a target="_blank" href="{{tg.url(sc.url)}}" target="_blank">{{sc.title|escape}}</a>
         </div>
         
         <select class="sp-select-shortcut">
@@ -99,59 +78,24 @@
         </div>
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
-        <!--{#<div class="sp-shortcut-ins-order" style="color: gray;">&nbsp;</div>
-        <div class="sp-shortcut-ref-order" style="color: gray;">&nbsp;</div>#}-->
     {% endif %}
         <!-- {# general actions over shortcuts #} -->
     
         <!-- {# Edit #} -->
         <option value="edit" 
             title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>
-        <!--{# <div style="float: left;">
-            <form method="post" action="/dashboard/sc/edit">
-            <input type="hidden" name="id" value="{{sc.id}}"/>
-            <input type="hidden" name="came_from" value="{{'/dashboard/?sc_parent=%d' % sc.parent}}"/>
-            <input class="sp-button" style="width: 50px; float: left;"
-                title="{{_('Edit this shortcut')}}" 
-                type="submit" value="{{_('Edit')}}"/>
-            </form>
-        </div> #}-->
         
         <!-- {# Delete #} -->
         <option value="delete" 
             title="{{_('Remove this shortcut')}}">{{_('Delete')}}</option>
-        <!-- {#
-        <div style="float: left;">
-            <input class="sp-button sc_delete_button" 
-                style="width: 50px; float: left;"
-                title="{{_('Remove this shortcut')}}" 
-                type="button" value="{{_('Delete')}}"/>
-        </div>
-        #} -->
     
         <!-- {# To dashboard #} -->
         <option value="to-dashboard"
             title="{{_('Put this shortcut on the dashboard')}}">{{_('Send to dashboard')}}</option>
-        <!-- {#
-        <div style="float: left;">
-            <input class="sp-button sc_bookmark_button" 
-                style="width: 110px;"
-                title="{{_('Put this shortcut on the dashboard')}}"
-                type="button" value="{{_('Send to dashboard')}}"/>
-        </div>
-        #} -->
 
         <!-- {# Share #} -->
         <option value="share"
             title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>
-        <!-- {#
-        <div>
-            <input class="sp-button sc_share_button" 
-                style="width: 65px;"
-                title=""
-                type="button" value="{{_('Share')}}"/>
-        </div>
-        #}-->
         
         </select>
         

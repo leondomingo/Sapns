@@ -501,10 +501,10 @@ clear:both;
     border-radius: 10px;
 }
 
-.sp_shortcut: hover {
-	background-color: orange;
+.sp_shortcut:hover {
+    background-color: orange !important;
 }
-    
+
 .sp-shortcut-title {
     width: 350px;
     float: left;
