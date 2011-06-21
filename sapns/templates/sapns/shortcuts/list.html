@@ -35,9 +35,9 @@
         <!-- List -->
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
-            <a target="_blank" href="{{tg.url('/dashboard/list', params=dict(
-                cls=sc.cls, came_from=''))}}">
-                {{sc.title}}</a>
+            <a target="_blank" href="{{tg.url('/dashboard/list/%s' % sc.cls)}}">
+                {{sc.title}}
+            </a>
         </div>
         
         <!-- {# actions over "list" shortcuts #} -->
