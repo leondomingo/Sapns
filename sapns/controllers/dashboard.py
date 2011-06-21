@@ -269,7 +269,7 @@ class DashboardController(BaseController):
         ds = self.export(cls, **kw)
         
         response.headerlist.append(('Content-Disposition',
-                                    'attachment;filename=%s.csv' % cls))
+                                    'attachment;filename=%s.csv' % cls.encode('utf-8')))
         
         return ds.to_csv()
     
@@ -279,7 +279,7 @@ class DashboardController(BaseController):
         ds = self.export(cls, **kw)
 
         response.headerlist.append(('Content-Disposition',
-                                    'attachment;filename=%s.xls' % cls))
+                                    'attachment;filename=%s.xls' % cls.encode('utf-8')))
         
         _, name = tempfile.mkstemp(suffix='.xls', prefix='export_')
         
