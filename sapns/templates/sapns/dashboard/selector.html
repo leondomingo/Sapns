@@ -7,19 +7,19 @@
     <!-- {# Select text #} -->
     <input id="st_{{name}}" class="sp-select-text" type="text" readonly
         value="{{rel_title}}" 
-        {% if read_only %} disabled {% endif %} />
+        {% if read_only %} disabled {% endif %}>
         
     <!-- {# Select button #} -->
     <input id="sb_{{name}}" class="sp-button sp-select-button" type="button" value="..."
         title='{{_("Set a value for \"%s\""|format(title))}}' 
         style="font-weight: bold;"
-        {% if read_only %} disabled {% endif %} />
+        {% if read_only %} disabled {% endif %}>
         
     <!-- {# Remove button #} -->
     {% if not read_only %}
     <input id="rb_{{name}}" class="sp-button sp-empty-button" type="button" value="X"
         title='{{_("Remove value of \"%s\""|format(title))}}' 
-        style="font-weight: bold; color: red;" />
+        style="font-weight: bold; color: red;">
     {% endif %}
 </div>
 {% endmacro %}

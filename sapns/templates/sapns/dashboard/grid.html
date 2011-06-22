@@ -182,7 +182,7 @@
             
             // {# Add params to the form #} 
             var params = 
-                '<input name="rp" type="hidden" value="' + rp + '"/>';
+                '<input name="rp" type="hidden" value="' + rp + '">';
                 
             $('#' + grid_id + ' .sp-search-form').append(params);
             
@@ -218,17 +218,18 @@
             if (ch_attr != '') {
                 var parent_id = $('#' + grid_id + ' .sp-search-form input[name=parent_id]').val(); 
                 form.append('<input type="hidden"' +
-                    ' name="_' + ch_attr + '" value="' + parent_id + '"/>');
+                    ' name="_' + ch_attr + '" value="' + parent_id + '">');
             }
 
             if ($(this).attr('require_id') == 'true') {
         		
         		// {# get the id of the selected row #}
         		var selected_row = selected_id(grid_id);
-        		var id_selected = selected_row.find('.sp-grid-rowid').attr('id_row');
         		
         		// {# if there's a selected row, go to the corresponding location #} 
-        		if (id_selected != null) {
+        		if (selected_row != null) {
+        			
+        			var id_selected = selected_row.find('.sp-grid-rowid').attr('id_row');
         			
         			if($(this).attr('action-type') == 'delete') {
         				delete_action($(this), selected_row, id_selected);
@@ -249,7 +250,7 @@
         					var id_param = form.find('input[name=id]').first();
         					if (id_param.length == 0) {
         						form.append('<input type="hidden" ' + 
-        						    ' name="id" value="' + id_selected + '"/>');
+        						    ' name="id" value="' + id_selected + '">');
         					}
         					else {
         						id_param.val(id_selected);
@@ -286,9 +287,11 @@
     	$('#rel-classes-show').click(function() {
     		
     		var grid = $(this).parent().parent();
-    		var id_selected = selected_id(grid.attr('id')).find('.sp-grid-rowid').attr('id_row');    		
+    		var id_selected = selected_id(grid.attr('id'));    		
     		
     		if (id_selected != null) {
+    			
+    			id_selected = id_selected.find('.sp-grid-rowid').attr('id_row');
     			
     			var option = $('#rel-classes-sel option:selected');
     			
@@ -296,10 +299,10 @@
     			
     			var params = '';
     			params += '<input type="hidden" name="ch_attr" ' +
-    			    'value="' + option.attr('ch_attr') + '"/>\n';
+    			    'value="' + option.attr('ch_attr') + '">\n';
     			    
     			params += '<input type="hidden" name="parent_id" ' + 
-    			    'value="' + id_selected + '"/>\n';
+    			    'value="' + id_selected + '">\n';
     			    
     			$('#rel-classes-form').attr('action', action).html(params).submit();
     		}
@@ -319,9 +322,9 @@
     		var cls = grid.attr('cls');
     		var q = grid.find('.sp-search-form input[name=q]').val();
     		
-    	    //<input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"/>
+    	    //<input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"> 
     	    var ch_attr = grid.find('.sp-search-form input[name=ch_attr]').val();
-    	    //<input type="hidden" name="parent_id" value="{{parent_id or ''}}"/> 
+    	    //<input type="hidden" name="parent_id" value="{{parent_id or ''}}"> 
     	    var parent_id = grid.find('.sp-search-form input[name=parent_id]').val();
     		
     	    if (sel.val() == 'csv') {
@@ -336,10 +339,10 @@
     		
     		var form_html =
     			'<form action="' + url + '" method="get" >' +
-    			    '<input type="hidden" name="cls" value="' + cls + '" />' +
-    			    '<input type="hidden" name="q" value="' + q + '" />' +
-    			    '<input type="hidden" name="ch_attr" value="' + ch_attr + '" />' +
-    			    '<input type="hidden" name="parent_id" value="' + parent_id + '" />' +
+    			    '<input type="hidden" name="cls" value="' + cls + '">' +
+    			    '<input type="hidden" name="q" value="' + q + '">' +
+    			    '<input type="hidden" name="ch_attr" value="' + ch_attr + '">' +
+    			    '<input type="hidden" name="parent_id" value="' + parent_id + '">' +
     			'</form>';
     			
     		$(form_html).appendTo('body').submit().remove();
@@ -365,14 +368,14 @@
 
 {% if with_search %}
 <form class="sp-search-form" method="post" action="{{grid.search_url + grid.cls}}">
-    <input type="hidden" name="caption" value="{{grid.caption}}"/>
-    <input type="hidden" name="show_ids" value="{{show_ids}}"/>
-    <input type="hidden" name="came_from" value="{{came_from}}"/>
-    <input class="sp-search-txt" name="q" type="text" value="{{q|escape}}"/>
+    <input type="hidden" name="caption" value="{{grid.caption}}">
+    <input type="hidden" name="show_ids" value="{{show_ids}}">
+    <input type="hidden" name="came_from" value="{{came_from}}">
+    <input class="sp-search-txt" name="q" type="text" value="{{q|escape}}">
     <!-- {# collections #} -->
-    <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"/>
-    <input type="hidden" name="parent_id" value="{{parent_id or ''}}"/>
-    <input class="sp-button sp-search-btn" type="button" value="{{_('Search...')}}"/>
+    <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}">
+    <input type="hidden" name="parent_id" value="{{parent_id or ''}}">
+    <input class="sp-button sp-search-btn" type="button" value="{{_('Search...')}}">
 </form>
 {% endif %}
 
@@ -407,7 +410,7 @@
         <!-- Fill in grid -->
         <tr class="sp-grid-row">
         <td title="{{loop.index}}"><input class="sp-grid-rowid" type="checkbox" 
-            id_row="{{row[0]}}"/></td>
+            id_row="{{row[0]}}"></td>
         {% for cell in row %}
         <td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}};
             width: {{grid.cols[loop.index0].width}}px;"
@@ -455,20 +458,20 @@
     {% macro form_newpage(pag_n, fl=False) %}
     <form method="post" action="{{grid.search_url + grid.cls}}"
         {% if fl %} style="float: left;" {% endif %}>
-        <input type="hidden" name="caption" value="{{grid.caption}}"/>
-        <input type="hidden" name="q" value="{{q}}"/>
-        <input type="hidden" name="rp" value="{{grid.rp}}"/>
-        <input type="hidden" name="pag_n" value="{{pag_n}}"/>
-        <input type="hidden" name="show_ids" value="{{show_ids}}"/>
-        <input type="hidden" name="came_from" value="{{came_from}}"/>
-        <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}"/>
-        <input type="hidden" name="parent_id" value="{{parent_id or ''}}"/>
+        <input type="hidden" name="caption" value="{{grid.caption}}">
+        <input type="hidden" name="q" value="{{q}}">
+        <input type="hidden" name="rp" value="{{grid.rp}}">
+        <input type="hidden" name="pag_n" value="{{pag_n}}">
+        <input type="hidden" name="show_ids" value="{{show_ids}}">
+        <input type="hidden" name="came_from" value="{{came_from}}">
+        <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}">
+        <input type="hidden" name="parent_id" value="{{parent_id or ''}}">
     {% endmacro %}
     
     <!-- {# first page #} -->
     {{form_newpage(1)}}
         <input class="sp-button sp-grid-pag-back" type="submit" value="|<<" 
-            title="{{_('page 1')}}"/>
+            title="{{_('page 1')}}">
     </form>
     
     <!-- {# previous page #} -->
@@ -476,31 +479,31 @@
     {{form_newpage(grid.pag_n-1)}}
         {% if grid.pag_n-1 > 0 %}
         <input class="sp-button sp-grid-pag-back" type="submit" value="<<" 
-            title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}"/>
+            title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}">
         {% else %}
-        <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled/>
+        <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled >
         {% endif %}
     </form>
     {# {% endif %} #}
     
     <div>
-        <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}"/>
+        <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}" readonly>
     </div>
     
     <!-- {# next page #} -->
     {{form_newpage(grid.pag_n+1, fl=True)}}
         {% if grid.pag_n+1 <= grid.total_pag %}
         <input class="sp-button sp-grid-pag-forth" type="submit" value=">>" 
-            title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}"/>
+            title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}" >
         {% else %}
-        <input class="sp-button sp-grid-pag-forth" type="button" value=">>" disabled/>
+        <input class="sp-button sp-grid-pag-forth" type="button" value=">>" disabled >
         {% endif %}
     </form>
 
     <!-- {# last page #} -->
     {{form_newpage(grid.total_pag)}}
         <input class="sp-button sp-grid-pag-forth" type="submit" value=">>|"
-            title="{{_('page %(p)d')|format(p=grid.total_pag)}}"/>
+            title="{{_('page %(p)d')|format(p=grid.total_pag)}}" >
     </form>
 </div>
 {% endif %}
@@ -512,18 +515,18 @@
     {% for act in grid.actions %}
     <div style="float: left;">
     <form class="action-form" method="post" action0="{{act.url}}" target="_blank">
-        <input type="hidden" name="cls" value="{{grid.cls}}"/>
-        <input type="hidden" name="came_from" />
+        <input type="hidden" name="cls" value="{{grid.cls}}" >
+        <input type="hidden" name="came_from" >
         <!-- {#
         {% if link != None %}
-        <input type="hidden" name="came_from" value="{{link}}"/>
+        <input type="hidden" name="came_from" value="{{link}}" >
         {% else %}
-        <input type="hidden" name="came_from" value="{{came_from}}"/>
+        <input type="hidden" name="came_from" value="{{came_from}}" >
         {% endif %}
         #}-->
         <input class="sp-button sp-grid-action" type="button" value="{{act.title|escape}}"
             title="{{act.url}}" url="{{act.url}}" action-type="{{act.type}}"
-            require_id="{{act.require_id|lower}}"/>
+            require_id="{{act.require_id|lower}}" >
     </form>
     </div>
     {% endfor %}
@@ -538,7 +541,7 @@
 <option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>
 {% endfor %}
 </select>
-<input id="rel-classes-show" class="sp-button" type="button" value="{{_('Show')}}"/>
+<input id="rel-classes-show" class="sp-button" type="button" value="{{_('Show')}}" >
 <form id="rel-classes-form" method="post" action="" 
     target="_blank">
 </form>

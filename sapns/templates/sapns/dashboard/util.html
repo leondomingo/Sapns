@@ -1,14 +1,14 @@
 {% macro list(url, submit_title, cls) %}
     <form method="post" action="{{url}}">
-        <input type="hidden" name="show_ids" value="false"/>
+        <input type="hidden" name="show_ids" value="false" >
         {% if cls %}
-        <input type="hidden" name="cls" value="{{cls}}"/>
-        <input type="hidden" name="caption" value="{{submit_title}}"/>
+        <input type="hidden" name="cls" value="{{cls}}" >
+        <input type="hidden" name="caption" value="{{submit_title}}" >
         {% else %}
-        <input type="text" name="cls" value=""/>
-        <!-- <input type="hidden" name="caption" value=""/> -->
+        <input type="text" name="cls" value="" >
+        <!-- <input type="hidden" name="caption" value="" > -->
         {% endif %}
-        <input class="sp-button" type="submit" value="{{submit_title}}"/>
+        <input class="sp-button" type="submit" value="{{submit_title}}" >
     </form>
 {% endmacro %}
 
@@ -30,13 +30,13 @@
 
 {# <!-- smoothness --> #}
 <link rel="stylesheet" type="text/css" media="screen" 
-    href="/css/smoothness/jquery-ui.css"/>
+    href="/css/smoothness/jquery-ui.css">
 
 {# sunny #}
 {#-
 <!--
 <link rel="stylesheet" type="text/css" media="screen" 
-    href="/css/sunny/jquery-ui.css"/>
+    href="/css/sunny/jquery-ui.css">
 -->
 #}    
   
@@ -44,7 +44,7 @@
 {#-
 <!--
 <link rel="stylesheet" type="text/css" media="screen" 
-    href="/css/overcast/jquery-ui.css"/>
+    href="/css/overcast/jquery-ui.css">
 -->
 #}
 

@@ -5,7 +5,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}" >
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
@@ -16,14 +16,14 @@
 <div id="edit-dialog" style="display: none;"></div>
 
 <form id="edit-form" method="post" action="{{tg.url('/dashboard/save/%s' % cls)}}">
-    <input type="hidden" name="id" value="{{id}}"/>
-    <input type="hidden" name="came_from" value="{{came_from}}"/>
+    <input type="hidden" name="id" value="{{id}}">
+    <input type="hidden" name="came_from" value="{{came_from}}">
 </form>
 
 <div class="sp-edit-panel">
     <div class="sp-save-button">
         <input id="save-button" class="sp-button" type="button" 
-            value="{{_('Save')}}"/>
+            value="{{_('Save')}}">
     </div>
     
     <!-- {# Title of the object #} -->
@@ -46,7 +46,7 @@
         </select>
         <button id="rel-classes-show" class="sp-button">{{_('Show')}}</button>
         <form id="rel-classes-form" method="post" action="" target="_blank">
-            <input type="hidden" name="parent_id" value="{{id}}" />
+            <input type="hidden" name="parent_id" value="{{id}}">
         </form>
     </div>
     {% endif %}
@@ -71,19 +71,19 @@
         {%- if attr.type == 'bool' %}
         <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
             {% if attr.read_only %} disabled {% endif %}
-            {% if attr.value %} checked {% endif %}/>
+            {% if attr.value %} checked {% endif %}>
         
         <!-- {# Date #} -->
         {%- elif attr.type == 'date' %}
         <input class="sp-date-field" type="text" name="{{attr.name}}"
             {% if attr.read_only %} disabled {% endif %} 
-            value="{{attr.value}}"/>
+            value="{{attr.value}}">
         
         <!-- {# Time #} -->
         {%- elif attr.type == 'time' %}
         <input class="sp-time-field" type="text" name="{{attr.name}}"
             {% if attr.read_only %} disabled {% endif %} 
-            value="{{attr.value}}"/>            
+            value="{{attr.value}}">            
         
         <!-- {# Memo #} -->
         {%- elif attr.type == 'memo' %}
@@ -101,7 +101,7 @@
         {# <!-- Everything else --> #}
         <input class="sp-text-field" type="text" name="{{attr.name}}" 
             value="{{attr.value|escape}}"
-            {% if attr.read_only %} disabled {% endif %} />
+            {% if attr.read_only %} disabled {% endif %}>
         {% endif %}
         </div>
     </div>
@@ -132,7 +132,7 @@
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + value + '"/>\n';
+                        'value="' + value + '">\n';
             });
             
             // {# checkbox #} 
@@ -140,7 +140,7 @@
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + $(this).attr('checked') + '"/>\n';
+                        'value="' + $(this).attr('checked') + '">\n';
             });
 
             // {# date #} 
@@ -168,7 +168,7 @@
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + date_value + '"/>\n';
+                        'value="' + date_value + '">\n';
             });
             
             // {# time #} 
@@ -183,7 +183,7 @@
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + value + '"/>\n';
+                        'value="' + value + '">\n';
             });
             
             // {# select fields #} 
@@ -199,7 +199,7 @@
                 params += 
                     '<input type="hidden" ' + 
                         'name="fld_' + $(this).attr('name') + '" ' + 
-                        'value="' + sel_value + '"/>\n';
+                        'value="' + sel_value + '">\n';
             });
             
             if (required_attrs != '') {
@@ -246,9 +246,9 @@
         	var action = "/dashboard/list/" + option.attr('cls');
         	
         	var params = '';
-        	params += '<input type="hidden" name="parent_id" value="{{id}}" />\n';
+        	params += '<input type="hidden" name="parent_id" value="{{id}}">\n';
         	params += '<input type="hidden" name="ch_attr" ' +
-        	   'value="' + option.attr('ch_attr') + '"/>\n';
+        	   'value="' + option.attr('ch_attr') + '">\n';
         	   
         	$('#rel-classes-form').attr('action', action).html(params).submit();
         });
