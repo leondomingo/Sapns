@@ -5,17 +5,18 @@
 <!-- * * * SUBSTITUTE "myapp" for the name of your app root folder * * * -->
 
 {% block head %}
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<title>My app title</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>My app title</title>
+
+    <!-- Sapns styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
+    
+    <!-- Overridden Sapns styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/myapp/sapns.css')}}"/>
+    
+    <!-- MyApp styles -->
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/myapp/style.css')}}"/>
 {% endblock %}
-{% set root_folder = tg.config.get('app.root_folder') %}
-{% if root_folder %}
-<!-- your app styles (re-definining Sapns styles -->
-<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/%s/style.css' % root_folder)}}"/>
-{% else %}
-<!-- Sapns styles -->
-<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}"/>
-{% endif %}
 </head>
 <body>
     {% block header %}

@@ -638,9 +638,14 @@ class DashboardController(BaseController):
         
         title_saved = False
         
+        cls_title = None
         for attr in attributes:
             
             attribute = dbs.query(SapnsAttribute).get(attr['id'])
+            
+            if not cls_title:
+                cls_title = attribute.class_.title
+            
             attribute.title = attr['title']
             attribute.insertion_order = attr['order']
             attribute.required = attr['required']
@@ -660,7 +665,8 @@ class DashboardController(BaseController):
             
         else:
             redirect(url('/message', 
-                         params=dict(message='Ok', came_from='')))
+                         params=dict(message=_('Insertion order for "%s" has been successfully updated' % cls_title), 
+                                     came_from='')))
     
     @expose('sapns/order/reference.html')
     @require(predicates.has_permission('manage'))
@@ -685,8 +691,12 @@ class DashboardController(BaseController):
         # save reference order
         attributes = sj.loads(attributes)
         
+        cls_title = None
         for attr in attributes:
             attribute = dbs.query(SapnsAttribute).get(attr['id'])
+            
+            if not cls_title:
+                cls_title = attribute.class_.title
             
             attribute.reference_order = attr['order']
             dbs.add(attribute)
@@ -697,4 +707,5 @@ class DashboardController(BaseController):
             
         else:
             redirect(url('/message', 
-                         params=dict(message='Ok', came_from='')))
+                         params=dict(message=_('Reference order for "%s" has been successfully update' % cls_title), 
+                                     came_from='')))
