@@ -263,6 +263,11 @@ clear:both;
 	background-repeat: no-repeat;*/
 }
 
+#you-are-in {
+	padding-left: 20px;
+	padding-top: 5px;
+}
+
 .sp_footer {
 	background-color: #B4BD3C;
 	color: white;

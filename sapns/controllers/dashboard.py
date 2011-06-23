@@ -84,7 +84,7 @@ class DashboardController(BaseController):
         caption = params.get('caption', '')
         show_ids = params.get('show_ids', 'false')
         
-        came_from = params.get('came_from')
+        came_from = params.get('came_from', '')
         if came_from:
             came_from = url(came_from)
             

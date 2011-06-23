@@ -3,31 +3,20 @@
 
 {# Head #}
 {% block head %}
-    {{super()}}
-    {{util.jquery()}}
-    {{util.jquery_ui()}}
-    {{util.jquery_jstree()}}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.jquery_jstree() }}
 {% endblock %}
 
 {# Middle #}
 {% block middle %}
-    {{super()}}
-    
-    <!--{#<style type="text/css">
-        .sc_type {
-            border: 1px dotted gray;
-            margin-left: 5px;
-            margin-right: 5px;
-            float: left;
-            background-color: white;
-        }
-    </style>#}-->
+    {{ super() }}
     
     <div style="height: 30px; margin-top: 10px; margin-left: 20px; font-size: 20px;">
         <a href="/dashboard">{{_('Dashboard')}}</a>
     </div>
-    {#<!--<div>-->#}
-    
+
     <!-- parent shortcut -->
     <div style="margin-left: 20px;">
         {% if sc_parent %}
@@ -36,27 +25,6 @@
         <a href="">[  ]</a>
         {% endif %}
     </div>
-    
-    <!-- shortcut actions -->
-    <!-- {#
-    <div style="">
-        <select id="shortcut_actions">
-            <option value="">{{_('(action)')}}</option> 
-            <option value="edit">{{_('Edit')}}</option>
-            <option value="delete">{{_('Delete')}}</option>
-            <option value="send-to">{{_('Send to dashboard')}}</option>
-            <option value="share">{{_('Share')}}</option>
-        </select>
-    </div>
-    </div> #}-->
-    
-    <!-- {#
-    <div>
-        <a class="sc_type" href="{{tg.url('/', sc_type='list')}}">List</a>
-        <a class="sc_type" href="{{tg.url('/', sc_type='bigicon')}}">Big icon</a>
-        <a class="sc_type" style="float: none;" 
-            href="{{tg.url('/', sc_type='smallicon')}}">Small icon</a>
-    </div> #} -->
     
     <div id="sc-container">
     {% if sc_type == 'list' %}
@@ -69,25 +37,33 @@
     
     <div>
     <div class="sp_shortcut">
+        <div style="padding-left: 10px;">
         <a href="{{tg.url('/dashboard/util', 
             params=dict(came_from='/dashboard'))}}">{{_('Utilities')}}</a>
+        </div>
     </div>
     
     <div class="sp_shortcut">
+        <div style="padding-left: 10px;">
         <a href="{{tg.url('/dashboard/views', 
             params=dict(came_from='/dashboard'))}}">{{_('Views')}}</a>
+        </div>
     </div>
     
     <div class="sp_shortcut">
+        <div style="padding-left: 10px;">
         <a href="{{tg.url('/dashboard/users', 
             params=dict(came_from='/dashboard'))}}">{{_('Users')}}</a>
+        </div>
     </div>
     
     <div class="sp_shortcut">
+        <div style="padding-left: 10px;">
         <a href="/dashboard/messages">{{_('Messages')}}</a>
         <span class="sp_messages" 
             style="{% if unread > 0 %} font-weight: bold; {% endif %}">{{unread}} / </span>
         <span class="sp_messages">{{messages}} messages</span>
+        </div>
     </div>
     </div>
     
