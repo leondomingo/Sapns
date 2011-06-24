@@ -108,15 +108,25 @@ class DashboardController(BaseController):
 
         meta = MetaData(bind=dbs.bind)
         
+        # views prefix
+        prefix = config.get('views_prefix', '_view_')
+            
+        # user's view
         try:
-            # TODO: cambiar "vista_busqueda_" por "_view_"
-            prefix = config.get('views_prefix', '_view_')
-            view_name = '%s%s' % (prefix, cls)
+            view_name = '%s%s_%d' % (prefix, cls, user.user_id)
             Table(view_name, meta, autoload=True)
             view = view_name
-            
+        
         except NoSuchTableError:
-            view = cls
+            # general view
+            try:
+                view_name = '%s%s' % (prefix, cls)
+                Table(view_name, meta, autoload=True)
+                view = view_name
+        
+            except NoSuchTableError:
+                # "raw" table
+                view = cls
             
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
@@ -234,6 +244,9 @@ class DashboardController(BaseController):
         # q
         q = kw.get('q', '')
         
+        # user
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        
         # collections
         ch_attr = kw.get('ch_attr')
         parent_id = kw.get('parent_id')
@@ -243,15 +256,25 @@ class DashboardController(BaseController):
         if ch_attr and parent_id:
             col = (cls, ch_attr, parent_id,)
             
+                # views prefix
+        prefix = config.get('views_prefix', '_view_')
+
+        # user's view
         try:
-            # TODO: cambiar "vista_busqueda_" por "_view_"
-            prefix = config.get('views_prefix', '_view_')
-            view_name = '%s%s' % (prefix, cls)
+            view_name = '%s%s_%d' % (prefix, cls, user.user_id)
             Table(view_name, meta, autoload=True)
             view = view_name
-            
+        
         except NoSuchTableError:
-            view = cls
+            # general view
+            try:
+                view_name = '%s%s' % (prefix, cls)
+                Table(view_name, meta, autoload=True)
+                view = view_name
+        
+            except NoSuchTableError:
+                # "raw" table
+                view = cls
         
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
