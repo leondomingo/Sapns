@@ -20,7 +20,7 @@ from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
 import logging
 import re
 import simplejson as sj
-import tempfile
+import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
@@ -281,17 +281,11 @@ class DashboardController(BaseController):
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.xls' % cls.encode('utf-8')))
         
-        _, name = tempfile.mkstemp(suffix='.xls', prefix='export_')
+        # generate XLS content into "memory file"
+        xl_file = cStringIO.StringIO()
+        ds.to_xls(cls.capitalize().replace('_', ' '), xl_file)
         
-        # generate XLS content into the temporary file
-        ds.to_xls(cls.capitalize().replace('_', ' '), name)
-        
-        f_xls = file(name, 'rb')
-        try:
-            return f_xls.read()
-        
-        finally:
-            f_xls.close()
+        return xl_file.getvalue()
     
     @expose('json')
     @require(predicates.not_anonymous())
