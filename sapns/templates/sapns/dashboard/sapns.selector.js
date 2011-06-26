@@ -1,101 +1,136 @@
 /* Sapns selector */
 
 (function($) {
-	
-	var settings;
-	
-	$.fn.sapnsSelector = function(callerSettings) {
+
+	// SapnsSelector (constructor)
+	function SapnsSelector(settings) {
 		
-		function getTitle() {
-			if (settings.value && settings.rc) {
-				$.ajax({
-					url: settings.url_title,
-					data: {
-						cls: settings.rc,
-						id: settings.value
-					},
-					success: function(data) {
-						if (data.status) {
-							$('#st_' + settings.name).val(data.title);
-						}
-					}
-				});
+		function set(this_object, key, value, obj) {
+			
+			if (obj == undefined) {
+				obj = settings;
 			}
+
+			if (obj[key] == undefined) {
+				this_object[key] = value;
+			}
+			else {
+				this_object[key] = obj[key];
+			}
+			
+			return;
 		}
 		
-		function click_search (q) {
-			
-			if (q == undefined) {
-                q = $('#dlg-' + settings.name + ' .sp-search-text').val();
-            }
-            
-            $.ajax({
-                url: settings.url_search,
-                type: 'post',
-                dataType: 'html',
-                data: {
-                    cls: settings.rc,
-                    q: q,
-                    rp: settings.dialog.results, // {# maximun number of results in the select dialog #} 
-                },
-                success: function(res) {
-                    $('#dlg-' + settings.name).html(res);
-                    
-                    $('#dlg-' + settings.name + ' .sp-search-button').click(function() {
-                        click_search();
-                    });
-                    
-                    $('#dlg-' + settings.name + ' .sp-search-text').keypress(function(event) {
-                        search_kp(event);
-                    }).val(q).focus();
-                },
-                error: function(f, status, error) {
-                    alert('error!');
-                    click_search();
-                    // {# $('#edit-dialog').dialog('close'); #} 
-                }
-            });
-        }
-		
-        function search_kp(event) {
-            if (event.which == 13) {
-                click_search();
-            }
-        }
+		set(this, 'fname', null);
+		set(this, 'name', '');
+		set(this, 'value', null);
+		set(this, 'title', '');
+		set(this, 'rc', '');
+		set(this, 'rc_title', '');
+		set(this, 'read_only', false);
+		set(this, 'url_title', "{{tg.url('/dashboard/title/')}}");
+	    set(this, 'url_search', "{{tg.url('/dashboard/search/')}}");
+	    
+	    set(this, 'dialog', {});
+	    
+	    set(this.dialog, 'width', 950, this.dialog);
+	    set(this.dialog, 'height', 550, this.dialog);
+	    set(this.dialog, 'results', 25, this.dialog);
+	}
 
+	// getTitle
+	SapnsSelector.prototype.getTitle = function() {
+		
+		var sapnsSelector = this;
+		var id = "#st_" + this.name
+		
+		if (this.value && this.rc) {
+			$.ajax({
+				url: sapnsSelector.url_title,
+				data: {
+					cls: this.rc,
+					id: this.value
+				},
+				success: function(data) {
+					if (data.status) {
+						$(id).val(data.title);
+					}
+				}
+			});
+		}
+		else {
+			$(id).val('');
+		}
+	}
+
+	// click_search
+	SapnsSelector.prototype.click_search = function(q) {
+		
+		var sapnsSelector = this;
+		var dialog_name = "#dialog-" + this.name;
+		
+		if (q == undefined) {
+	        q = $(dialog_name + ' .sp-search-text').val();
+	    }
+
+		$.ajax({
+	        url: this.url_search,
+	        type: 'post',
+	        dataType: 'html',
+	        data: {
+	            cls: this.rc,
+	            q: q,
+	            rp: this.dialog.results, // {# maximun number of results in the select dialog #} 
+	        },
+	        success: function(res) {
+	            $(dialog_name).html(res);
+	            
+	            $(dialog_name + ' .sp-search-button').click(function() {
+	                sapnsSelector.click_search();
+	            });
+	            
+	            $(dialog_name + ' .sp-search-text').keypress(function(event) {
+	                sapnsSelector.search_kp(event);
+	            }).val(q).focus();
+	        },
+	        error: function(f, status, error) {
+	            alert('error!');
+	            sapnsSelector.click_search();
+	            // {# $(dialog_name).dialog('close'); #} 
+	        }
+	    });
+	}
+
+	// search_kp
+	SapnsSelector.prototype.search_kp = function(event) {
+	    if (event.which == 13) {
+	        this.click_search();
+	    }
+	}
+
+	// remove
+	SapnsSelector.prototype.remove = function() {
+		this.value = null;
+		this.getTitle();
+	}
+
+	$.fn.sapnsSelector = function(callerSettings) {
+		
         if (!callerSettings.fname) {
-			
-			// name, value, rel_title, title, rc, rc_title, read_only=False) %}
-			settings = $.extend({
-				fname: null,
-				name: '',
-				value: null,
-				rel_title: '',
-				title: '',
-				rc: '',
-				rc_title: '',
-				read_only: false,
-				url_title: "{{tg.url('/dashboard/title/')}}",
-				url_search: "{{tg.url('/dashboard/search/')}}",
-			}, callerSettings||{});
-			
-			// settings.dialog
-			settings.dialog = $.extend({
-				width: 950,
-				height: 550,
-				results: 25
-			}, callerSettings.dialog||{});
-			
+        	
+        	this.sapnsSelector = new SapnsSelector(callerSettings);
+        	var sapnsSelector = this.sapnsSelector;
+        	
 			// dialog
-			this.append('<div id="dlg-' + settings.name + '" style="display: none;"></div>'); 
+			this.append('<div id="dialog-' + sapnsSelector.name + '" style="display: none;"></div>'); 
 
 			// select text
-			var select_text = '<input id="st_' + settings.name + '"' + 
+			var select_text = '<input id="st_' + sapnsSelector.name + '"' + 
 				' class="sp-select-text"' + 
 				' type="text" readonly' + 
-				' value="' + settings.rel_title + '"';
+				' value=""';
 			
-			if (settings.read_only) {
+			if (sapnsSelector.read_only) {
 				select_text += ' disabled';
 			}
 			
@@ -104,12 +139,12 @@
 			this.append(select_text);
 			
 			// select_button
-			var select_button = '<button id="sb_' + settings.name + '"' +
+			var select_button = '<button id="sb_' + sapnsSelector.name + '"' +
 				' class="sp-button sp-select-button" ' +
-				' title=\'Set a value for "' + settings.title + '"\'' +
+				' title=\'Set a value for "' + sapnsSelector.title + '"\'' +
 				' style="font-weight: bold;"';
 			
-			if (settings.read_only) {
+			if (sapnsSelector.read_only) {
 				select_button += ' disabled';
 			}
 			
@@ -117,77 +152,66 @@
 			
 			this.append(select_button);
 			
-			this.find('#sb_' + settings.name).click(function() {
+			this.find('#sb_' + sapnsSelector.name).click(function() {
 
-				$('#dlg-' + settings.name).dialog({
-	                title: settings.rc_title,
-	                width: settings.dialog.width,
-	                height: settings.dialog.height,
+				$('#dialog-' + sapnsSelector.name).dialog({
+	                title: sapnsSelector.rc_title,
+	                width: sapnsSelector.dialog.width,
+	                height: sapnsSelector.dialog.height,
 	                resizable: false,
 	                modal: true,
 	                buttons: {
 	                    "{{_('Ok')}}": function() {
 	                        // {# get the id of the selected row #} 
 	                        var id_selected = '';
-	                        $('#dlg-' + settings.name + ' .sp-grid .sp-grid-rowid').each(function() {
+	                        $('#dialog-' + sapnsSelector.name + ' .sp-grid .sp-grid-rowid').each(function() {
 	                            if ($(this).attr('checked') == true) {
 	                                id_selected = $(this).attr('id_row');
 	                            }
 	                        });
 	                        
 	                        if (id_selected != '') {
-	                            $.ajax({
-	                                url: settings.url_title,
-	                                type: "get",
-	                                dataType: "json",
-	                                data: {
-	                                    cls: settings.rc,
-	                                    id: id_selected
-	                                },
-	                                success: function(res) {
-	                                    if (res.status) {
-	                                        $('#st_' + settings.name).val(res.title);
-	                                    }
-	                                },
-	                                error: function() {
-	                                }
-	                            });
+	                        	sapnsSelector.value = id_selected;
+	                        	sapnsSelector.getTitle();
 	                        }
 	                        else {
-	                        	$('#st_' + settings.name).val('');
+	                        	$('#st_' + sapnsSelector.name).val('');
 	                        }
 	                        
-	                        settings.value = id_selected;
+	                        sapnsSelector.value = id_selected;
 	                        
-	                        $('#dlg-' + settings.name).dialog('close');
+	                        $('#dialog-' + sapnsSelector.name).dialog('close');
 	                    },
 	                    "{{_('Cancel')}}": function() {
-	                        $('#dlg-' + settings.name).dialog('close');
+	                        $('#dialog-' + sapnsSelector.name).dialog('close');
 	                    }
 	                }
 	            });
 	            
-	            click_search('');
+	            sapnsSelector.click_search('');
 	        });
+			
+			sapnsSelector.getTitle();
 			
 			// remove button
 			var remove_button = '';
-			if (!settings.read_only) {
-				remove_button += '<button id="rb_' + settings.name + '"' +
+			if (!sapnsSelector.read_only) {
+				remove_button += '<button id="rb_' + sapnsSelector.name + '"' +
 					' class="sp-button sp-empty button"' +
-					' title=\'Remove value of "' + settings.title + '"\'' +
+					' title=\'Remove value of "' + sapnsSelector.title + '"\'' +
 					' style="font-weight: bold; color: red;">X</button>';
 			}
 		
 			this.append(remove_button);
+			
+			this.find('#rb_' + sapnsSelector.name).click(function() {
+				sapnsSelector.remove();
+			});
 		}
 		else if (callerSettings.fname == 'getTitle') {
-			getTitle();
+			this.sapnsSelector.getTitle();
 		}
         
-        // get object's title (if "value" is defined)
-        getTitle();
-		
 		return this;
 	};
 }) (jQuery);

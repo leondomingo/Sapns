@@ -96,7 +96,7 @@
         
         {%- elif attr.related_class != None %}
         <!-- {# Select #} -->
-        <div id="selector-{{attr.name}}"></div>
+        <div id="selector-{{attr.name}}" class="sp-select-field"></div>
         <!--{# {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
             attr.title, attr.related_class, attr.related_class_title, 
             read_only=attr.read_only) }} #} -->
@@ -259,12 +259,16 @@
         
         {% for attr in attributes %}
             {% if attr.related_class != None %}
+            
+            var read_only = "{{attr.read_only}}";
+            
             $("#selector-{{attr.name}}").sapnsSelector({
             	name: "{{attr.name}}",
             	value: "{{attr.value}}",
             	title: "{{attr.title}}",
             	rc: "{{attr.related_class}}",
-            	rc_title: "{{attr.related_class_title}}"
+            	rc_title: "{{attr.related_class_title}}",
+            	read_only: read_only == 'True'
             });
             
             /* {# {{ s.selector_field(_, attr.name, attr.value, attr.related_title,

@@ -9,20 +9,32 @@
         {% include 'sapns/dashboard/sapns.selector.js' %}
         
         $(document).ready(function() {
-            $('#selector-1').sapnsSelector({
-                name: 'student',
-                value: 1,
-                title: 'Student',
-                rc: 'students',
-                rc_title: 'Students'
-                // dialog: {results: 3, width: 650, height: 380}, 
-                // read_only: true, 
-            }); 
+            $('#selector-alumno').sapnsSelector({
+                name: 'alumno',
+                value: 1166,
+                title: 'Alumno',
+                rc: 'alumnos',
+                rc_title: 'Alumnos',
+                dialog: {results: 3, height: 380}
+                // ,read_only: true 
+            });
+            
+            $('#selector-profesor').sapnsSelector({
+                name: 'profesor',
+                value: 40,
+                title: 'Profesor',
+                rc: 'personal',
+                rc_title: 'Personal'
+            });
         });
     </script>
 {% endblock %}
 
 {% block middle %}
-    <label>Student</label>
-    <div id="selector-1"></div>
+
+    <label>Alumno</label>
+    <div id="selector-alumno"></div>
+    
+    <label>Profesor</label>
+    <div id="selector-profesor"></div>
 {% endblock %}
