@@ -55,7 +55,7 @@
     {% endif %}
     
     {%- for attr in attributes %}
-    <div class="sp-edit-field" 
+    <div class="sp-edit-field" name="{{attr.name}}"
         {% if attr.required %}
         required="true"
         {% else %}
@@ -72,38 +72,33 @@
         <div>
         <!-- {# Boolean #} -->
         {%- if attr.type == 'bool' %}
-        <input class="sp-checkbox-field" type="checkbox" name="{{attr.name}}"
+        <input class="sp-checkbox-field" type="checkbox"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value %} checked {% endif %}>
         
         <!-- {# Date #} -->
         {%- elif attr.type == 'date' %}
-        <input class="sp-date-field" type="text" name="{{attr.name}}"
+        <input class="sp-date-field" type="text"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}">
         
         <!-- {# Time #} -->
         {%- elif attr.type == 'time' %}
-        <input class="sp-time-field" type="text" name="{{attr.name}}"
+        <input class="sp-time-field" type="text"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}">            
         
         <!-- {# Memo #} -->
         {%- elif attr.type == 'memo' %}
         <textarea class="sp-text-field sp-memo-field"
-            {% if attr.read_only %} disabled {% endif %} 
-            name="{{attr.name}}">{{attr.value|escape}}</textarea>
+            {% if attr.read_only %} disabled {% endif %}>{{attr.value|escape}}</textarea>
         
         {%- elif attr.related_class != None %}
         <!-- {# Select #} -->
         <div id="selector-{{attr.name}}" class="sp-select-field"></div>
-        <!--{# {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
-            attr.title, attr.related_class, attr.related_class_title, 
-            read_only=attr.read_only) }} #} -->
-             
         {%- else %}
         {# <!-- Everything else --> #}
-        <input class="sp-text-field" type="text" name="{{attr.name}}" 
+        <input class="sp-text-field" type="text" 
             value="{{attr.value|escape}}"
             {% if attr.read_only %} disabled {% endif %}>
         {% endif %}
@@ -126,7 +121,8 @@
             
             // {# text #} 
             $('.sp-text-field').each(function() {
-                var required = $(this).parent().parent().attr('required');
+            	var name = $(this).parent().parent().attr('name');
+            	var required = $(this).parent().parent().attr('required');
                 var value = $(this).val();
                         
                 if (required == 'true' && value == '') {
@@ -134,16 +130,15 @@
                 }
                 
                 params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
+                    '<input type="hidden" name="fld_' + name + '" ' + 
                         'value="' + value + '">\n';
             });
             
             // {# checkbox #} 
             $('.sp-checkbox-field').each(function() {
+            	var name = $(this).parent().parent().attr('name');
                 params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
+                    '<input type="hidden" name="fld_' + name + '" ' + 
                         'value="' + $(this).attr('checked') + '">\n';
             });
 
@@ -151,6 +146,7 @@
             $('.sp-date-field').each(function() {
                 
                 var date_value = $(this).datepicker('getDate');
+                var name = $(this).parent().parent().attr('name');
                 
                 if (date_value != null) {
                     var year = date_value.getFullYear()
@@ -170,13 +166,13 @@
                 }
                 
                 params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
+                    '<input type="hidden" name="fld_' + name + '" ' + 
                         'value="' + date_value + '">\n';
             });
             
             // {# time #} 
             $('.sp-time-field').each(function() {
+            	var name = $(this).parent().parent().attr('name');
                 var required = $(this).parent().parent().attr('required');
                 var value = $(this).val();
                         
@@ -185,14 +181,14 @@
                 }
                 
                 params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
+                    '<input type="hidden" name="fld_' + name + '" ' + 
                         'value="' + value + '">\n';
             });
             
             // {# select fields #} 
             $('.sp-select-field').each(function() {
                 
+            	var name = $(this).parent().parent().attr('name');
                 var required = $(this).parent().parent().attr('required');
                 var sel_value = $(this).attr('value');
                         
@@ -201,8 +197,7 @@
                 }
                 
                 params += 
-                    '<input type="hidden" ' + 
-                        'name="fld_' + $(this).attr('name') + '" ' + 
+                    '<input type="hidden" name="fld_' + name + '" ' + 
                         'value="' + sel_value + '">\n';
             });
             

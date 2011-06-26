@@ -43,8 +43,9 @@
 		
 		var sapnsSelector = this;
 		var id = "#st_" + this.name
+		var value = this.value;
 		
-		if (this.value && this.rc) {
+		if (value && this.rc) {
 			$.ajax({
 				url: sapnsSelector.url_title,
 				data: {
@@ -53,13 +54,13 @@
 				},
 				success: function(data) {
 					if (data.status) {
-						$(id).val(data.title);
+						$(id).val(data.title).parent().attr('value', value);
 					}
 				}
 			});
 		}
 		else {
-			$(id).val('');
+			$(id).val('').parent().attr('value', '');
 		}
 	}
 
