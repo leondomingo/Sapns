@@ -1,6 +1,6 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
-{% import 'sapns/dashboard/selector.html' as s %}
+{# {% import 'sapns/dashboard/selector.html' as s %} #}
 {% import 'sapns/dashboard/datefield.js' as df %}
 
 {% block head %}
@@ -9,7 +9,10 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
-    {{ s.selector_field_js(tg, _) }}
+    {# {{ s.selector_field_js(tg, _) }} #}
+    <script type="text/javascript">
+        {% include 'sapns/dashboard/sapns.selector.js' %}
+    </script>
 {% endblock %}
 
 {% block middle %}
@@ -93,9 +96,10 @@
         
         {%- elif attr.related_class != None %}
         <!-- {# Select #} -->
-        {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
+        <div id="selector-{{attr.name}}"></div>
+        <!--{# {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
             attr.title, attr.related_class, attr.related_class_title, 
-            read_only=attr.read_only) }}
+            read_only=attr.read_only) }} #} -->
              
         {%- else %}
         {# <!-- Everything else --> #}
@@ -252,6 +256,23 @@
         	   
         	$('#rel-classes-form').attr('action', action).html(params).submit();
         });
+        
+        {% for attr in attributes %}
+            {% if attr.related_class != None %}
+            $("#selector-{{attr.name}}").sapnsSelector({
+            	name: "{{attr.name}}",
+            	value: "{{attr.value}}",
+            	title: "{{attr.title}}",
+            	rc: "{{attr.related_class}}",
+            	rc_title: "{{attr.related_class_title}}"
+            });
+            
+            /* {# {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
+                    attr.title, attr.related_class, attr.related_class_title, 
+                    read_only=attr.read_only) }} #} */
+            
+            {% endif %}
+        {% endfor %}
     });
 </script>
 {% endblock %}
