@@ -1,0 +1,28 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    <script type="text/javascript">
+        {% include 'sapns/dashboard/sapns.selector.js' %}
+        
+        $(document).ready(function() {
+            $('#selector-1').sapnsSelector({
+                name: 'student',
+                value: 1,
+                title: 'Student',
+                rc: 'students',
+                rc_title: 'Students'
+                // dialog: {results: 3, width: 650, height: 380}, 
+                // read_only: true, 
+            }); 
+        });
+    </script>
+{% endblock %}
+
+{% block middle %}
+    <label>Student</label>
+    <div id="selector-1"></div>
+{% endblock %}
