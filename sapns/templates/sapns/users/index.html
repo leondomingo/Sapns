@@ -5,6 +5,8 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.qtip() }}
     {{ grid_html.js_functions(_) }}    
     {{ grid_html.js_select_row(_) }}
 {% endblock %}
