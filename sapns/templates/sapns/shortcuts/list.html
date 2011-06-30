@@ -29,9 +29,8 @@
         <!-- List -->
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
-            <a target="_blank" href="{{tg.url('/dashboard/list/%s' % sc.cls)}}">
-                {{sc.title|escape}}
-            </a>
+            <a href="{{tg.url('/dashboard/list/%s' % sc.cls)}}"
+                target="_blank" >{{sc.title|escape}}</a>
         </div>
         
         <!-- {# actions over "list" shortcuts #} -->
@@ -132,11 +131,8 @@
     		else if (opc == 'ref-order') {
     			ref_order(sc);
     		}
-    		else if (opc == 'up') {
-    			up(sc);
-    		}
-    		else if (opc == 'down') {
-    			down(sc);
+    		else if (opc == 'up' || opc == 'down') {
+    			move_shortcut(sc, opc);
     		}
     		
     		$(this).find('option:first').attr('selected', true);
@@ -312,30 +308,64 @@
         }
         
         function reorder_sc(sc_id, type) {
-        	var shortcuts = $('.sp_shortcut');
-        	alert(shortcuts.length);
+        	var other;
+        	var shortcuts = {};
+        	var n;
+        	$('#sc-container').find('.sp_shortcut').each(function(index) {
+        		shortcuts[index] = $(this);
+        		$(this).remove();
+        		n = index;
+        	});
+        	
+        	for (var index=0; index<=n; index++) {
+        		console.log(index);
+        		var self = shortcuts[index];
+        		if (self != null) {
+            		if (self.attr('sc_id') == sc_id) {
+            			console.log(type);
+            			if (type == 'up') {
+            				other = shortcuts[index-1];
+            				//shortcuts[index-1] = null; 
+            				other.remove();
+            				$('#sc-container').append(self);
+                            $('#sc-container').append(other);
+            			}
+            			else {
+            				// down 
+            				other = shortcuts[index+1];
+            				shortcuts[index+1] = null;
+            				$('#sc-container').append(other);
+            				$('#sc-container').append(self);
+            			}
+            		}
+            		else {
+            			$('#sc-container').append(self);
+            		}
+        		}
+        	} 
         }
         
-        function up(sc) {
-        	var sc_id = sc.attr('sc_id');
+        function move_shortcut(sc, type) {
+        	window.location = document.URL;
+        	/*var sc_id = sc.attr('sc_id');
         	$.ajax({
         		url: "{{tg.url('/dashboard/sc/reorder/')}}",
         		type: "get",
         		dataType: "json",
         		data: {
         			id_sc: sc_id,
-        			type: "up"
+        			type: type
         		},
-        		sucess: function(data) {
+        		success: function(data) {
         			if (data.status) {
         				// TODO: reorder list of shortcuts 
+        				reorder_sc(sc_id, type);
         			}
-        		}
-        	});
-        }
-        
-        function down(sc) {
-        	var sc_id = sc.attr('sc_id');
+        			else {
+        				alert('error!');
+        			}
+        		},        		
+        	});*/
         }
     });
 </script>
