@@ -22,7 +22,7 @@
 <div>
     {% for sc in shortcuts %}
     <div class="sp_shortcut" sc_id="{{sc.id}}" sc_parent="{{sc.parent}}"
-        cls="{{sc.cls}}"
+        cls="{{sc.cls}}" sc_order="{{sc.order}}"
         style="{% if loop.index % 2 == 0 %}background-color: white;{% endif %}">
         
     {% if sc.action_type %}
@@ -96,6 +96,14 @@
         <!-- {# Share #} -->
         <option value="share"
             title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>
+            
+        <!-- {# Up #} -->
+        <option value="up"
+            title="">{{_('Up')}}</option>
+            
+        <!-- {# Down #} -->
+        <option value="down"
+            title="">{{_('Down')}}</option>
         
         </select>
         
@@ -123,6 +131,12 @@
     		}
     		else if (opc == 'ref-order') {
     			ref_order(sc);
+    		}
+    		else if (opc == 'up') {
+    			up(sc);
+    		}
+    		else if (opc == 'down') {
+    			down(sc);
     		}
     		
     		$(this).find('option:first').attr('selected', true);
@@ -295,6 +309,33 @@
                     }
                 }
             });
+        }
+        
+        function reorder_sc(sc_id, type) {
+        	var shortcuts = $('.sp_shortcut');
+        	alert(shortcuts.length);
+        }
+        
+        function up(sc) {
+        	var sc_id = sc.attr('sc_id');
+        	$.ajax({
+        		url: "{{tg.url('/dashboard/sc/reorder/')}}",
+        		type: "get",
+        		dataType: "json",
+        		data: {
+        			id_sc: sc_id,
+        			type: "up"
+        		},
+        		sucess: function(data) {
+        			if (data.status) {
+        				// TODO: reorder list of shortcuts 
+        			}
+        		}
+        	});
+        }
+        
+        function down(sc) {
+        	var sc_id = sc.attr('sc_id');
         }
     });
 </script>

@@ -82,6 +82,7 @@ class SapnsUser(User):
                     class_ = cl.name 
                             
             shortcuts.append(dict(url=url, 
+                                  order=sc.order,
                                   title=_(sc.title),
                                   action_type=type_,
                                   cls=class_,
@@ -241,17 +242,35 @@ class SapnsShortcut(DeclarativeBase):
                        ForeignKey('sp_actions.id', 
                                   onupdate='CASCADE', ondelete='SET NULL')) #, nullable=False)
     
-    def __repr__(self):
-        return ('<Shortcut: user=%s, action=%s>' % self.user, self.action).encode('utf-8')
+    def __str__(self):
+        return unicode(self).encode('utf-8')
 
     def __unicode__(self):
-        return u'<Shortcut: user=%s, action=%s>' % (self.user, self.action)
+        return u'<Shortcut: "%s" user=%s, action=%s>' % \
+            (self.title, self.user, self.action or '')
     
-    def by_order(self, order):
+    def by_order(self, order, comp=0):
         """Return a 'child' shortcut (of this) with the indicated 'order'"""
+        
+        logger = logging.getLogger('SapnsShortcut.by_order')
+        logger.info('order=%d' % order)
+        
+        if comp == -1:
+            cond = SapnsShortcut.order <= order
+            order = desc(SapnsShortcut.order)
+            
+        elif comp == 1:
+            cond = SapnsShortcut.order >= order
+            order = SapnsShortcut.order
+            
+        else:
+            cond = SapnsShortcut.order == order
+            order = None #SapnsShortcut.order
+        
         sc = dbs.query(SapnsShortcut).\
                 filter(and_(SapnsShortcut.parent_id == self.shortcut_id,
-                            SapnsShortcut.order == order)).\
+                            cond)).\
+                order_by(order).\
                 first()
                 
         return sc
@@ -288,15 +307,55 @@ class SapnsShortcut(DeclarativeBase):
         
         dbs.add(new_sc)
         dbs.flush()
+        
+    REORDER_TYPE_UP = 'up'
+    REORDER_TYPE_DOWN = 'down'
+        
+    def reorder(self, type='up'):
+        
+        logger = logging.getLogger('SapnsShortcut.reorder')
+        logger.info(unicode(self))
+        
+        def _reorder(this, that):
+            aux = that.order
+            that.order = this.order
+            this.order = aux
+            
+            dbs.add(this)
+            dbs.add(that)
+            dbs.flush()
+            
+        if type == SapnsShortcut.REORDER_TYPE_UP:
+            if self.order > 0:
+                next_sc = self.parent.by_order(self.order-1, -1)
+            
+            else:
+                raise Exception('It is not possible to go upper')
+            
+        elif type == SapnsShortcut.REORDER_TYPE_DOWN:
+            if self.order < self.parent.next_order()-1:
+                next_sc = self.parent.by_order(self.order+1, +1)
+            
+            else:
+                raise Exception('It is not possible to go deeper')
+            
+        logger.info(next_sc.title)
+            
+        _reorder(self, next_sc)
 
 # TODO: 1-to-1 autoreference relation
-SapnsShortcut.children = \
+SapnsShortcut.parent = \
     relation(SapnsShortcut,
-             backref='parent',
+             backref='children',
              uselist=False,
              remote_side=[SapnsShortcut.shortcut_id],
              primaryjoin=SapnsShortcut.shortcut_id == SapnsShortcut.parent_id)
-
+    
+SapnsUser.shortcuts = \
+    relation(SapnsShortcut,
+             backref='user',
+             primaryjoin=SapnsUser.user_id == SapnsShortcut.user_id)
+   
 class SapnsClass(DeclarativeBase):
     """List of sapns tables"""
 
@@ -807,6 +866,17 @@ class SapnsAction(DeclarativeBase):
     URL_NEW = '/dashboard/new'
     URL_EDIT = '/dashboard/edit'
     URL_DELETE = '/dashboard/delete'
+    
+    def __unicode__(self):
+        return u'<SapnsAction: "%s" type=%s>' % (self.name, self.type)
+    
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+    
+SapnsAction.shortcuts = \
+    relation(SapnsShortcut,
+             backref='action',
+             primaryjoin=SapnsAction.action_id == SapnsShortcut.action_id)
     
 class SapnsView(DeclarativeBase):
     """Views in Sapns"""

@@ -85,6 +85,22 @@ class ShortcutsController(BaseController):
         
         except Exception, e:
             logger.error(e)
-            return dict(status=False) 
+            return dict(status=False)
+        
+    @expose('json')
+    def reorder(self, id_sc, type):
+        
+        logger = logging.getLogger(__name__ + '/reorder')
+        try:
+            sc = dbs.query(SapnsShortcut).get(id_sc)            
+            logger.info('Reordering shortcut (%s %s)' % (sc, type))
+            
+            sc.reorder(type)
+            
+            return dict(status=True)
+            
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
         
         
