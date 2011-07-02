@@ -28,8 +28,9 @@
 		set(this, 'rc', '');
 		set(this, 'rc_title', '');
 		set(this, 'read_only', false);
-		set(this, 'url_title', "{{tg.url('/dashboard/title/')}}");
-	    set(this, 'url_search', "{{tg.url('/dashboard/search/')}}");
+		set(this, 'title_url', "{{tg.url('/dashboard/title/')}}");
+	    set(this, 'search_url', "{{tg.url('/dashboard/search/')}}");
+	    set(this, 'search_params', null);
 	    
 	    set(this, 'dialog', {});
 	    
@@ -47,7 +48,7 @@
 		
 		if (value && this.rc) {
 			$.ajax({
-				url: sapnsSelector.url_title,
+				url: sapnsSelector.title_url,
 				data: {
 					cls: this.rc,
 					id: this.value
@@ -73,16 +74,23 @@
 		if (q == undefined) {
 	        q = $(dialog_name + ' .sp-search-text').val();
 	    }
+		
+		// search params
+		var params = {};
+		if (this.search_params != null) {
+			params = this.search_params;
+		}
+		
+		params.cls = this.rc;
+		params.q = q;
+		params.rp = this.dialog.results;
 
+		// search
 		$.ajax({
-	        url: this.url_search,
+	        url: this.search_url,
 	        type: 'post',
 	        dataType: 'html',
-	        data: {
-	            cls: this.rc,
-	            q: q,
-	            rp: this.dialog.results, // {# maximun number of results in the select dialog #} 
-	        },
+	        data: params,
 	        success: function(res) {
 	            $(dialog_name).html(res);
 	            
