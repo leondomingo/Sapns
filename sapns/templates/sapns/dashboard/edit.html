@@ -1,6 +1,5 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
-{# {% import 'sapns/dashboard/selector.html' as s %} #}
 {% import 'sapns/dashboard/datefield.js' as df %}
 
 {% block head %}
@@ -9,7 +8,6 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
-    {# {{ s.selector_field_js(tg, _) }} #}
     <script type="text/javascript">
         {% include 'sapns/dashboard/sapns.selector.js' %}
     </script>
@@ -265,10 +263,6 @@
             	rc_title: "{{attr.related_class_title}}",
             	read_only: read_only == 'True'
             });
-            
-            /* {# {{ s.selector_field(_, attr.name, attr.value, attr.related_title,
-                    attr.title, attr.related_class, attr.related_class_title, 
-                    read_only=attr.read_only) }} #} */
             
             {% endif %}
         {% endfor %}
