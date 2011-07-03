@@ -2,12 +2,12 @@
 """Shortcuts management controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect, request
+from tg import expose, url, config, redirect, request, require
 
 # third party imports
 from pylons.i18n import ugettext as _
 from pylons.i18n import lazy_ugettext as l_
-from repoze.what import authorize
+from repoze.what import authorize, predicates
 
 # project specific imports
 from sapns.lib.base import BaseController
@@ -24,6 +24,7 @@ class ShortcutsController(BaseController):
     allow_only = authorize.not_anonymous()
     
     @expose('sapns/shortcuts/edit.html')
+    @require(predicates.not_anonymous())
     def edit(self, id=None, **params):
         came_from = params.get('came_from', '/')
         page = _('Shorcuts editing')
@@ -31,11 +32,13 @@ class ShortcutsController(BaseController):
         return dict(page=page, came_from=came_from)
     
     @expose()
+    @require(predicates.not_anonymous())
     def save(self, id=None, **params):
         came_from = params.get('came_from', '/')
         redirect(url(came_from))
     
     @expose('json')
+    @require(predicates.not_anonymous())
     def delete(self, id=None, **params):
         
         logger = logging.getLogger(__name__ + '/delete')
@@ -55,6 +58,7 @@ class ShortcutsController(BaseController):
             return dict(status=False)
     
     @expose('json')
+    @require(predicates.not_anonymous())
     def bookmark(self, id=None, **params):
         logger = logging.getLogger(__name__ + '/bookmark')
         try:
@@ -69,6 +73,22 @@ class ShortcutsController(BaseController):
             return dict(status=False)
         
     @expose('json')
+    @require(predicates.not_anonymous())
+    def from_list(self, title, link):
+        logger = logging.getLogger('shortcuts/from_list')
+        try:
+            # connected user
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            user.from_list(title, link)
+        
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, message=unicode(e))
+        
+    @expose('json')
+    @require(predicates.not_anonymous())
     def share(self, id_sc=None, id_user=None, **params):
         
         logger = logging.getLogger(__name__ + '/share')

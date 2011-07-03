@@ -152,23 +152,46 @@ class SapnsUser(User):
                 
         except Exception, e:
             logger.error(e)
+            
+    def from_list(self, title, url):
+        
+        # new action
+        action_link = SapnsAction()
+        action_link.class_id = None
+        action_link.type = SapnsAction.TYPE_OBJECT
+        action_link.name = title
+        action_link.url = url
+        
+        dbs.add(action_link)
+        dbs.flush()
+        
+        # new shortcut
+        sc_link = SapnsShortcut()
+        sc_link.action_id = action_link.action_id
+        sc_link.title = title
+        sc_link.user_id = self.user_id
+        
+        dbs.add(sc_link)
+        dbs.flush()
+        
+        self.get_dashboard().add_child(sc_link.shortcut_id, copy=False)
     
     def has_privilege(self, cls):
         priv = dbs.query(SapnsPrivilege).\
-                join((SapnsClass, 
-                      SapnsClass.class_id == SapnsPrivilege.class_id)).\
-                filter(and_(SapnsPrivilege.user_id == self.user_id, 
-                            SapnsClass.name == cls)).\
-                first()
+            join((SapnsClass,
+                  SapnsClass.class_id == SapnsPrivilege.class_id)).\
+            filter(and_(SapnsPrivilege.user_id == self.user_id,
+                        SapnsClass.name == cls)).\
+            first()
                 
         return priv != None
     
     def attr_privilege(self, id_attribute):
         priv_atr = dbs.query(SapnsAttrPrivilege).\
-                filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
-                            SapnsAttrPrivilege.attribute_id == id_attribute,
-                            )).\
-                first()
+            filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
+                        SapnsAttrPrivilege.attribute_id == id_attribute,
+                        )).\
+            first()
                 
         return priv_atr
     
@@ -316,21 +339,26 @@ class SapnsShortcut(DeclarativeBase):
         else:
             return (sc.order or 0) + 1
         
-    def add_child(self, id_shortcut):
+    def add_child(self, id_shortcut, copy=True):
         
-        # the shortcut to be copied
-        sc = dbs.query(SapnsShortcut).get(id_shortcut)
+        if copy:
+            # the shortcut to be copied
+            sc = dbs.query(SapnsShortcut).get(id_shortcut)
+            
+            if not sc:
+                raise Exception('It does not exist that shortcut [%s]' % id_shortcut)
+
+            # the "copy"            
+            new_sc = SapnsShortcut()
+            new_sc.user_id = self.user_id
+            new_sc.title = sc.title
+            new_sc.action_id = sc.action_id
+            
+        else:
+            new_sc = dbs.query(SapnsShortcut).get(id_shortcut)
         
-        if not sc:
-            raise Exception('It does not exist that shortcut [%s]' % id_shortcut)
-        
-        # the "copy"
-        new_sc = SapnsShortcut()
-        new_sc.user_id = self.user_id
         new_sc.parent_id = self.shortcut_id
         new_sc.order = self.next_order()
-        new_sc.title = sc.title
-        new_sc.action_id = sc.action_id
         
         dbs.add(new_sc)
         dbs.flush()
