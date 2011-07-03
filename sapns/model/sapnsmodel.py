@@ -15,6 +15,7 @@ from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, De
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
 from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime, Date,\
     Time, Text
+from sqlalchemy import MetaData, Table
 from sqlalchemy.orm import relation, synonym
 
 from sapns.model import DeclarativeBase, metadata, DBSession as dbs
@@ -22,6 +23,7 @@ from sapns.model.auth import User
 
 import logging
 from neptuno.util import datetostr
+from sqlalchemy.exc import NoSuchTableError
 
 __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
@@ -170,11 +172,36 @@ class SapnsUser(User):
                 
         return priv_atr
     
+    def get_view_name(self, cls):
+        
+        meta = MetaData(bind=dbs.bind)
+        prefix = config.get('views_prefix', '_view_')
+        try:
+            # user's view
+            # "_view_alumnos_1"
+            view_name = '%s%s_%d' % (prefix, cls, self.user_id)
+            Table(view_name, meta, autoload=True)
+            view = view_name
+        
+        except NoSuchTableError:
+            # general view
+            # "_view_alumnos"
+            try:
+                view_name = '%s%s' % (prefix, cls)
+                Table(view_name, meta, autoload=True)
+                view = view_name
+        
+            except NoSuchTableError:
+                # "raw" table
+                # "alumnos"
+                view = cls
+                
+        return view
+    
     def get_messages(self):
         messages = []
-        for msg, msgto, userfrom in dbs.query(SapnsMessage, 
-                                                    SapnsMessageTo, 
-                                                    SapnsUser).\
+        for msg, msgto, userfrom in \
+                dbs.query(SapnsMessage, SapnsMessageTo, SapnsUser).\
                 join((SapnsMessageTo, 
                       SapnsMessageTo.message_id == SapnsMessage.message_id)).\
                 join((SapnsUser, SapnsUser.user_id == SapnsMessage.user_from_id)).\

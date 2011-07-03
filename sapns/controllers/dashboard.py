@@ -10,8 +10,16 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 import sapns.config.app_cfg as app_cfg
 
+# controllers
+from sapns.controllers.views import ViewsController
+from sapns.controllers.util import UtilController
+from sapns.controllers.users import UsersController
+from sapns.controllers.shortcuts import ShortcutsController
+from sapns.controllers.messages import MessagesController
+
 from neptuno.postgres.search import search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
+from neptuno.dataset import DataSet
 
 from tg.controllers.util import urlencode
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
@@ -25,11 +33,6 @@ from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from sqlalchemy.sql.expression import and_
-from sapns.controllers.views import ViewsController
-from sapns.controllers.util import UtilController
-from sapns.controllers.users import UsersController
-from sapns.controllers.shortcuts import ShortcutsController
-from sapns.controllers.messages import MessagesController
 
 __all__ = ['DashboardController']
 
@@ -103,35 +106,12 @@ class DashboardController(BaseController):
         rp = int(rp)
         pag_n = int(pag_n)
         show_ids = strtobool(show_ids)
-        
         pos = (pag_n-1) * rp
 
-        meta = MetaData(bind=dbs.bind)
-        
-        # views prefix
-        prefix = config.get('views_prefix', '_view_')
-            
-        # user's view
-        try:
-            view_name = '%s%s_%d' % (prefix, cls, user.user_id)
-            Table(view_name, meta, autoload=True)
-            view = view_name
-        
-        except NoSuchTableError:
-            # general view
-            try:
-                view_name = '%s%s' % (prefix, cls)
-                Table(view_name, meta, autoload=True)
-                view = view_name
-        
-            except NoSuchTableError:
-                # "raw" table
-                view = cls
+        view = user.get_view_name(cls)
             
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
-        
-        def strtodatef(s):
-            return strtodate(s, fmt=date_fmt, no_exc=True)
+        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
         logger.info('search...%s / q=%s' % (view, q))
         
@@ -152,7 +132,7 @@ class DashboardController(BaseController):
             
         # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    show_ids=show_ids, strtodatef=strtodatef, collection=col) 
+                    show_ids=show_ids, strtodatef=strtodate_, collection=col) 
         
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -238,8 +218,6 @@ class DashboardController(BaseController):
             parent_id  <int>
         """
         
-        meta = MetaData(bind=dbs.bind)
-        
         # parameters
         # q
         q = kw.get('q', '')
@@ -256,33 +234,15 @@ class DashboardController(BaseController):
         if ch_attr and parent_id:
             col = (cls, ch_attr, parent_id,)
             
-                # views prefix
-        prefix = config.get('views_prefix', '_view_')
-
-        # user's view
-        try:
-            view_name = '%s%s_%d' % (prefix, cls, user.user_id)
-            Table(view_name, meta, autoload=True)
-            view = view_name
-        
-        except NoSuchTableError:
-            # general view
-            try:
-                view_name = '%s%s' % (prefix, cls)
-                Table(view_name, meta, autoload=True)
-                view = view_name
-        
-            except NoSuchTableError:
-                # "raw" table
-                view = cls
+        view = user.get_view_name(cls)
         
         date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
         
-        def strtodatef(s):
-            return strtodate(s, fmt=date_fmt, no_exc=True)
+        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
         # get dataset
-        ds = search(dbs, view, q=q.encode('utf-8'), rp=0, collection=col)
+        ds = search(dbs, view, q=q.encode('utf-8'), rp=0, collection=col,
+                    strtodatef=strtodate_)
         
         return ds 
     
