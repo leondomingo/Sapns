@@ -215,7 +215,7 @@
 			var remove_button = '';
 			if (!sapnsSelector.read_only) {
 				remove_button += '<button id="rb_' + sapnsSelector.name + '"' +
-					' class="sp-button sp-empty button"' +
+					' class="sp-button sp-empty-button"' +
 					' title=\'Remove value of "' + sapnsSelector.title + '"\'' +
 					' style="font-weight: bold; color: red;">X</button>';
 			}

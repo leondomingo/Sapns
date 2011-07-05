@@ -51,6 +51,10 @@
     border: 1px solid orange;
 }
 
+.sp-select-button, .sp-empty-button {
+	height: 25px !important;
+}
+
 .sp-checkbox-field {
     margin-left: 1%;
 }
