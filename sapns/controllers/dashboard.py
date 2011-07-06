@@ -110,7 +110,7 @@ class DashboardController(BaseController):
 
         view = user.get_view_name(cls)
             
-        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        date_fmt = config.get('formats.date', default='%m/%d/%Y')
         strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
         logger.info('search...%s / q=%s' % (view, q))
@@ -136,10 +136,10 @@ class DashboardController(BaseController):
         
         # Reading global settings
         ds.date_fmt = date_fmt
-        ds.time_fmt = config.get('grid.time_format', default='%H:%M')
-        ds.datetime_fmt = config.get('grid.datetime_format', default='%m/%d/%Y %H:%M')
-        ds.true_const = config.get('grid.true_const', default='Yes')
-        ds.false_const = config.get('grid.false_const', default='No')
+        ds.time_fmt = config.get('formats.time', default='%H:%M')
+        ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
+        ds.true_const = _('Yes')
+        ds.false_const = _('No')
         
         ds.float_fmt = app_cfg.format_float
         
@@ -236,7 +236,7 @@ class DashboardController(BaseController):
             
         view = user.get_view_name(cls)
         
-        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        date_fmt = config.get('formats.date', default='%m/%d/%Y')
         
         strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
@@ -441,7 +441,7 @@ class DashboardController(BaseController):
                          params=dict(message=_('This class does not exist'),
                                      came_from=came_from)))
             
-        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        date_fmt = config.get('formats.date', default='%m/%d/%Y')
         
         default_values_ro = {}
         default_values = {}

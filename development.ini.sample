@@ -35,6 +35,7 @@ pg_path = /usr/bin
 views_prefix = _view_
 formats.date = %m/%d/%Y
 formats.time = %H:%M
+formats.datetime = %m/%d/%Y %H:%M
 grid.date_format = %m/%d/%Y
 grid.time_format = %H:%M
 grid.datetime_format = %m/%d/%Y %H:%M

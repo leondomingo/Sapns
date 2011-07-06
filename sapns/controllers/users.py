@@ -48,10 +48,10 @@ class UsersController(BaseController):
         actions.append(dict(title=_('Delete'), url='/dashboard/users/delete', require_id=True))
         
         # Reading global settings
-        ds.date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
-        ds.time_fmt = config.get('grid.time_format', default='%H:%M')
-        ds.true_const = config.get('grid.true_const', default='Yes')
-        ds.false_const = config.get('grid.false_const', default='No')
+        ds.date_fmt = config.get('formats.date', default='%m/%d/%Y')
+        ds.time_fmt = config.get('formats.time', default='%H:%M')
+        ds.true_const = _('Yes')
+        ds.false_const = _('No')
         
         #ds.float_fmt = app_cfg.format_float
         

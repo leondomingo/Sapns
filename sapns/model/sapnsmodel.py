@@ -452,7 +452,7 @@ class SapnsClass(DeclarativeBase):
         
         logger = logging.getLogger(__name__ + '/class_titles')
         
-        date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+        date_fmt = config.get('formats.date', default='%m/%d/%Y')
         
         def __class_title(class_name, qry=None, attr=None):
             
@@ -532,7 +532,7 @@ class SapnsClass(DeclarativeBase):
          
         def __init__(self, class_name):
             self.class_name = class_name
-            self.date_fmt = config.get('grid.date_format', default='%m/%d/%Y')
+            self.date_fmt = config.get('formats.date', default='%m/%d/%Y')
             
             meta = MetaData(bind=dbs.bind)
             self.cls = SapnsClass.by_name(class_name)
