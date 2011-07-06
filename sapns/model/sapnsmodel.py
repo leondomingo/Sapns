@@ -329,7 +329,8 @@ class SapnsShortcut(DeclarativeBase):
         """Returns the next order for a child shortcut."""
         
         sc = dbs.query(SapnsShortcut).\
-                filter(SapnsShortcut.parent_id == self.shortcut_id).\
+                filter(and_(SapnsShortcut.parent_id == self.shortcut_id,
+                            SapnsShortcut.order != None)).\
                 order_by(desc(SapnsShortcut.order)).\
                 first()
                 
@@ -346,7 +347,7 @@ class SapnsShortcut(DeclarativeBase):
             sc = dbs.query(SapnsShortcut).get(id_shortcut)
             
             if not sc:
-                raise Exception('It does not exist that shortcut [%s]' % id_shortcut)
+                raise Exception('That shortcut does not exist [%s]' % id_shortcut)
 
             # the "copy"            
             new_sc = SapnsShortcut()
