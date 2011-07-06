@@ -351,8 +351,9 @@
     		sel.find('option:first').attr('selected', true);
     	});
     	
+    	// create a shortcut from this search 
     	$('#link-shortcut').click(function() {
-    		$('#link-shortcut-title').focus();
+    		$('#link-shortcut-title').val('').focus();
     		$('#link-shortcut-dialog').dialog({
     			title: "{{_('Create a shortcut for this search')}}",
     			modal: true,
