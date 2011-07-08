@@ -266,22 +266,6 @@
             
             {% endif %}
         {% endfor %}
-        
-        $('.sp-select-text').dblclick(function() {
-        	var cls = $(this).parent().sapnsSelector('getClass');
-        	var id = $(this).parent().sapnsSelector('getValue');
-        	if (id != '') {
-        		var url_edit = "{{tg.url('/dashboard/edit/')}}";
-        		var form_edit =
-        			'<form action="' + url_edit + '" method="post" target="_blank">' +
-        			    '<input type="hidden" name="cls" value="' + cls + '">' +   
-        			    '<input type="hidden" name="id" value="' + id + '">' +
-        			    '<input type="hidden" name="came_from" value="">' +
-        			'</form>';
-        			
-        		$(form_edit).appendTo('body').submit().remove();
-        	}
-        });
     });
 </script>
 {% endblock %}

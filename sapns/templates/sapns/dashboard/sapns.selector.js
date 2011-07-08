@@ -30,6 +30,7 @@
 		set(this, 'title_url', "{{tg.url('/dashboard/title/')}}");
 	    set(this, 'search_url', "{{tg.url('/dashboard/search/')}}");
 	    set(this, 'search_params', null);
+	    set(this, 'edit_url', "{{tg.url('/dashboard/edit/')}}");
 	    set(this, 'onChange', null);
 	    
 	    set(this, 'dialog', {});
@@ -46,6 +47,10 @@
 		}
 		
 		this.value = value;
+	}
+	
+	SapnsSelector.prototype.getValue = function() {
+		return this.value;
 	}
 
 	// setTitle
@@ -79,6 +84,10 @@
 	// getTitle
 	SapnsSelector.prototype.getTitle = function() {
 		return this.title;
+	}
+	
+	SapnsSelector.prototype.getClass = function() {
+		return this.rc;
 	}
 
 	// click_search
@@ -161,6 +170,23 @@
 			select_text += '>';
 			
 			this.append(select_text);
+			
+			// double-click to edit the selected object (if there's any)
+			this.find('#st_' + sapnsSelector.name).dblclick(function() {
+	        	var cls = sapnsSelector.getClass();
+	        	var id = sapnsSelector.getValue();
+	        	if (id != '') {
+	        		var url_edit = sapnsSelector.edit_url;
+	        		var form_edit =
+	        			'<form action="' + url_edit + '" method="post" target="_blank">' +
+	        			    '<input type="hidden" name="cls" value="' + cls + '">' +   
+	        			    '<input type="hidden" name="id" value="' + id + '">' +
+	        			    '<input type="hidden" name="came_from" value="">' +
+	        			'</form>';
+	        			
+	        		$(form_edit).appendTo('body').submit().remove();
+	        	}
+	        });
 			
 			// select_button
 			var select_button = '<button id="sb_' + sapnsSelector.name + '"' +
