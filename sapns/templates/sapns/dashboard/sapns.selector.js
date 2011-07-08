@@ -22,7 +22,7 @@
 		}
 		
 		set(this, 'name', '');
-		set(this, 'value', null);
+		set(this, 'value', '');
 		set(this, 'title', '');
 		set(this, 'rc', '');
 		set(this, 'rc_title', '');
