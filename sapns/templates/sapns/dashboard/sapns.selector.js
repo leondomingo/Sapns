@@ -135,8 +135,7 @@
 
 	// remove
 	SapnsSelector.prototype.remove = function() {
-		//this.value = null;
-		this.setValue(null);
+		this.setValue('');
 		this.setTitle();
 	}
 
@@ -144,7 +143,7 @@
 		
         if (typeof(arg1) == "object") {
         	
-        	var sapnsSelector = new SapnsSelector(arg1); //this.sapnsSelector;
+        	var sapnsSelector = new SapnsSelector(arg1);
         	
 			// dialog
 			this.append('<div id="dialog-' + sapnsSelector.name + '" style="display: none;"></div>'); 
@@ -247,6 +246,10 @@
 			// getTitle()
 			else if (arg1 == "getTitle") {
 				return sapnsSelector.title;
+			}
+			// getClass()
+			else if (arg1 == "getClass") {
+				return sapnsSelector.rc;
 			}
 			// TODO: other sapnsSelector methods
 		}
