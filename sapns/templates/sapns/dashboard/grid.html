@@ -31,22 +31,13 @@
     	
     	$('.sp-grid-cell').qtip({
     		content: {
-    			text: false
+    			text: true
     		},
     		position: {
-    			corner: {
-    				target: "bottomMiddle"
-    			}
+    		    my: "left top",
+    		    at: "bottom center"
     		},
-    		style: {
-    			color: "white",
-    			"background-color": "gray",
-    			border: {
-    				width: 1,
-    				color: "orange",
-    				radius: 3
-    			}
-    		}
+    		style: "ui-tooltip-dark ui-tooltip-rounded"
     	});
     	
     	// {# default DELETE action #} 
@@ -463,7 +454,13 @@
         {% for cell in row %}
         <td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}};
             width: {{grid.cols[loop.index0].width}}px;"
+            
+            {% if cell %}
             title="{{cell|escape}}"
+            {% else %}
+            title="({{_('empty')}})"
+            {% endif %}
+            
             {% if can_edit and loop.index0 == 0 %}
             clickable="false">
             <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from=" 
