@@ -4,6 +4,7 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
+    {{ util.jquery_ui() }}
     <style type="text/css">
         #edit-user {
             padding: 20px;
@@ -20,7 +21,8 @@
 {% endblock %}
 
 {% block middle %}
-<form method="post" action="/dashboard/users/save">
+<div id="user-dialog"></div>
+<form id="form-edit-user" method="post" action="/dashboard/users/save">
 <input type="hidden" name="id" value="{{user.user_id}}"/>
 <div id="edit-user">
     <div class="edit-user-field">
@@ -43,8 +45,14 @@
     
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('Password')}}</div>
-        <input class="sp-text-field" type="password" 
+        <input id="password" class="sp-text-field" type="password" 
             name="password" value=""/>
+    </div>
+    
+    <div class="edit-user-field">
+        <div class="sp-label-field">{{_('Re-type password')}}</div>
+        <input id="password2" class="sp-text-field" type="password" 
+            value=""/>
     </div>
     
     {% if not user.user_id %}
@@ -55,35 +63,55 @@
     {% endif %}
     
     <div>
-        <input id="save_user_btn" type="submit" value="{{_('Save')}}"/>
+        <input id="save_user_btn" type="button" value="{{_('Save')}}"/>
     </div>
 </div>
 </form>
 
 <script type="text/javascript">
     $(document).ready(function() {
-    	
-    	$('.sp-text-field:first').focus();
-    	
-    	$.ajax({
-    		url: "{{tg.url('/dashboard/users/all')}}",
-    		type: "get",
-    		dataType: "json",
-    		success: function(res) {
-    			var options = '';
-    			for (var i=0; i<res.users.length; i++) {
-    				var user = res.users[i];
-    				
-    				options +=
-    					'<option value="' + user.id + '">' +
-    					   user.display_name + ' [' + user.user_name + ']</option>';
-    			}
-    			
-    			$('select[name=copy_from]').html(options);
-    		},
-    		error: function() {
-    		}
-    	});
+        
+        $('.sp-text-field:first').focus();
+        
+        $('#save_user_btn').click(function() {
+            var pswd = $('#password').val();
+            var pswd2 = $('#password2').val();
+            
+            if (pswd != '' && pswd != pswd2) {
+                $('#user-dialog').
+                    html("<p>{{_('Passwords must be equal')}}</p>").
+                    dialog({
+                        title: "{{_('User')}}",
+                        modal: true,
+                        width: 300,
+                        height: 100,
+                        resizable: false
+                    });
+            }
+            else {
+                $('#form-edit-user').submit();
+            }
+        });
+        
+        $.ajax({
+            url: "{{tg.url('/dashboard/users/all')}}",
+            type: "get",
+            dataType: "json",
+            success: function(res) {
+                var options = '';
+                for (var i=0; i<res.users.length; i++) {
+                    var user = res.users[i];
+                    
+                    options +=
+                        '<option value="' + user.id + '">' +
+                           user.display_name + ' [' + user.user_name + ']</option>';
+                }
+                
+                $('select[name=copy_from]').html(options);
+            },
+            error: function() {
+            }
+        });
     });
 </script>
 {% endblock %}

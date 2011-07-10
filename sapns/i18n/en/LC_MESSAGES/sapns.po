@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-07-03 12:25+0200\n"
+"POT-Creation-Date: 2011-07-10 21:01+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -30,6 +30,16 @@ msgstr "Sorry, you do not have privilege on this class"
 #, python-format
 msgid "%s of [%s]"
 msgstr "%s of [%s]"
+
+#: sapns/controllers/dashboard.py:141
+#: sapns/controllers/users.py:53
+msgid "Yes"
+msgstr "Yes"
+
+#: sapns/controllers/dashboard.py:142
+#: sapns/controllers/users.py:54
+msgid "No"
+msgstr "No"
 
 #: sapns/controllers/dashboard.py:398
 msgid "The record has been successfully saved"
@@ -75,17 +85,17 @@ msgid "Shorcuts editing"
 msgstr "Shortcuts editing"
 
 #: sapns/controllers/users.py:33
-#: sapns/templates/sapns/users/edit.html:27
+#: sapns/templates/sapns/users/edit.html:29
 msgid "Display name"
 msgstr "Display name"
 
 #: sapns/controllers/users.py:34
-#: sapns/templates/sapns/users/edit.html:33
+#: sapns/templates/sapns/users/edit.html:35
 msgid "User name"
 msgstr "User name"
 
 #: sapns/controllers/users.py:35
-#: sapns/templates/sapns/users/edit.html:39
+#: sapns/templates/sapns/users/edit.html:41
 msgid "E-mail address"
 msgstr "E-mail address"
 
@@ -293,17 +303,17 @@ msgstr "Do you really want to delete this record?"
 #: sapns/templates/sapns/dashboard/edit.html:27
 #: sapns/templates/sapns/order/insert.html:65
 #: sapns/templates/sapns/order/reference.html:128
-#: sapns/templates/sapns/users/edit.html:58
+#: sapns/templates/sapns/users/edit.html:66
 msgid "Save"
 msgstr "Save"
 
 #: sapns/templates/sapns/dashboard/edit.html:42
-#: sapns/templates/sapns/dashboard/grid.html:586
+#: sapns/templates/sapns/dashboard/grid.html:587
 msgid "Related info"
 msgstr "Related info"
 
 #: sapns/templates/sapns/dashboard/edit.html:48
-#: sapns/templates/sapns/dashboard/grid.html:592
+#: sapns/templates/sapns/dashboard/grid.html:593
 msgid "Show"
 msgstr "Show"
 
@@ -328,8 +338,8 @@ msgid "Oops, something went wrong..."
 msgstr "Oops, something went wrong..."
 
 #: sapns/templates/sapns/dashboard/grid.html:95
-#: sapns/templates/sapns/dashboard/grid.html:363
-#: sapns/templates/sapns/dashboard/sapns.selector.js:189
+#: sapns/templates/sapns/dashboard/grid.html:364
+#: sapns/templates/sapns/dashboard/sapns.selector.js:214
 #: sapns/templates/sapns/dashboard/selector.html:112
 #: sapns/templates/sapns/shortcuts/list.html:166
 #: sapns/templates/sapns/shortcuts/list.html:204
@@ -342,8 +352,8 @@ msgid "For your information this object is related with other objects in the fol
 msgstr "For your information this object is related with other objects in the following classes:"
 
 #: sapns/templates/sapns/dashboard/grid.html:153
-#: sapns/templates/sapns/dashboard/grid.html:385
-#: sapns/templates/sapns/dashboard/sapns.selector.js:203
+#: sapns/templates/sapns/dashboard/grid.html:386
+#: sapns/templates/sapns/dashboard/sapns.selector.js:228
 #: sapns/templates/sapns/dashboard/selector.html:147
 #: sapns/templates/sapns/shortcuts/list.html:184
 #: sapns/templates/sapns/shortcuts/list.html:228
@@ -355,67 +365,67 @@ msgstr "Cancel"
 msgid "You must select a row before click on this action"
 msgstr "You must select a row before click on this action"
 
-#: sapns/templates/sapns/dashboard/grid.html:357
+#: sapns/templates/sapns/dashboard/grid.html:358
 msgid "Create a shortcut for this search"
 msgstr "Create a shortcut for this search"
 
-#: sapns/templates/sapns/dashboard/grid.html:416
+#: sapns/templates/sapns/dashboard/grid.html:417
 msgid "Search..."
 msgstr "Search..."
 
-#: sapns/templates/sapns/dashboard/grid.html:423
+#: sapns/templates/sapns/dashboard/grid.html:424
 msgid "this search"
 msgstr "this search"
 
-#: sapns/templates/sapns/dashboard/grid.html:425
+#: sapns/templates/sapns/dashboard/grid.html:426
 msgid "Create a shortcut"
 msgstr "Create a shortcut"
 
-#: sapns/templates/sapns/dashboard/grid.html:427
+#: sapns/templates/sapns/dashboard/grid.html:428
 msgid "Do you want to create a shortcut for this search?"
 msgstr "Do you want to create a shortcut for this search?"
 
-#: sapns/templates/sapns/dashboard/grid.html:428
+#: sapns/templates/sapns/dashboard/grid.html:429
 msgid "Shortcut title"
 msgstr "Shortcut title"
 
-#: sapns/templates/sapns/dashboard/grid.html:429
+#: sapns/templates/sapns/dashboard/grid.html:430
 msgid "title"
 msgstr "title"
 
-#: sapns/templates/sapns/dashboard/grid.html:438
+#: sapns/templates/sapns/dashboard/grid.html:439
 msgid "(format)"
 msgstr "(format)"
 
-#: sapns/templates/sapns/dashboard/grid.html:442
+#: sapns/templates/sapns/dashboard/grid.html:443
 msgid "Export"
 msgstr "Export"
 
-#: sapns/templates/sapns/dashboard/grid.html:485
+#: sapns/templates/sapns/dashboard/grid.html:486
 msgid "No results"
 msgstr "No results"
 
-#: sapns/templates/sapns/dashboard/grid.html:496
+#: sapns/templates/sapns/dashboard/grid.html:497
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 
-#: sapns/templates/sapns/dashboard/grid.html:503
+#: sapns/templates/sapns/dashboard/grid.html:504
 msgid "All"
 msgstr "All"
 
-#: sapns/templates/sapns/dashboard/grid.html:522
+#: sapns/templates/sapns/dashboard/grid.html:523
 msgid "page 1"
 msgstr "page 1"
 
-#: sapns/templates/sapns/dashboard/grid.html:530
-#: sapns/templates/sapns/dashboard/grid.html:545
-#: sapns/templates/sapns/dashboard/grid.html:554
+#: sapns/templates/sapns/dashboard/grid.html:531
+#: sapns/templates/sapns/dashboard/grid.html:546
+#: sapns/templates/sapns/dashboard/grid.html:555
 #, python-format
 msgid "page %(p)d"
 msgstr "page %(p)d"
 
-#: sapns/templates/sapns/dashboard/grid.html:562
+#: sapns/templates/sapns/dashboard/grid.html:563
 msgid "Actions"
 msgstr "Actions"
 
@@ -445,7 +455,6 @@ msgstr "Search..."
 
 #: sapns/templates/sapns/order/insert.html:29
 #: sapns/templates/sapns/order/reference.html:113
-#: sapns/templates/sapns/shortcuts/list.html:101
 #: sapns/templates/sapns/views/columns.html:27
 #: sapns/templates/sapns/views/filters.html:15
 #: sapns/templates/sapns/views/order.html:15
@@ -460,7 +469,6 @@ msgstr "Up"
 
 #: sapns/templates/sapns/order/insert.html:35
 #: sapns/templates/sapns/order/reference.html:119
-#: sapns/templates/sapns/shortcuts/list.html:105
 #: sapns/templates/sapns/views/columns.html:28
 #: sapns/templates/sapns/views/filters.html:16
 #: sapns/templates/sapns/views/order.html:16
@@ -544,13 +552,25 @@ msgstr "Share this shortcut with another user"
 msgid "Share"
 msgstr "Share"
 
-#: sapns/templates/sapns/users/edit.html:45
+#: sapns/templates/sapns/users/edit.html:47
 msgid "Password"
 msgstr "Password"
 
-#: sapns/templates/sapns/users/edit.html:52
+#: sapns/templates/sapns/users/edit.html:53
+msgid "Re-type password"
+msgstr "Re-type password"
+
+#: sapns/templates/sapns/users/edit.html:60
 msgid "Copy from"
 msgstr "Copy from"
+
+#: sapns/templates/sapns/users/edit.html:82
+msgid "Passwords must be equal"
+msgstr "Passwords must be equal"
+
+#: sapns/templates/sapns/users/edit.html:84
+msgid "User"
+msgstr "User"
 
 #: sapns/templates/sapns/users/index.html:22
 msgid "Permission"
