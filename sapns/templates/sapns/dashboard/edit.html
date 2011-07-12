@@ -115,6 +115,8 @@
         
         $('#save-button').click(function() {
             
+            $('.ui-tooltip').remove();
+            
             var params = '';
             var required_attrs = [];
             
@@ -216,8 +218,8 @@
                             event: false
                         },
                         position: {
-                            at: "right center",
-                            my: "left center"
+                            at: "right top",
+                            my: "left bottom"
                         },
                         style: "ui-tooltip-red ui-tooltip-rounded"                        
                     });
