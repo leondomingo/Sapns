@@ -8,6 +8,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
+    {{ util.qtip2() }}
     <script type="text/javascript">
         {% include 'sapns/dashboard/sapns.selector.js' %}
     </script>
@@ -124,7 +125,8 @@
                 var value = $(this).val();
                         
                 if (required == 'true' && value == '') {
-                    required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    //required_attrs.push($(this).parent().parent().attr('attr-title')); 
+                    required_attrs.push($(this));
                 }
                 
                 params += 
@@ -160,7 +162,8 @@
                 var required = $(this).parent().parent().attr('required');
                         
                 if (required == 'true' && date_value == '') {
-                    required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    //required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    required_attrs.push($(this));
                 }
                 
                 params += 
@@ -175,7 +178,8 @@
                 var value = $(this).val();
                         
                 if (required == 'true' && value == '') {
-                    required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    //required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    required_attrs.push($(this));
                 }
                 
                 params += 
@@ -191,7 +195,8 @@
                 var sel_value = $(this).attr('value');
                         
                 if (required == 'true' && sel_value == '') {
-                    required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    //required_attrs.push($(this).parent().parent().attr('attr-title'));
+                    required_attrs.push($(this));
                 }
                 
                 params += 
@@ -199,8 +204,26 @@
                         'value="' + sel_value + '">\n';
             });
             
-            if (required_attrs != '') {
-                var alert_msg = "{{_('The following fields must be filled:')}}";
+            if (required_attrs.length > 0) {
+                for (var i=0; i<required_attrs.length; i++) {
+                    required_attrs[i].qtip({
+                        content: { text: "{{_('this field is required')}}" },
+                        show: {
+                            target: false,
+                            ready: true                            
+                        },
+                        hide: {
+                            event: false
+                        },
+                        position: {
+                            at: "right center",
+                            my: "left center"
+                        },
+                        style: "ui-tooltip-red ui-tooltip-rounded"                        
+                    });
+                }
+                
+                /*var alert_msg = "{{_('The following fields must be filled:')}}";
                 alert_msg += '<br>';
                 for (var i=0; i<required_attrs.length; i++) {
                     alert_msg += 
@@ -225,7 +248,7 @@
                         		$('#edit-dialog').dialog('close');
                         	}
                         }
-                    });
+                    });*/
             }
             else {
                 $('#edit-form').append(params).submit();

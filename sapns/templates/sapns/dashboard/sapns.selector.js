@@ -86,10 +86,11 @@
 		return this.title;
 	}
 	
+	// getClass
 	SapnsSelector.prototype.getClass = function() {
 		return this.rc;
 	}
-
+	
 	// click_search
 	SapnsSelector.prototype.click_search = function(q) {
 		

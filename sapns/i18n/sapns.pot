@@ -5,9 +5,9 @@
 ##, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: sapns 0.1\n"
+"Project-Id-Version: sapns 0.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-07-10 21:43+0200\n"
+"POT-Creation-Date: 2011-07-12 20:01+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -279,32 +279,36 @@ msgstr ""
 msgid "Do you really want to delete this record?"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:27
+#: sapns/templates/sapns/dashboard/edit.html:28
 #: sapns/templates/sapns/order/insert.html:65
 #: sapns/templates/sapns/order/reference.html:128
 #: sapns/templates/sapns/users/edit.html:66
 msgid "Save"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:42
-#: sapns/templates/sapns/dashboard/grid.html:584
+#: sapns/templates/sapns/dashboard/edit.html:43
+#: sapns/templates/sapns/dashboard/grid.html:589
 msgid "Related info"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:48
-#: sapns/templates/sapns/dashboard/grid.html:590
+#: sapns/templates/sapns/dashboard/edit.html:49
+#: sapns/templates/sapns/dashboard/grid.html:595
 msgid "Show"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:203
+#: sapns/templates/sapns/dashboard/edit.html:210
+msgid "this field is required"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:226
 msgid "The following fields must be filled:"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:218
+#: sapns/templates/sapns/dashboard/edit.html:241
 msgid "Required fields"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:224
+#: sapns/templates/sapns/dashboard/edit.html:247
 #: sapns/templates/sapns/dashboard/grid.html:126
 #: sapns/templates/sapns/dashboard/grid.html:136
 #: sapns/templates/sapns/views/views-min.js:1
@@ -318,7 +322,7 @@ msgstr ""
 
 #: sapns/templates/sapns/dashboard/grid.html:86
 #: sapns/templates/sapns/dashboard/grid.html:355
-#: sapns/templates/sapns/dashboard/sapns.selector.js:214
+#: sapns/templates/sapns/dashboard/sapns.selector.js:215
 #: sapns/templates/sapns/dashboard/selector.html:112
 #: sapns/templates/sapns/shortcuts/list.html:166
 #: sapns/templates/sapns/shortcuts/list.html:204
@@ -332,7 +336,7 @@ msgstr ""
 
 #: sapns/templates/sapns/dashboard/grid.html:144
 #: sapns/templates/sapns/dashboard/grid.html:377
-#: sapns/templates/sapns/dashboard/sapns.selector.js:228
+#: sapns/templates/sapns/dashboard/sapns.selector.js:229
 #: sapns/templates/sapns/dashboard/selector.html:147
 #: sapns/templates/sapns/shortcuts/list.html:184
 #: sapns/templates/sapns/shortcuts/list.html:228
@@ -420,15 +424,15 @@ msgstr ""
 msgid "Utilities"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/index.html:49
+#: sapns/templates/sapns/dashboard/index.html:51
 msgid "Views"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/index.html:56
+#: sapns/templates/sapns/dashboard/index.html:60
 msgid "Users"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/index.html:62
+#: sapns/templates/sapns/dashboard/index.html:67
 msgid "Messages"
 msgstr ""
 
