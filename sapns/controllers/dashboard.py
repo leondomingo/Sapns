@@ -3,6 +3,7 @@
 
 from tg import response, expose, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
+from pylons import cache
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
 
@@ -478,16 +479,7 @@ class DashboardController(BaseController):
             
         # get attributes
         attributes = []
-        for attr, attr_priv in dbs.query(SapnsAttribute, SapnsAttrPrivilege).\
-                join((SapnsClass, 
-                      SapnsClass.class_id == SapnsAttribute.class_id)).\
-                join((SapnsAttrPrivilege, 
-                      and_(SapnsAttrPrivilege.user_id == user.user_id,
-                           SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
-                filter(and_(SapnsClass.name == cls,
-                            SapnsAttribute.visible == True)).\
-                order_by(SapnsAttribute.insertion_order):
-            
+        for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
             if attr.name in default_values_ro:
@@ -535,7 +527,7 @@ class DashboardController(BaseController):
                     logger.error(e)
 #                    attributes[-1]['vals'] = None
                     attribute['vals'] = None
-            
+                    
         return dict(cls=cls, title=class_.title, id=id, 
                     related_classes=class_.related_classes(), 
                     attributes=attributes, reference=ref, 

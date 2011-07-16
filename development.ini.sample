@@ -29,6 +29,7 @@ full_stack = true
 cache_dir = %(here)s/data
 beaker.session.key = sapns
 beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
+beaker.cache.type = memory
 
 # Sapns settings
 pg_path = /usr/bin

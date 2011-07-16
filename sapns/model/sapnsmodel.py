@@ -10,6 +10,7 @@ import datetime as dt
 from pylons.i18n import ugettext as _
 
 from tg import config
+from pylons import cache
 
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
@@ -37,36 +38,42 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
 class SapnsUser(User):
     
     def get_dashboard(self):
-        dboard = dbs.query(SapnsShortcut).\
-                    filter(and_(SapnsShortcut.user_id == self.user_id,
-                                SapnsShortcut.parent_id == None)).\
-                    first()
-                    
-        return dboard
+        def _get_dashboard():
+            return dbs.query(SapnsShortcut).\
+                filter(and_(SapnsShortcut.user_id == self.user_id,
+                            SapnsShortcut.parent_id == None)).\
+                first()
+                
+        _cache = cache.get_cache('user_get_dashboard')
+        return _cache.get_value(key=self.user_id, createfunc=_get_dashboard,
+                                expiretime=3600)
     
     def get_dataexploration(self):
-        data_exploration = dbs.query(SapnsShortcut).\
+        def _get_dataexpl():
+            
+            return dbs.query(SapnsShortcut).\
                 filter(and_(SapnsShortcut.parent_id == self.get_dashboard().shortcut_id,
                             SapnsShortcut.order == 0,
                             )).\
                 first()
                 
-        return data_exploration
+        _cache = cache.get_cache('user_get_dataexploration')
+        return _cache.get_value(key=self.user_id, createfunc=_get_dataexpl,
+                                expiretime=3600)
     
     def get_shortcuts(self, id_parent=None):
         
-        #logger = logging.getLogger('SapnsUser.get_shortcuts')
-
+#        logger = logging.getLogger('SapnsUser.get_shortcuts')
+        
         if not id_parent:
             id_parent = self.get_dashboard().shortcut_id
             
         shortcuts = []
-        for sc, ac, cl in dbs.query(SapnsShortcut, 
-                                          SapnsAction,
-                                          SapnsClass).\
+        for sc, ac, cl in dbs.query(SapnsShortcut, SapnsAction, SapnsClass).\
                 outerjoin((SapnsAction,
                            SapnsAction.action_id == SapnsShortcut.action_id)).\
-                outerjoin((SapnsClass, SapnsClass.class_id == SapnsAction.class_id)).\
+                outerjoin((SapnsClass, 
+                           SapnsClass.class_id == SapnsAction.class_id)).\
                 filter(and_(SapnsShortcut.user_id == self.user_id,
                             SapnsShortcut.parent_id == id_parent)).\
                 order_by(SapnsShortcut.order).\
@@ -92,6 +99,13 @@ class SapnsUser(User):
                                   id=sc.shortcut_id))
         
         return shortcuts
+        
+#        _cache = cache.get_cache('get_shortcuts')
+#        sc_cached = _cache.get_value(key='%d_%s' % (self.user_id, id_parent),
+#                                     createfunc=_get_shortcuts,
+#                                     expiretime=3600)
+#        
+#        return sc_cached
     
     def copy_from(self, other_id):
         
@@ -177,66 +191,97 @@ class SapnsUser(User):
         self.get_dashboard().add_child(sc_link.shortcut_id, copy=False)
     
     def has_privilege(self, cls):
-        priv = dbs.query(SapnsPrivilege).\
-            join((SapnsClass,
-                  SapnsClass.class_id == SapnsPrivilege.class_id)).\
-            filter(and_(SapnsPrivilege.user_id == self.user_id,
-                        SapnsClass.name == cls)).\
-            first()
+        
+        def _has_privilege():
+            priv = dbs.query(SapnsPrivilege).\
+                join((SapnsClass,
+                      SapnsClass.class_id == SapnsPrivilege.class_id)).\
+                filter(and_(SapnsPrivilege.user_id == self.user_id,
+                            SapnsClass.name == cls)).\
+                first()
                 
-        return priv != None
+            return priv != None
+        
+        _cache = cache.get_cache('user_has_privilege')
+        return _cache.get_value(key='%s_%d' % (cls, self.user_id),
+                                createfunc=_has_privilege, expiretime=3600)
     
     def attr_privilege(self, id_attribute):
-        priv_atr = dbs.query(SapnsAttrPrivilege).\
-            filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
-                        SapnsAttrPrivilege.attribute_id == id_attribute,
-                        )).\
-            first()
-                
-        return priv_atr
+        
+        def _attr_privilege():
+            
+            priv_atr = dbs.query(SapnsAttrPrivilege).\
+                filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
+                            SapnsAttrPrivilege.attribute_id == id_attribute,
+                            )).\
+                first()
+                    
+            return priv_atr
+        
+        _cache = cache.get_cache('user_attr_priv')
+        return _cache.get_value(key='%d_%d' % (id_attribute, self.user_id),
+                                createfunc=_get_view_name, expiretime=3600)
     
     def get_view_name(self, cls):
         
-        meta = MetaData(bind=dbs.bind)
-        prefix = config.get('views_prefix', '_view_')
-        try:
-            # user's view
-            # "_view_alumnos_1"
-            view_name = '%s%s_%d' % (prefix, cls, self.user_id)
-            Table(view_name, meta, autoload=True)
-            view = view_name
+        logger = logging.getLogger('get_view_name')
+        logger.info(dir(cache))
+        #logger.info(help(cache.cache))
         
-        except NoSuchTableError:
-            # general view
-            # "_view_alumnos"
+        def _get_view_name():
+            
+            #logger.info('getting view name...')
+            
+            meta = MetaData(bind=dbs.bind)
+            prefix = config.get('views_prefix', '_view_')
             try:
-                view_name = '%s%s' % (prefix, cls)
+                # user's view
+                # "_view_alumnos_1"
+                view_name = '%s%s_%d' % (prefix, cls, self.user_id)
                 Table(view_name, meta, autoload=True)
                 view = view_name
-        
+            
             except NoSuchTableError:
-                # "raw" table
-                # "alumnos"
-                view = cls
-                
-        return view
+                # general view
+                # "_view_alumnos"
+                try:
+                    view_name = '%s%s' % (prefix, cls)
+                    Table(view_name, meta, autoload=True)
+                    view = view_name
+            
+                except NoSuchTableError:
+                    # "raw" table
+                    # "alumnos"
+                    view = cls
+                    
+            return view
+                    
+        _cache = cache.get_cache('user_get_view_name')
+        return _cache.get_value(key='%s_%d' % (cls, self.user_id),
+                                createfunc=_get_view_name, expiretime=3600)
     
     def get_messages(self):
-        messages = []
-        for msg, msgto, userfrom in \
-                dbs.query(SapnsMessage, SapnsMessageTo, SapnsUser).\
-                join((SapnsMessageTo, 
-                      SapnsMessageTo.message_id == SapnsMessage.message_id)).\
-                join((SapnsUser, SapnsUser.user_id == SapnsMessage.user_from_id)).\
-                filter(SapnsMessageTo.user_to_id == self.user_id):
+        
+        def _get_messages():
+            messages = []
+            for msg, msgto, userfrom in \
+                    dbs.query(SapnsMessage, SapnsMessageTo, SapnsUser).\
+                    join((SapnsMessageTo, 
+                          SapnsMessageTo.message_id == SapnsMessage.message_id)).\
+                    join((SapnsUser, SapnsUser.user_id == SapnsMessage.user_from_id)).\
+                    filter(SapnsMessageTo.user_to_id == self.user_id):
+                
+                messages.append(dict(id=msg.message_id,
+                                     from_id=userfrom.user_id,
+                                     from_name=userfrom.display_name,
+                                     read=msgto.read, subject=msg.subject,
+                                     body=msg.body, body_title=msg.body[:30]))
             
-            messages.append(dict(id=msg.message_id,
-                                 from_id=userfrom.user_id,
-                                 from_name=userfrom.display_name,
-                                 read=msgto.read, subject=msg.subject,
-                                 body=msg.body, body_title=msg.body[:30]))
-            
-        return messages
+            return messages
+        
+        _cache = cache.get_cache('user_get_messages')
+        return _cache.get_value(key=self.user_id, createfunc=_get_messages,
+                                expiretime=120)
     
     def messages(self):
         n = dbs.query(SapnsMessageTo).\
@@ -442,11 +487,14 @@ class SapnsClass(DeclarativeBase):
         OUT
           <SapnsClass>
         """
-        cls = dbs.query(SapnsClass).\
-            filter(SapnsClass.name == class_name).\
-            first()
-            
-        return cls
+        def _by_name():
+            return dbs.query(SapnsClass).\
+                filter(SapnsClass.name == class_name).\
+                first()
+                
+        _cache = cache.get_cache('class_by_name')
+        return _cache.get_value(key=class_name, createfunc=_by_name,
+                                expiretime=3600)
     
     @staticmethod
     def class_titles(class_name):
@@ -596,32 +644,37 @@ class SapnsClass(DeclarativeBase):
             "type":       <unicode>}, ...]
         """
         
-        actions = []
-        for ac in dbs.query(SapnsAction).\
-                filter(and_(SapnsAction.class_id == self.class_id,
-                            SapnsAction.type != SapnsAction.TYPE_LIST,
-                            )).\
-                all():
-            
-            url = ac.url
-            if url and url[-1] != '/':
-                url += '/'
+        def _sorted_actions():
+            actions = []
+            for ac in dbs.query(SapnsAction).\
+                    filter(and_(SapnsAction.class_id == self.class_id,
+                                SapnsAction.type != SapnsAction.TYPE_LIST,
+                                )).\
+                    all():
                 
-            require_id = True
-            if ac.type == SapnsAction.TYPE_NEW:
-                url = SapnsAction.URL_NEW
-                require_id = False
-            
-            elif ac.type == SapnsAction.TYPE_EDIT:
-                url = SapnsAction.URL_EDIT
-            
-            elif ac.type == SapnsAction.TYPE_DELETE:
-                url = SapnsAction.URL_DELETE
-            
-            actions.append(dict(title=_(ac.name), type=ac.type, 
-                                url=url, require_id=require_id))
-    
-        return actions
+                url = ac.url
+                if url and url[-1] != '/':
+                    url += '/'
+                    
+                require_id = True
+                if ac.type == SapnsAction.TYPE_NEW:
+                    url = SapnsAction.URL_NEW
+                    require_id = False
+                
+                elif ac.type == SapnsAction.TYPE_EDIT:
+                    url = SapnsAction.URL_EDIT
+                
+                elif ac.type == SapnsAction.TYPE_DELETE:
+                    url = SapnsAction.URL_DELETE
+                
+                actions.append(dict(title=_(ac.name), type=ac.type, 
+                                    url=url, require_id=require_id))
+        
+            return actions
+        
+        _cache = cache.get_cache('sorted_actions')
+        return _cache.get_value(key=self.class_id, createfunc=_sorted_actions,
+                                expiretime=3600)
     
     def insertion(self):
         """
@@ -709,20 +762,43 @@ class SapnsClass(DeclarativeBase):
             "attr_title": <unicode>}, ...]
         """
         
-        rel_classes = []
-        for cls, attr in dbs.query(SapnsClass, SapnsAttribute).\
-                join((SapnsAttribute, 
-                      SapnsAttribute.class_id == SapnsClass.class_id)).\
-                filter(SapnsAttribute.related_class_id == self.class_id).\
-                order_by(SapnsClass.title, SapnsAttribute.insertion_order):
+        def _related_classes():
             
-            rc = dict(id=cls.class_id, name=cls.name, title=cls.title,
-                      attr_id=attr.attribute_id,
-                      attr_name=attr.name, attr_title=attr.title)
+            rel_classes = []
+            for cls, attr in dbs.query(SapnsClass, SapnsAttribute).\
+                    join((SapnsAttribute, 
+                          SapnsAttribute.class_id == SapnsClass.class_id)).\
+                    filter(SapnsAttribute.related_class_id == self.class_id).\
+                    order_by(SapnsClass.title, SapnsAttribute.insertion_order):
+                
+                rc = dict(id=cls.class_id, name=cls.name, title=cls.title,
+                          attr_id=attr.attribute_id,
+                          attr_name=attr.name, attr_title=attr.title)
+                
+                rel_classes.append(rc)
+                
+            return rel_classes
+        
+        _cache = cache.get_cache('related_classes')
+        return _cache.get_value(key=self.class_id, createfunc=_related_classes,
+                                expiretime=3600)
+        
+    # get attributes
+    def get_attributes(self, id_user):
+        
+        def _get_attributes():
+            return dbs.query(SapnsAttribute, SapnsAttrPrivilege).\
+                    join((SapnsAttrPrivilege, 
+                          and_(SapnsAttrPrivilege.user_id == id_user,
+                               SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
+                    filter(and_(SapnsAttribute.class_id == self.class_id,
+                                SapnsAttribute.visible == True)).\
+                    order_by(SapnsAttribute.insertion_order)
             
-            rel_classes.append(rc)
-            
-        return rel_classes
+        _cache = cache.get_cache('class_get_attributes')
+        return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
+                                createfunc=_get_attributes, expiretime=3600)
+        
 
 class SapnsAttribute(DeclarativeBase):
     
@@ -849,23 +925,35 @@ class SapnsAttrPrivilege(DeclarativeBase):
     @staticmethod
     def get_privilege(id_user, id_attribute):
         
-        priv = dbs.query(SapnsAttrPrivilege).\
-                filter(and_(SapnsAttrPrivilege.user_id == id_user,
-                            SapnsAttrPrivilege.attribute_id == id_attribute
-                            )).\
-                first()
-                
-        return priv
+        def _get_privilege():
+            
+            priv = dbs.query(SapnsAttrPrivilege).\
+                    filter(and_(SapnsAttrPrivilege.user_id == id_user,
+                                SapnsAttrPrivilege.attribute_id == id_attribute
+                                )).\
+                    first()
+                    
+            return priv
+        
+        _cache = cache.get_cache('attrpriv_get_privilege')
+        return _cache.get_value(key='%d_%d' % (id_user, id_attribute),
+                                createfunc=_get_privilege, expiretime=3600)
     
     @staticmethod
     def get_access(id_user, id_attribute):
-    
-        priv = SapnsAttrPrivilege.get_privilege(id_user, id_attribute)
-        if priv is None:
-            return SapnsAttrPrivilege.ACCESS_DENIED
         
-        else:
-            return priv.access
+        def _get_access():
+        
+            priv = SapnsAttrPrivilege.get_privilege(id_user, id_attribute)
+            if priv is None:
+                return SapnsAttrPrivilege.ACCESS_DENIED
+            
+            else:
+                return priv.access
+            
+        _cache = cache.get_cache('attrpriv_get_access')
+        return _cache.get_value(key='%d_%d' % (id_user, id_attribute),
+                                createfunc=_get_access, expiretime=3600)
         
     @staticmethod
     def add_privilege(id_user, id_attribute, access):
