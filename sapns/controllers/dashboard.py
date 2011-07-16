@@ -130,6 +130,9 @@ class DashboardController(BaseController):
             
             caption = _('%s of [%s]' % (cls_.title, p_title))
             
+        else:
+            caption = cls_.title
+            
         # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     show_ids=show_ids, strtodatef=strtodate_, collection=col) 
