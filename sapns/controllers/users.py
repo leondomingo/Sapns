@@ -5,6 +5,7 @@
 from tg import expose, url, config, redirect, require
 
 # third party imports
+from pylons import cache
 from pylons.i18n import ugettext as _
 from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize, predicates
@@ -26,6 +27,8 @@ class UsersController(BaseController):
     @expose('sapns/users/index.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def index(self, came_from='/dashboard'):
+        
+        logger = logging.getLogger('Users.index')
     
         pos = 0
 
@@ -37,7 +40,7 @@ class UsersController(BaseController):
         
         for us in dbs.query(SapnsUser).order_by(SapnsUser.user_id):
             ds.append(dict(id=us.user_id,
-                           display_name=us.display_name, 
+                           display_name=us.display_name,
                            user_name=us.user_name,
                            e_mail=us.email_address,
                            ))
@@ -191,9 +194,16 @@ class UsersController(BaseController):
         
     @expose('json')
     def all(self):
-        users = []
-        for user in dbs.query(SapnsUser).order_by(SapnsUser.user_name):
-            users.append(dict(id=user.user_id, display_name=user.display_name, 
-                              user_name=user.user_name))
-            
-        return dict(users=users)
+        logger = logging.getLogger('Users.all')
+        def _all():
+            logger.info('Getting all users...')
+            users = []
+            for user in dbs.query(SapnsUser).order_by(SapnsUser.user_name):
+                users.append(dict(id=user.user_id, display_name=user.display_name, 
+                                  user_name=user.user_name))
+                
+            return users
+                
+        _cache = cache.get_cache('users_all')
+                        
+        return dict(users=_cache.get_value(key='all', createfunc=_all, expiretime=3600))

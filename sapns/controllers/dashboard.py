@@ -419,23 +419,14 @@ class DashboardController(BaseController):
         
         logger = logging.getLogger(__name__ + '/edit')
         
-        user = request.identity['user']
-        
-        # does this user have privilege on this class?
-        priv_class = dbs.query(SapnsPrivilege, SapnsClass).\
-                join((SapnsClass, 
-                      SapnsClass.class_id == SapnsPrivilege.class_id)).\
-                filter(and_(SapnsPrivilege.user_id == user.user_id, 
-                            SapnsClass.name == cls)).\
-                first()
-                
-        if not priv_class:
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        if not user.has_privilege(cls):        
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
             
-        __, class_ = priv_class
-        
+        class_ = SapnsClass.by_name(cls)
+            
         meta = MetaData(dbs.bind)
         try:
             tbl = Table(cls, meta, autoload=True)

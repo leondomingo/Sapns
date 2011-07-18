@@ -5,6 +5,7 @@
 from tg import expose, url, config, redirect, request, require
 
 # third party imports
+from pylons import cache
 from pylons.i18n import ugettext as _
 from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize, predicates
@@ -39,17 +40,23 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     @require(predicates.not_anonymous())
-    def delete(self, id=None, **params):
+    def delete(self, id_shortcut, **params):
         
         logger = logging.getLogger(__name__ + '/delete')
         try:
-            logger.info('Deleting shortcut [%s]' % id)
+            logger.info('Deleting shortcut [%s]' % id_shortcut)
+            
+            # the shortcut to be deleted
+            sc = dbs.query(SapnsShortcut).get(id_shortcut)
             
             dbs.query(SapnsShortcut).\
-                filter(SapnsShortcut.shortcut_id == id).\
+                filter(SapnsShortcut.shortcut_id == id_shortcut).\
                 delete()
             
             dbs.flush()
+             
+            _key = '%d_%d' % (sc.user_id, sc.parent_id)
+            cache.get_cache('user_get_shortcuts').remove_value(key=_key)
         
             return dict(status=True)
     
@@ -59,12 +66,15 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     @require(predicates.not_anonymous())
-    def bookmark(self, id=None, **params):
+    def bookmark(self, id_shortcut, **params):
         logger = logging.getLogger(__name__ + '/bookmark')
         try:
-            logger.info('Bookmarking shortcut [%s]' % id)
+            logger.info('Bookmarking shortcut [%s]' % id_shortcut)
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-            user.get_dashboard().add_child(id)
+            user.get_dashboard().add_child(id_shortcut)
+            
+            _key = '%d_%d' % (user.user_id, user.get_dashboard().shortcut_id)
+            cache.get_cache('user_get_shortcuts').remove_value(key=_key)
             
             return dict(status=True)
             

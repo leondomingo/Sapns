@@ -63,49 +63,52 @@ class SapnsUser(User):
     
     def get_shortcuts(self, id_parent=None):
         
-#        logger = logging.getLogger('SapnsUser.get_shortcuts')
+        logger = logging.getLogger('SapnsUser.get_shortcuts')
         
         if not id_parent:
             id_parent = self.get_dashboard().shortcut_id
             
-        shortcuts = []
-        for sc, ac, cl in dbs.query(SapnsShortcut, SapnsAction, SapnsClass).\
-                outerjoin((SapnsAction,
-                           SapnsAction.action_id == SapnsShortcut.action_id)).\
-                outerjoin((SapnsClass, 
-                           SapnsClass.class_id == SapnsAction.class_id)).\
-                filter(and_(SapnsShortcut.user_id == self.user_id,
-                            SapnsShortcut.parent_id == id_parent)).\
-                order_by(SapnsShortcut.order).\
-                all():
+        id_parent = int(id_parent)
             
-            #logger.info('Getting shortcut "%s"' % sc.title)
-            url = ''
-            type_ = ''
-            class_ = ''
-            if ac:
-                url = ac.url
-                type_ = ac.type
+        def __get_shortcuts(id_parent):
+            logger.info('Getting shortcuts of [%d]' % id_parent)
+            
+            shortcuts = []
+            for sc, ac, cl in dbs.query(SapnsShortcut, SapnsAction, SapnsClass).\
+                    outerjoin((SapnsAction,
+                               SapnsAction.action_id == SapnsShortcut.action_id)).\
+                    outerjoin((SapnsClass, 
+                               SapnsClass.class_id == SapnsAction.class_id)).\
+                    filter(and_(SapnsShortcut.user_id == self.user_id,
+                                SapnsShortcut.parent_id == id_parent)).\
+                    order_by(SapnsShortcut.order):
                 
-                if cl:
-                    class_ = cl.name 
-                            
-            shortcuts.append(dict(url=url, 
-                                  order=sc.order,
-                                  title=_(sc.title),
-                                  action_type=type_,
-                                  cls=class_,
-                                  parent=sc.parent_id, 
-                                  id=sc.shortcut_id))
+                url = ''
+                type_ = ''
+                class_ = ''
+                if ac:
+                    url = ac.url
+                    type_ = ac.type
+                    
+                    if cl:
+                        class_ = cl.name 
+                                
+                shortcuts.append(dict(url=url, 
+                                      order=sc.order,
+                                      title=_(sc.title),
+                                      action_type=type_,
+                                      cls=class_,
+                                      parent=sc.parent_id, 
+                                      id=sc.shortcut_id))
+            
+            return shortcuts
+
+        def _get_shortcuts():
+            return __get_shortcuts(id_parent)
         
-        return shortcuts
-        
-#        _cache = cache.get_cache('get_shortcuts')
-#        sc_cached = _cache.get_value(key='%d_%s' % (self.user_id, id_parent),
-#                                     createfunc=_get_shortcuts,
-#                                     expiretime=3600)
-#        
-#        return sc_cached
+        _cache = cache.get_cache('user_get_shortcuts')
+        _key = '%d_%d' % (self.user_id, id_parent)
+        return _cache.get_value(key=_key, createfunc=_get_shortcuts, expiretime=3600)
     
     def copy_from(self, other_id):
         
