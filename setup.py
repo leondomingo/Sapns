@@ -28,6 +28,7 @@ setup(
         "tgext.admin>=0.3.9",
         "tw.forms",
         "Neptuno2",
+        "argparse",
         ],
     setup_requires=["PasteScript >= 1.7"],
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2'],
