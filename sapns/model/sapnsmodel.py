@@ -38,28 +38,17 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
 class SapnsUser(User):
     
     def get_dashboard(self):
-        def _get_dashboard():
-            return dbs.query(SapnsShortcut).\
-                filter(and_(SapnsShortcut.user_id == self.user_id,
-                            SapnsShortcut.parent_id == None)).\
-                first()
-                
-        _cache = cache.get_cache('user_get_dashboard')
-        return _cache.get_value(key=self.user_id, createfunc=_get_dashboard,
-                                expiretime=3600)
+        return dbs.query(SapnsShortcut).\
+            filter(and_(SapnsShortcut.user_id == self.user_id,
+                        SapnsShortcut.parent_id == None)).\
+            first()
     
     def get_dataexploration(self):
-        def _get_dataexpl():
-            
-            return dbs.query(SapnsShortcut).\
-                filter(and_(SapnsShortcut.parent_id == self.get_dashboard().shortcut_id,
-                            SapnsShortcut.order == 0,
-                            )).\
-                first()
-                
-        _cache = cache.get_cache('user_get_dataexploration')
-        return _cache.get_value(key=self.user_id, createfunc=_get_dataexpl,
-                                expiretime=3600)
+        return dbs.query(SapnsShortcut).\
+            filter(and_(SapnsShortcut.parent_id == self.get_dashboard().shortcut_id,
+                        SapnsShortcut.order == 0,
+                        )).\
+            first()
     
     def get_shortcuts(self, id_parent=None):
         
@@ -211,19 +200,11 @@ class SapnsUser(User):
     
     def attr_privilege(self, id_attribute):
         
-        def _attr_privilege():
-            
-            priv_atr = dbs.query(SapnsAttrPrivilege).\
-                filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
-                            SapnsAttrPrivilege.attribute_id == id_attribute,
-                            )).\
-                first()
-                    
-            return priv_atr
-        
-        _cache = cache.get_cache('user_attr_priv')
-        return _cache.get_value(key='%d_%d' % (id_attribute, self.user_id),
-                                createfunc=_get_view_name, expiretime=3600)
+        return dbs.query(SapnsAttrPrivilege).\
+            filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
+                        SapnsAttrPrivilege.attribute_id == id_attribute,
+                        )).\
+            first()
     
     def get_view_name(self, cls):
         
@@ -490,15 +471,10 @@ class SapnsClass(DeclarativeBase):
         OUT
           <SapnsClass>
         """
-        def _by_name():
-            return dbs.query(SapnsClass).\
-                filter(SapnsClass.name == class_name).\
-                first()
+        return dbs.query(SapnsClass).\
+            filter(SapnsClass.name == class_name).\
+            first()
                 
-        _cache = cache.get_cache('class_by_name')
-        return _cache.get_value(key=class_name, createfunc=_by_name,
-                                expiretime=3600)
-    
     @staticmethod
     def class_titles(class_name):
         
@@ -928,19 +904,11 @@ class SapnsAttrPrivilege(DeclarativeBase):
     @staticmethod
     def get_privilege(id_user, id_attribute):
         
-        def _get_privilege():
-            
-            priv = dbs.query(SapnsAttrPrivilege).\
-                    filter(and_(SapnsAttrPrivilege.user_id == id_user,
-                                SapnsAttrPrivilege.attribute_id == id_attribute
-                                )).\
-                    first()
-                    
-            return priv
-        
-        _cache = cache.get_cache('attrpriv_get_privilege')
-        return _cache.get_value(key='%d_%d' % (id_user, id_attribute),
-                                createfunc=_get_privilege, expiretime=3600)
+        return dbs.query(SapnsAttrPrivilege).\
+            filter(and_(SapnsAttrPrivilege.user_id == id_user,
+                        SapnsAttrPrivilege.attribute_id == id_attribute
+                        )).\
+            first()
     
     @staticmethod
     def get_access(id_user, id_attribute):
