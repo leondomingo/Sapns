@@ -4,11 +4,25 @@
 import os
 from argparse import ArgumentParser
 
-#from tg import config
-#from sapns.model import DBSession as dbs
+import pylons
+from contextlib import contextmanager
+from pylons.i18n.translation import _get_translator
+
+# this is a hook that is needed to set up some
+# things that are needed inside transaction hooks
+@contextmanager
+def set_language_context_manager(language=None, **kwargs):
+    # this is stolen from the pylons test setup.
+    # it will make sure the gettext-stuff is working
+    translator = _get_translator(language, **kwargs)
+    pylons.translator._push_object(translator)
+    try:
+        yield
+    finally:
+        pylons.translator._pop_object()
+
 from paste.deploy import appconfig
 from sapns.config.environment import load_environment
-
 from sapns.lib.sapns.util import update_metadata
 
 def load_config(filename):
@@ -22,6 +36,9 @@ def parse_args():
     return parser.parse_args()
 
 def do_init():
+    
+    set_language_context_manager('en')
+    
     args = parse_args()
     load_config(args.conf_file)
     
