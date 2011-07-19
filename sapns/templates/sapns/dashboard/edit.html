@@ -23,10 +23,7 @@
 </form>
 
 <div class="sp-edit-panel">
-    <div class="sp-save-button">
-        <input id="save-button" class="sp-button" type="button" 
-            value="{{_('Save')}}">
-    </div>
+    <div id="edit-header">
     
     <!-- {# Title of the object #} -->
     <div style="font-size: 25px; margin-left: 1%;">{{title}}</div>
@@ -38,6 +35,7 @@
     
     <div style="height: 10px;"></div>
     
+    <!-- related classes -->
     {% if id and related_classes|length > 0 %}
     <div style="margin-left: 10px;">
         <div id="rel-classes-title">{{_('Related info')}}</div>
@@ -52,6 +50,32 @@
         </form>
     </div>
     {% endif %}
+    
+    <!-- actions -->
+    {% if id and actions|length > 0 %}
+    <div style="margin-left: 10px;">
+        <div id="actions-title">{{_('Actions')}}</div>
+        <select id="actions-sel">
+        <option selected>({{_('none')}})</option>
+        {% for act in actions %}
+        <option value="{{act.url}}">{{act.title|escape}}</option>
+        {% endfor %}
+        </select>
+        <button id="action-go" class="sp-button">{{_('Go')}}</button>
+        <form id="action-form" method="post" action="" target="_blank">
+            <input type="hidden" name="id" value="{{id}}">
+            <input type="hidden" name="came_from" value="">
+        </form>
+    </div>
+    {% endif %}
+    
+    <!--<div class="sp-save-button">-->
+    <button id="save-button" class="sp-button">{{_('Save')}}</button>
+    <!--</div>-->
+    
+    </div>
+    
+    <div style="height: 175px;">&nbsp;</div>
     
     {%- for attr in attributes %}
     <div class="sp-edit-field" name="{{attr.name}}"
@@ -273,6 +297,13 @@
         	   'value="' + option.attr('ch_attr') + '">\n';
         	   
         	$('#rel-classes-form').attr('action', action).html(params).submit();
+        });
+        
+        // execute action 
+        $('#action-go').click(function() {
+            var url = $('#actions-sel option:selected').val();
+            $('#action-form').attr('action', url).submit();
+            $('#actions-sel option:first').attr('selected', true);
         });
         
         {% for attr in attributes %}
