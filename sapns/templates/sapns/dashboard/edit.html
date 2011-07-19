@@ -55,7 +55,7 @@
     {% if id and actions|length > 0 %}
     <div style="margin-left: 10px;">
         <div id="actions-title">{{_('Actions')}}</div>
-        <select id="actions-sel">
+        <select id="actions-sel" row_id="{{id}}">
         <option selected>({{_('none')}})</option>
         {% for act in actions %}
         <option value="{{act.url}}">{{act.title|escape}}</option>
@@ -63,7 +63,7 @@
         </select>
         <button id="action-go" class="sp-button">{{_('Go')}}</button>
         <form id="action-form" method="post" action="" target="_blank">
-            <input type="hidden" name="id" value="{{id}}">
+            <!--<input type="hidden" name="id" value="{{id}}">-->
             <input type="hidden" name="came_from" value="">
         </form>
     </div>
@@ -301,7 +301,15 @@
         
         // execute action 
         $('#action-go').click(function() {
+            var id = $('#actions-sel').attr('row_id');
             var url = $('#actions-sel option:selected').val();
+            
+            if (url[url.length-1] != '/') {
+                url += '/';
+            }
+            
+            url += id;
+            
             $('#action-form').attr('action', url).submit();
             $('#actions-sel option:first').attr('selected', true);
         });
