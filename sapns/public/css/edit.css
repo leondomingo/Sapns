@@ -2,29 +2,38 @@
     overflow: auto;
 }
 
-#rel-classes-title {
+#rel-classes-title, #actions-title {
     float: left; 
-    color: gray; 
+    /*color: gray;*/ 
     margin-top: 3px;
     font-size: 11px; 
-    width: 160px; 
-    text-align: center;
+    width: 150px; 
+    text-align: right;
+    margin-right: 5px;
 }
 
-#rel-classes-sel {
+#rel-classes-sel, #actions-sel {
 	float: left; 
 	font-size: 11px; 
 	margin-top: 2px;
 }
 
+#edit-header {
+	position: fixed;
+	background-color: #BCC170; /*#CCCFA5;*/
+	border: 3px solid gray;
+	border-radius: 10px;
+	width: 982px;
+	height: 150px;
+	padding: 5px;
+	opacity: 0.85;
+} 
+
 .sp-save-button {
-    position: fixed;
     right: 350px;
     width: 80px;
     height: 30px;
     text-align: center;
-    background-color: #B4BD3C;
-    border: 1px solid gray;
 }
 
 .sp-edit-field {

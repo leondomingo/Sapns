@@ -561,8 +561,8 @@
     {% for act in grid.actions %}
     <div style="float: left;">
     <form class="action-form" method="post" action0="{{act.url}}" target="_blank">
-        <input type="hidden" name="cls" value="{{grid.cls}}" >
-        <input type="hidden" name="came_from" >
+        <input type="hidden" name="cls" value="{{grid.cls}}">
+        <input type="hidden" name="came_from">
         
         {% if parent_id %}
         <input type="hidden" name="_{{ch_attr}}" value="{{parent_id}}">

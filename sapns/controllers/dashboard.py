@@ -426,6 +426,10 @@ class DashboardController(BaseController):
                                      came_from=came_from)))
             
         class_ = SapnsClass.by_name(cls)
+        
+        # actions
+        actions = [action for action in class_.sorted_actions() 
+                   if action['type']  == 'process']
             
         meta = MetaData(dbs.bind)
         try:
@@ -521,8 +525,8 @@ class DashboardController(BaseController):
                     
         return dict(cls=cls, title=class_.title, id=id, 
                     related_classes=class_.related_classes(), 
-                    attributes=attributes, reference=ref, 
-                    came_from=url(came_from))
+                    attributes=attributes, reference=ref,
+                    actions=actions, came_from=url(came_from))
     
     @expose('sapns/dashboard/delete.html')
     @expose('json')
