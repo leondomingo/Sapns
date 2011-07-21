@@ -3,7 +3,6 @@
 
 from tg import response, expose, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
-from pylons import cache
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
 
@@ -20,11 +19,10 @@ from sapns.controllers.messages import MessagesController
 
 from neptuno.postgres.search import search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
-from neptuno.dataset import DataSet
 
 from tg.controllers.util import urlencode
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
-    SapnsPrivilege, SapnsAttribute, SapnsAttrPrivilege, SapnsAction
+    SapnsAttribute, SapnsAttrPrivilege, SapnsAction
 
 import logging
 import re
@@ -33,7 +31,6 @@ import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
-from sqlalchemy.sql.expression import and_
 
 __all__ = ['DashboardController']
 
