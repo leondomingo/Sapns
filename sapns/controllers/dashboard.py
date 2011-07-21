@@ -80,7 +80,7 @@ class DashboardController(BaseController):
     def list(self, cls, q='', **params):
         
         logger = logging.getLogger(__name__ + '/list')
-        logger.info('params=%s' % params)
+        #logger.info('params=%s' % params)
 
         # picking up parameters
         rp = params.get('rp', 10)
@@ -674,5 +674,5 @@ class DashboardController(BaseController):
             
         else:
             redirect(url('/message', 
-                         params=dict(message=_('Reference order for "%s" has been successfully update' % cls_title), 
+                         params=dict(message=_('Reference order for "%s" has been successfully updated' % cls_title), 
                                      came_from='')))

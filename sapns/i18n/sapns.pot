@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-07-12 20:01+0200\n"
+"POT-Creation-Date: 2011-07-21 08:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -16,45 +16,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: sapns/controllers/dashboard.py:103 sapns/controllers/dashboard.py:309
-#: sapns/controllers/dashboard.py:430 sapns/controllers/dashboard.py:553
-#: sapns/controllers/dashboard.py:602 sapns/controllers/dashboard.py:657
+#: sapns/controllers/dashboard.py:104 sapns/controllers/dashboard.py:313
+#: sapns/controllers/dashboard.py:425 sapns/controllers/dashboard.py:543
+#: sapns/controllers/dashboard.py:592 sapns/controllers/dashboard.py:647
 msgid "Sorry, you do not have privilege on this class"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:131
+#: sapns/controllers/dashboard.py:132
 #, python-format
 msgid "%s of [%s]"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:141 sapns/controllers/users.py:53
+#: sapns/controllers/dashboard.py:145 sapns/controllers/users.py:56
 msgid "Yes"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:142 sapns/controllers/users.py:54
+#: sapns/controllers/dashboard.py:146 sapns/controllers/users.py:57
 msgid "No"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:398
+#: sapns/controllers/dashboard.py:402
 msgid "The record has been successfully saved"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:441
+#: sapns/controllers/dashboard.py:440
 msgid "This class does not exist"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:470 sapns/controllers/dashboard.py:561
+#: sapns/controllers/dashboard.py:469 sapns/controllers/dashboard.py:551
 msgid "Record does not exist"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:645
+#: sapns/controllers/dashboard.py:635
 #, python-format
 msgid "Insertion order for \"%s\" has been successfully updated"
 msgstr ""
 
-#: sapns/controllers/dashboard.py:687
+#: sapns/controllers/dashboard.py:677
 #, python-format
-msgid "Reference order for \"%s\" has been successfully update"
+msgid "Reference order for \"%s\" has been successfully updated"
 msgstr ""
 
 #: sapns/controllers/root.py:62 sapns/controllers/myapp/root.py:66
@@ -70,76 +70,76 @@ msgstr ""
 msgid "We hope to see you soon!"
 msgstr ""
 
-#: sapns/controllers/shortcuts.py:30
+#: sapns/controllers/shortcuts.py:31
 msgid "Shorcuts editing"
 msgstr ""
 
-#: sapns/controllers/users.py:33 sapns/templates/sapns/users/edit.html:29
+#: sapns/controllers/users.py:36 sapns/templates/sapns/users/edit.html:29
 msgid "Display name"
 msgstr ""
 
-#: sapns/controllers/users.py:34 sapns/templates/sapns/users/edit.html:35
+#: sapns/controllers/users.py:37 sapns/templates/sapns/users/edit.html:35
 msgid "User name"
 msgstr ""
 
-#: sapns/controllers/users.py:35 sapns/templates/sapns/users/edit.html:41
+#: sapns/controllers/users.py:38 sapns/templates/sapns/users/edit.html:41
 msgid "E-mail address"
 msgstr ""
 
-#: sapns/controllers/users.py:46 sapns/controllers/util.py:235
+#: sapns/controllers/users.py:49 sapns/lib/sapns/util.py:175
 msgid "New"
 msgstr ""
 
-#: sapns/controllers/users.py:47 sapns/controllers/util.py:236
+#: sapns/controllers/users.py:50 sapns/lib/sapns/util.py:176
 #: sapns/templates/sapns/shortcuts/list.html:85
 msgid "Edit"
 msgstr ""
 
-#: sapns/controllers/users.py:48 sapns/controllers/util.py:237
+#: sapns/controllers/users.py:51 sapns/lib/sapns/util.py:177
 #: sapns/templates/sapns/dashboard/grid.html:84
 #: sapns/templates/sapns/shortcuts/list.html:89
 msgid "Delete"
 msgstr ""
 
-#: sapns/controllers/users.py:135
+#: sapns/controllers/users.py:138
 msgid "An error occurred while saving the user"
 msgstr ""
 
-#: sapns/controllers/util.py:39
+#: sapns/controllers/util.py:36
 msgid "Initialization was completed successfully"
 msgstr ""
 
-#: sapns/controllers/util.py:62 sapns/templates/sapns/dashboard/index.html:17
+#: sapns/controllers/util.py:59 sapns/templates/sapns/dashboard/index.html:17
 msgid "Dashboard"
 msgstr ""
 
-#: sapns/controllers/util.py:71
+#: sapns/controllers/util.py:68
 msgid "Data exploration"
 msgstr ""
 
-#: sapns/controllers/util.py:90
+#: sapns/controllers/util.py:87
 msgid "Project"
 msgstr ""
 
-#: sapns/controllers/util.py:121 sapns/controllers/util.py:238
+#: sapns/controllers/util.py:118 sapns/lib/sapns/util.py:178
 msgid "List"
 msgstr ""
 
-#: sapns/controllers/util.py:182
+#: sapns/controllers/util.py:179
 msgid "The user dashboards have been created"
 msgstr ""
 
-#: sapns/controllers/util.py:207
-#, python-format
-msgid "Class: %s"
-msgstr ""
-
-#: sapns/controllers/util.py:286
+#: sapns/controllers/util.py:185
 msgid "Process terminated"
 msgstr ""
 
 #: sapns/controllers/views.py:101
 msgid "The view has been successfully deleted"
+msgstr ""
+
+#: sapns/lib/sapns/util.py:147
+#, python-format
+msgid "Class: %s"
 msgstr ""
 
 #: sapns/templates/myapp/base.html:30 sapns/templates/sapns/base.html:25
@@ -279,36 +279,49 @@ msgstr ""
 msgid "Do you really want to delete this record?"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:28
+#: sapns/templates/sapns/dashboard/edit.html:41
+#: sapns/templates/sapns/dashboard/grid.html:589
+msgid "Related info"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:47
+#: sapns/templates/sapns/dashboard/grid.html:595
+msgid "Show"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:57
+#: sapns/templates/sapns/dashboard/grid.html:560
+msgid "Actions"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:59
+msgid "none"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:64
+msgid "Go"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:73
 #: sapns/templates/sapns/order/insert.html:65
 #: sapns/templates/sapns/order/reference.html:128
 #: sapns/templates/sapns/users/edit.html:66
 msgid "Save"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:43
-#: sapns/templates/sapns/dashboard/grid.html:589
-msgid "Related info"
-msgstr ""
-
-#: sapns/templates/sapns/dashboard/edit.html:49
-#: sapns/templates/sapns/dashboard/grid.html:595
-msgid "Show"
-msgstr ""
-
-#: sapns/templates/sapns/dashboard/edit.html:210
+#: sapns/templates/sapns/dashboard/edit.html:236
 msgid "this field is required"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:226
+#: sapns/templates/sapns/dashboard/edit.html:252
 msgid "The following fields must be filled:"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:241
+#: sapns/templates/sapns/dashboard/edit.html:267
 msgid "Required fields"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:247
+#: sapns/templates/sapns/dashboard/edit.html:273
 #: sapns/templates/sapns/dashboard/grid.html:126
 #: sapns/templates/sapns/dashboard/grid.html:136
 #: sapns/templates/sapns/views/views-min.js:1
@@ -410,10 +423,6 @@ msgstr ""
 #: sapns/templates/sapns/dashboard/grid.html:552
 #, python-format
 msgid "page %(p)d"
-msgstr ""
-
-#: sapns/templates/sapns/dashboard/grid.html:560
-msgid "Actions"
 msgstr ""
 
 #: sapns/templates/sapns/dashboard/index.html:23

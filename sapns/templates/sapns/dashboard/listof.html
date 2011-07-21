@@ -3,7 +3,7 @@
 {% import 'sapns/dashboard/grid.html' as grid_html %}
 
 {% block head %}
-    {{super()}}
+    {{ super() }}
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- "Sapns - Web Information System: Students" (with caption) -->
     <!-- "Sapns - Web Information System" (without caption) -->
@@ -14,12 +14,12 @@
 {% endblock %}
 
 {% block middle %}
-    {{super()}}
-    {{grid_html.js_select_row(_)}}
-    {{grid_html.js_functions(_)}}
-    {{grid_html.show(page, _, q, grid, show_ids, link=link, 
+    {{ super() }}
+    {{ grid_html.js_select_row(_) }}
+    {{ grid_html.js_functions(_) }}
+    {{ grid_html.show(page, _, q, grid, show_ids, link=link, 
         came_from=came_from, can_edit=True, 
-        rel_classes=rel_classes, ch_attr=ch_attr, parent_id=parent_id)}}
+        rel_classes=rel_classes, ch_attr=ch_attr, parent_id=parent_id) }}
         
     <script type="text/javascript">
         $(document).ready(function() {

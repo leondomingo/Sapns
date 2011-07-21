@@ -6,16 +6,18 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    {{ util.qtip() }}
-    {{ grid_html.js_functions(_) }}    
+    {{ util.qtip2() }}
+    {{ grid_html.js_functions(_) }}
     {{ grid_html.js_select_row(_) }}
 {% endblock %}
 
 {% block middle %}
+    {{ super }}
     <!-- List of users -->
-    {{grid_html.show(None, _, '', grid, show_ids, link=None, came_from=came_from, 
-        with_search=False, with_pager=False)}}
+    {{ grid_html.show(None, _, '', grid, show_ids, link=None, came_from=came_from, 
+        with_search=False, with_pager=False) }}
     
+    {#
     <ul>        
         <li>
             <a href="{{tg.url('/dashoard/users/permission', 
@@ -27,4 +29,5 @@
                 params=dict(came_from=tg.url('/users')))}}">{{_('Roles')}}</a>
         </li>
     </ul>
+    #}
 {% endblock %}
