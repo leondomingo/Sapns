@@ -485,7 +485,14 @@ clear:both;
 	/*font-family: Arial;*/
 	font-size: 25px;
 	color: #605B7C;
-	padding: 20px;
+	margin-top: 20px;
+	padding-left: 20px;
+}
+
+.count-message {
+	padding-left: 20px;
+	font-size: 10px;
+	color: gray;
 }
 
 #sc-container {

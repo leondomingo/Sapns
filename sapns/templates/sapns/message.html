@@ -1,5 +1,36 @@
 {% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+{% endblock %}
 
 {% block middle %}
     <div class="sp_message">{{message}}</div>
+    {% if not came_from %}
+    <div class="count-message">{{_('This window will be closed in')}} <span id="count"></span></div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            
+            var MAX = 3;
+            var n = MAX;
+            
+            $('#count').html(MAX);            
+            
+            function dec_count() {
+                n--;
+                if (n > 0) {
+                    $('#count').html(n);
+                    setTimeout(dec_count, 1000);
+                }
+                else {
+                    window.close();
+                }
+            }
+            
+            setTimeout(dec_count, 1000);
+        });
+    </script>
+    {% endif %}
 {% endblock %}

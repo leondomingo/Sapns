@@ -208,9 +208,7 @@ class SapnsUser(User):
     
     def get_view_name(self, cls):
         
-        logger = logging.getLogger('get_view_name')
-        logger.info(dir(cache))
-        #logger.info(help(cache.cache))
+        #logger = logging.getLogger('get_view_name')
         
         def _get_view_name():
             
