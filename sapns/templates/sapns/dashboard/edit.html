@@ -14,6 +14,9 @@
     </script>
 {% endblock %}
 
+{% block header %}
+{% endblock %}
+
 {% block middle %}
 <div id="edit-dialog" style="display: none;"></div>
 
@@ -25,12 +28,20 @@
 <div class="sp-edit-panel">
     <div id="edit-header">
     
+    <div style="position: fixed; width: 350px; height: 145px;">
+        <div style="">
+            <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
+            <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
+        </div>
+    </div>
+    
     <!-- {# Title of the object #} -->
-    <div style="font-size: 25px; margin-left: 1%;">{{title}}</div>
+    <div style="position: fixed; margin-left: 500px;">
+    <div style="font-size: 25px; text-align: right;">{{title}}</div>
 
     {%- if reference %}
-    <div style="margin-left: 1%; width: 97%; font-size: 15px; color: black; 
-        background-color: none;">[{{reference}}]</div>
+    <div style="margin-left: 0; font-size: 15px; color: black; 
+        background-color: none; text-align: right;">[{{reference}}]</div>
     {% endif %}
     
     <div style="height: 10px;"></div>
@@ -44,7 +55,7 @@
         <option ch_attr="{{rc.attr_name}}" cls="{{rc.name}}">{{rc.title}} ({{rc.attr_title}})</option>
         {% endfor %}
         </select>
-        <button id="rel-classes-show" class="sp-button">{{_('Show')}}</button>
+        <button id="rel-classes-show" class="sp-button" style="width: 63px;">{{_('Show')}}</button>
         <form id="rel-classes-form" method="post" action="" target="_blank">
             <input type="hidden" name="parent_id" value="{{id}}">
         </form>
@@ -61,7 +72,7 @@
         <option value="{{act.url}}">{{act.title|escape}}</option>
         {% endfor %}
         </select>
-        <button id="action-go" class="sp-button">{{_('Go')}}</button>
+        <button id="action-go" class="sp-button" style="width: 63px;">{{_('Go')}}</button>
         <form id="action-form" method="post" action="" target="_blank">
             <!--<input type="hidden" name="id" value="{{id}}">-->
             <input type="hidden" name="came_from" value="">
@@ -70,9 +81,9 @@
     {% endif %}
     
     <!--<div class="sp-save-button">-->
-    <button id="save-button" class="sp-button">{{_('Save')}}</button>
+    <button id="save-button" class="sp-button" style="width: 63px; margin-left: 407px;">{{_('Save')}}</button>
     <!--</div>-->
-    
+    </div>
     </div>
     
     <div style="height: 175px;">&nbsp;</div>
@@ -332,4 +343,7 @@
         {% endfor %}
     });
 </script>
+{% endblock %}
+
+{% block footer %}
 {% endblock %}

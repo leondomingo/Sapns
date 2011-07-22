@@ -16,13 +16,13 @@
 	float: left; 
 	font-size: 11px; 
 	margin-top: 2px;
+	width: 240px;
 }
 
 #edit-header {
 	position: fixed;
 	background-color: #BCC170; /*#CCCFA5;*/
 	border: 3px solid gray;
-	border-radius: 10px;
 	width: 982px;
 	height: 150px;
 	padding: 5px;
