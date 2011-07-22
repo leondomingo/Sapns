@@ -54,6 +54,11 @@ class DashboardController(BaseController):
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=sc_parent)
         
+        params = {}
+        if sc_parent:
+            params = dict(sc_parent=sc_parent)
+        came_from = url('/dashboard/', params=params)
+        
         if sc_parent:
             sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
             
@@ -65,8 +70,8 @@ class DashboardController(BaseController):
         unread = user.unread_messages()
         
         return dict(page='dashboard', curr_lang=curr_lang, shortcuts=shortcuts,
-                    messages=messages, unread=unread, 
-                    sc_type=sc_type, sc_parent=sc_parent)
+                    messages=messages, unread=unread,
+                    sc_type=sc_type, sc_parent=sc_parent, _came_from=came_from)
         
     @expose()
     def init(self):

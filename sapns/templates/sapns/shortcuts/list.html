@@ -29,8 +29,8 @@
         <!-- List -->
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url('/dashboard/list/%s' % sc.cls)}}"
-                target="_blank" >{{sc.title|escape}}</a>
+            <a href="{{tg.url('/dashboard/list', params=dict(cls=sc.cls, came_from=_came_from))}}"
+                target="" >{{sc.title|escape}}</a>
         </div>
         
         <!-- {# actions over "list" shortcuts #} -->
@@ -46,8 +46,8 @@
         <!-- Process -->
         {% elif sc.action_type == 'process' %}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}" 
-                target="_blank">{{sc.title|escape}}</a>
+            <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=_came_from))}}" 
+                target="">{{sc.title|escape}}</a>
         </div>
         
         <select class="sp-select-shortcut">
@@ -56,7 +56,8 @@
         <!-- Object -->
         {% elif sc.action_type == 'object' %}
         <div class="sp-shortcut-title">
-            <a target="_blank" href="{{tg.url(sc.url)}}" target="_blank">{{sc.title|escape}}</a>
+            <a target="_blank" href="{{tg.url(sc.url, params=dict(came_from=_came_from))}}" 
+                target="">{{sc.title|escape}}</a>
         </div>
         
         <select class="sp-select-shortcut">
