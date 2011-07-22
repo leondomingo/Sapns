@@ -35,8 +35,9 @@
         </div>
     </div>
     
+    <div style="position: fixed; margin-left: 490px;">
+    
     <!-- {# Title of the object #} -->
-    <div style="position: fixed; margin-left: 500px;">
     <div style="font-size: 25px; text-align: right;">{{title}}</div>
 
     {%- if reference %}
@@ -49,7 +50,7 @@
     <!-- related classes -->
     {% if id and related_classes|length > 0 %}
     <div style="margin-left: 10px;">
-        <div id="rel-classes-title">{{_('Related info')}}</div>
+        <div id="rel-classes-title">{{_('Related info')}} <span class="related-classes-count">[{{related_classes|length}}]</span></div>
         <select id="rel-classes-sel">
         {% for rc in related_classes %}
         <option ch_attr="{{rc.attr_name}}" cls="{{rc.name}}">{{rc.title}} ({{rc.attr_title}})</option>
@@ -65,7 +66,7 @@
     <!-- actions -->
     {% if id and actions|length > 0 %}
     <div style="margin-left: 10px;">
-        <div id="actions-title">{{_('Actions')}}</div>
+        <div id="actions-title">{{_('Actions')}} <span class="actions-count">[{{actions|length}}]</span></div>
         <select id="actions-sel" row_id="{{id}}">
         <option selected>({{_('none')}})</option>
         {% for act in actions %}
@@ -81,7 +82,7 @@
     {% endif %}
     
     <!--<div class="sp-save-button">-->
-    <button id="save-button" class="sp-button" style="width: 63px; margin-left: 407px;">{{_('Save')}}</button>
+    <button id="save-button" class="sp-button" style="width: 63px; margin-left: 416px;">{{_('Save')}}</button>
     <!--</div>-->
     </div>
     </div>

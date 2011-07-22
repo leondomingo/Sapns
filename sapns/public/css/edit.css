@@ -7,9 +7,14 @@
     /*color: gray;*/ 
     margin-top: 3px;
     font-size: 11px; 
-    width: 150px; 
+    width: 160px; 
     text-align: right;
     margin-right: 5px;
+}
+
+.related-classes-count, .actions-count {
+	font-weight: bold;
+	font-size: 9px;
 }
 
 #rel-classes-sel, #actions-sel {
