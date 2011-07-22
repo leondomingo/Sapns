@@ -232,8 +232,8 @@
         					//  "/foo/bar/123" 
         					//  where "/foo/bar/" is the url of the action and 
         					//  "123" is the id of the selected row 
-        					form.attr('target', '_blank').
-        					     attr('action', form.attr('action0') + id_selected);
+        					form.attr('action', form.attr('action0') + id_selected);
+        					//attr('target', '_blank').
         				}
         				else {
         					// other "action types" 
@@ -560,9 +560,9 @@
     <div class="sp-grid-actions-title">{{_('Actions')}}:</div>
     {% for act in grid.actions %}
     <div style="float: left;">
-    <form class="action-form" method="post" action0="{{act.url}}" target="_blank">
+    <form class="action-form" method="post" action0="{{act.url}}"> <!-- target="_blank"> -->
         <input type="hidden" name="cls" value="{{grid.cls}}">
-        <input type="hidden" name="came_from">
+        <input type="hidden" name="came_from" value="{{link}}">
         
         {% if parent_id %}
         <input type="hidden" name="_{{ch_attr}}" value="{{parent_id}}">
