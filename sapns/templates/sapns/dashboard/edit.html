@@ -243,6 +243,23 @@
             });
             
             if (required_attrs.length > 0) {
+                
+                $('#save-button').qtip({
+                    content: { text: "{{_('Check required fields!')}}" },
+                    show: {
+                        target: false,
+                        ready: true                            
+                    },
+                    hide: {
+                        event: false
+                    },
+                    position: {
+                        at: "right top",
+                        my: "left bottom"
+                    },
+                    style: "ui-tooltip-red ui-tooltip-rounded"
+                });
+                
                 for (var i=0; i<required_attrs.length; i++) {
                     required_attrs[i].qtip({
                         content: { text: "{{_('this field is required')}}" },
