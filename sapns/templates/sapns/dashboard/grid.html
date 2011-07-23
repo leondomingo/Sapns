@@ -196,8 +196,8 @@
     	});
     	
     	// {# Clicking on an action #} 
-    	$('.sp-grid-action').click(function() {
-
+    	$('.sp-grid-action').click(function(event) {
+    	    
             // {# parent grid of this action #} 
             var grid_id = $(this).parent().parent().parent().parent().attr('id');
 
@@ -211,6 +211,13 @@
                 form.append('<input type="hidden"' +
                     ' name="_' + ch_attr + '" value="' + parent_id + '">');
             }*/
+            
+            // if CTRL is pressed open in a new tab 
+            form.attr('target', '');
+            if (event.ctrlKey) {
+                form.attr('target', '_blank');
+                // $(form).find('input[name=came_from]').val(''); 
+            }
 
             if ($(this).attr('require_id') == 'true') {
         		
@@ -233,7 +240,6 @@
         					//  where "/foo/bar/" is the url of the action and 
         					//  "123" is the id of the selected row 
         					form.attr('action', form.attr('action0') + id_selected);
-        					//attr('target', '_blank').
         				}
         				else {
         					// other "action types" 
@@ -247,8 +253,8 @@
         						id_param.val(id_selected);
         					}
         				}
-        				
-        				// submit action form 
+
+                        // submit action form 
           			    form.submit();
         			}
         		}
