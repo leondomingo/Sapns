@@ -463,8 +463,8 @@
             
             {% if can_edit and loop.index0 == 0 %}
             clickable="false">
-            <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from=" 
-                target="_blank">{{cell|escape}}</a>
+            <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from={{link}}" 
+                target="">{{cell|escape}}</a>
             {% else %}
             clickable="true">
             {% if ('%s'|format(cell))|length > 30 %}
