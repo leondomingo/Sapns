@@ -22,11 +22,11 @@
     
     <div class="sp_middle">
     {% if page %}
-    <div id="you-are-in"><a href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
+    <div id="you-are-in"><a style="font-size: 15px;" href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
     {% endif %}
     
     {% if came_from %}
-    <div><a href="{{came_from}}">{{_('return')}}</a></div>
+    <div id="sp-back" style="margin-left: 5px; font-size: 9px;"><a href="{{came_from}}">{{_('return')}}</a></div>
     {% endif %}
     {% block middle %}
     {% endblock middle %}

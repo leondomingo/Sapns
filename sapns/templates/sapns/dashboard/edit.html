@@ -28,7 +28,7 @@
 <div class="sp-edit-panel">
     <div id="edit-header">
     
-    <div style="position: fixed; width: 350px; height: 145px;">
+    <div style="position: fixed; width: 350px; height: 145px; z-index: -1;">
         <div style="">
             <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
             <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
@@ -85,6 +85,12 @@
     <button id="save-button" class="sp-button" style="width: 63px; margin-left: 416px;">{{_('Save')}}</button>
     <!--</div>-->
     </div>
+    
+    {% if came_from %}
+    <div id="edit-back">
+        <button id="back-button" class="sp-button">{{_('return')}}</button>
+    </div>
+    {% endif %}
     </div>
     
     <div style="height: 175px;">&nbsp;</div>
@@ -146,6 +152,12 @@
 
 <script type="text/javascript">
     $(document).ready(function() {
+        
+        $('#sp-back').hide();
+        
+        $('#back-button').click(function() {
+            window.location = "{{came_from}}";
+        });
     	
     	$('.sp-edit-field:first').find('input:first').focus();    	
         

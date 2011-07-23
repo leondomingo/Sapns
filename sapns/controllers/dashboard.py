@@ -87,7 +87,7 @@ class DashboardController(BaseController):
         # picking up parameters
         rp = params.get('rp', 10)
         pag_n = params.get('pag_n', 1)
-        caption = params.get('caption', '')
+        caption = params.get('caption')
         show_ids = params.get('show_ids', 'false')
         
         came_from = params.get('came_from', '')
@@ -133,7 +133,7 @@ class DashboardController(BaseController):
             
             caption = _('%s of [%s]' % (cls_.title, p_title))
             
-        else:
+        elif caption is None:
             caption = cls_.title
             
         # get dataset
@@ -212,6 +212,7 @@ class DashboardController(BaseController):
         logger = logging.getLogger(__name__ + '/search')
         logger.info(params)
         
+        params['caption'] = ''
         return self.list(**params)
     
     def export(self, cls, **kw):

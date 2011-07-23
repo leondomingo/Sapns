@@ -24,6 +24,10 @@
 	width: 240px;
 }
 
+#rel-classes-show, #action-go {
+	cursor: pointer;
+}
+
 #edit-header {
 	position: fixed;
 	background-color: #BCC170; /*#CCCFA5;*/
@@ -32,7 +36,17 @@
 	height: 150px;
 	padding: 5px;
 	opacity: 0.85;
-} 
+}
+
+#edit-back {
+	margin-top: 120px;
+	/*border: 1px solid gray;*/
+	z-index: 100;
+}
+
+#back-button, #save-button {
+	cursor: pointer;
+}
 
 .sp-save-button {
     right: 350px;
