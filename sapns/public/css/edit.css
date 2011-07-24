@@ -59,19 +59,19 @@
 }
 
 .sp-text-field {
-    width: 90%;
-    max-width: 90%;
-    min-width: 90%;
+    width: 97%;
+    max-width: 97%;
+    min-width: 97%;
     margin-left: 1%;
 }
 
 .sp-select-field {
-    width: 85%;
+    width: 97%;
     margin-left: 1%;
 }
 
 .sp-select-text {
-	width: 90%;
+	width: 93%;
     border: 1px solid gray;
 }
 

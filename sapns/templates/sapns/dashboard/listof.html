@@ -13,6 +13,9 @@
     {{ util.qtip2() }}
 {% endblock %}
 
+{% block header %}
+{% endblock %}
+
 {% block middle %}
     {{ super() }}
     {{ grid_html.js_select_row(_) }}

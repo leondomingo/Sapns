@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from tg import expose, flash, require, url, request, redirect #, config
+from tg import expose, flash, require, url, request, redirect, config
 from pylons.i18n import ugettext as _ #, lazy_ugettext as l_
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
@@ -36,6 +36,10 @@ class RootController(BaseController):
 
     @expose('sapns/index.html')
     def index(self):
+        home = config.get('app.home')
+        if home and home != '/':
+            redirect(url(home))
+            
         curr_lang = get_lang()
         return dict(curr_lang=curr_lang)
         

@@ -55,6 +55,7 @@ app.name = Sapns
 app.subtitle = Web Information System
 app.company_url = http://www.sapns.org
 #app.root_folder = 
+app.home = /dashboard
 
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings
