@@ -11,6 +11,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
+    <script type="text/javascript" src="/js/sprintf.min.js"></script>
 {% endblock %}
 
 {% block header %}
@@ -27,6 +28,8 @@
     <script type="text/javascript">
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
+        	var title = $(document).attr('title');
+        	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title)); 
         });
     </script>
 {% endblock %}
