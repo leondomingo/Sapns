@@ -37,11 +37,13 @@
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
         
+        {% if h.authorize.has_any_permission('manage') %}
         <!-- {# insertion order #} -->
         <option value="ins-order">{{_('Insertion order')}}</option>
 
         <!-- {# reference order #} -->
         <option value="ref-order">{{_('Reference order')}}</option>
+        {% endif %}
         
         <!-- Process -->
         {% elif sc.action_type == 'process' %}
@@ -82,8 +84,8 @@
         <!-- {# general actions over shortcuts #} -->
     
         <!-- {# Edit #} -->
-        <option value="edit" 
-            title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>
+        {#<option value="edit" 
+            title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>#}
         
         <!-- {# Delete #} -->
         <option value="delete" 
