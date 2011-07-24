@@ -306,15 +306,15 @@
     	});
     	
     	// {# export button #} 
-    	$('#btn-export').click(function() {
-    		var sel = $('#select-export');
+    	$('#select-export').change(function() {
+    		var fmt = $(this).val();
     		
-    		if (sel.val() == '') {
+    		if (fmt == '') {
     			// nothing selected 
     			return;
     		}
     		
-    		var grid = sel.parent().parent();
+    		var grid = $(this).parent().parent().parent();
     		
     		var cls = grid.attr('cls');
     		var q = grid.find('.sp-search-form input[name=q]').val();
@@ -324,11 +324,11 @@
     	    //<input type="hidden" name="parent_id" value="{{parent_id or ''}}"> 
     	    var parent_id = grid.find('.sp-search-form input[name=parent_id]').val();
     		
-    	    if (sel.val() == 'csv') {
+    	    if (fmt == 'csv') {
     			var type = 'csv';
     			var url = '/dashboard/tocsv';
     		}
-    		else if (sel.val() == 'excel') {
+    		else if (fmt == 'excel') {
     			var type = 'excel';
     			var url = '/dashboard/toxls';
     		}
@@ -345,7 +345,7 @@
     		$(form_html).appendTo('body').submit().remove();
     		
     		// reset the select 
-    		sel.find('option:first').attr('selected', true);
+    		$(this).find('option:first').attr('selected', true);
     	});
     	
     	// create a shortcut from this search 
@@ -434,21 +434,6 @@
 </div>
 {% endif %}
 
-
-<!-- export to CSV, Excel, ... -->
-{% if xxexportable %}
-<div style="">
-    <div id="grid-export" style="background-color: none; height: 25px; margin-left: 815px;">
-        <select id="select-export" style="height: 20px; font-size: 10px;">
-            <option value="">{{_('(format)')}}</option>
-            <option value="csv">CSV</option>
-            <option value="excel">Excel</option>
-        </select>
-        <button id="btn-export" class="sp-button">{{_('Export')}}</button>
-    </div>
-</div>
-{% endif %}
-
 <div style="overflow: auto; clear: left;">
 <table class="sp-grid">
     <tr>
@@ -475,7 +460,7 @@
             title="({{_('empty')}})"
             {% endif %}
             
-            {% if can_edit and loop.index0 == 0 %}
+            {% if __can_edit and loop.index0 == 0 %}
             clickable="false">
             <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from={{link}}" 
                 target="">{{cell|escape}}</a>
@@ -595,6 +580,18 @@
     </form>
     </div>
     {% endfor %}
+    
+    <!-- action for exporting (Excel, CSV) -->
+    {% if exportable %}
+    <div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">
+        <select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">
+            <option value="">({{_('Export')}})</option>
+            <option value="csv">CSV</option>
+            <option value="excel">Excel</option>
+        </select>
+        <!-- <button id="btn-export" class="sp-button">{{_('Export')}}</button> -->
+    </div>
+    {% endif %}
 </div>
 {% endif %}
 
