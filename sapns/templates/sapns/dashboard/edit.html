@@ -28,14 +28,16 @@
 <div class="sp-edit-panel">
     <div id="edit-header">
     
-    <div style="position: fixed; width: 350px; height: 145px; left: 185px; z-index: -1;">
+    <div style="position: absolute; width: 350px; height: 145px; top: 5px; z-index: -1;
+        background-color: transparent;">
         <div style="">
             <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
             <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
         </div>
     </div>
     
-    <div style="position: fixed; left: 670px;">
+    <div style="position: absolute; left: 360px; top: 5px; padding-right: 10px; 
+        width: 617px; background-color: transparent;">
     
     <!-- {# Title of the object #} -->
     <div style="font-size: 25px; text-align: right;">{{title}}</div>
@@ -49,7 +51,7 @@
     
     <!-- related classes -->
     {% if id and related_classes|length > 0 %}
-    <div style="margin-left: 10px;">
+    <div id="rel-classes">
         <div id="rel-classes-title">{{_('Related info')}} <span class="related-classes-count">[{{related_classes|length}}]</span></div>
         <select id="rel-classes-sel">
         {% for rc in related_classes %}
@@ -65,7 +67,7 @@
     
     <!-- actions -->
     {% if id and actions|length > 0 %}
-    <div style="margin-left: 10px;">
+    <div id="actions">
         <div id="actions-title">{{_('Actions')}} <span class="actions-count">[{{actions|length}}]</span></div>
         <select id="actions-sel" row_id="{{id}}">
         <option selected>({{_('none')}})</option>
@@ -81,9 +83,9 @@
     </div>
     {% endif %}
     
-    <!--<div class="sp-save-button">-->
-    <button id="save-button" class="sp-button" style="width: 63px; margin-left: 416px;">{{_('Save')}}</button>
-    <!--</div>-->
+    <div class="sp-save-button">
+        <button id="save-button" class="sp-button">{{_('Save')}}</button>
+    </div>
     </div>
     
     {% if came_from %}

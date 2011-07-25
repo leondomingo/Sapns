@@ -2,6 +2,12 @@
     overflow: auto;
 }
 
+#rel-classes, #actions {
+	margin-left: 87px; 
+	width: 555px;
+	/*border: 1px solid gray;*/
+}
+
 #rel-classes-title, #actions-title {
     float: left; 
     /*color: gray;*/ 
@@ -21,7 +27,7 @@
 	float: left; 
 	font-size: 11px; 
 	margin-top: 2px;
-	width: 240px;
+	width: 300px;
 }
 
 #rel-classes-show, #action-go {
@@ -49,10 +55,10 @@
 }
 
 .sp-save-button {
-    right: 350px;
-    width: 80px;
-    height: 30px;
-    text-align: center;
+	/*background-color: orange;
+	border: 1px solid white;*/
+    margin-left: 553px;
+    width: 70px; 
 }
 
 .sp-edit-field {
