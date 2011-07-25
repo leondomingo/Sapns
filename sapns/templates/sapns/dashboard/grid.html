@@ -164,9 +164,9 @@
     	}
     	
         function search(button) {
-        	
+            
             // {# parent grid of this search #} 
-            var grid_id = button.parent().parent().attr('id');
+            var grid_id = button.parent().parent().parent().parent().attr('id');
 
             // {# results per page #} 
             var rp = $('#' + grid_id + ' .sp-grid-rp').val();
