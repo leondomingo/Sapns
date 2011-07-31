@@ -71,9 +71,11 @@ class ShortcutsController(BaseController):
         try:
             logger.info('Bookmarking shortcut [%s]' % id_shortcut)
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-            user.get_dashboard().add_child(id_shortcut)
             
-            _key = '%d_%d' % (user.user_id, user.get_dashboard().shortcut_id)
+            dboard = user.get_dashboard()
+            dboard.add_child(id_shortcut)
+            
+            _key = '%d_%d' % (user.user_id, dboard.shortcut_id)
             cache.get_cache('user_get_shortcuts').remove_value(key=_key)
             
             return dict(status=True)
@@ -90,7 +92,7 @@ class ShortcutsController(BaseController):
             # connected user
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             user.from_list(title, link)
-        
+
             return dict(status=True)
         
         except Exception, e:

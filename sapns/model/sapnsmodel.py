@@ -179,8 +179,14 @@ class SapnsUser(User):
         
         dbs.add(sc_link)
         dbs.flush()
+
+        # add this search as a dashboard's shortcut        
+        dboard = self.get_dashboard()
+        dboard.add_child(sc_link.shortcut_id, copy=False)
         
-        self.get_dashboard().add_child(sc_link.shortcut_id, copy=False)
+        # reset cache for this user's dashboard
+        _key = '%d_%d' % (self.user_id, dboard.shortcut_id)
+        cache.get_cache('user_get_shortcuts').remove_value(key=_key)
     
     def has_privilege(self, cls):
         
