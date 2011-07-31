@@ -608,7 +608,13 @@ class SapnsClass(DeclarativeBase):
     
     @staticmethod
     def object_title(class_name, id_object):
-        return SapnsClass.ObjectTitle(class_name).title(id_object)
+        _title = SapnsClass.ObjectTitle(class_name).title(id_object)
+        
+        if not _title:
+            cls = SapnsClass.by_name(class_name)
+            _title = '[%s: %s]' % (cls.title, id_object)
+            
+        return _title
     
     def sorted_actions(self):
         """
