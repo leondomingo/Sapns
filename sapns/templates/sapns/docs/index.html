@@ -1,0 +1,119 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+{% import 'sapns/docs/list.html' as doc %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    <style type="text/css">
+        #docs_list {
+            padding: 10px;
+            border: 1px solid red;
+        }
+        
+        #doclist_content {
+            border: 1px solid orange;
+            overflow: auto;
+            height: 540px;
+            width: 100%;
+        }
+        
+        .doc_row {
+            height: 24px;
+        }
+        
+        .col_label {
+            font-size: 12px;
+            font-weight: bold;
+            text-align: center;
+            border: 1px solid gray;
+            margin-right: 2px;
+            margin-bottom: 2px;
+            height: 24px;
+            padding-left: 3px;
+            padding-right: 3px;
+        }
+        
+        .col_value {
+            text-align: center;
+            border: 1px solid gray;
+            margin-right: 2px;
+            margin-bottom: 2px;
+            height: 24px;
+            padding-left: 3px;
+            padding-right: 3px;
+            overflow: hidden;
+        }
+        
+        .col_check {
+            width: 60px;
+            float: left;
+        }
+        
+        .row_check {
+            height: 18px;
+        }
+        
+        .col_title {
+            width: 380px;
+            float: left;
+        }
+        
+        .col_format {
+            width: 130px;
+            float: left;
+        }
+        
+        .col_type {
+            width: 130px;
+            float: left;
+        }
+        
+        .col_author {
+            width: 200px;
+            float: left;
+        }
+        
+        #doclist_actions {
+            padding-left: 10px;
+        }
+        
+        .doc_action {
+            width: 110px;
+        }
+    </style>    
+{% endblock %}
+
+{% block middle %}
+
+    {{super()}}
+
+    <div id="docs_list">{{ doc.doclist(tg, _, doclist) }}</div>
+
+    <div id="doclist_actions">
+        <button id="btn_add_doc" class="doc_action">{{_('Add')}}</button>
+        <button id="btn_upd_doc" class="doc_action">{{_('Update')}}</button>
+        <button id="btn_del_doc" class="doc_action">{{_('Delete')}}</button>
+    </div>
+
+    <script type="text/javascript">
+        $(document).ready(function() {
+            
+            $('.col_value').click(function() {
+                var check = $(this).parent().find('.row_check');
+                var checked = check.attr('checked');
+                
+                $('.row_check').each(function() {
+                    $(this).attr('checked', false);
+                });
+                
+                if (checked) {
+                    check.attr('checked', false);
+                }
+                else {
+                    check.attr('checked', true);
+                }
+            });
+        });
+    </script>
+{% endblock %}

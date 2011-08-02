@@ -1210,6 +1210,10 @@ class SapnsDoc(DeclarativeBase):
                         ForeignKey('sp_doctypes.id',
                                    onupdate='CASCADE', ondelete='SET NULL'))
     
+    docformat_id = Column('id_docformat', Integer,
+                          ForeignKey('sp_docformats.id',
+                                     onupdate='CASCADE', ondelete='RESTRICT'))
+    
     def __unicode__(self):
         return u'%s' % self.title
     
@@ -1243,6 +1247,19 @@ class SapnsDocType(DeclarativeBase):
     
     def __repr__(self):
         return unicode(self).encode('utf-8')
+    
+class SapnsDocFormat(DeclarativeBase):
+    
+    __tablename__ = 'sp_docformats'
+    
+    docformat_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode(80), nullable=False)
+    extension = Column(Unicode(5), nullable=False)
+    mime_type = Column(Unicode(30), nullable=False)
+    description = Column(Text)
+    
+    docs = relation(SapnsDoc, backref='docformat',
+                    primaryjoin=docformat_id == SapnsDoc.docformat_id)
     
 class SapnsAssignedDoc(DeclarativeBase):
     

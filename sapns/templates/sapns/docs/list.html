@@ -1,0 +1,21 @@
+{% macro doclist(tg, _, dl) %}
+<div class="doc_row">
+    <div class="col_label col_check">*</div>
+    <div class="col_label col_title">{{_('Title')}}</div>
+    <div class="col_label col_format">{{_('Format')}}</div>
+    <div class="col_label col_type">{{_('Type')}}</div>
+    <div class="col_label col_author">{{_('Author')}}</div>
+</div>
+
+<div id="doclist_content">
+{% for doc in dl %}
+<div class="doc_row">
+    <div class="col_label col_check"><input class="row_check" type="checkbox"></div>
+    <div class="col_value col_title">{{doc.title}}</div>
+    <div class="col_value col_format">{{doc.format}}</div>
+    <div class="col_value col_type">{{doc.type}}</div>
+    <div class="col_value col_author">{{doc.author}}</div>
+</div>
+{% endfor %}
+</div>
+{% endmacro %}

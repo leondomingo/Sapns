@@ -16,6 +16,7 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.users import UsersController
 from sapns.controllers.shortcuts import ShortcutsController
 from sapns.controllers.messages import MessagesController
+from sapns.controllers.docs import DocsController
 
 from neptuno.postgres.search import search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
@@ -42,6 +43,7 @@ class DashboardController(BaseController):
     users = UsersController()
     sc = ShortcutsController()
     messages = MessagesController()
+    docs = DocsController()
 
     @expose('sapns/dashboard/index.html')
     @require(predicates.not_anonymous())
@@ -679,3 +681,7 @@ class DashboardController(BaseController):
             redirect(url('/message', 
                          params=dict(message=_('Reference order for "%s" has been successfully updated' % cls_title), 
                                      came_from='')))
+            
+    @expose('sapns/upload_test.html')
+    def upload_test(self):
+        return dict()
