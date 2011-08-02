@@ -1278,6 +1278,5 @@ class SapnsAssignedDoc(DeclarativeBase):
     object_id = Column(Integer)
     
 SapnsDoc.assigned_docs = \
-    relation(SapnsAssignedDoc,
-             backref='doc',
+    relation(SapnsAssignedDoc, backref='doc',
              primaryjoin=SapnsDoc.doc_id == SapnsAssignedDoc.doc_id)

@@ -90,8 +90,6 @@ class DocsController(BaseController):
             repo = dbs.query(SapnsRepo).get(id_repo)
             REPO_PATH = os.path.join(REPO_BASE_PATH, repo.path)
             
-            #logger.info(str(dir(fichero)))
-            
             # create doc
             new_doc = SapnsDoc()
             new_doc.repo_id = id_repo
