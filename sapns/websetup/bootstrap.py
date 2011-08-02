@@ -74,6 +74,14 @@ def bootstrap(command, conf, vars):
         model.DBSession.add(u1)
         model.DBSession.flush()
         
+        # repo (docs)
+        main_repo = model.SapnsRepo()
+        main_repo.name = u'Main repo'
+        main_repo.path = ''
+        
+        model.DBSession.add(main_repo)
+        model.DBSession.flush()
+        
         transaction.commit()
     except IntegrityError:
         print 'Warning, there was a problem adding your auth data, it may have already been added:'

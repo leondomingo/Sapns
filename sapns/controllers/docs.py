@@ -31,12 +31,15 @@ class DocsController(BaseController):
     def index(self, **kw):
         came_from = kw.get('came_from')
         
-        doclist = DataSet(['title', 'format', 'type', 'author'])
+        doclist = DataSet(['title', 'format', 'type', 'author', 'repo'])
+        
         for i in xrange(30):
             doclist.append(dict(title='Title %d' % ((i+1)*100),
                                 format='Format %d' % i,
                                 type='Type %d' % i,
-                                author='Author %d' % i))
+                                author='Author %d' % i,
+                                repo='Repo %d' % i,
+                                ))
 
         return dict(page='user-docs', doclist=doclist, came_from=came_from)
     
@@ -45,12 +48,15 @@ class DocsController(BaseController):
     def all(self, **kw):
         came_from = kw.get('came_from')
         
-        doclist = DataSet(['title', 'format', 'type', 'author'])
+        doclist = DataSet(['title', 'format', 'type', 'author', 'repo'])
+        
         for i in xrange(30):
             doclist.append(dict(title='Title %d' % i,
                                 format='Format %d' % i,
                                 type='Type %d' % i,
-                                author='Author %d' % i))
+                                author='Author %d' % i,
+                                repo='Repo %d' % i,
+                                ))
         
         return dict(page='all-docs', doclist=doclist, came_from=came_from)
 
@@ -71,8 +77,8 @@ class DocsController(BaseController):
             
             file_name = s256.hexdigest()
             
-            # TODO: get repo base path
-            REPO_BASE_PATH = '/home/leon/workspace/sapns/sapns/public/repo'
+            # get repo base path
+            REPO_BASE_PATH = config.get('app.repo_base')
             
             # collect params
             id_author = request.identity['user'].user_id
