@@ -169,6 +169,7 @@ class DashboardController(BaseController):
                    if act['type'] in [SapnsAction.TYPE_NEW,
                                       SapnsAction.TYPE_EDIT,
                                       SapnsAction.TYPE_DELETE,
+                                      SapnsAction.TYPE_DOCS,
                                       SapnsAction.TYPE_PROCESS,
                                      ]]
 

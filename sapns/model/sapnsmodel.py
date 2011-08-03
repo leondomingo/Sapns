@@ -655,6 +655,9 @@ class SapnsClass(DeclarativeBase):
                 
                 elif ac.type == SapnsAction.TYPE_DELETE:
                     url = SapnsAction.URL_DELETE
+                    
+                elif ac.type == SapnsAction.TYPE_DOCS:
+                    url = SapnsAction.URL_DOCS
                 
                 actions.append(dict(title=_(ac.name), type=ac.type, 
                                     url=url, require_id=require_id))
@@ -978,19 +981,21 @@ class SapnsAction(DeclarativeBase):
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'))
     
-    TYPE_NEW = 'new'
-    TYPE_EDIT = 'edit'
-    TYPE_DELETE = 'delete'
-    TYPE_REPORT = 'report'
+    TYPE_NEW =     'new'
+    TYPE_EDIT =    'edit'
+    TYPE_DELETE =  'delete'
+    TYPE_DOCS =    'docs'
+    TYPE_REPORT =  'report'
     TYPE_PROCESS = 'process'
-    TYPE_LIST = 'list'
-    TYPE_OBJECT = 'object'
-    TYPE_GROUP = 'group'
+    TYPE_LIST =    'list'
+    TYPE_OBJECT =  'object'
+    TYPE_GROUP =   'group'
     
     # default URL
-    URL_NEW = '/dashboard/new'
-    URL_EDIT = '/dashboard/edit'
+    URL_NEW =    '/dashboard/new'
+    URL_EDIT =   '/dashboard/edit'
     URL_DELETE = '/dashboard/delete'
+    URL_DOCS =   '/dashboard/docs'
     
     def __unicode__(self):
         return u'<SapnsAction: "%s" type=%s>' % (self.name, self.type)
