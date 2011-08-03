@@ -66,7 +66,9 @@ class DocsController(BaseController):
 #                                repo='Repo %d' % i,
 #                                ))
 
-        return dict(page='object-docs', doclist=doclist, came_from=came_from)
+        return dict(page='object-docs', 
+                    obj=dict(id_class=class_.class_id, id=id_object),
+                    doclist=doclist, came_from=came_from)
     
     @expose('sapns/docs/index.html')
     @require(authorize.has_any_permission('manage', 'docs'))
@@ -84,6 +86,22 @@ class DocsController(BaseController):
                                 ))
         
         return dict(page='all-docs', doclist=doclist, came_from=came_from)
+    
+    @expose('sapns/docs/edit.html')
+    def edit(self, **kw):
+        id_doc = get_paramw(kw, 'id_doc', int, opcional=True)
+        id_class = get_paramw(kw, 'id_class', int)
+        id_object = get_paramw(kw, 'id_object', int)
+        
+        if id_doc:
+            # edit doc
+            pass
+        
+        else:
+            # new doc
+            pass
+        
+        return dict(doc=dict(title=''))
 
     @expose()
     def upload_file(self, fichero, **kw):

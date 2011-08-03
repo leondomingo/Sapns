@@ -5,6 +5,7 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
+    {{ util.jquery_ui() }}
     <style type="text/css">
         #docs_list {
             padding: 10px;
@@ -86,7 +87,17 @@
         .doc_action {
             width: 110px;
         }
-    </style>    
+        
+        .doc_field {
+            width: 90%;
+            margin-bottom: 5px;
+        }
+    </style>
+    
+    <script type="text/javascript">
+    {% include 'sapns/dashboard/sapns.selector.js' %}
+    </script>
+    
 {% endblock %}
 
 {% block middle %}
@@ -100,9 +111,14 @@
         <button id="btn_upd_doc" class="doc_action">{{_('Update')}}</button>
         <button id="btn_del_doc" class="doc_action">{{_('Delete')}}</button>
     </div>
+    
+    <div id="docs_dialog" style="display: none;"></div>
 
     <script type="text/javascript">
         $(document).ready(function() {
+            
+            var id_class = {{obj.id_class}};
+            var id_object = {{obj.id}};
             
             $('.col_value').click(function() {
                 var check = $(this).parent().find('.row_check');
@@ -118,6 +134,62 @@
                 else {
                     check.attr('checked', true);
                 }
+            });
+            
+            $('#btn_add_doc').click(function() {
+                
+                var load_dialog = function(data) {
+                    
+                    $('#docs_dialog').dialog({
+                        modal: true,
+                        resizable: false,
+                        height: 550,
+                        width: 450,
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                // TODO: save doc for this object 
+                                $('#docs_dialog').dialog('close');
+                            },
+                            "{{_('Cancel')}}": function() {
+                                $('#docs_dialog').dialog('close');
+                            },
+                        }
+                    });
+                };
+                
+                $.ajax({
+                    url: "{{tg.url('/dashboard/docs/edit')}}",
+                    data: {
+                        id_class: id_class,
+                        id_object: id_object
+                    },
+                    success: function(data) {
+                        
+                        // put form into the dialog 
+                        $('#docs_dialog').html(data);
+                        
+                        // doc_type 
+                        $('#doc_type').sapnsSelector({
+                            name: 'doctype',
+                            value: null,
+                            title: "{{_('Document type')}}",
+                            rc: 'sp_doctypes',
+                            rc_title: "{{_('Document types')}}",
+                        });
+                        
+                        // doc_format 
+                        $('#doc_format').sapnsSelector({
+                            name: 'docformat',
+                            value: null,
+                            title: "{{_('Document format')}}",
+                            rc: 'sp_docformats',
+                            rc_title: "{{_('Document formats')}}",
+                        });
+                        
+                        load_dialog(data);
+                    }
+                });
+                
             });
         });
     </script>
