@@ -4,7 +4,8 @@
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <title>Uploading files test</title>
-{{util.jquery()}}
+{{ util.jquery() }}
+{{ util.qtip2() }}
 <style type="text/css">
     .file_name {
         text-decoration: underline;
@@ -12,69 +13,24 @@
         font-family: Arial;
     }
 </style>
+<script type="text/javascript">
+{% include 'sapns/dashboard/sapns.uploader.js' %}
+</script>
 </head>
 <body>
     <div id="upload_1"></div>
     <div id="upload_2"></div>
     <div id="upload_3"></div>
     
-    <button id="upload_all">Upload all</button>
-    
     <script type="text/javascript">
-        function init_upload_file(params) {
-            
-            var div = params.div;
-            var sufix = params.sufix;
-            var show_button = params.show_button;
-            if (show_button == undefined) {
-                show_button = true;
-            }
-            
-            console.log(show_button);
-            
-            var url = "{{tg.url('/dashboard/docs/upload_file')}}";
-            
-            var content = '<div id="file_name_' + sufix + '" style="display: none;">&nbsp;</div>';
-                
-            content += 
-                '<form id="upload_file_form_' + sufix + '" method="post" action="' + url + '"' + 
-                ' target="upload_target_' + sufix + '" enctype="multipart/form-data">' +
-                    ' <input id="file_' + sufix + '" type="file" name="fichero">';
-                    
-            if (show_button) {
-                content += ' <input id="btn_upload_' + sufix + '" type="button" value="Upload">';
-            }
-                    
-            content += ' </form>';
-            
-            content += '<iframe id="upload_target_' + sufix + '" name="upload_target_' + sufix + '" style="display: none;"></iframe>';
-            
-            div.append(content);
-            
-            // event handlers            
-            $('#upload_target_' + sufix).load(function() {
-                var result = document.getElementById('upload_target_' + sufix).contentWindow.document.body.innerHTML;
-                if (result != '') {
-                    result = JSON.parse(result);
-                    if (result.status) {
-                        console.log(result.message);
-                        $('#upload_file_form_' + sufix).hide();
-                        $('#file_' + sufix).val('');
-                        
-                        $('#upload_' + sufix).addClass('file_name').html(result.file_name).show();
-                    }
-                }
-            });
-            
-            $('#btn_upload_' + sufix).click(function() {
-                $('#upload_file_form_' + sufix).submit();
-            });
-        }
-
         $(document).ready(function() {
-            init_upload_file({div: $('#upload_1'), sufix: '1', show_button: false});
-            init_upload_file({div: $('#upload_2'), sufix: '2'});
-            init_upload_file({div: $('#upload_3'), sufix: '3'});
+            $('#upload_1').sapnsUploader({
+                repo: 5 
+                //qtip: {style: 'ui-tooltip-red'} 
+            });
+            
+            $('#upload_2').sapnsUploader({repo: 1});
+            $('#upload_3').sapnsUploader({repo: 1});
         });
     </script>
 </body>

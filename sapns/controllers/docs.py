@@ -19,6 +19,7 @@ from sapns.model.sapnsmodel import SapnsUser , SapnsDoc, SapnsRepo,\
 import logging
 import simplejson as sj
 from neptuno.dataset import DataSet
+from neptuno.dict import Dict
 from neptuno.util import get_paramw
 from sqlalchemy.sql.expression import and_
 
@@ -67,7 +68,8 @@ class DocsController(BaseController):
 #                                ))
 
         return dict(page='object-docs', 
-                    obj=dict(id_class=class_.class_id, id=id_object),
+                    obj=dict(id_class=class_.class_id, id=id_object,
+                             title=SapnsClass.object_title(cls, id_object)),
                     doclist=doclist, came_from=came_from)
     
     @expose('sapns/docs/index.html')
@@ -88,23 +90,75 @@ class DocsController(BaseController):
         return dict(page='all-docs', doclist=doclist, came_from=came_from)
     
     @expose('sapns/docs/edit.html')
+    @require(authorize.has_any_permission('manage', 'docs'))
     def edit(self, **kw):
         id_doc = get_paramw(kw, 'id_doc', int, opcional=True)
-        id_class = get_paramw(kw, 'id_class', int)
-        id_object = get_paramw(kw, 'id_object', int)
+        #id_class = get_paramw(kw, 'id_class', int)
+        #id_object = get_paramw(kw, 'id_object', int)
         
+        doc = Dict(repo=None)
+        
+        # lookup repositories
+        repos = dbs.query(SapnsRepo).all()
+        if len(repos) == 1:
+            doc.id_repo = repos[0].repo_id
+            
         if id_doc:
             # edit doc
-            pass
+            doc_ = dbs.query(SapnsDoc).get(id_doc)
         
         else:
             # new doc
-            pass
+            doc_ = SapnsDoc()
+                        
+        doc.title = doc_.title
+        doc.id_type = doc_.doctype_id
+        doc.id_format = doc_.docformat_id
+        doc.filename = doc_.filename
+        doc.id_author = doc_.author_id
         
-        return dict(doc=dict(title=''))
+        return dict(doc=doc)
+    
+    @expose()
+    @require(authorize.has_any_permission('manage', 'docs'))
+    def save(self, **kw):
+
+        # collect params
+        id_author = request.identity['user'].user_id
+        
+        id_object = get_paramw(kw, 'id_object', int)
+        id_class = get_paramw(kw, 'id_class', int)
+        
+        title = get_paramw(kw, 'title', unicode)
+        id_type = get_paramw(kw, 'id_type', int)
+        id_format = get_paramw(kw, 'id_format', int)
+        id_repo = get_paramw(kw, 'id_repo', int)
+        file_name = get_paramw(kw, 'filename', unicode)
+
+        # create doc
+        new_doc = SapnsDoc()
+        new_doc.repo_id = id_repo
+        new_doc.doctype_id = id_type
+        new_doc.docformat_id = id_format
+        new_doc.author_id = id_author
+        new_doc.filename = file_name
+        new_doc.title = title
+        
+        dbs.add(new_doc)
+        dbs.flush()
+        
+        # assign doc
+        assigned_doc = SapnsAssignedDoc()
+        assigned_doc.doc_id = new_doc.doc_id
+        assigned_doc.class_id = id_class
+        assigned_doc.object_id = id_object
+        
+        dbs.add(assigned_doc)
+        dbs.flush()
 
     @expose()
-    def upload_file(self, fichero, **kw):
+    @require(authorize.has_any_permission('manage', 'docs'))
+    def upload_file(self, f, **kw):
         
         logger = logging.getLogger('DocsController.upload_file')
         try:
@@ -116,57 +170,29 @@ class DocsController(BaseController):
             s256 = hl.sha256()
             
             random.seed()
-            s256.update('%s%6.6d' % (fichero.filename, random.randint(0, 999999)))
+            s256.update('%s%6.6d' % (f.filename, random.randint(0, 999999)))
             
             file_name = s256.hexdigest()
             
             # get repo base path
             REPO_BASE_PATH = config.get('app.repo_base')
             
-            # collect params
-            id_author = request.identity['user'].user_id
-            
-            id_object = get_paramw(kw, 'id_object', int)
-            id_class = get_paramw(kw, 'id_class', int)
-            
-            title = get_paramw(kw, 'title', unicode)
-            id_type = get_paramw(kw, 'id_type', int)
-            id_format = get_paramw(kw, 'id_format', int)
-            
             # repo
             id_repo = get_paramw(kw, 'id_repo', int)
             
             repo = dbs.query(SapnsRepo).get(id_repo)
-            REPO_PATH = os.path.join(REPO_BASE_PATH, repo.path)
+            if not repo:
+                raise Exception(_('Repo [%d] was not found' % id_repo))
             
-            # create doc
-            new_doc = SapnsDoc()
-            new_doc.repo_id = id_repo
-            new_doc.doctype_id = id_type
-            new_doc.docformat_id = id_format
-            new_doc.author_id = id_author
-            new_doc.filename = file_name
-            new_doc.title = title
-            
-            dbs.add(new_doc)
-            dbs.flush()
-            
-            # assign doc
-            assigned_doc = SapnsAssignedDoc()
-            assigned_doc.doc_id = new_doc.doc_id
-            assigned_doc.class_id = id_class
-            assigned_doc.object_id = id_object
-            
-            dbs.add(assigned_doc)
-            dbs.flush()
-            
-            fichero.file.seek(0)
-            with file(os.path.join(REPO_PATH, file_name), 'wb') as f:
-                f.write(fichero.file.read())
+            REPO_PATH = os.path.join(REPO_BASE_PATH, repo.path or '')
+
+            f.file.seek(0)
+            with file(os.path.join(REPO_PATH, file_name), 'wb') as fu:
+                fu.write(f.file.read())
             
             return sj.dumps(dict(status=True, 
-                                 id_doc=new_doc.doc_id,
-                                 file_name=fichero.filename))
+                                 uploaded_file=f.filename,
+                                 file_name=file_name))
         
         except Exception, e:
             logger.error(e)

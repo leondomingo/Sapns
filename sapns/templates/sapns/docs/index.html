@@ -6,6 +6,8 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
+    {{ util.qtip2() }}
+    
     <style type="text/css">
         #docs_list {
             padding: 10px;
@@ -15,7 +17,7 @@
         #doclist_content {
             border: 1px solid orange;
             overflow: auto;
-            height: 540px;
+            height: 100px; /*540px;*/
             width: 100%;
         }
         
@@ -92,12 +94,18 @@
             width: 90%;
             margin-bottom: 5px;
         }
+        
+        .doc_field_required {
+            font-weight: bold;
+        }
     </style>
     
     <script type="text/javascript">
-    {% include 'sapns/dashboard/sapns.selector.js' %}
+        {% include 'sapns/dashboard/sapns.selector.js' %}
+        {% include 'sapns/dashboard/sapns.uploader.js' %}
     </script>
     
+    <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
 {% endblock %}
 
 {% block middle %}
@@ -117,8 +125,12 @@
     <script type="text/javascript">
         $(document).ready(function() {
             
-            var id_class = {{obj.id_class}};
-            var id_object = {{obj.id}};
+            // the object assigned to these documents 
+            var obj = {
+                    id_class: {{obj.id_class}},
+                    id_object: {{obj.id}},
+                    title: "{{obj.title}}"
+            };
             
             $('.col_value').click(function() {
                 var check = $(this).parent().find('.row_check');
@@ -141,16 +153,63 @@
                 var load_dialog = function(data) {
                     
                     $('#docs_dialog').dialog({
+                        title: sprintf("{{_('Document of [%s]')}}", obj.title),
                         modal: true,
                         resizable: false,
                         height: 550,
                         width: 450,
                         buttons: {
                             "{{_('Ok')}}": function() {
-                                // TODO: save doc for this object 
-                                $('#docs_dialog').dialog('close');
+                                
+                                $('.ui-tooltip').remove();
+                                
+                                // TODO: check required fields
+                                var required_fields = [];
+                            
+                                var doc_title = $('#doc_title').val();
+                                if (doc_title == '') {
+                                    required_fields.push($('#doc_title'));
+                                }
+                                
+                                // type 
+                                var doc_type = $('#doc_type').sapnsSelector('getValue'); 
+                                
+                                // format 
+                                var doc_format = $('#doc_format').sapnsSelector('getValue');
+                                if (doc_format == '') {
+                                    required_fields.push($('#doc_format'));
+                                }
+                                
+                                // repo 
+                                var doc_repo = $('#doc_repo').sapnsSelector('getValue');
+                                if (doc_repo == '') {
+                                    required_fields.push($('#doc_repo'));
+                                }
+                                
+                                var l = required_fields.length;
+                                if (l == 0) {
+                                    // TODO: save doc for this object 
+                                    $('#docs_dialog').dialog('close');
+                                }
+                                else {
+                                    for (var i=0; i<l; i++) {
+                                        required_fields[i].qtip({
+                                            content: {text: 'Required field' },
+                                            show: {
+                                                target: false,
+                                                ready: true
+                                            },
+                                            position: {
+                                                my: 'left bottom',
+                                                at: 'right top'
+                                            },
+                                            style: 'ui-tooltip-cluetip ui-tooltip-rounded'
+                                        });
+                                    }
+                                }
                             },
                             "{{_('Cancel')}}": function() {
+                                $('.ui-tooltip').remove();
                                 $('#docs_dialog').dialog('close');
                             },
                         }
@@ -160,8 +219,8 @@
                 $.ajax({
                     url: "{{tg.url('/dashboard/docs/edit')}}",
                     data: {
-                        id_class: id_class,
-                        id_object: id_object
+                        id_class: obj.id_class,
+                        id_object: obj.id_object
                     },
                     success: function(data) {
                         
@@ -171,7 +230,7 @@
                         // doc_type 
                         $('#doc_type').sapnsSelector({
                             name: 'doctype',
-                            value: null,
+                            value: {{doc.id_type or 'null'}},
                             title: "{{_('Document type')}}",
                             rc: 'sp_doctypes',
                             rc_title: "{{_('Document types')}}",
@@ -180,11 +239,36 @@
                         // doc_format 
                         $('#doc_format').sapnsSelector({
                             name: 'docformat',
-                            value: null,
+                            value: {{doc.id_format or 'null'}},
                             title: "{{_('Document format')}}",
                             rc: 'sp_docformats',
                             rc_title: "{{_('Document formats')}}",
                         });
+                        
+                        // doc repo 
+                        $('#doc_repo').sapnsSelector({
+                            name: 'docrepo',
+                            value: null, //{{doc.id_repo or 'null'}}, 
+                            title: "{{_('Document repository')}}",
+                            rc: 'sp_repos',
+                            rc_title: "{{_('Document repositories')}}",
+                            onChange: function(new_value, old_value) {
+                                $('#doc_file').sapnsUploader('setRepo', new_value);
+                            }
+                        });
+                        
+                        // doc author 
+                        $('#doc_author').sapnsSelector({
+                            name: 'docauthor',
+                            value: {{tg.request.identity['user'].user_id}},
+                            title: "{{_('Document author')}}",
+                            rc: 'sp_users',
+                            rc_title: "{{_('Users')}}",
+                            read_only: true
+                        });
+                        
+                        // doc_file 
+                        $('#doc_file').sapnsUploader();
                         
                         load_dialog(data);
                     }

@@ -1,7 +1,7 @@
 <div style="padding: 5px;">
 <div class="doc_field">
-    <div>{{_('Title')}}</div>
-    <input id="doc_title" type="text" value="{{doc.title}}">
+    <div class="doc_field_required">{{_('Title')}}</div>
+    <input id="doc_title" type="text" value="{{doc.title or ''}}">
 </div>
 
 <div class="doc_field">
@@ -10,7 +10,23 @@
 </div>
 
 <div class="doc_field">
-    <div>{{_('Document format')}}</div>
+    <div class="doc_field_required">{{_('Document format')}}</div>
     <div id="doc_format"></div>
 </div>
+
+<div class="doc_field">
+    <div class="doc_field_required">{{_('Repository')}}</div>
+    <div id="doc_repo"></div>
+</div>
+
+<div class="doc_field">
+    <div class="doc_field">{{_('Author')}}</div>
+    <div id="doc_author"></div>
+</div>
+
+<div class="doc_field">
+    <div class="doc_field">{{_('File')}}</div>
+    <div id="doc_file"></div>
+</div>
+
 </div>
