@@ -49,6 +49,7 @@
 		this.value = value;
 	}
 	
+	// getValue
 	SapnsSelector.prototype.getValue = function() {
 		return this.value;
 	}

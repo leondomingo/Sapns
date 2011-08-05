@@ -1190,6 +1190,10 @@ class SapnsRepo(DeclarativeBase):
     name = Column(Unicode(50), nullable=False)
     path = Column(Unicode(255))
     
+    def abs_path(self):
+        REPO_BASE_PATH = config.get('app.repo_base')
+        return os.path.join(REPO_BASE_PATH, self.path)
+    
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.path)
     

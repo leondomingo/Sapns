@@ -150,6 +150,27 @@
             
             $('#btn_add_doc').click(function() {
                 
+                var onClose = function(event) {
+                    // TODO: El problema es que esto también se ejecuta cuando hace "Ok"
+                    // console.log(event);
+                    var file_name = $('#doc_file').sapnsUploader('getFilename');
+                    if (file_name != '') {
+                        $.ajax({
+                            url: "{{tg.url('/dashboard/docs/remove_file')}}",
+                            data: {
+                                file_name: file_name,
+                                id_repo: $('#doc_file').sapnsUploader('getRepo')
+                            },
+                            success: function(data) {
+                                if (data.status) {
+                                }
+                                else {
+                                }
+                            }
+                        });
+                    }
+                };
+                
                 var load_dialog = function(data) {
                     
                     $('#docs_dialog').dialog({
@@ -189,7 +210,24 @@
                                 var l = required_fields.length;
                                 if (l == 0) {
                                     // TODO: save doc for this object 
-                                    $('#docs_dialog').dialog('close');
+                                    $.ajax({
+                                        url: "{{tg.url('/dashboard/docs/save')}}",
+                                        data: {
+                                            id_object: obj.id_object,
+                                            id_class: obj.id_class,
+                                            title: doc_title,
+                                            id_type: doc_type,
+                                            id_format: doc_format,
+                                            id_repo: doc_repo,
+                                            file_name: $('#doc_file').sapnsUploader('getFilename')
+                                        },
+                                        success: function(data) {
+                                            if (data.status) {
+                                                $('.ui-tooltip').remove();
+                                                $('#docs_dialog').dialog('close');
+                                            }
+                                        }
+                                    });
                                 }
                                 else {
                                     for (var i=0; i<l; i++) {
@@ -207,12 +245,13 @@
                                         });
                                     }
                                 }
-                            },
+                            }, // ok 
                             "{{_('Cancel')}}": function() {
                                 $('.ui-tooltip').remove();
                                 $('#docs_dialog').dialog('close');
-                            },
-                        }
+                            }
+                        }, // buttons 
+                        close: onClose
                     });
                 };
                 
@@ -228,27 +267,30 @@
                         $('#docs_dialog').html(data);
                         
                         // doc_type 
+                        var id_doctype = $('#doc_type').attr('id_type');
                         $('#doc_type').sapnsSelector({
                             name: 'doctype',
-                            value: {{doc.id_type or 'null'}},
+                            value: id_doctype,
                             title: "{{_('Document type')}}",
                             rc: 'sp_doctypes',
                             rc_title: "{{_('Document types')}}",
                         });
                         
                         // doc_format 
+                        var id_docformat = $('#doc_format').attr('id_format');
                         $('#doc_format').sapnsSelector({
                             name: 'docformat',
-                            value: {{doc.id_format or 'null'}},
+                            value: id_docformat,
                             title: "{{_('Document format')}}",
                             rc: 'sp_docformats',
                             rc_title: "{{_('Document formats')}}",
                         });
-                        
+
                         // doc repo 
+                        var id_repo = $('#doc_repo').attr('id_repo');
                         $('#doc_repo').sapnsSelector({
                             name: 'docrepo',
-                            value: null, //{{doc.id_repo or 'null'}}, 
+                            value: '', //id_repo, 
                             title: "{{_('Document repository')}}",
                             rc: 'sp_repos',
                             rc_title: "{{_('Document repositories')}}",
@@ -258,9 +300,10 @@
                         });
                         
                         // doc author 
+                        var id_author = $('#doc_author').attr('id_author');
                         $('#doc_author').sapnsSelector({
                             name: 'docauthor',
-                            value: {{tg.request.identity['user'].user_id}},
+                            value: id_author, 
                             title: "{{_('Document author')}}",
                             rc: 'sp_users',
                             rc_title: "{{_('Users')}}",
@@ -270,6 +313,10 @@
                         // doc_file 
                         $('#doc_file').sapnsUploader();
                         
+                        // assign repo (if there's any) 
+                        $('#doc_repo').sapnsSelector('setValue', id_repo);
+                        
+                        // load content into dialog 
                         load_dialog(data);
                     }
                 });

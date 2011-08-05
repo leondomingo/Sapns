@@ -51,6 +51,12 @@
             return;
         }
         
+        if (this.getRepo() == '') {
+            this.showWarning($('#btn_upload_' + this.name), 
+                    "{{_('There is no repo selected')}}");
+            return;
+        }
+        
         $('#upload_file_form_' + this.name + ' input[name=id_repo]').val(this.repo);
         $('#upload_file_form_' + this.name).submit();
     }
@@ -65,11 +71,9 @@
         return this.repo;
     }
     
-    SapnsUploader.prototype.showWarning = function(container, message) {
+    SapnsUploader.prototype.showWarning = function(target, message) {
         try {
-            var sufix = this.name;
-            //alert(JSON.stringify(sapnsUploader.qtip));
-            container.find('#btn_upload_' + sufix).qtip({
+            target.qtip({
                 content: {text: message},
                 show: {
                     target: false,
@@ -137,7 +141,7 @@
                     }
                     else {
                         // result.status = false
-                        sapnsUploader.showWarning(container, result.message);
+                        sapnsUploader.showWarning($('#btn_upload_' + sufix), result.message);
                     }
                 }
             });

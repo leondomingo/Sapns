@@ -6,27 +6,27 @@
 
 <div class="doc_field">
     <div>{{_('Document type')}}</div>
-    <div id="doc_type"></div>
+    <div id="doc_type" id_type="{{doc.id_type or ''}}"></div>
 </div>
 
 <div class="doc_field">
     <div class="doc_field_required">{{_('Document format')}}</div>
-    <div id="doc_format"></div>
+    <div id="doc_format" id_format="{{doc.id_format or ''}}"></div>
 </div>
 
 <div class="doc_field">
     <div class="doc_field_required">{{_('Repository')}}</div>
-    <div id="doc_repo"></div>
+    <div id="doc_repo" id_repo="{{doc.id_repo or ''}}"></div>
 </div>
 
 <div class="doc_field">
     <div class="doc_field">{{_('Author')}}</div>
-    <div id="doc_author"></div>
+    <div id="doc_author" id_author="{{doc.id_author or ''}}"></div>
 </div>
 
 <div class="doc_field">
     <div class="doc_field">{{_('File')}}</div>
-    <div id="doc_file"></div>
+    <div id="doc_file" file_name="{{doc.filename or ''}}"></div>
 </div>
 
 </div>
