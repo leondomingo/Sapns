@@ -98,11 +98,15 @@
         .doc_field_required {
             font-weight: bold;
         }
+        
+        #doc_title {
+            width: 410px;
+        }
     </style>
     
     <script type="text/javascript">
-        {% include 'sapns/dashboard/sapns.selector.js' %}
-        {% include 'sapns/dashboard/sapns.uploader.js' %}
+        {% include 'sapns/components/sapns.selector.js' %}
+        {% include 'sapns/components/sapns.uploader.js' %}
     </script>
     
     <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
@@ -116,7 +120,7 @@
 
     <div id="doclist_actions">
         <button id="btn_add_doc" class="doc_action">{{_('Add')}}</button>
-        <button id="btn_upd_doc" class="doc_action">{{_('Update')}}</button>
+        <button id="btn_edit_doc" class="doc_action">{{_('Edit')}}</button>
         <button id="btn_del_doc" class="doc_action">{{_('Delete')}}</button>
     </div>
     
@@ -148,11 +152,10 @@
                 }
             });
             
-            $('#btn_add_doc').click(function() {
+            var edit_doc = function(doc_id) {
                 
-                var onClose = function(event) {
-                    // TODO: El problema es que esto también se ejecuta cuando hace "Ok"
-                    // console.log(event);
+                var removeFileOnClose = function() {
+                    
                     var file_name = $('#doc_file').sapnsUploader('getFilename');
                     if (file_name != '') {
                         $.ajax({
@@ -179,12 +182,13 @@
                         resizable: false,
                         height: 550,
                         width: 450,
+                        closeOnEscape: false,
                         buttons: {
                             "{{_('Ok')}}": function() {
                                 
                                 $('.ui-tooltip').remove();
                                 
-                                // TODO: check required fields
+                                // check required fields 
                                 var required_fields = [];
                             
                                 var doc_title = $('#doc_title').val();
@@ -207,9 +211,15 @@
                                     required_fields.push($('#doc_repo'));
                                 }
                                 
+                                // doc 
+                                var doc_file = $('#doc_file').sapnsUploader('getFilename');
+                                if (doc_file == '') {
+                                    required_fields.push($('#doc_file'));
+                                }
+                                
                                 var l = required_fields.length;
                                 if (l == 0) {
-                                    // TODO: save doc for this object 
+                                    // save doc for this object 
                                     $.ajax({
                                         url: "{{tg.url('/dashboard/docs/save')}}",
                                         data: {
@@ -247,24 +257,34 @@
                                 }
                             }, // ok 
                             "{{_('Cancel')}}": function() {
+                                removeFileOnClose();
                                 $('.ui-tooltip').remove();
                                 $('#docs_dialog').dialog('close');
                             }
-                        }, // buttons 
-                        close: onClose
+                        } // buttons 
                     });
+                    
+                    // hide X button in the upper right corner of the dialog 
+                    $('.ui-icon-closethick').css('display', 'none');
                 };
+                
+                var data_in = {
+                        id_class: obj.id_class,
+                        id_object: obj.id_object
+                };
+                
+                // is this editing or creation? 
+                if (doc_id != undefined) {
+                    data_in.id_doc = doc_id;
+                }
                 
                 $.ajax({
                     url: "{{tg.url('/dashboard/docs/edit')}}",
-                    data: {
-                        id_class: obj.id_class,
-                        id_object: obj.id_object
-                    },
-                    success: function(data) {
+                    data: data_in,
+                    success: function(doc_form) {
                         
-                        // put form into the dialog 
-                        $('#docs_dialog').html(data);
+                        // put the form into the dialog 
+                        $('#docs_dialog').html(doc_form);
                         
                         // doc_type 
                         var id_doctype = $('#doc_type').attr('id_type');
@@ -294,8 +314,9 @@
                             title: "{{_('Document repository')}}",
                             rc: 'sp_repos',
                             rc_title: "{{_('Document repositories')}}",
-                            onChange: function(new_value, old_value) {
-                                $('#doc_file').sapnsUploader('setRepo', new_value);
+                            onChange: function(value) {
+                                //console.log(JSON.stringify(this));
+                                $('#doc_file').sapnsUploader('setRepo', value);
                             }
                         });
                         
@@ -311,16 +332,36 @@
                         });
                         
                         // doc_file 
-                        $('#doc_file').sapnsUploader();
+                        $('#doc_file').sapnsUploader({
+                            onUpload: function() {
+                                //console.log(JSON.stringify(this));
+                                if ($('#doc_title').val() == '') {
+                                    $('#doc_title').val(this.getUploadedfile());
+                                }
+                            }
+                        });
                         
                         // assign repo (if there's any) 
                         $('#doc_repo').sapnsSelector('setValue', id_repo);
                         
                         // load content into dialog 
-                        load_dialog(data);
+                        load_dialog(doc_form);
                     }
                 });
                 
+            };
+            
+            $('#btn_add_doc').click(function() {
+                edit_doc();
+            });
+            
+            $('#btn_edit_doc').click(function() {
+                if ($('.row_check:checked').length > 0) {
+                    edit_doc($('.row_check:checked:first').attr('doc_id'));
+                }
+                else {
+                    alert('No selected doc');
+                }
             });
         });
     </script>

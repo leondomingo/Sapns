@@ -40,7 +40,7 @@ class DocsController(BaseController):
         
         came_from = kw.get('came_from')
         
-        doclist = DataSet(['title', 'format', 'type', 'author', 'repo'])
+        doclist = DataSet(['id', 'title', 'format', 'type', 'author', 'repo'])
         
         for doc, doctype, docformat, repo, author in \
                 dbs.query(SapnsDoc, SapnsDocType, SapnsDocFormat, SapnsRepo, SapnsUser).\
@@ -56,20 +56,13 @@ class DocsController(BaseController):
                             SapnsAssignedDoc.object_id == id_object,
                             )):
             
-            doclist.append(dict(title=doc.title,
+            doclist.append(dict(id=doc.doc_id,
+                                title=doc.title,
                                 format=docformat.name,
-                                type=doctype.name,
+                                type=(doctype.name if doctype else ''),
                                 author=author.display_name,
                                 repo=repo.name))
         
-#        for i in xrange(30):
-#            doclist.append(dict(title='Title %d' % ((i+1)*100),
-#                                format='Format %d' % i,
-#                                type='Type %d' % i,
-#                                author='Author %d' % i,
-#                                repo='Repo %d' % i,
-#                                ))
-
         return dict(page='object-docs', 
                     obj=dict(id_class=class_.class_id, id=id_object,
                              title=SapnsClass.object_title(cls, id_object)),

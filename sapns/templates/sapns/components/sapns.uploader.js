@@ -27,7 +27,7 @@
         set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
         set(this, 'repo', '');
         set(this, 'show_button', true);
-        set(this, 'onChange', null);
+        set(this, 'onUpload', null);
         
         set(this, 'qtip', {});
         set(this.qtip, 'style', 'ui-tooltip-red ui-tooltip-rounded', this.qtip);
@@ -138,6 +138,10 @@
                         
                         sapnsUploader.uploaded_file = result.uploaded_file;
                         sapnsUploader.file_name = result.file_name;
+                        
+                        if (sapnsUploader.onUpload) {
+                            sapnsUploader.onUpload();
+                        }
                     }
                     else {
                         // result.status = false
