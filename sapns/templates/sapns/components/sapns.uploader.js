@@ -24,6 +24,7 @@
         set(this, 'name', Math.floor(Math.random()*999999));
         set(this, 'file_name', '');
         set(this, 'uploaded_file', '');
+        this.uploaded = false;
         set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
         set(this, 'repo', '');
         set(this, 'show_button', true);
@@ -39,9 +40,19 @@
         return this.file_name;
     }
     
+    // setFilename
+    SapnsUploader.prototype.setFilename = function(value) {
+        this.file_name = value;
+    }
+    
     // getUploadedfile
     SapnsUploader.prototype.getUploadedfile = function() {
         return this.uploaded_file;
+    }
+    
+    // setUploadedfile
+    SapnsUploader.prototype.setUploadedfile = function(value) {
+        this.uploaded_file = value;
     }
 
     // upload
@@ -61,6 +72,16 @@
         $('#upload_file_form_' + this.name).submit();
     }
     
+    // getUploaded
+    SapnsUploader.prototype.isUploaded = function() {
+        return this.uploaded;
+    }
+    
+    // setUploaded
+    SapnsUploader.prototype.setUploaded = function(value) {
+        this.uploaded = value;
+    }
+    
     // setRepo
     SapnsUploader.prototype.setRepo = function(repo) {
         this.repo = repo;
@@ -71,6 +92,7 @@
         return this.repo;
     }
     
+    // showWarning
     SapnsUploader.prototype.showWarning = function(target, message) {
         try {
             target.qtip({
@@ -91,6 +113,40 @@
         }
     }
     
+    // deleteFile
+    SapnsUploader.prototype.deleteFile = function(remove_from_disk) {
+        var self = this;
+        var f = self.getFilename();
+        if (f != '') {
+            var sufix = self.name;
+            
+            var show_form = function() {
+                $('#file_name_' + sufix).hide();
+                $('#upload_file_form_' + sufix).show();
+                self.setFilename('');
+                self.setUploadedfile('');
+            }
+            
+            if (remove_from_disk) {
+                $.ajax({
+                    url: "{{tg.url('/dashboard/docs/remove_file')}}",
+                    data: {
+                        file_name: f,
+                        id_repo: self.getRepo(),
+                    },
+                    success: function(data) {
+                        if (data.status) {
+                            show_form();
+                        }
+                    }
+                });
+            }
+            else {
+                show_form();
+            }
+        }
+    }
+    
     $.fn.sapnsUploader = function(arg1, arg2) {
         
         if (arg1 == undefined) {
@@ -99,14 +155,19 @@
         
         if (typeof(arg1) == "object") {
             
-            var sapnsUploader = new SapnsUploader(arg1);
+            var sapnsUploader = new SapnsUploader(arg1); 
             
             var url = sapnsUploader.url;
             var sufix = sapnsUploader.name;
             
             var content = 
-                '<div id="file_name_' + sufix + '" style="display: none;">&nbsp;</div>';
-                
+                '<div id="file_name_' + sufix + '" class="file_name">' +
+                    '<div style="width: 80%; float: left;' + 
+                        ' border: 1px solid lightgray;' + 
+                        ' margin-top: 3px;">...</div>' +
+                    '<button id="btn_delete_file_' + sufix + '">{{_("Delete")}}</button>' +                
+                '</div>';
+            
             content += 
                 '<form id="upload_file_form_' + sufix + '" method="post" action="' + url + '"' + 
                 ' target="upload_target_' + sufix + '" enctype="multipart/form-data">' +
@@ -125,6 +186,20 @@
             
             this.append(content);
             
+            if (sapnsUploader.getFilename() == '') {
+                $('#file_name_' + sufix).css('display', 'none');
+            }
+            else {
+                //console.log(sapnsUploader.getFilename());
+                $('#upload_file_form_' + sufix).hide();
+                $('#file_name_' + sufix).find('div').html(sapnsUploader.getUploadedfile()).show();                
+            }
+            
+            $('#btn_delete_file_' + sufix).click(function() {
+                // hides filename but does not remove the file from disk
+                sapnsUploader.deleteFile();
+            });
+            
             // event handlers 
             var container = this;
             this.find('#upload_target_' + sufix).load(function() {
@@ -134,7 +209,8 @@
                     if (result.status) {
                         $('#upload_file_form_' + sufix).hide();
                         $('#file_' + sufix).val('');                        
-                        $('#file_name_' + sufix).addClass('file_name').html(result.uploaded_file).show();
+                        $('#file_name_' + sufix).find('div').html(result.uploaded_file);
+                        $('#file_name_' + sufix).show();
                         
                         sapnsUploader.uploaded_file = result.uploaded_file;
                         sapnsUploader.file_name = result.file_name;
@@ -142,6 +218,8 @@
                         if (sapnsUploader.onUpload) {
                             sapnsUploader.onUpload();
                         }
+                        
+                        sapnsUploader.setUploaded(true);
                     }
                     else {
                         // result.status = false
@@ -176,6 +254,12 @@
             }
             else if (arg1 == "getRepo") {
                 return sapnsUploader.getRepo();
+            }
+            else if (arg1 == "deleteFile") {
+                sapnsUploader.deleteFile(arg2);
+            }
+            else if (arg1 == "isUploaded") {
+                return sapnsUploader.isUploaded();
             }
             // TODO: other sapnsUploader methods
         }

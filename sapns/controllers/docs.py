@@ -133,9 +133,18 @@ class DocsController(BaseController):
             id_format = get_paramw(kw, 'id_format', int)
             id_repo = get_paramw(kw, 'id_repo', int)
             file_name = get_paramw(kw, 'file_name', unicode)
+            
+            id_doc = get_paramw(kw, 'id_doc', int, opcional=True)
     
             # create doc
-            new_doc = SapnsDoc()
+            if id_doc:
+                # edit
+                new_doc = dbs.query(SapnsDoc).get(id_doc)
+                
+            else:
+                # create
+                new_doc = SapnsDoc()
+                
             new_doc.repo_id = id_repo
             new_doc.doctype_id = id_type
             new_doc.docformat_id = id_format
@@ -146,14 +155,16 @@ class DocsController(BaseController):
             dbs.add(new_doc)
             dbs.flush()
             
-            # assign doc to object/class
-            assigned_doc = SapnsAssignedDoc()
-            assigned_doc.doc_id = new_doc.doc_id
-            assigned_doc.class_id = id_class
-            assigned_doc.object_id = id_object
-            
-            dbs.add(assigned_doc)
-            dbs.flush()
+            if not id_doc:
+                # (only at creation)
+                # assign doc to object/class
+                assigned_doc = SapnsAssignedDoc()
+                assigned_doc.doc_id = new_doc.doc_id
+                assigned_doc.class_id = id_class
+                assigned_doc.object_id = id_object
+                
+                dbs.add(assigned_doc)
+                dbs.flush()
             
             return dict(status=True)
     

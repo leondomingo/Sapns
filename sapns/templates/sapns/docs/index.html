@@ -154,26 +154,6 @@
             
             var edit_doc = function(doc_id) {
                 
-                var removeFileOnClose = function() {
-                    
-                    var file_name = $('#doc_file').sapnsUploader('getFilename');
-                    if (file_name != '') {
-                        $.ajax({
-                            url: "{{tg.url('/dashboard/docs/remove_file')}}",
-                            data: {
-                                file_name: file_name,
-                                id_repo: $('#doc_file').sapnsUploader('getRepo')
-                            },
-                            success: function(data) {
-                                if (data.status) {
-                                }
-                                else {
-                                }
-                            }
-                        });
-                    }
-                };
-                
                 var load_dialog = function(data) {
                     
                     $('#docs_dialog').dialog({
@@ -219,10 +199,8 @@
                                 
                                 var l = required_fields.length;
                                 if (l == 0) {
-                                    // save doc for this object 
-                                    $.ajax({
-                                        url: "{{tg.url('/dashboard/docs/save')}}",
-                                        data: {
+                                    
+                                    var data_in = {
                                             id_object: obj.id_object,
                                             id_class: obj.id_class,
                                             title: doc_title,
@@ -230,7 +208,17 @@
                                             id_format: doc_format,
                                             id_repo: doc_repo,
                                             file_name: $('#doc_file').sapnsUploader('getFilename')
-                                        },
+                                    };
+                                    
+                                    // is this editing or creation? 
+                                    if (doc_id != undefined) {
+                                        data_in.id_doc = doc_id;
+                                    }
+                                    
+                                    // save doc for this object 
+                                    $.ajax({
+                                        url: "{{tg.url('/dashboard/docs/save')}}",
+                                        data: data_in,
                                         success: function(data) {
                                             if (data.status) {
                                                 $('.ui-tooltip').remove();
@@ -255,9 +243,12 @@
                                         });
                                     }
                                 }
-                            }, // ok 
+                            }, 
                             "{{_('Cancel')}}": function() {
-                                removeFileOnClose();
+                                if ($('#doc_file').sapnsUploader('isUploaded')) {
+                                    $('#doc_file').sapnsUploader('deleteFile', true);
+                                }
+                                
                                 $('.ui-tooltip').remove();
                                 $('#docs_dialog').dialog('close');
                             }
@@ -332,7 +323,14 @@
                         });
                         
                         // doc_file 
+                        var file_name = $('#doc_file').attr('file_name');
+                        var uploaded_file = '';
+                        if (file_name != '') {
+                            uploaded_file = $('#doc_title').val();
+                        }
                         $('#doc_file').sapnsUploader({
+                            file_name: file_name,
+                            uploaded_file: uploaded_file,
                             onUpload: function() {
                                 //console.log(JSON.stringify(this));
                                 if ($('#doc_title').val() == '') {
