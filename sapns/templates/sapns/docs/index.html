@@ -17,7 +17,7 @@
         #doclist_content {
             border: 1px solid orange;
             overflow: auto;
-            height: 100px; /*540px;*/
+            height: 400px; /*540px;*/
             width: 100%;
         }
         
@@ -105,8 +105,8 @@
     </style>
     
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.selector.js' %}
-        {% include 'sapns/components/sapns.uploader.js' %}
+        {% include 'sapns/components/sapns.selector.min.js' %}
+        {% include 'sapns/components/sapns.uploader.min.js' %}
     </script>
     
     <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
@@ -223,6 +223,7 @@
                                             if (data.status) {
                                                 $('.ui-tooltip').remove();
                                                 $('#docs_dialog').dialog('close');
+                                                // TODO: update list of docs 
                                             }
                                         }
                                     });
@@ -349,16 +350,85 @@
                 
             };
             
+            // Add 
             $('#btn_add_doc').click(function() {
                 edit_doc();
             });
             
+            var no_selected_doc = "{{_('No selected doc')}}";
+            
+            // Edit 
             $('#btn_edit_doc').click(function() {
                 if ($('.row_check:checked').length > 0) {
                     edit_doc($('.row_check:checked:first').attr('doc_id'));
                 }
                 else {
-                    alert('No selected doc');
+                    alert(no_selected_doc);
+                }
+            });
+            
+            // Delete 
+            $('#btn_del_doc').click(function() {
+                if ($('.row_check:checked').length > 0) {
+
+                    var delete_file = function(id_doc, callback) {
+                        $.ajax({
+                            url: "{{tg.url('/dashboard/docs/delete')}}",
+                            data: {
+                                id_doc: id_doc
+                            },
+                            success: function(data) {
+                                if (data.status) {
+                                    callback();
+                                }
+                                else {
+                                }
+                            }
+                        });
+                    }
+                    
+                    var id_doc = $('.row_check:checked:first').attr('doc_id');
+                    
+                    var delete_message = 
+                        "<p>{{_('Do you want to delete this doc?')}}</p>" +
+                        '<p id="doc_to_delete" style="font-style: italic;"></p>';
+                        
+                    $('#docs_dialog').html(delete_message);
+                        
+                    $.ajax({
+                        url: "{{tg.url('/dashboard/title')}}",
+                        data: {
+                            cls: 'sp_docs',
+                            id: id_doc
+                        },
+                        success: function(data) {
+                            if (data.status) {
+                                $('#doc_to_delete').html(data.title);
+                            }
+                        }
+                    });
+                    
+                    $('#docs_dialog').dialog({
+                        modal: true,
+                        resizable: false,
+                        title: "{{_('Delete document')}}",
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                var callback_success = function() {
+                                    $('#docs_dialog').dialog('close');
+                                    $('.row_check:checked:first').parent().parent().remove();
+                                }
+                                
+                                delete_file(id_doc, callback_success);
+                            },
+                            "{{_('Cancel')}}": function() {
+                                $('#docs_dialog').dialog('close');
+                            }
+                        }
+                    });
+                }
+                else {
+                    alert(no_selected_doc);
                 }
             });
         });

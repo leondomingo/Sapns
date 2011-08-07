@@ -20,8 +20,10 @@ import os
 import logging
 import simplejson as sj
 from neptuno.dataset import DataSet
+from neptuno.postgres.search import search
 from neptuno.dict import Dict
 from neptuno.util import get_paramw
+import sqlalchemy as sa
 from sqlalchemy.sql.expression import and_
 
 __all__ = ['DocsController']
@@ -40,28 +42,33 @@ class DocsController(BaseController):
         
         came_from = kw.get('came_from')
         
-        doclist = DataSet(['id', 'title', 'format', 'type', 'author', 'repo'])
+        meta = sa.MetaData(bind=dbs.bind)
+        tbl_doc = sa.Table('sp_docs', meta, autoload=True)
+        tbl_doct = sa.Table('sp_doctypes', meta, autoload=True)
+        tbl_docf = sa.Table('sp_docformats', meta, autoload=True)
+        tbl_adoc = sa.Table('sp_assigned_docs', meta, autoload=True)
+        tbl_repo = sa.Table('sp_repos', meta, autoload=True)
+        tbl_usr = sa.Table('sp_users', meta, autoload=True)
         
-        for doc, doctype, docformat, repo, author in \
-                dbs.query(SapnsDoc, SapnsDocType, SapnsDocFormat, SapnsRepo, SapnsUser).\
-                join((SapnsAssignedDoc,
-                      SapnsAssignedDoc.doc_id == SapnsDoc.doc_id)).\
-                outerjoin((SapnsDocType,
-                           SapnsDocType.doctype_id == SapnsDoc.doctype_id)).\
-                join((SapnsDocFormat,
-                      SapnsDocFormat.docformat_id == SapnsDoc.docformat_id)).\
-                join((SapnsUser,
-                      SapnsUser.user_id == SapnsDoc.author_id)).\
-                filter(and_(SapnsAssignedDoc.class_id == class_.class_id,
-                            SapnsAssignedDoc.object_id == id_object,
-                            )):
+        qry = tbl_doc.\
+            join(tbl_adoc, tbl_adoc.c.id == tbl_doc.c.id).\
+            outerjoin(tbl_doct, tbl_doct.c.id == tbl_doc.c.id_doctype).\
+            join(tbl_docf, tbl_docf.c.id == tbl_doc.c.id_docformat).\
+            join(tbl_usr, tbl_usr.c.id == tbl_doc.c.id_author).\
+            join(tbl_repo, tbl_repo.c.id == tbl_doc.c.id_repo)
             
-            doclist.append(dict(id=doc.doc_id,
-                                title=doc.title,
-                                format=docformat.name,
-                                type=(doctype.name if doctype else ''),
-                                author=author.display_name,
-                                repo=repo.name))
+        sel = sa.select([tbl_doc.c.id,
+                         tbl_doc.c.title.label('title'),
+                         tbl_docf.c.name.label('format'),
+                         tbl_doct.c.name.label('type'),
+                         tbl_usr.c.display_name.label('author'),
+                         tbl_repo.c.name.label('repo'),
+                         ], from_obj=qry,
+                        whereclause=and_(tbl_adoc.c.id_class == class_.class_id,
+                                         tbl_adoc.c.object_id == id_object,
+                                         ))
+
+        doclist = search(dbs, sel)
         
         return dict(page='object-docs', 
                     obj=dict(id_class=class_.class_id, id=id_object,
@@ -168,6 +175,29 @@ class DocsController(BaseController):
             
             return dict(status=True)
     
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, message=str(e).decode('utf-8'))
+        
+    @expose('json')
+    @require(authorize.has_any_permission('manage', 'docs'))
+    def delete(self, id_doc):
+
+        logger = logging.getLogger('DocsController.delete')        
+        try:
+            id_doc = int(id_doc)
+            doc = dbs.query(SapnsDoc).get(id_doc)
+            
+            # TODO: remove file from disk
+            self.remove_file(file_name=doc.filename, id_repo=doc.repo_id)
+            
+            # remove doc
+            dbs.query(SapnsDoc).filter(SapnsDoc.doc_id == id_doc).delete()
+            
+            dbs.flush()
+            
+            return dict(status=True)
+        
         except Exception, e:
             logger.error(e)
             return dict(status=False, message=str(e).decode('utf-8'))
