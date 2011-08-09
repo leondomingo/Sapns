@@ -101,7 +101,13 @@ class DashboardController(BaseController):
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         
-        if not user.has_privilege(cls):
+        cls_ = SapnsClass.by_name(cls)
+        ch_cls_ = SapnsClass.by_name(cls, parent=False)        
+            
+        logger.info('Parent class: %s' % cls_.name)
+        logger.info('Child class: %s' % ch_cls_.name)
+             
+        if not user.has_privilege(cls_.name):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -111,14 +117,12 @@ class DashboardController(BaseController):
         show_ids = strtobool(show_ids)
         pos = (pag_n-1) * rp
 
-        view = user.get_view_name(cls)
+        view = user.get_view_name(ch_cls_.name)
             
         date_fmt = config.get('formats.date', default='%m/%d/%Y')
         strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
         logger.info('search...%s / q=%s' % (view, q))
-        
-        cls_ = SapnsClass.by_name(cls)
         
         # related classes
         rel_classes = cls_.related_classes()
@@ -131,10 +135,10 @@ class DashboardController(BaseController):
             p_cls = cls_.attr_by_name(ch_attr).related_class
             p_title = SapnsClass.object_title(p_cls.name, parent_id)
             
-            caption = _('%s of [%s]' % (cls_.title, p_title))
+            caption = _('%s of [%s]' % (ch_cls_.title, p_title))
             
         elif caption is None:
-            caption = cls_.title
+            caption = ch_cls_.title
             
         # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
@@ -157,9 +161,7 @@ class DashboardController(BaseController):
             if col == 'id':
                 w = 60
                 
-            cols.append(dict(title=col,
-                             width=w,
-                             align='center'))
+            cols.append(dict(title=col, width=w, align='center'))
         
         # actions for this class
         actions = cls_.sorted_actions()
@@ -200,7 +202,7 @@ class DashboardController(BaseController):
                     # related classes
                     rel_classes=rel_classes,
                     link=('/dashboard/list/%s/?' % cls) + urlencode(link_data),
-                    grid=dict(caption=caption, name=cls, cls=cls,
+                    grid=dict(caption=caption, name=cls, cls=cls_.name,
                               search_url=url('/dashboard/list/'), 
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
@@ -372,6 +374,12 @@ class DashboardController(BaseController):
                             field_value = None
                         else:
                             field_value = strtotime(field_value)
+                            
+                    elif attr.type == SapnsAttribute.TYPE_DATETIME:
+                        if field_value == '':
+                            field_value = None
+                        else:
+                            field_value = strtotime(field_value)
                     
                     # string types        
                     else:
@@ -423,20 +431,19 @@ class DashboardController(BaseController):
         logger = logging.getLogger(__name__ + '/edit')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        if not user.has_privilege(cls):        
+        class_ = SapnsClass.by_name(cls)        
+        if not user.has_privilege(class_.name):        
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
-            
-        class_ = SapnsClass.by_name(cls)
-        
+
         # actions
         actions = [action for action in class_.sorted_actions() 
                    if action['type']  == 'process']
             
         meta = MetaData(dbs.bind)
         try:
-            tbl = Table(cls, meta, autoload=True)
+            tbl = Table(class_.name, meta, autoload=True)
             
         except NoSuchTableError:
             redirect(url('/message',
@@ -539,23 +546,24 @@ class DashboardController(BaseController):
         rel_tables = []
         try:
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            cls_ = SapnsClass.by_name(cls)
             
             # check privilege on this class
-            if not user.has_privilege(cls):
+            if not user.has_privilege(cls_.name):
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
             
             # does the record exist?
             meta = MetaData(dbs.bind)
-            tbl = Table(cls, meta, autoload=True)
+            tbl = Table(cls_.name, meta, autoload=True)
             
             this_record = dbs.execute(tbl.select(tbl.c.id == id)).fetchone()
             if not this_record:
                 return dict(status=False, message=_('Record does not exist'))
 
             # look for objects in other classes that are related with this
-            cls = SapnsClass.by_name(cls)
-            rel_classes = cls.related_classes()
+            
+            rel_classes = cls_.related_classes()
             for rcls in rel_classes:
                 
                 logger.info('Related class: "%s.%s"' % (rcls['name'], rcls['attr_name']))

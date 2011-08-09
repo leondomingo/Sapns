@@ -456,6 +456,9 @@ class SapnsClass(DeclarativeBase):
     name = Column(Unicode(50), nullable=False)
     title = Column(Unicode(100), nullable=False)
     description = Column(Text)
+    parent_class_id = Column('id_parent_class', Integer, 
+                             ForeignKey('sp_classes.id', 
+                                        onupdate='CASCADE', ondelete='CASCADE'))
     
     # attributes (SapnsAttribute)
     
@@ -466,7 +469,7 @@ class SapnsClass(DeclarativeBase):
         return unicode(self).encode('utf-8')
     
     @staticmethod
-    def by_name(class_name):
+    def by_name(class_name, parent=True):
         """
         Returns the SapnsClass whose name is "class_name"
         IN
@@ -475,9 +478,21 @@ class SapnsClass(DeclarativeBase):
         OUT
           <SapnsClass>
         """
-        return dbs.query(SapnsClass).\
+        
+        logger = logging.getLogger('SapnsClass.by_name')
+        logger.info('Looking up a class by name...%s' % class_name)
+        
+        cls = dbs.query(SapnsClass).\
             filter(SapnsClass.name == class_name).\
             first()
+            
+        logger.info(cls)
+            
+        if parent and cls.parent_class_id:
+            logger.info('Getting parent class...')
+            cls = dbs.query(SapnsClass).get(cls.parent_class_id)
+            
+        return cls
                 
     @staticmethod
     def class_titles(class_name):
