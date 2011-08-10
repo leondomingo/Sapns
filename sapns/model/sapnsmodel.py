@@ -3,7 +3,6 @@
 """Sapns basic data model"""
 
 import os
-import sys
 import shutil
 import datetime as dt
 
@@ -14,13 +13,11 @@ from pylons import cache
 
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
-from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime, Date,\
-    Time, Text
-from sqlalchemy import MetaData, Table
-from sqlalchemy.orm import relation, synonym
+from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text
+from sqlalchemy.orm import relation
 from sqlalchemy.exc import NoSuchTableError
 
-from sapns.model import DeclarativeBase, metadata, DBSession as dbs
+from sapns.model import DeclarativeBase, DBSession as dbs
 from sapns.model.auth import User, user_group_table
 
 import logging
@@ -693,11 +690,8 @@ class SapnsClass(DeclarativeBase):
                                     require_id=require_id, pos=pos))
                 
             def cmp_act(x, y):
-                if x.pos is None:
-                    return -1
-                
-                elif y.pos is None:
-                    return 1
+                if x.pos == y.pos:
+                    return cmp(x.title, y.title)
                 
                 else:
                     return cmp(x.pos, y.pos)
@@ -706,7 +700,7 @@ class SapnsClass(DeclarativeBase):
         
         _cache = cache.get_cache('sorted_actions')
         return _cache.get_value(key=self.class_id, createfunc=_sorted_actions,
-                                expiretime=1)
+                                expiretime=3600)
     
     def insertion(self):
         """
