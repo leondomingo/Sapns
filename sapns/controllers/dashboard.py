@@ -539,7 +539,8 @@ class DashboardController(BaseController):
     
     @expose('sapns/dashboard/delete.html')
     @expose('json')
-    def delete(self, cls='', id=None, came_from='/dashboard'):
+    @require(predicates.not_anonymous())
+    def delete(self, cls, id, came_from='/dashboard'):
         
         logger = logging.getLogger(__name__ + '/delete')
         rel_tables = []
