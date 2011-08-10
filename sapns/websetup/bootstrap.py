@@ -19,54 +19,46 @@ def bootstrap(command, conf, vars):
     
         model.DBSession.add(u)
     
-        # role
-        g = model.Group()
-        g.group_name = u'managers'
-        g.display_name = u'Managers Group'
+        # "managers" role
+        managers = model.Group()
+        managers.group_name = u'managers'
+        managers.display_name = u'Managers Group'
     
-        g.users.append(u)
+        managers.users.append(u)
     
-        model.DBSession.add(g)
+        model.DBSession.add(managers)
     
         # permissions
         p_man = model.Permission()
         p_man.permission_name = u'manage'
         p_man.description = u'This permission give an administrative right to the bearer'
-        p_man.groups.append(g)
+        p_man.groups.append(managers)
     
         model.DBSession.add(p_man)
         
         p_users = model.Permission()
         p_users.permission_name = u'users'
         p_users.description = u'User management permission'
-        p_users.groups.append(g)
+        p_users.groups.append(managers)
         
         model.DBSession.add(p_users)
 
         p_views = model.Permission()
         p_views.permission_name = u'views'
         p_views.description = u'Views management permission'
-        p_views.groups.append(g)
+        p_views.groups.append(managers)
         
         model.DBSession.add(p_views)
         
         p_util = model.Permission()
         p_util.permission_name = u'utilities'
         p_util.description = u'Utilites'
-        p_util.groups.append(g)
+        p_util.groups.append(managers)
         
         model.DBSession.add(p_util)
-
-        # user
-        u1 = model.User()
-        u1.user_name = u'user'
-        u1.display_name = u'Common User'
-        u1.email_address = u'common.user@somedomain.com'
-        u1.password = u'user'
-    
-        model.DBSession.add(u1)
-        model.DBSession.flush()
         
+        model.DBSession.flush()
+
         transaction.commit()
     except IntegrityError:
         print 'Warning, there was a problem adding your auth data, it may have already been added:'

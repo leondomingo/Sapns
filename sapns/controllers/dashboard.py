@@ -332,6 +332,8 @@ class DashboardController(BaseController):
                 field_name_ = m_field.group(1) 
                 attr = cls.attr_by_name(field_name_)
                 
+                logger.info(field_name_)
+                
                 # skipping "read-only" and "denied" attributes
                 acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
                 if acc in READONLY_DENIED:
@@ -484,6 +486,7 @@ class DashboardController(BaseController):
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
+            
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
             if attr.name in default_values_ro:
@@ -508,7 +511,7 @@ class DashboardController(BaseController):
                              related_class=None, related_class_title='',
                              read_only=read_only, vals=None)
             
-            logger.info('%s = %s' % (attr.name, repr(value)))
+            #logger.info('%s = %s' % (attr.name, repr(value)))
             
             attributes.append(attribute)
             
