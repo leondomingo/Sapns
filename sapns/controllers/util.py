@@ -16,11 +16,8 @@ import sapns.lib.sapns.util as libutil
 
 import re
 import logging
-from sqlalchemy.sql.expression import and_
 from pylons.templating import render_jinja2
-from sapns.model.sapnsmodel import SapnsClass, SapnsAttribute, SapnsUser,\
-    SapnsShortcut, SapnsAction, SapnsPrivilege, SapnsAttrPrivilege
-    
+
 __all__ = ['UtilController']
 
 class UtilController(BaseController):
@@ -31,7 +28,7 @@ class UtilController(BaseController):
     def init(self):
         set_lang('en')
         self.update_metadata()
-        self.create_dashboards()
+        libutil.create_data_exploration()
         
         return dict(message=_('Initialization was completed successfully'),
                     came_from=url('/'))
@@ -39,146 +36,7 @@ class UtilController(BaseController):
     @expose('sapns/util/index.html')
     def index(self, came_from='/'):
         return dict(page='util', came_from=came_from)
-    
-    @expose('sapns/message.html')
-    def create_dashboards(self, came_from='/dashboard/util'):
-        
-        logger = logging.getLogger(__name__ + '/create_dashboards')
-        
-        for us in dbs.query(SapnsUser):
-            
-            logger.info('Creating dashboard for "%s"' % us.display_name)
-            
-            # user's dashboard
-            dboard = us.get_dashboard()
-            if not dboard:
-                
-                dboard = SapnsShortcut()
-                dboard.user_id = us.user_id
-                dboard.parent_id = None
-                dboard.title = unicode(l_('Dashboard'))
-                dboard.order = 0
-                
-                dbs.add(dboard)
-                dbs.flush()
-                
-                # data exploration
-                
-                data_ex = SapnsShortcut()
-                data_ex.title = unicode(l_('Data exploration'))
-                data_ex.parent_id = dboard.shortcut_id
-                data_ex.user_id = us.user_id
-                data_ex.order = 0
-                
-                dbs.add(data_ex)
-                dbs.flush()
-                
-                # Data exploration/Sapns
-                sc_sapns = SapnsShortcut()
-                sc_sapns.title = 'Sapns'
-                sc_sapns.parent_id = data_ex.shortcut_id
-                sc_sapns.user_id = us.user_id
-                sc_sapns.order = 0
-                
-                dbs.add(sc_sapns)
-                
-                # Data exploration/Project
-                sc_project = SapnsShortcut()
-                sc_project.title = config.get('app.name', unicode(l_('Project')))
-                sc_project.parent_id = data_ex.shortcut_id
-                sc_project.user_id = us.user_id
-                sc_project.order = 1
-                
-                dbs.add(sc_project)
-                dbs.flush()
-                
-            else:
-                logger.info('Dashboard already exists')
-                data_ex = us.get_dataexploration()
-                sc_sapns = data_ex.by_order(0)
-                sc_project = data_ex.by_order(1)
-                
-            # data exploration/project
-            tables = self.extract_model(all=True)['tables']
-            
-            for i, tbl in enumerate(tables):
-                
-                cls = dbs.query(SapnsClass).\
-                        filter(SapnsClass.name == tbl['name']).\
-                        first()
-                
-                # look for this table action
-                act_table = dbs.query(SapnsAction).\
-                                filter(and_(SapnsAction.type == SapnsAction.TYPE_LIST,
-                                            SapnsAction.class_id == cls.class_id)).\
-                                first()
-                                
-                if not act_table:
-                    act_table = SapnsAction()
-                    act_table.name = unicode(l_('List'))
-                    act_table.type = SapnsAction.TYPE_LIST
-                    act_table.class_id = cls.class_id
-                    
-                    dbs.add(act_table)
-                    dbs.flush()
-                    
-                # project
-                sc_parent = sc_project.shortcut_id
-                if cls.name.startswith('sp_'):
-                    # sapns
-                    sc_parent = sc_sapns.shortcut_id
-                    
-                sc_table = dbs.query(SapnsShortcut).\
-                        filter(and_(SapnsShortcut.parent_id == sc_parent,
-                                    SapnsShortcut.action_id == act_table.action_id,
-                                    SapnsShortcut.user_id == us.user_id,
-                                    )).\
-                        first()
-                        
-                # does this user have this class shortcut?
-                if not sc_table:
-                    sc_table = SapnsShortcut()
-                    sc_table.title = tbl['name']
-                    sc_table.parent_id = sc_parent
-                    sc_table.user_id = us.user_id
-                    sc_table.action_id = act_table.action_id
-                    sc_table.order = i
-    
-                    dbs.add(sc_table)
-                    dbs.flush()
-                
-                    # privileges
-                    priv = SapnsPrivilege()
-                    priv.user_id = us.user_id
-                    priv.class_id = cls.class_id
-                
-                    dbs.add(priv)
-                    dbs.flush()
-                    
-                else:
-                    logger.info('Shortcut for "%s" already exists' % cls.title)
-                
-                # attribute privileges
-                for attr in dbs.query(SapnsAttribute).\
-                        filter(SapnsAttribute.class_id == cls.class_id).\
-                        all():
-                    
-                    #if not SapnsAttrPrivilege.get_privilege(us.user_id, attr.attribute_id):
-                    if not us.attr_privilege(attr.attribute_id):
-                        priv_attr = SapnsAttrPrivilege()
-                        priv_attr.user_id = us.user_id
-                        priv_attr.attribute_id = attr.attribute_id
-                        priv_attr.access = SapnsAttrPrivilege.ACCESS_READWRITE
-                        
-                        dbs.add(priv_attr)
-                        dbs.flush()
-                        
-                    else:
-                        logger.info('Privilege for "%s" already exists' % attr.title)
 
-        return dict(message=_('The user dashboards have been created'), 
-                    came_from=url(came_from))
-    
     @expose('sapns/message.html')
     def update_metadata(self, came_from='/dashboard/util'):
         libutil.update_metadata()

@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from tg import config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsClass, SapnsAction, SapnsAttribute
+from sapns.model.sapnsmodel import SapnsClass, SapnsAction, SapnsAttribute,\
+    SapnsUser, SapnsShortcut, SapnsPrivilege, SapnsAttrPrivilege, SapnsRoles,\
+    SapnsUserRole
 
 import logging
 from sqlalchemy import MetaData
@@ -222,3 +225,144 @@ def update_metadata():
         
         dbs.add(attr)
         dbs.flush()
+    
+    
+def create_dashboards(us):
+    
+    logger = logging.getLogger('lib.sapns.util.create_dashboards')
+    
+    #us = dbs.query(SapnsUser).get(id_user)
+        
+    logger.info('Creating dashboard for "%s"' % us.display_name)
+    
+    # user's dashboard
+    dboard = us.get_dashboard()
+    if not dboard:
+        
+        dboard = SapnsShortcut()
+        dboard.user_id = us.user_id
+        dboard.parent_id = None
+        dboard.title = unicode(l_('Dashboard'))
+        dboard.order = 0
+        
+        dbs.add(dboard)
+        dbs.flush()
+        
+        # data exploration
+        
+        data_ex = SapnsShortcut()
+        data_ex.title = unicode(l_('Data exploration'))
+        data_ex.parent_id = dboard.shortcut_id
+        data_ex.user_id = us.user_id
+        data_ex.order = 0
+        
+        dbs.add(data_ex)
+        dbs.flush()
+        
+        # Data exploration/Sapns
+        sc_sapns = SapnsShortcut()
+        sc_sapns.title = 'Sapns'
+        sc_sapns.parent_id = data_ex.shortcut_id
+        sc_sapns.user_id = us.user_id
+        sc_sapns.order = 0
+        
+        dbs.add(sc_sapns)
+        
+        # Data exploration/Project
+        sc_project = SapnsShortcut()
+        sc_project.title = config.get('app.name', unicode(l_('Project')))
+        sc_project.parent_id = data_ex.shortcut_id
+        sc_project.user_id = us.user_id
+        sc_project.order = 1
+        
+        dbs.add(sc_project)
+        dbs.flush()
+        
+    else:
+        logger.info('Dashboard already exists')
+        
+def create_data_exploration():
+    
+    ROLE_MANAGERS = u'managers'
+    managers = SapnsRoles.by_name(ROLE_MANAGERS)
+    #managers = SapnsRoles()
+    
+    logger = logging.getLogger('lib.sapns.util.create_data_exploration')
+    
+    tables = extract_model(all=True) #['tables']
+    
+    for tbl in tables:
+        cls = SapnsClass.by_name(tbl['name'])
+        
+        # class privilege
+        if not managers.has_privilege(cls.class_id):
+            managers.add_privilege(cls.class_id)
+            
+        # attribute privileges
+        for attr in dbs.query(SapnsAttribute).\
+                filter(SapnsAttribute.class_id == cls.class_id):
+            
+            if not managers.attr_privilege(attr.attribute_id):
+                managers.add_attr_privilege(attr.attribute_id, SapnsAttrPrivilege.ACCESS_READWRITE)
+    
+    for us in dbs.query(SapnsUser).\
+        join((SapnsUserRole,
+              and_(SapnsUserRole.user_id == SapnsUser.user_id,
+                   SapnsUserRole.role_id == managers.group_id,
+                   ))):
+        
+        create_dashboards(us)
+        
+        data_ex = us.get_dataexploration()
+        sc_sapns = data_ex.by_order(0)
+        sc_project = data_ex.by_order(1)
+        
+        # data exploration/project       
+        for i, tbl in enumerate(tables):
+            
+            cls = dbs.query(SapnsClass).\
+                    filter(SapnsClass.name == tbl['name']).\
+                    first()
+            
+            # look for this table "list" action
+            act_table = dbs.query(SapnsAction).\
+                filter(and_(SapnsAction.type == SapnsAction.TYPE_LIST,
+                            SapnsAction.class_id == cls.class_id)).\
+                first()
+                            
+            if not act_table:
+                act_table = SapnsAction()
+                act_table.name = unicode(l_('List'))
+                act_table.type = SapnsAction.TYPE_LIST
+                act_table.class_id = cls.class_id
+                
+                dbs.add(act_table)
+                dbs.flush()
+                
+            # project
+            sc_parent = sc_project.shortcut_id
+            if cls.name.startswith('sp_'):
+                # sapns
+                sc_parent = sc_sapns.shortcut_id
+                
+            sc_table = dbs.query(SapnsShortcut).\
+                    filter(and_(SapnsShortcut.parent_id == sc_parent,
+                                SapnsShortcut.action_id == act_table.action_id,
+                                SapnsShortcut.user_id == us.user_id,
+                                )).\
+                    first()
+                    
+            # does this user have this class shortcut?
+            if not sc_table:
+                sc_table = SapnsShortcut()
+                sc_table.title = tbl['name']
+                sc_table.parent_id = sc_parent
+                sc_table.user_id = us.user_id
+                sc_table.action_id = act_table.action_id
+                sc_table.order = i
+    
+                dbs.add(sc_table)
+                dbs.flush()
+            
+            else:
+                logger.info('Shortcut for "%s" already exists' % cls.title)

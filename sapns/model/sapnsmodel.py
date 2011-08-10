@@ -18,7 +18,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.exc import NoSuchTableError
 
 from sapns.model import DeclarativeBase, DBSession as dbs
-from sapns.model.auth import User, user_group_table
+from sapns.model.auth import User, user_group_table, Group
 
 import logging
 from neptuno.util import datetostr
@@ -31,6 +31,68 @@ __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsMessage', 'SapnsMessageTo',
            'SapnsRepo', 'SapnsDoc', 'SapnsDocType', 'SapnsAssignedDoc',
           ]
+
+class SapnsRoles(Group):
+
+    @staticmethod
+    def by_name(role_name):
+        return dbs.query(SapnsRoles).\
+            filter(SapnsRoles.group_name == role_name).\
+            first()
+    
+    def add_privilege(self, id_class):
+        priv = SapnsPrivilege()
+        priv.role_id = self.group_id
+        priv.class_id = id_class
+        
+        dbs.add(priv)
+        dbs.flush()
+        
+    def remove_privilege(self, id_class):
+        dbs.query(SapnsPrivilege).\
+            filter(and_(SapnsPrivilege.role_id == self.group_id,
+                        SapnsPrivilege.class_id == id_class,
+                        )).\
+            delete()
+            
+        dbs.flush()
+            
+    def has_privilege(self, id_class):
+        return dbs.query(SapnsPrivilege).\
+            filter(and_(SapnsPrivilege.role_id == self.group_id,
+                        SapnsPrivilege.class_id == id_class
+                        )).\
+            first() != None
+            
+    def attr_privilege(self, id_attribute):
+        return dbs.query(SapnsAttrPrivilege).\
+            filter(and_(SapnsAttrPrivilege.role_id == self.group_id,
+                        SapnsAttrPrivilege.attribute_id == id_attribute)).\
+            first()
+            
+    def add_attr_privilege(self, id_attribute, access):
+        ap = SapnsAttrPrivilege()
+        ap.role_id = self.group_id
+        ap.attribute_id = id_attribute
+        ap.access = access
+        
+        dbs.add(ap)
+        dbs.flush()
+
+class SapnsUserRole(DeclarativeBase):
+    
+    __tablename__ = 'sp_user_role'
+    __table_args__ = (None, dict(useexisting=True))
+    
+    user_id = Column('id_user', Integer,
+                     ForeignKey('sp_users.id',
+                                onupdate="CASCADE", ondelete="CASCADE"), 
+                     primary_key=True)
+                          
+    role_id = Column('id_role', Integer, 
+                     ForeignKey('sp_roles.id',
+                                onupdate="CASCADE", ondelete="CASCADE"), 
+                     primary_key=True)
 
 # inherited class from "User"
 class SapnsUser(User):
@@ -197,14 +259,7 @@ class SapnsUser(User):
     def has_privilege(self, cls):
         
         def _has_privilege():
-            priv = dbs.query(SapnsPrivilege).\
-                join((SapnsClass,
-                      SapnsClass.class_id == SapnsPrivilege.class_id)).\
-                filter(and_(SapnsPrivilege.user_id == self.user_id,
-                            SapnsClass.name == cls)).\
-                first()
-                
-            return priv != None
+            return SapnsPrivilege.has_privilege(self.user_id, cls)            
         
         _cache = cache.get_cache('user_has_privilege')
         return _cache.get_value(key='%s_%d' % (cls, self.user_id),
@@ -811,24 +866,66 @@ class SapnsClass(DeclarativeBase):
         
     # get attributes
     def get_attributes(self, id_user):
-        
+
         def _get_attributes():
-            return dbs.query(SapnsAttribute, SapnsAttrPrivilege).\
-                    join((SapnsAttrPrivilege, 
-                          and_(SapnsAttrPrivilege.user_id == id_user,
-                               SapnsAttrPrivilege.attribute_id == SapnsAttribute.attribute_id))).\
-                    filter(and_(SapnsAttribute.class_id == self.class_id,
-                                SapnsAttribute.visible == True)).\
-                    order_by(SapnsAttribute.insertion_order)
+            _cmp = SapnsAttrPrivilege.cmp_access
             
+            class_attr_priv = {}
+            
+            # role based
+            for attr_priv in dbs.query(SapnsAttrPrivilege).\
+                    join((SapnsRoles,
+                          SapnsRoles.group_id == SapnsAttrPrivilege.role_id)).\
+                    join((SapnsUserRole,
+                          and_(SapnsUserRole.role_id == SapnsRoles.group_id,
+                               SapnsUserRole.user_id == id_user
+                               ))):
+                
+                if class_attr_priv.has_key(attr_priv.attribute_id):
+                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
+                        class_attr_priv[attr_priv.attribute_id] = attr_priv.access
+    
+                else:
+                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
+
+            # user based                    
+            for attr_priv in dbs.query(SapnsAttrPrivilege).\
+                    join((SapnsAttribute,
+                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
+                               SapnsAttribute.class_id == self.class_id,
+                               SapnsAttrPrivilege.user_id == id_user
+                               ))):
+                
+                if class_attr_priv.has_key(attr_priv.attribute_id):
+                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
+                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
+    
+                else:
+                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
+                    
+    
+            class_attributes = []
+            for attr in dbs.query(SapnsAttribute).\
+                    filter(SapnsAttribute.class_id == self.class_id):
+                
+                if class_attr_priv.has_key(attr.attribute_id) and \
+                class_attr_priv[attr.attribute_id].access != SapnsAttrPrivilege.ACCESS_DENIED:
+                    class_attributes.append(
+                        Dict(id=attr.attribute_id,
+                             name=attr.name,
+                             title=attr.title,
+                             type=attr.type,
+                             required=attr.required,
+                             related_class_id=attr.related_class_id,
+                            ))
+                
+            return zip(class_attributes, class_attr_priv.values())
+
         _cache = cache.get_cache('class_get_attributes')
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
-                                createfunc=_get_attributes, expiretime=3600)
-        
+                                createfunc=_get_attributes, expiretime=1)
 
 class SapnsAttribute(DeclarativeBase):
-    
-    """List of sapns columns in tables"""
     
     __tablename__ = 'sp_attributes'
     __table_args__ = (UniqueConstraint('name', 'id_class'), {})
@@ -882,27 +979,44 @@ SapnsClass.related_attributes = \
 class SapnsPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_privileges'
-    __table_args__ = (UniqueConstraint('id_user', 'id_class'), {})
+    __table_args__ = (UniqueConstraint('id_user', 'id_class'),
+                      UniqueConstraint('id_role', 'id_class'), {})
     
     privilege_id = Column('id', Integer, primary_key=True, autoincrement=True)
     
     user_id = Column('id_user', Integer, 
                      ForeignKey('sp_users.id',
-                                onupdate='CASCADE', ondelete='CASCADE'),
-                     nullable=False)
-    
+                                onupdate='CASCADE', ondelete='CASCADE'))
+
+    role_id = Column('id_role', Integer,
+                     ForeignKey('sp_roles.id',
+                                onupdate='CASCADE', ondelete='CASCADE'))
+
     class_id = Column('id_class', Integer, 
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'), 
                       nullable=False)
-    
+
     @staticmethod
     def has_privilege(id_user, id_class):
+        
+        if isinstance(id_class, (str, unicode)):
+            id_class = SapnsClass.by_name(id_class).class_id
+        
         priv = dbs.query(SapnsPrivilege).\
-                filter(and_(SapnsPrivilege.user_id == id_user,
-                            SapnsPrivilege.class_id == id_class,
-                            )).\
-                first()
+            join((SapnsRoles,
+                  SapnsRoles.group_id == SapnsPrivilege.role_id)).\
+            join((SapnsUserRole,
+                  and_(SapnsUserRole.role_id == SapnsRoles.group_id,
+                       SapnsUserRole.user_id == id_user))).\
+            first()
+            
+        if not priv:
+            priv = dbs.query(SapnsPrivilege).\
+                    filter(and_(SapnsPrivilege.user_id == id_user,
+                                SapnsPrivilege.class_id == id_class,
+                                )).\
+                    first()
                 
         return priv != None
     
@@ -910,7 +1024,7 @@ class SapnsPrivilege(DeclarativeBase):
     def add_privilege(id_user, id_class):
         priv = SapnsPrivilege()
         priv.user = id_user
-        priv.class_ = id_class
+        priv.class_id = id_class
         
         dbs.add(priv)
         dbs.flush()
@@ -928,14 +1042,18 @@ class SapnsPrivilege(DeclarativeBase):
 class SapnsAttrPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_attr_privileges'
-    __table_args__ = (UniqueConstraint('id_user', 'id_attribute'), {})
+    __table_args__ = (UniqueConstraint('id_user', 'id_attribute'),
+                      UniqueConstraint('id_role', 'id_attribute'), {})
     
     attr_privilege_id = Column('id', Integer, primary_key=True, autoincrement=True)
     
     user_id = Column('id_user', Integer, 
                      ForeignKey('sp_users.id', 
-                                onupdate='CASCADE', ondelete='CASCADE'), 
-                     nullable=False)
+                                onupdate='CASCADE', ondelete='CASCADE'))
+    
+    role_id = Column('id_role', Integer,
+                     ForeignKey('sp_roles.id',
+                                onupdate='CASCADE', ondelete='CASCADE'))
     
     attribute_id = Column('id_attribute', Integer, 
                           ForeignKey('sp_attributes.id',
@@ -959,19 +1077,38 @@ class SapnsAttrPrivilege(DeclarativeBase):
     
     @staticmethod
     def get_access(id_user, id_attribute):
-        
+
         def _get_access():
-        
-            priv = SapnsAttrPrivilege.get_privilege(id_user, id_attribute)
-            if priv is None:
-                return SapnsAttrPrivilege.ACCESS_DENIED
-            
-            else:
-                return priv.access
+            _cmp = SapnsAttrPrivilege.cmp_access
+            access = SapnsAttrPrivilege.ACCESS_DENIED
+    
+            # role_based
+            for attr_priv in dbs.query(SapnsAttrPrivilege).\
+                    join((SapnsRoles,
+                          SapnsRoles.group_id == SapnsAttrPrivilege.role_id)).\
+                    join((SapnsUserRole,
+                          and_(SapnsUserRole.role_id == SapnsRoles.group_id,
+                               SapnsUserRole.user_id == id_user
+                               ))).\
+                    filter(SapnsAttrPrivilege.attribute_id == id_attribute):
+                
+                if _cmp(access, attr_priv.access) == -1:
+                    access = attr_priv.access
+                    
+            # user based
+            attr_priv = dbs.query(SapnsAttrPrivilege).\
+                    filter(and_(SapnsAttrPrivilege.user_id == id_user,
+                                SapnsAttrPrivilege.attribute_id == id_attribute)).\
+                    first()
+                
+            if attr_priv and _cmp(access, attr_priv.access) == -1:
+                access = attr_priv.access
+                    
+            return access
             
         _cache = cache.get_cache('attrpriv_get_access')
         return _cache.get_value(key='%d_%d' % (id_user, id_attribute),
-                                createfunc=_get_access, expiretime=3600)
+                                createfunc=_get_access, expiretime=1)
         
     @staticmethod
     def add_privilege(id_user, id_attribute, access):
@@ -998,6 +1135,21 @@ class SapnsAttrPrivilege(DeclarativeBase):
             delete()
             
         dbs.flush()
+        
+    @staticmethod
+    def cmp_access(a1, a2):
+        
+        def value(a):
+            if a == SapnsAttrPrivilege.ACCESS_READWRITE:
+                return 3
+            
+            elif a == SapnsAttrPrivilege.ACCESS_READONLY:
+                return 2
+            
+            elif a == SapnsAttrPrivilege.ACCESS_DENIED:
+                return 1
+            
+        return cmp(value(a1), value(a2))
 
 class SapnsAction(DeclarativeBase):
     """List of available actions in Sapns"""
