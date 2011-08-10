@@ -23,36 +23,37 @@
 {% block middle %}
 <div id="user-dialog"></div>
 <form id="form-edit-user" method="post" action="/dashboard/users/save">
-<input type="hidden" name="id" value="{{user.user_id}}"/>
+<input type="hidden" name="id" value="{{user.user_id}}">
+<input type="hidden" name="came_from" value="{{came_from or ''}}">
 <div id="edit-user">
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('Display name')}}</div>
         <input class="sp-text-field" type="text" style="width: 50%;" 
-            name="display_name" value="{{user.display_name}}"/>
+            name="display_name" value="{{user.display_name}}">
     </div>
     
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('User name')}}</div>
         <input class="sp-text-field" type="text" style="width: 50%;" 
-            name="user_name" value="{{user.user_name}}"/>
+            name="user_name" value="{{user.user_name}}">
     </div>
 
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('E-mail address')}}</div>
         <input class="sp-text-field" type="text" style="width: 50%;" 
-            name="email_address" value="{{user.email_address}}"/>
+            name="email_address" value="{{user.email_address}}">
     </div>
     
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('Password')}}</div>
-        <input id="password" class="sp-text-field" type="password" 
-            name="password" value=""/>
+        <input id="password" class="sp-text-field" type="password"
+            name="password" value="">
     </div>
     
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('Re-type password')}}</div>
         <input id="password2" class="sp-text-field" type="password" 
-            value=""/>
+            value="">
     </div>
     
     {% if not user.user_id %}
