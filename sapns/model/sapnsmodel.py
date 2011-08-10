@@ -18,13 +18,14 @@ from sqlalchemy.types import Unicode, Integer, String, Boolean, DateTime, Date,\
     Time, Text
 from sqlalchemy import MetaData, Table
 from sqlalchemy.orm import relation, synonym
+from sqlalchemy.exc import NoSuchTableError
 
 from sapns.model import DeclarativeBase, metadata, DBSession as dbs
-from sapns.model.auth import User
+from sapns.model.auth import User, user_group_table
 
 import logging
 from neptuno.util import datetostr
-from sqlalchemy.exc import NoSuchTableError
+from neptuno.dict import Dict
 
 __all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
            'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
@@ -154,6 +155,14 @@ class SapnsUser(User):
                 ap_copy.access = ap.access
                 
                 dbs.add(ap_copy)
+                dbs.flush()
+                
+            logger.info('Copying roles')
+            cond = user_group_table.c.id_user == other_id #@UndefinedVariable
+            for rl in dbs.execute(user_group_table.select(cond)):
+                copy_rl = dict(id_user=self.user_id, id_role=rl.id_role)
+                ins_rl = user_group_table.insert(values=copy_rl)
+                dbs.execute(ins_rl)
                 dbs.flush()
                 
         except Exception, e:
@@ -653,32 +662,51 @@ class SapnsClass(DeclarativeBase):
             for ac in dbs.query(SapnsAction).\
                     filter(and_(SapnsAction.class_id == self.class_id,
                                 SapnsAction.type != SapnsAction.TYPE_LIST,
-                                )).\
-                    all():
+                                )):
                 
                 url = ac.url
                 if url and url[-1] != '/':
                     url += '/'
                     
                 require_id = True
+                pos = None
                 if ac.type == SapnsAction.TYPE_NEW:
-                    url = SapnsAction.URL_NEW
+                    if not ac.url:
+                        url = SapnsAction.URL_NEW
+                        
                     require_id = False
+                    pos = 0
                 
                 elif ac.type == SapnsAction.TYPE_EDIT:
-                    url = SapnsAction.URL_EDIT
+                    if not ac.url:
+                        url = SapnsAction.URL_EDIT
+                        
+                    pos = 1
                 
                 elif ac.type == SapnsAction.TYPE_DELETE:
-                    url = SapnsAction.URL_DELETE
+                    if not ac.url:
+                        url = SapnsAction.URL_DELETE
+                        
+                    pos = 2
+
+                actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
+                                    require_id=require_id, pos=pos))
                 
-                actions.append(dict(title=_(ac.name), type=ac.type, 
-                                    url=url, require_id=require_id))
+            def cmp_act(x, y):
+                if x.pos is None:
+                    return -1
+                
+                elif y.pos is None:
+                    return 1
+                
+                else:
+                    return cmp(x.pos, y.pos)
         
-            return actions
+            return sorted(actions, cmp=cmp_act)
         
         _cache = cache.get_cache('sorted_actions')
         return _cache.get_value(key=self.class_id, createfunc=_sorted_actions,
-                                expiretime=3600)
+                                expiretime=1)
     
     def insertion(self):
         """

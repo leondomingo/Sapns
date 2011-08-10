@@ -188,8 +188,7 @@ class DashboardController(BaseController):
         if rp and totalp > rp:
             totalp = rp
             
-        link_data = dict(q=q, rp=rp, pag_n=pag_n, caption=caption, 
-                         show_ids=show_ids)
+        link_data = dict(q=q, rp=rp, pag_n=pag_n, caption=caption, show_ids=show_ids)
         
         if ch_attr and parent_id:
             link_data['ch_attr'] = ch_attr
