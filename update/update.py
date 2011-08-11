@@ -11,6 +11,29 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 upper_path = os.path.split(current_path)[0]
 sys.path.append(upper_path)
 
+import pylons
+from pylons.i18n import ugettext as _
+from pylons.i18n.translation import _get_translator
+from contextlib import contextmanager
+
+@contextmanager
+def set_language_context_manager(language=None, **kwargs):
+    translator = _get_translator(language, **kwargs)
+    pylons.translator._push_object(translator)
+    try:
+        yield
+    finally:
+        pylons.translator._pop_object()
+        
+@contextmanager
+def set_tmpl_context_cm():
+    obj = None
+    pylons.tmpl_context._push_object(obj)
+    try:
+        yield
+    finally:
+        pylons.tmpl_context._pop_object()
+
 from tg import config
 from paste.deploy import appconfig
 from sapns.model import DBSession as dbs
@@ -24,16 +47,13 @@ def parse_args():
     parser = ArgumentParser(description=__doc__)
     parser.add_argument('conf_file', help='configuration to use')
     parser.add_argument('-m', '--mode')
+    parser.add_argument('-l', '--lang', help='language')
 
     return parser.parse_args()
 
-def make_update():
+def make_update(args, mode):
     
-    args = parse_args()
-    mode = args.mode or 'post'
-    load_config(args.conf_file)
-
-    sys.stdout.write('Loading settings...')
+    sys.stdout.write(_('Loading settings...'))
     SETTINGS = {}
     # postgresql://postgres:mypassword@localhost:5432/mydb
     m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', str(dbs.bind))
@@ -47,16 +67,16 @@ def make_update():
         sys.stdout.write('OK\n')
         
     else:
-        raise Exception('It was not possible to get connection data!')
+        raise Exception(_('It was not possible to get connection data'))
     
     SETTINGS['pg_path'] = config.get('pg_path', '/usr/bin/')
     
     if not mode.lower() in ['pre', 'post']:
-        raise Exception('"%s": Wrong mode' % mode)
+        raise Exception(_('"%s": Wrong mode' % mode))
 
-    sys.stdout.write('Updating in [%s] mode\n' % mode)
+    sys.stdout.write(_('Updating in [%s] mode\n' % mode))
 
-    # read already-made updates
+    # read already-done updates
     # 6729 post
     # 7832 pre
     # ...
@@ -89,15 +109,15 @@ def make_update():
     f_done = file(DONE, 'a')
     try:
         for line in f_todo:
-            # # esto es un comentario
+            # # a comment
             # #7000 pre
             m_coment = re.search(r'^#.+', line)
             if m_coment:
                 continue
 
-            # 7916.modelo    post    ./issue_7916/issue_7916.sql
-            # 7916-otros     post    ./issue_7916/issue_7916.py
-            m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./-]+)', 
+            # 7916.modelo    post    issue_7916/issue_7916.sql
+            # 7916-otros     post    issue_7916.issue_7916  .py
+            m_issue = re.search(r'^([\w\-\._]+)\s+(pre|post)\s+([\w./-]+)\s*(\.py)?', 
                                 line, re.I | re.U)
             if m_issue:
                 # 6729    post    ./issue_6729/issue_6729.sql
@@ -107,7 +127,7 @@ def make_update():
                 
                 if current_issue in made or \
                 m_issue.group(2).lower() != mode.lower():
-                    sys.stderr.write('Skipping [%s] \n' % current_issue)
+                    sys.stderr.write(_('Skipping [%s] \n' % current_issue))
 
                 else:
                     sys.stdout.write('[%s] ' % current_issue)
@@ -115,20 +135,16 @@ def make_update():
                     # get update file extension
                     ext = os.path.splitext(m_issue.group(3))[1]
                     try:
-                        if ext == '.py':
+                        # .py
+                        if m_issue.group(4):
                             # Python
-                            sys.stdout.write('Executing Python script...\n')
-                            
-                            call = [sys.executable, 
-                                    os.path.join(current_path, m_issue.group(3)),
-                                    args.conf_file,
-                                    ]
-                            
-                            sp.check_call(call)
+                            sys.stdout.write(_('Executing Python script...\n'))
+                            module = __import__(m_issue.group(3), None, None, ['update'])
+                            module.update()
 
+                        # SQL
                         elif ext == '.sql':
-                            # SQL
-                            sys.stdout.write('Executing SQL script...\n')
+                            sys.stdout.write(_('Executing SQL script...\n'))
                             os.environ['PGPASSWORD'] = SETTINGS['password']
                             
                             call = [os.path.join(SETTINGS['pg_path'], 'psql'),
@@ -153,6 +169,13 @@ def make_update():
     finally:
         f_todo.close()
         f_done.close()
-
+            
 if __name__ == '__main__':
-    make_update()
+    
+    args = parse_args()
+    mode = args.mode or 'post'
+    load_config(args.conf_file)
+
+    with set_tmpl_context_cm():
+        with set_language_context_manager(language=args.lang):    
+            make_update(args, mode)

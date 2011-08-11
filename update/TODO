@@ -1,3 +1,13 @@
 # lista de actualizaciones
-#0000    post    example/example.sql
-#0000    post    example/example.py
+#0000               post    example/example.sql
+#0000               post    example/example.py
+# Sapns initialization
+#get_roles           post    sapns_init/get_roles.function.sql
+#has_role            post    sapns_init/has_role.function.sql
+#sp_classes          post    sapns_init/sp_classes.view.sql
+#sp_attributes       post    sapns_init/sp_attributes.view.sql
+#sp_actions_view     post    sapns_init/sp_actions.view.sql
+#sp_attr_priv_view   post    sapns_init/sp_attr_privileges.view.sql
+#sp_users_view       post    sapns_init/sp_users.view.sql
+init                 post    sapns_init.init  .py
+
