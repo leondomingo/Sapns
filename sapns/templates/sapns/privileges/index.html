@@ -75,7 +75,7 @@
         }
         
         .class_row_selected {
-            background-color: red;
+            background-color: orange;
         }
         
         .class_name {
@@ -111,6 +111,15 @@
             padding-left: 10px;
             font-size: 15px;
             background-color: lightgray;
+        }
+        
+        #attr_title_caption {
+            width: 540px;
+            float: left;
+        }
+        
+        .btn_denied, .btn_readonly, .btn_readwrite {
+            font-size: 9px;
         }
         
         #attr_list {
@@ -192,12 +201,17 @@
     
     <div id="right_content">
         <div id="attr_pane">
-            <div id="attr_title">Attributes</div>
+            <div id="attr_title">
+              <div id="attr_title_caption">{{_('Attributes')}}</div>
+              <button class="btn_denied">DE</button>
+              <button class="btn_readonly">R-O</button>
+              <button class="btn_readwrite">R/W</button>
+            </div>
             <div id="attr_list"></div>
         </div>
         
         <div id="actions_pane">
-            <div id="actions_title">Actions</div>
+            <div id="actions_title">{{_('Actions')}}</div>
             <div id="actions_list"></div>
         </div>
     </div>
@@ -223,41 +237,43 @@
             return true;
         }
         
+        function attr_access_change() {
+
+            var attr_p = $(this).parent();
+            
+            var data_in = {
+                    id_attribute: attr_p.attr('id_attr'),
+                    id_attr_p: attr_p.attr('id_attr_p'),
+                    access: $(this).val()
+            };
+            
+            /*
+            if(!(get_role_user(data_in)) {
+                return;
+            }
+            */
+            data_in.id_role = 1;
+            
+            //console.log(JSON.stringify(data_in)); 
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/privileges/attrp_update')}}",
+                data: data_in,
+                success: function(data) {
+                    if (data.status) {
+                        attr_p.attr('id_attr_p', data.id_attr_p);
+                    }
+                }
+            });
+        }        
+        
         function init_events() {
             
             // attr_access (select) 
-            $('.attr_access').change(function() {
+            $('.attr_row select').change(attr_access_change);
                 
-                var attr_p = $(this).parent();
-                
-                var data_in = {
-                        id_attribute: attr_p.attr('id_attr'),
-                        id_attr_p: attr_p.attr('id_attr_p'),
-                        access: $(this).val()
-                };
-                
-                /*
-                if(!(get_role_user(data_in)) {
-                    return;
-                }
-                */
-                data_in.id_role = 1;
-                
-                console.log(JSON.stringify(data_in));
-                
-                $.ajax({
-                    url: "{{tg.url('/dashboard/privileges/attrp_update')}}",
-                    data: data_in,
-                    success: function(data) {
-                        if (data.status) {
-                            attr_p.attr('id_attr_p', data.id_attr_p);
-                        }
-                    }
-                });
-            });
-                
-            // action_granted (checkbox) 
-            $('.action_granted').click(function() {
+            // action_granted (checkbox)
+            $('.action_row input[type=checkbox]').click(function() {
                 
                 var action_p = $(this).parent();
                 
@@ -335,13 +351,14 @@
             // class checkbox 
             $('.class_row input[type=checkbox]').click(function() {
                 
-                var cls = $(this).parent();
-                
+                /*
+                var cls = $(this).parent();                
                 console.log(cls.attr('id_class') + '=' + $(this).attr('checked'));
+                */
                 
                 var data_in = {
                         id_class: cls.attr('id_class'),
-                        id_class_p: cls.attr('id_class_p')
+                        granted: $(this).attr('checked')
                 };
                 
                 data_in.id_role = 1;
@@ -383,6 +400,15 @@
                 }
             });
         }
+        
+        function change_all_selects(button, access) {
+            button.parent().parent().find('select').each(function() {
+                //console.log($(this).html());
+                $(this).val(access);
+                this.attr_access_change = attr_access_change;
+                this.attr_access_change();
+            });            
+        }
     
         $(document).ready(function() {
 
@@ -391,6 +417,18 @@
             
             // user selector 
             $('#user_selector').sapnsSelector({});
+            
+            $('.btn_denied').click(function() {
+                change_all_selects($(this), 'denied');
+            });
+            
+            $('.btn_readonly').click(function() {
+                change_all_selects($(this), 'read-only');
+            });
+
+            $('.btn_readwrite').click(function() {
+                change_all_selects($(this), 'read/write');
+            });
             
             load_classes();
         });

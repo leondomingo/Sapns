@@ -5,7 +5,7 @@
 from tg import expose, url, config, redirect, request, require
 
 # third party imports
-#from pylons import cache
+from pylons import cache
 from pylons.i18n import ugettext as _
 #from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize #, predicates
@@ -16,9 +16,11 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 
 from sapns.model.sapnsmodel import SapnsUser , SapnsClass,\
-    SapnsRole, SapnsAttrPrivilege, SapnsAction, SapnsActPrivilege
+    SapnsRole, SapnsAttrPrivilege, SapnsAction, SapnsActPrivilege,\
+    SapnsPrivilege, SapnsUserRole, SapnsAttribute
 from neptuno.dict import Dict
-from neptuno.util import get_paramw
+from neptuno.util import get_paramw, strtobool
+from sqlalchemy.sql.expression import and_
 
 __all__ = ['PrivilegesController']
 
@@ -58,6 +60,42 @@ class PrivilegesController(BaseController):
                                 ))
         
         return dict(classes=classes)
+    
+    @expose('json')
+    def classp_update(self, **kw):
+        
+        logger = logging.getLogger('PrivilegesController.classp_update')
+        try:
+            
+            id_class = get_paramw(kw, 'id_class', int)
+            granted = get_paramw(kw, 'granted', strtobool)
+            
+            id_role = get_paramw(kw, 'id_role', int, opcional=True)
+            id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            
+            if granted:
+                class_p = SapnsPrivilege()
+                class_p.class_id = id_class
+                class_p.role_id = id_role
+                class_p.user_id = id_user
+                
+                dbs.add(class_p)
+                
+            else:
+                dbs.query(SapnsPrivilege).\
+                    filter(and_(SapnsPrivilege.class_id == id_class,
+                                SapnsPrivilege.role_id == id_role,
+                                SapnsPrivilege.user_id == id_user,                                
+                                )).\
+                    delete()
+            
+            dbs.flush()           
+            
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, message=str(e).decode('utf-8'))
     
     @expose('sapns/privileges/attributes.html')
     def attributes(self, id_class, **kw):
@@ -145,19 +183,38 @@ class PrivilegesController(BaseController):
         
         logger = logging.getLogger('PrivilegesController.attrp_update')
         try:
+            id_role = get_paramw(kw, 'id_role', int, opcional=True)
+            id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            id_attribute = get_paramw(kw, 'id_attribute', int)
+            
             id_attr_p = get_paramw(kw, 'id_attr_p', int, opcional=True)
             if id_attr_p:
                 attr_p = dbs.query(SapnsAttrPrivilege).get(id_attr_p)
-
+                
             else:
                 attr_p = SapnsAttrPrivilege()
-                attr_p.role_id = get_paramw(kw, 'id_role', int, opcional=True)
-                attr_p.user_id = get_paramw(kw, 'id_user', int, opcional=True)
-                attr_p.attribute_id = get_paramw(kw, 'id_attribute', int)
+                attr_p.role_id = id_role
+                attr_p.user_id = id_user 
+                attr_p.attribute_id = id_attribute
             
             attr_p.access = get_paramw(kw, 'access', str)
             dbs.add(attr_p)
             dbs.flush()
+            
+            # reset cache
+            if id_user:
+                ids_user = [id_user]
+                
+            else:
+                ids_user = [ur.user_id for ur in dbs.query(SapnsUserRole).\
+                            filter(SapnsUserRole.role_id == id_role)]
+                
+            attr = dbs.query(SapnsAttribute).get(id_attribute)
+                
+            for id_user in ids_user:
+                _cache = cache.get_cache('class_get_attributes')
+                _key = '%d_%d' % (attr.class_id, id_user)
+                _cache.remove_value(key=_key)
             
             return dict(status=True, id_attr_p=attr_p.attr_privilege_id)
             

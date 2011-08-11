@@ -912,6 +912,8 @@ class SapnsClass(DeclarativeBase):
         
     # get attributes
     def get_attributes(self, id_user):
+        
+        logger = logging.getLogger('get_attributes')
 
         def _get_attributes():
             _cmp = SapnsAttrPrivilege.cmp_access
@@ -925,15 +927,21 @@ class SapnsClass(DeclarativeBase):
                     join((SapnsUserRole,
                           and_(SapnsUserRole.role_id == SapnsRole.group_id,
                                SapnsUserRole.user_id == id_user
+                               ))).\
+                    join((SapnsAttribute,
+                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
+                               SapnsAttribute.class_id == self.class_id,
                                ))):
+                
+                logger.info(attr_priv.access)
                 
                 if class_attr_priv.has_key(attr_priv.attribute_id):
                     if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
-                        class_attr_priv[attr_priv.attribute_id] = attr_priv.access
+                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
     
                 else:
                     class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-
+                    
             # user based                    
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
                     join((SapnsAttribute,
@@ -966,10 +974,10 @@ class SapnsClass(DeclarativeBase):
                             ))
                 
             return zip(class_attributes, class_attr_priv.values())
-
+        
         _cache = cache.get_cache('class_get_attributes')
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
-                                createfunc=_get_attributes, expiretime=1)
+                                createfunc=_get_attributes, expiretime=3600)
 
 class SapnsAttribute(DeclarativeBase):
     
