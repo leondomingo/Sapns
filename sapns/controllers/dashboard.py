@@ -164,7 +164,7 @@ class DashboardController(BaseController):
             cols.append(dict(title=col, width=w, align='center'))
         
         # actions for this class
-        actions = cls_.sorted_actions()
+        actions = cls_.sorted_actions(user.user_id)
         actions = [act for act in actions \
                    if act['type'] in [SapnsAction.TYPE_NEW,
                                       SapnsAction.TYPE_EDIT,
@@ -439,7 +439,7 @@ class DashboardController(BaseController):
                                      came_from=came_from)))
 
         # actions
-        actions = [action for action in class_.sorted_actions() 
+        actions = [action for action in class_.sorted_actions(user.user_id) 
                    if action['type']  == 'process']
             
         meta = MetaData(dbs.bind)

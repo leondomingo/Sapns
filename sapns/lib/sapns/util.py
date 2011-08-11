@@ -5,7 +5,7 @@ from pylons.i18n import ugettext as _, lazy_ugettext as l_
 
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsClass, SapnsAction, SapnsAttribute,\
-    SapnsUser, SapnsShortcut, SapnsPrivilege, SapnsAttrPrivilege, SapnsRoles,\
+    SapnsUser, SapnsShortcut, SapnsPrivilege, SapnsAttrPrivilege, SapnsRole,\
     SapnsUserRole
 
 import logging
@@ -14,6 +14,8 @@ from sqlalchemy.sql.expression import and_
 from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
     BOOLEAN, BLOB
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
+
+ROLE_MANAGERS = u'managers'
 
 def extract_model(all=False): 
     logger = logging.getLogger('lib.sapns.extract_model')
@@ -130,6 +132,9 @@ def update_metadata():
     
     logger = logging.getLogger('lib.sapns.update_metadata')
     
+    managers = SapnsRole.by_name(ROLE_MANAGERS)
+    #managers = SapnsRole()
+    
     tables = extract_model(all=True)
     tables_id = {}
     pending_attr = {}
@@ -173,6 +178,9 @@ def update_metadata():
                 
                 dbs.add(action)
                 dbs.flush()
+                
+                # add this action to "managers" role
+                managers.add_act_privilege(action.action_id)
                 
         # create standard actions
         create_action(unicode(l_('New')), SapnsAction.TYPE_NEW)
@@ -283,9 +291,8 @@ def create_dashboards(us):
         
 def create_data_exploration():
     
-    ROLE_MANAGERS = u'managers'
-    managers = SapnsRoles.by_name(ROLE_MANAGERS)
-    #managers = SapnsRoles()
+    managers = SapnsRole.by_name(ROLE_MANAGERS)
+    #managers = SapnsRole()
     
     logger = logging.getLogger('lib.sapns.util.create_data_exploration')
     
@@ -338,6 +345,9 @@ def create_data_exploration():
                 
                 dbs.add(act_table)
                 dbs.flush()
+                
+                # add to "managers" role
+                managers.add_act_privilege(act_table.action_id)
                 
             # project
             sc_parent = sc_project.shortcut_id
