@@ -1,0 +1,6 @@
+{% for act in actions %}
+<div class="action_row" id_action_p="{{act.id or ''}}" id_action="{{act.id_action}}">
+    <div class="action_name">{{act.name}}</div>
+    <input class="action_granted" type="checkbox" {% if act.granted %} checked {% endif %}>
+</div>
+{% endfor %}

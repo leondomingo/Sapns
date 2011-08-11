@@ -86,6 +86,12 @@ class SapnsRole(Group):
         dbs.add(actp)
         dbs.flush()
         
+    def act_privilege(self, id_action):
+        return dbs.query(SapnsActPrivilege).\
+            filter(and_(SapnsActPrivilege.role_id == self.group_id,
+                        SapnsActPrivilege.action_id == id_action)).\
+            first()
+        
     def has_act_privilege(self, id_action):
         return dbs.query(SapnsActPrivilege).\
             filter(and_(SapnsActPrivilege.role_id == self.group_id,
@@ -284,6 +290,12 @@ class SapnsUser(User):
             filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
                         SapnsAttrPrivilege.attribute_id == id_attribute,
                         )).\
+            first()
+            
+    def act_privilege(self, id_action):
+        return dbs.query(SapnsActPrivilege).\
+            filter(and_(SapnsActPrivilege.user_id == self.user_id,
+                        SapnsActPrivilege.action_id == id_action)).\
             first()
             
     def has_act_privilege(self, id_action):
@@ -990,13 +1002,11 @@ class SapnsAttribute(DeclarativeBase):
         return unicode(self).encode('utf-8')
     
 SapnsClass.attributes = \
-    relation(SapnsAttribute,
-             backref='class_',
+    relation(SapnsAttribute, backref='class_',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.class_id)
     
 SapnsClass.related_attributes = \
-    relation(SapnsAttribute,
-             backref='related_class',
+    relation(SapnsAttribute, backref='related_class',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.related_class_id)
 
 class SapnsPrivilege(DeclarativeBase):
@@ -1194,6 +1204,10 @@ class SapnsAction(DeclarativeBase):
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'))
     
+    shortcuts = \
+        relation(SapnsShortcut, backref='action',
+                 primaryjoin=action_id == SapnsShortcut.action_id)
+    
     TYPE_NEW = 'new'
     TYPE_EDIT = 'edit'
     TYPE_DELETE = 'delete'
@@ -1217,10 +1231,8 @@ class SapnsAction(DeclarativeBase):
     def has_privilege(self, id_user):
         return SapnsActPrivilege.has_privilege(id_user, self.action_id)
     
-SapnsAction.shortcuts = \
-    relation(SapnsShortcut,
-             backref='action',
-             primaryjoin=SapnsAction.action_id == SapnsShortcut.action_id)
+SapnsClass.actions = relation(SapnsAction, backref='class_',
+                              primaryjoin=SapnsClass.class_id == SapnsAction.class_id)
     
 class SapnsActPrivilege(DeclarativeBase):
     
