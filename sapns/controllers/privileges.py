@@ -33,6 +33,32 @@ class PrivilegesController(BaseController):
         
         return dict(page=page, came_from=came_from)
     
+    @expose('sapns/privileges/classes.html')
+    def classes(self, **kw):
+        
+        id_role = get_paramw(kw, 'id_role', int, opcional=True)
+        if id_role:
+            who = dbs.query(SapnsRole).get(id_role)
+            def has_privilege(id_class):
+                return who.has_privilege(id_class, no_cache=True)
+            
+        else:
+            id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            who = dbs.query(SapnsUser).get(id_user)
+            def has_privilege(id_class):
+                cls = dbs.query(SapnsClass).get(id_class)                
+                return who.has_privilege(cls.name, no_cache=True)
+
+        classes = []
+        for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
+            classes.append(Dict(id=cls.class_id,
+                                id_class_p=None,
+                                name=cls.title,
+                                granted=has_privilege(cls.class_id),
+                                ))
+        
+        return dict(classes=classes)
+    
     @expose('sapns/privileges/attributes.html')
     def attributes(self, id_class, **kw):
         

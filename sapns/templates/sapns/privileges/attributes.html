@@ -3,13 +3,13 @@
     <div class="attr_name">{{attr.name}}</div>
     <select class="attr_access">
         <option value="denied" {% if
-           attr.access == 'denied' %} selected {% endif %}>Denied</option>
+           attr.access == 'denied' %} selected {% endif %}>{{_('Denied')}}</option>
         
         <option value="read-only" {% if
-           attr.access == 'read-only' %} selected {% endif %}>Read-only</option>
+           attr.access == 'read-only' %} selected {% endif %}>{{_('Read-only')}}</option>
         
         <option value="read/write" {% if
-           attr.access == 'read/write' %} selected {% endif %}>Read/Write</option>
+           attr.access == 'read/write' %} selected {% endif %}>{{_('Read/Write')}}</option>
     </select>
 </div>
 {% endfor %}

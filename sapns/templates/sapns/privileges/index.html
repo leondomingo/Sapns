@@ -45,7 +45,7 @@
         
         #main_pane {
             position: relative;
-            height: 400px;
+            height: 485px;
             padding: 10px;
             border: 1px solid gray;
             background-color: white;
@@ -55,8 +55,8 @@
             position: absolute;
             left: 0px;
             top: 0px;
-            height: 400px;
-            width: 200px;
+            height: 483px;
+            width: 270px;
             border: 1px solid white;
             overflow: auto;
             padding: 10px;
@@ -80,8 +80,9 @@
         
         .class_name {
             font-weight: bold;
-            width: 150px;
+            width: 220px;
             float: left;
+            overflow: hidden;
         }
         
         .class_name:hover {
@@ -91,16 +92,16 @@
         #right_content {
             position: absolute;
             top: 0px;
-            left: 224px;
-            width: 751px;
-            height: 399px;
+            left: 290px;
+            width: 685px;
+            height: 484px;
             padding: 10px;
-            border: 1px solid orange; 
+            border: 1px solid gray; 
         }
         
         #attr_pane {
             position: relative;
-            height: 240px;
+            height: 300px;
             /*background-color: cyan;*/
             margin-bottom: 10px;
         }
@@ -114,7 +115,9 @@
         
         #attr_list {
             overflow: auto;
-            height: 210px;
+            height: 250px;
+            background-color: lightgray;
+            padding-left: 10px;
         }
         
         .attr_row {
@@ -127,7 +130,7 @@
         }
         
         .attr_name {
-            width: 610px;
+            width: 538px;
             float: left;
         }
         
@@ -148,6 +151,8 @@
         #actions_list {
             overflow: auto;
             height: 120px;
+            padding-left: 10px;
+            background-color: lightgray;
         }
         
         .action_row {
@@ -160,7 +165,7 @@
         }
         
         .action_name {
-            width: 695px;
+            width: 620px;
             float: left;
         }
     </style>
@@ -177,20 +182,13 @@
     </div>
     
     <div id="user_option">
-        <div class="option_title">{{('Users')}}</div>
+        <div class="option_title">{{_('Users')}}</div>
         <div id="user_selector"></div>
     </div>
 </div>
 
 <div id="main_pane">
-    <div id="classes_sidebar">
-        {% for i in range(100) %}
-        <div id="class_{{i}}" class="class_row" id_class="{{i}}">
-            <div class="class_name">{{'Class %d'|format(i)}}</div>
-            <input type="checkbox">
-        </div>
-        {% endfor %}
-    </div>
+    <div id="classes_sidebar"></div>
     
     <div id="right_content">
         <div id="attr_pane">
@@ -295,7 +293,6 @@
                     id_class: id_class
             };
             
-            data_in.id_class = 55;
             data_in.id_role = 1;
             
             if (true) { //get_role_user(data_in)) {
@@ -325,20 +322,12 @@
                 console.log(JSON.stringify(data_in));
             }
         }
-    
-        $(document).ready(function() {
             
-            // role selector 
-            $('#role_selector').sapnsSelector({});
-            
-            // user selector 
-            $('#user_selector').sapnsSelector({});
-            
+        function init_classes_events() {
             // class name click 
             $('.class_name').click(function() {
                 $('.class_row').removeClass('class_row_selected');
-                $(this).parent().addClass('class_row_selected');
-                
+                $(this).parent().addClass('class_row_selected');                
                 
                 load_privileges($(this).parent().attr('id_class'));
             });
@@ -346,15 +335,20 @@
             // class checkbox 
             $('.class_row input[type=checkbox]').click(function() {
                 
-                console.log($(this).parent().attr('id_class') + '=' + $(this).attr('checked'));
+                var cls = $(this).parent();
+                
+                console.log(cls.attr('id_class') + '=' + $(this).attr('checked'));
                 
                 var data_in = {
-                        id_class: $(this).parent().attr('id_class')
+                        id_class: cls.attr('id_class'),
+                        id_class_p: cls.attr('id_class_p')
                 };
                 
-                if (get_role_user(data_in)) {
+                data_in.id_role = 1;
+                
+                if (true) { //get_role_user(data_in)) { 
                     $.ajax({
-                        url: "{{tg.url('/dashboard/privileges/update_class_privilege')}}",
+                        url: "{{tg.url('/dashboard/privileges/classp_update')}}",
                         data: data_in,
                         success: function(data) {
                             if (data.status) {
@@ -366,6 +360,39 @@
                     console.log(JSON.stringify(data_in));
                 }
             });
+        }
+            
+        function load_classes() {
+            $('#classes_sidebar').html("<p>{{_('Loading')}}...</p>");
+            
+            var data_in = {}
+            /*if (!get_role_user(data_in)) {
+                return;
+            }*/
+            
+            data_in.id_role = 1;
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/privileges/classes')}}",
+                data: data_in,
+                success: function(data) {
+                    $('#classes_sidebar').html(data);
+                    init_classes_events();
+                    // Select the first class 
+                    $('.class_name:first').click();
+                }
+            });
+        }
+    
+        $(document).ready(function() {
+
+            // role selector 
+            $('#role_selector').sapnsSelector({});
+            
+            // user selector 
+            $('#user_selector').sapnsSelector({});
+            
+            load_classes();
         });
     </script>
 </div>

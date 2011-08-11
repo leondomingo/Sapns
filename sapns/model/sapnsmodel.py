@@ -57,12 +57,20 @@ class SapnsRole(Group):
             
         dbs.flush()
             
-    def has_privilege(self, id_class):
-        return dbs.query(SapnsPrivilege).\
-            filter(and_(SapnsPrivilege.role_id == self.group_id,
-                        SapnsPrivilege.class_id == id_class
-                        )).\
-            first() != None
+    def has_privilege(self, id_class, no_cache=False):
+        def _has_privilege():
+            return dbs.query(SapnsPrivilege).\
+                filter(and_(SapnsPrivilege.role_id == self.group_id,
+                            SapnsPrivilege.class_id == id_class
+                            )).\
+                first() != None
+                
+        _cache = cache.get_cache('role_has_privilege')
+        _key = '%s_%d' % (id_class, self.group_id)
+        if no_cache:
+            _cache.remove_value(key=_key)
+                
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
             
     def attr_privilege(self, id_attribute):
         return dbs.query(SapnsAttrPrivilege).\
@@ -275,14 +283,17 @@ class SapnsUser(User):
         _key = '%d_%d' % (self.user_id, dboard.shortcut_id)
         cache.get_cache('user_get_shortcuts').remove_value(key=_key)
     
-    def has_privilege(self, cls):
+    def has_privilege(self, cls, no_cache=False):
         
         def _has_privilege():
             return SapnsPrivilege.has_privilege(self.user_id, cls)            
         
         _cache = cache.get_cache('user_has_privilege')
-        return _cache.get_value(key='%s_%d' % (cls, self.user_id),
-                                createfunc=_has_privilege, expiretime=3600)
+        _key = '%s_%d' % (cls, self.user_id)
+        if no_cache:
+            _cache.remove_value(key=_key)
+            
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
     
     def attr_privilege(self, id_attribute):
         
