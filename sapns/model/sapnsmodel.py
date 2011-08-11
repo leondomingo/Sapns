@@ -24,20 +24,20 @@ import logging
 from neptuno.util import datetostr
 from neptuno.dict import Dict
 
-__all__ = ['SapnsAction', 'SapnsAttrPrivilege', 'SapnsAttribute',
-           'SapnsClass', 'SapnsPrivilege', 'SapnsReport', 'SapnsReportParam',
-           'SapnsShortcut', 'SapnsUser', 'SapnsView', 'SapnsViewColumn',
-           'SapnsViewFilter', 'SapnsViewOrder', 'SapnsViewRelation',
-           'SapnsMessage', 'SapnsMessageTo',
-           'SapnsRepo', 'SapnsDoc', 'SapnsDocType', 'SapnsAssignedDoc',
+__all__ = ['SapnsAction', 'SapnsAssignedDoc', 'SapnsAttrPrivilege', 'SapnsClass',
+           'SapnsDoc', 'SapnsDocType', 'SapnsMessage', 'SapnsMessageTo',
+           'SapnsPrivilege', 'SapnsRepo', 'SapnsReport', 'SapnsReportParam',
+           'SapnsRole', 'SapnsShortcut', 'SapnsUser', 'SapnsUserRole',
+           'SapnsView', 'SapnsViewColumn', 'SapnsViewFilter', 'SapnsViewOrder',
+           'SapnsViewRelation', 
           ]
 
-class SapnsRoles(Group):
+class SapnsRole(Group):
 
     @staticmethod
     def by_name(role_name):
-        return dbs.query(SapnsRoles).\
-            filter(SapnsRoles.group_name == role_name).\
+        return dbs.query(SapnsRole).\
+            filter(SapnsRole.group_name == role_name).\
             first()
     
     def add_privilege(self, id_class):
@@ -78,6 +78,19 @@ class SapnsRoles(Group):
         
         dbs.add(ap)
         dbs.flush()
+        
+    def add_act_privilege(self, id_action):
+        actp = SapnsActPrivilege()
+        actp.action_id = id_action
+        actp.role_id = self.group_id
+        dbs.add(actp)
+        dbs.flush()
+        
+    def has_act_privilege(self, id_action):
+        return dbs.query(SapnsActPrivilege).\
+            filter(and_(SapnsActPrivilege.role_id == self.group_id,
+                        SapnsActPrivilege.action_id == id_action)).\
+            first() != None
 
 class SapnsUserRole(DeclarativeBase):
     
@@ -272,6 +285,9 @@ class SapnsUser(User):
                         SapnsAttrPrivilege.attribute_id == id_attribute,
                         )).\
             first()
+            
+    def has_act_privilege(self, id_action):
+        return SapnsActPrivilege.has_privilege(self.user_id, id_action)
     
     def get_view_name(self, cls):
         
@@ -698,7 +714,7 @@ class SapnsClass(DeclarativeBase):
             
         return _title
     
-    def sorted_actions(self):
+    def sorted_actions(self, id_user):
         """
         Returns a list of actions associated with this class.
         
@@ -710,39 +726,46 @@ class SapnsClass(DeclarativeBase):
         """
         
         def _sorted_actions():
+            
+            #user = dbs.query(SapnsUser).get(id_user)
+            #user = 
+            
             actions = []
             for ac in dbs.query(SapnsAction).\
                     filter(and_(SapnsAction.class_id == self.class_id,
                                 SapnsAction.type != SapnsAction.TYPE_LIST,
                                 )):
                 
-                url = ac.url
-                if url and url[-1] != '/':
-                    url += '/'
+                # does this user has privilege on this action?
+                if SapnsActPrivilege.has_privilege(id_user, ac.action_id):
                     
-                require_id = True
-                pos = None
-                if ac.type == SapnsAction.TYPE_NEW:
-                    if not ac.url:
-                        url = SapnsAction.URL_NEW
+                    url = ac.url
+                    if url and url[-1] != '/':
+                        url += '/'
                         
-                    require_id = False
-                    pos = 0
-                
-                elif ac.type == SapnsAction.TYPE_EDIT:
-                    if not ac.url:
-                        url = SapnsAction.URL_EDIT
-                        
-                    pos = 1
-                
-                elif ac.type == SapnsAction.TYPE_DELETE:
-                    if not ac.url:
-                        url = SapnsAction.URL_DELETE
-                        
-                    pos = 2
-
-                actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
-                                    require_id=require_id, pos=pos))
+                    require_id = True
+                    pos = None
+                    if ac.type == SapnsAction.TYPE_NEW:
+                        if not ac.url:
+                            url = SapnsAction.URL_NEW
+                            
+                        require_id = False
+                        pos = 0
+                    
+                    elif ac.type == SapnsAction.TYPE_EDIT:
+                        if not ac.url:
+                            url = SapnsAction.URL_EDIT
+                            
+                        pos = 1
+                    
+                    elif ac.type == SapnsAction.TYPE_DELETE:
+                        if not ac.url:
+                            url = SapnsAction.URL_DELETE
+                            
+                        pos = 2
+    
+                    actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
+                                        require_id=require_id, pos=pos))
                 
             def cmp_act(x, y):
                 if x.pos == y.pos:
@@ -755,7 +778,7 @@ class SapnsClass(DeclarativeBase):
         
         _cache = cache.get_cache('sorted_actions')
         return _cache.get_value(key=self.class_id, createfunc=_sorted_actions,
-                                expiretime=3600)
+                                expiretime=1)
     
     def insertion(self):
         """
@@ -874,10 +897,10 @@ class SapnsClass(DeclarativeBase):
             
             # role based
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
-                    join((SapnsRoles,
-                          SapnsRoles.group_id == SapnsAttrPrivilege.role_id)).\
+                    join((SapnsRole,
+                          SapnsRole.group_id == SapnsAttrPrivilege.role_id)).\
                     join((SapnsUserRole,
-                          and_(SapnsUserRole.role_id == SapnsRoles.group_id,
+                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
                                SapnsUserRole.user_id == id_user
                                ))):
                 
@@ -998,17 +1021,21 @@ class SapnsPrivilege(DeclarativeBase):
                       nullable=False)
 
     @staticmethod
-    def has_privilege(id_user, id_class):
+    def has_privilege(id_user, cls):
         
-        if isinstance(id_class, (str, unicode)):
-            id_class = SapnsClass.by_name(id_class).class_id
+        if isinstance(cls, (str, unicode)):
+            id_class = SapnsClass.by_name(cls).class_id
+            
+        else:
+            id_class = cls
         
         priv = dbs.query(SapnsPrivilege).\
-            join((SapnsRoles,
-                  SapnsRoles.group_id == SapnsPrivilege.role_id)).\
+            join((SapnsRole,
+                  SapnsRole.group_id == SapnsPrivilege.role_id)).\
             join((SapnsUserRole,
-                  and_(SapnsUserRole.role_id == SapnsRoles.group_id,
+                  and_(SapnsUserRole.role_id == SapnsRole.group_id,
                        SapnsUserRole.user_id == id_user))).\
+            filter(SapnsPrivilege.class_id == id_class).\
             first()
             
         if not priv:
@@ -1084,10 +1111,10 @@ class SapnsAttrPrivilege(DeclarativeBase):
     
             # role_based
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
-                    join((SapnsRoles,
-                          SapnsRoles.group_id == SapnsAttrPrivilege.role_id)).\
+                    join((SapnsRole,
+                          SapnsRole.group_id == SapnsAttrPrivilege.role_id)).\
                     join((SapnsUserRole,
-                          and_(SapnsUserRole.role_id == SapnsRoles.group_id,
+                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
                                SapnsUserRole.user_id == id_user
                                ))).\
                     filter(SapnsAttrPrivilege.attribute_id == id_attribute):
@@ -1187,11 +1214,63 @@ class SapnsAction(DeclarativeBase):
     def __str__(self):
         return unicode(self).encode('utf-8')
     
+    def has_privilege(self, id_user):
+        return SapnsActPrivilege.has_privilege(id_user, self.action_id)
+    
 SapnsAction.shortcuts = \
     relation(SapnsShortcut,
              backref='action',
              primaryjoin=SapnsAction.action_id == SapnsShortcut.action_id)
     
+class SapnsActPrivilege(DeclarativeBase):
+    
+    __tablename__ = 'sp_actions_priv'
+    __table_args__ = (UniqueConstraint('id_user', 'id_action'),
+                      UniqueConstraint('id_role', 'id_action'), {})
+
+    
+    actpriv_id = Column('id', Integer, primary_key=True)
+    action_id = Column('id_action', Integer, 
+                       ForeignKey('sp_actions.id',
+                                  onupdate='CASCADE', ondelete='CASCADE'))
+    
+    user_id = Column('id_user', Integer,
+                     ForeignKey('sp_users.id',
+                                onupdate='CASCADE', ondelete='CASCADE'))
+    
+    role_id = Column('id_role', Integer,
+                     ForeignKey('sp_roles.id',
+                                onupdate='CASCADE', ondelete='CASCADE'))
+    
+    @staticmethod
+    def has_privilege(id_user, id_action):
+        
+        #logger = logging.getLogger('SapnsActPrivilege.has_privilege')
+        #logger.info('user=%d / action=%d' % (id_user, id_action))
+        
+        def _has_privilege():
+            priv = dbs.query(SapnsActPrivilege).\
+                join((SapnsRole,
+                      SapnsRole.group_id == SapnsActPrivilege.role_id)).\
+                join((SapnsUserRole,
+                      and_(SapnsUserRole.role_id == SapnsRole.group_id,
+                           SapnsUserRole.user_id == id_user))).\
+                filter(SapnsActPrivilege.action_id == id_action).\
+                first()
+                
+            if not priv:
+                priv = dbs.query(SapnsActPrivilege).\
+                        filter(and_(SapnsActPrivilege.user_id == id_user,
+                                    SapnsActPrivilege.action_id == id_action,
+                                    )).\
+                        first()
+                        
+            return priv != None
+
+        _cache = cache.get_cache('user_act_privilege')
+        return _cache.get_value(key='%d_%d' % (id_user, id_action),
+                                createfunc=_has_privilege, expiretime=1)
+        
 class SapnsView(DeclarativeBase):
     """Views in Sapns"""
     
