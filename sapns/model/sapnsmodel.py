@@ -1224,7 +1224,7 @@ SapnsAction.shortcuts = \
     
 class SapnsActPrivilege(DeclarativeBase):
     
-    __tablename__ = 'sp_actions_priv'
+    __tablename__ = 'sp_act_privileges'
     __table_args__ = (UniqueConstraint('id_user', 'id_action'),
                       UniqueConstraint('id_role', 'id_action'), {})
 
