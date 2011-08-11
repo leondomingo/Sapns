@@ -26,7 +26,7 @@ from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
 
 import logging
 import re
-import simplejson as sj
+import simplejson as sj #@UnresolvedImport
 import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError

@@ -122,8 +122,8 @@ base_config.jinja_extensions = ['jinja2.ext.i18n']
 
 #Configure the base SQLALchemy Setup
 base_config.use_sqlalchemy = True
-base_config.model = sapns.model
-base_config.DBSession = sapns.model.DBSession
+base_config.model = sapns.model #@UndefinedVariable
+base_config.DBSession = sapns.model.DBSession #@UndefinedVariable
 
 # Configure the authentication backend
 
