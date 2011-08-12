@@ -16,6 +16,7 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.users import UsersController
 from sapns.controllers.shortcuts import ShortcutsController
 from sapns.controllers.messages import MessagesController
+from sapns.controllers.privileges import PrivilegesController
 
 from neptuno.postgres.search import search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
@@ -42,6 +43,7 @@ class DashboardController(BaseController):
     users = UsersController()
     sc = ShortcutsController()
     messages = MessagesController()
+    privileges = PrivilegesController()
 
     @expose('sapns/dashboard/index.html')
     @require(predicates.not_anonymous())
@@ -433,7 +435,7 @@ class DashboardController(BaseController):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         class_ = SapnsClass.by_name(cls)        
-        if not user.has_privilege(class_.name):        
+        if not user.has_privilege(class_.name):
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -486,6 +488,8 @@ class DashboardController(BaseController):
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
+            
+            logger.info('%s [%s]' % (attr.name, attr_priv.access))
             
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY

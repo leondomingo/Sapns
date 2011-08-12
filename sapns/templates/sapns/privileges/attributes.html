@@ -1,0 +1,15 @@
+{% for attr in attributes %}
+<div class="attr_row" id_attr_p="{{attr.id or ''}}" id_attr="{{attr.id_attr}}">
+    <div class="attr_name">{{attr.name}}</div>
+    <select>
+        <option value="denied" {% if
+           attr.access == 'denied' %} selected {% endif %}>{{_('Denied')}}</option>
+        
+        <option value="read-only" {% if
+           attr.access == 'read-only' %} selected {% endif %}>{{_('Read-only')}}</option>
+        
+        <option value="read/write" {% if
+           attr.access == 'read/write' %} selected {% endif %}>{{_('Read/Write')}}</option>
+    </select>
+</div>
+{% endfor %}

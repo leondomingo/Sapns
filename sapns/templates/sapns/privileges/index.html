@@ -1,0 +1,452 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    <style type="text/css">
+        #options {
+            position: relative;
+            height: 53px;
+            border: 1px solid gray;
+            background-color: lightgray;
+        }
+        
+        #role_option {
+            position: absolute;
+            top: 3px;
+            left: 20px;
+            width: 450px;
+            height: 25px;
+            padding: 10px;
+            border: 1px solid gray;
+            background-color: white;
+        }
+        
+        .option_title {
+            float: left;
+            width: 90px;
+            font-weight: bold;
+            /*font-family: arial;*/
+            font-size: 15px;
+        }
+        
+        #user_option {
+            position: absolute;
+            top: 3px;
+            left: 510px;
+            width: 450px;
+            height: 25px;
+            padding: 10px;
+            border: 1px solid gray;
+            background-color: white;
+        }
+        
+        #main_pane {
+            position: relative;
+            height: 485px;
+            padding: 10px;
+            border: 1px solid gray;
+            background-color: white;
+        }
+        
+        #classes_sidebar {
+            position: absolute;
+            left: 0px;
+            top: 0px;
+            height: 483px;
+            width: 270px;
+            border: 1px solid white;
+            overflow: auto;
+            padding: 10px;
+            font-size: 14px;
+            /*font-family: Arial;*/
+            background-color: lightgray;
+        }
+        
+        .class_row {
+            height: 21px;
+            border: 1px solid gray;
+            padding-left: 10px;
+            cursor: pointer;
+            background-color: gray;
+            margin-bottom: 3px;
+        }
+        
+        .class_row_selected {
+            background-color: orange;
+        }
+        
+        .class_name {
+            font-weight: bold;
+            width: 220px;
+            float: left;
+            overflow: hidden;
+        }
+        
+        .class_name:hover {
+            text-decoration: underline;
+        }
+        
+        #right_content {
+            position: absolute;
+            top: 0px;
+            left: 290px;
+            width: 685px;
+            height: 484px;
+            padding: 10px;
+            border: 1px solid gray; 
+        }
+        
+        #attr_pane {
+            position: relative;
+            height: 300px;
+            /*background-color: cyan;*/
+            margin-bottom: 10px;
+        }
+        
+        #attr_title {
+            height: 30px;
+            padding-left: 10px;
+            font-size: 15px;
+            background-color: lightgray;
+        }
+        
+        #attr_title_caption {
+            width: 540px;
+            float: left;
+        }
+        
+        .btn_denied, .btn_readonly, .btn_readwrite {
+            font-size: 9px;
+        }
+        
+        #attr_list {
+            overflow: auto;
+            height: 250px;
+            background-color: lightgray;
+            padding-left: 10px;
+        }
+        
+        .attr_row {
+            heigth: 21px;
+            padding-left: 10px;
+            margin-bottom: 3px;
+            float: left;
+            background-color: gray;
+            border: 1px solid gray;
+        }
+        
+        .attr_name {
+            width: 538px;
+            float: left;
+        }
+        
+        #actions_pane {
+            position: relative;
+            height: 150px;
+            overflow: auto;
+            /*background-color: gray;*/
+        }
+        
+        #actions_title {
+            height: 30px;
+            padding-left: 10px;
+            font-size: 15px;
+            background-color: lightgray;
+        }
+        
+        #actions_list {
+            overflow: auto;
+            height: 120px;
+            padding-left: 10px;
+            background-color: lightgray;
+        }
+        
+        .action_row {
+            heigth: 21px;
+            padding-left: 10px;
+            margin-bottom: 3px;
+            float: left;
+            background-color: gray;
+            border: 1px solid gray;
+        }
+        
+        .action_name {
+            width: 620px;
+            float: left;
+        }
+    </style>
+    <script type="text/javascript">
+        {% include 'sapns/dashboard/sapns.selector.js' %}
+    </script>
+{% endblock %}
+
+{% block middle %}
+<div id="options">
+    <div id="role_option">
+        <div class="option_title">{{_('Roles')}}</div>
+        <div id="role_selector"></div>
+    </div>
+    
+    <div id="user_option">
+        <div class="option_title">{{_('Users')}}</div>
+        <div id="user_selector"></div>
+    </div>
+</div>
+
+<div id="main_pane">
+    <div id="classes_sidebar"></div>
+    
+    <div id="right_content">
+        <div id="attr_pane">
+            <div id="attr_title">
+              <div id="attr_title_caption">{{_('Attributes')}}</div>
+              <button class="btn_denied">DE</button>
+              <button class="btn_readonly">R-O</button>
+              <button class="btn_readwrite">R/W</button>
+            </div>
+            <div id="attr_list"></div>
+        </div>
+        
+        <div id="actions_pane">
+            <div id="actions_title">{{_('Actions')}}</div>
+            <div id="actions_list"></div>
+        </div>
+    </div>
+    
+    <script type="text/javascript">
+    
+        function get_role_user(data_in) {
+            
+            var id_role = $('#role_selector').sapnsSelector('getValue');
+            var id_user = $('#user_selector').sapnsSelector('getValue');
+            
+            if (id_role != '') {
+                data_in.id_role = id_role;
+            }
+            else if (id_user != '') {
+                data_in.id_user = id_user; 
+            }
+            else {
+                alert("{{_('Please, select a user or role')}}");
+                return false;
+            }
+            
+            return true;
+        }
+        
+        function attr_access_change() {
+
+            var attr_p = $(this).parent();
+            
+            var data_in = {
+                    id_attribute: attr_p.attr('id_attr'),
+                    id_attr_p: attr_p.attr('id_attr_p'),
+                    access: $(this).val()
+            };
+            
+            if(!get_role_user(data_in)) {
+                return;
+            }
+            
+            console.log(JSON.stringify(data_in)); 
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/privileges/attrp_update')}}",
+                data: data_in,
+                success: function(data) {
+                    if (data.status) {
+                        attr_p.attr('id_attr_p', data.id_attr_p);
+                    }
+                }
+            });
+        }        
+        
+        function init_events() {
+            
+            // attr_access (select) 
+            $('.attr_row select').change(attr_access_change);
+                
+            // action_granted (checkbox)
+            $('.action_row input[type=checkbox]').click(function() {
+                
+                var action_p = $(this).parent();
+                
+                var data_in = {
+                        id_action: action_p.attr('id_action'),
+                        id_action_p: action_p.attr('id_action_p')
+                };
+                
+                if(!get_role_user(data_in)) {
+                    return;
+                }
+                
+                console.log(JSON.stringify(data_in));
+                
+                $.ajax({
+                    url: "{{tg.url('/dashboard/privileges/actionp_update')}}",
+                    data: data_in,
+                    success: function(data) {
+                        if (data.status) {
+                            action_p.attr('id_action_p', data.id_action_p);
+                        }
+                    }
+                });
+            });
+        }
+        
+        function load_privileges(id_class) {
+
+            var data_in = {
+                    id_class: id_class
+            };
+            
+            data_in.id_role = 1;
+            
+            if (get_role_user(data_in)) {
+                // attributes 
+                $('#attr_list').html("<p>{{_('Loading')}}...</p>");
+                $.ajax({
+                    url: "{{tg.url('/dashboard/privileges/attributes')}}",
+                    data: data_in, 
+                    success: function(data) {
+                        $('#attr_list').html(data);
+                        init_events();
+                    }
+                });
+                
+                // actions 
+                $('#actions_list').html("<p>{{_('Loading')}}...</p>");
+                $.ajax({
+                    url: "{{tg.url('/dashboard/privileges/actions')}}",
+                    data: data_in,
+                    success: function(data) {
+                        $('#actions_list').html(data);
+                    }
+                });
+
+            }
+            else {
+                console.log(JSON.stringify(data_in));
+            }
+        }
+            
+        function init_classes_events() {
+            // class name click 
+            $('.class_name').click(function() {
+                $('.class_row').removeClass('class_row_selected');
+                $(this).parent().addClass('class_row_selected');                
+                
+                load_privileges($(this).parent().attr('id_class'));
+            });
+            
+            // class checkbox 
+            $('.class_row input[type=checkbox]').click(function() {
+                
+                console.log('class checkbox');
+                
+                /*
+                var cls = $(this).parent();                
+                console.log(cls.attr('id_class') + '=' + $(this).attr('checked'));
+                */
+                
+                var data_in = {
+                        id_class: cls.attr('id_class'),
+                        granted: $(this).attr('checked')
+                };
+                
+                if (get_role_user(data_in)) { 
+                    $.ajax({
+                        url: "{{tg.url('/dashboard/privileges/classp_update')}}",
+                        data: data_in,
+                        success: function(data) {
+                            if (data.status) {
+                            }
+                        }
+                    });
+                }
+                else {
+                    console.log(JSON.stringify(data_in));
+                }
+            });
+        }
+            
+        function load_classes() {
+            
+            console.log('load_classes');
+            
+            $('#classes_sidebar').html("<p>{{_('Loading')}}...</p>");
+            
+            var data_in = {}
+            if (!get_role_user(data_in)) {
+                return;
+            }
+            
+            console.log(JSON.stringify(data_in));
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/privileges/classes')}}",
+                data: data_in,
+                success: function(data) {
+                    $('#classes_sidebar').html(data);
+                    init_classes_events();
+                    // Select the first class 
+                    $('.class_name:first').click();
+                }
+            });
+        }
+        
+        function change_all_selects(button, access) {
+            button.parent().parent().find('select').each(function() {
+                //console.log($(this).html());
+                $(this).val(access);
+                this.attr_access_change = attr_access_change;
+                this.attr_access_change();
+            });            
+        }
+    
+        $(document).ready(function() {
+
+            // role selector 
+            $('#role_selector').sapnsSelector({
+                name: 'role',
+                title: "{{_('Role')}}",
+                rc: 'sp_roles',
+                rc_title: "{{_('Roles')}}",
+                onChange: function() {
+                    console.log('*roles*');
+                    $('#user_selector').sapnsSelector('setValue', '');
+                    load_classes();
+                }
+            });
+            
+            // user selector 
+            $('#user_selector').sapnsSelector({
+                name: 'user',
+                title: "{{_('User')}}",
+                rc: 'sp_users',
+                rc_title: "{{_('Users')}}",
+                onChange: function() {
+                    console.log('*users');
+                    $('#role_selector').sapnsSelector('setValue', '');
+                    load_classes();
+                }
+            });
+            
+            $('.btn_denied').click(function() {
+                change_all_selects($(this), 'denied');
+            });
+            
+            $('.btn_readonly').click(function() {
+                change_all_selects($(this), 'read-only');
+            });
+
+            $('.btn_readwrite').click(function() {
+                change_all_selects($(this), 'read/write');
+            });
+        });
+    </script>
+</div>
+{% endblock %}

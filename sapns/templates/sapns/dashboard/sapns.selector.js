@@ -42,11 +42,12 @@
 	
 	// setValue
 	SapnsSelector.prototype.setValue = function(value) {
-		if (this.value != value && this.onChange) {
-			this.onChange(this);
-		}
+	    var change = this.value != value;
 		
 		this.value = value;
+		if (change && this.onChange) {
+		    this.onChange(this);
+		}
 	}
 	
 	SapnsSelector.prototype.getValue = function() {

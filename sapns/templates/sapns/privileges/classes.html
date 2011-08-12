@@ -1,0 +1,6 @@
+{% for cls in classes %}
+<div class="class_row" id_class="{{cls.id}}">
+    <div class="class_name" title="{{cls.name}}">{{cls.name|escape}}</div>
+    <input type="checkbox" {% if cls.granted %} checked {% endif %}>
+</div>
+{% endfor %}

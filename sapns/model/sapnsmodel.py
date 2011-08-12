@@ -57,12 +57,20 @@ class SapnsRole(Group):
             
         dbs.flush()
             
-    def has_privilege(self, id_class):
-        return dbs.query(SapnsPrivilege).\
-            filter(and_(SapnsPrivilege.role_id == self.group_id,
-                        SapnsPrivilege.class_id == id_class
-                        )).\
-            first() != None
+    def has_privilege(self, id_class, no_cache=False):
+        def _has_privilege():
+            return dbs.query(SapnsPrivilege).\
+                filter(and_(SapnsPrivilege.role_id == self.group_id,
+                            SapnsPrivilege.class_id == id_class
+                            )).\
+                first() != None
+                
+        _cache = cache.get_cache('role_has_privilege')
+        _key = '%s_%d' % (id_class, self.group_id)
+        if no_cache:
+            _cache.remove_value(key=_key)
+                
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
             
     def attr_privilege(self, id_attribute):
         return dbs.query(SapnsAttrPrivilege).\
@@ -85,6 +93,12 @@ class SapnsRole(Group):
         actp.role_id = self.group_id
         dbs.add(actp)
         dbs.flush()
+        
+    def act_privilege(self, id_action):
+        return dbs.query(SapnsActPrivilege).\
+            filter(and_(SapnsActPrivilege.role_id == self.group_id,
+                        SapnsActPrivilege.action_id == id_action)).\
+            first()
         
     def has_act_privilege(self, id_action):
         return dbs.query(SapnsActPrivilege).\
@@ -269,14 +283,17 @@ class SapnsUser(User):
         _key = '%d_%d' % (self.user_id, dboard.shortcut_id)
         cache.get_cache('user_get_shortcuts').remove_value(key=_key)
     
-    def has_privilege(self, cls):
+    def has_privilege(self, cls, no_cache=False):
         
         def _has_privilege():
             return SapnsPrivilege.has_privilege(self.user_id, cls)            
         
         _cache = cache.get_cache('user_has_privilege')
-        return _cache.get_value(key='%s_%d' % (cls, self.user_id),
-                                createfunc=_has_privilege, expiretime=3600)
+        _key = '%s_%d' % (cls, self.user_id)
+        if no_cache:
+            _cache.remove_value(key=_key)
+            
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
     
     def attr_privilege(self, id_attribute):
         
@@ -284,6 +301,12 @@ class SapnsUser(User):
             filter(and_(SapnsAttrPrivilege.user_id == self.user_id,
                         SapnsAttrPrivilege.attribute_id == id_attribute,
                         )).\
+            first()
+            
+    def act_privilege(self, id_action):
+        return dbs.query(SapnsActPrivilege).\
+            filter(and_(SapnsActPrivilege.user_id == self.user_id,
+                        SapnsActPrivilege.action_id == id_action)).\
             first()
             
     def has_act_privilege(self, id_action):
@@ -889,6 +912,8 @@ class SapnsClass(DeclarativeBase):
         
     # get attributes
     def get_attributes(self, id_user):
+        
+        logger = logging.getLogger('get_attributes')
 
         def _get_attributes():
             _cmp = SapnsAttrPrivilege.cmp_access
@@ -902,15 +927,21 @@ class SapnsClass(DeclarativeBase):
                     join((SapnsUserRole,
                           and_(SapnsUserRole.role_id == SapnsRole.group_id,
                                SapnsUserRole.user_id == id_user
+                               ))).\
+                    join((SapnsAttribute,
+                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
+                               SapnsAttribute.class_id == self.class_id,
                                ))):
+                
+                logger.info(attr_priv.access)
                 
                 if class_attr_priv.has_key(attr_priv.attribute_id):
                     if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
-                        class_attr_priv[attr_priv.attribute_id] = attr_priv.access
+                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
     
                 else:
                     class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-
+                    
             # user based                    
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
                     join((SapnsAttribute,
@@ -943,10 +974,10 @@ class SapnsClass(DeclarativeBase):
                             ))
                 
             return zip(class_attributes, class_attr_priv.values())
-
+        
         _cache = cache.get_cache('class_get_attributes')
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
-                                createfunc=_get_attributes, expiretime=1)
+                                createfunc=_get_attributes, expiretime=3600)
 
 class SapnsAttribute(DeclarativeBase):
     
@@ -990,13 +1021,11 @@ class SapnsAttribute(DeclarativeBase):
         return unicode(self).encode('utf-8')
     
 SapnsClass.attributes = \
-    relation(SapnsAttribute,
-             backref='class_',
+    relation(SapnsAttribute, backref='class_',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.class_id)
     
 SapnsClass.related_attributes = \
-    relation(SapnsAttribute,
-             backref='related_class',
+    relation(SapnsAttribute, backref='related_class',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.related_class_id)
 
 class SapnsPrivilege(DeclarativeBase):
@@ -1194,6 +1223,10 @@ class SapnsAction(DeclarativeBase):
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'))
     
+    shortcuts = \
+        relation(SapnsShortcut, backref='action',
+                 primaryjoin=action_id == SapnsShortcut.action_id)
+    
     TYPE_NEW = 'new'
     TYPE_EDIT = 'edit'
     TYPE_DELETE = 'delete'
@@ -1217,10 +1250,8 @@ class SapnsAction(DeclarativeBase):
     def has_privilege(self, id_user):
         return SapnsActPrivilege.has_privilege(id_user, self.action_id)
     
-SapnsAction.shortcuts = \
-    relation(SapnsShortcut,
-             backref='action',
-             primaryjoin=SapnsAction.action_id == SapnsShortcut.action_id)
+SapnsClass.actions = relation(SapnsAction, backref='class_',
+                              primaryjoin=SapnsClass.class_id == SapnsAction.class_id)
     
 class SapnsActPrivilege(DeclarativeBase):
     
