@@ -230,7 +230,7 @@
                 data_in.id_user = id_user; 
             }
             else {
-                //alert("{{_('Please, select a user or role')}}");
+                alert("{{_('Please, select a user or role')}}");
                 return false;
             }
             
@@ -247,14 +247,11 @@
                     access: $(this).val()
             };
             
-            /*
-            if(!(get_role_user(data_in)) {
+            if(!get_role_user(data_in)) {
                 return;
             }
-            */
-            data_in.id_role = 1;
             
-            //console.log(JSON.stringify(data_in)); 
+            console.log(JSON.stringify(data_in)); 
             
             $.ajax({
                 url: "{{tg.url('/dashboard/privileges/attrp_update')}}",
@@ -282,12 +279,9 @@
                         id_action_p: action_p.attr('id_action_p')
                 };
                 
-                /*
-                if(!(get_role_user(data_in)) {
+                if(!get_role_user(data_in)) {
                     return;
                 }
-                */
-                data_in.id_role = 1;
                 
                 console.log(JSON.stringify(data_in));
                 
@@ -311,7 +305,7 @@
             
             data_in.id_role = 1;
             
-            if (true) { //get_role_user(data_in)) {
+            if (get_role_user(data_in)) {
                 // attributes 
                 $('#attr_list').html("<p>{{_('Loading')}}...</p>");
                 $.ajax({
@@ -351,6 +345,8 @@
             // class checkbox 
             $('.class_row input[type=checkbox]').click(function() {
                 
+                console.log('class checkbox');
+                
                 /*
                 var cls = $(this).parent();                
                 console.log(cls.attr('id_class') + '=' + $(this).attr('checked'));
@@ -361,9 +357,7 @@
                         granted: $(this).attr('checked')
                 };
                 
-                data_in.id_role = 1;
-                
-                if (true) { //get_role_user(data_in)) { 
+                if (get_role_user(data_in)) { 
                     $.ajax({
                         url: "{{tg.url('/dashboard/privileges/classp_update')}}",
                         data: data_in,
@@ -380,14 +374,17 @@
         }
             
         function load_classes() {
+            
+            console.log('load_classes');
+            
             $('#classes_sidebar').html("<p>{{_('Loading')}}...</p>");
             
             var data_in = {}
-            /*if (!get_role_user(data_in)) {
+            if (!get_role_user(data_in)) {
                 return;
-            }*/
+            }
             
-            data_in.id_role = 1;
+            console.log(JSON.stringify(data_in));
             
             $.ajax({
                 url: "{{tg.url('/dashboard/privileges/classes')}}",
@@ -413,10 +410,30 @@
         $(document).ready(function() {
 
             // role selector 
-            $('#role_selector').sapnsSelector({});
+            $('#role_selector').sapnsSelector({
+                name: 'role',
+                title: "{{_('Role')}}",
+                rc: 'sp_roles',
+                rc_title: "{{_('Roles')}}",
+                onChange: function() {
+                    console.log('*roles*');
+                    $('#user_selector').sapnsSelector('setValue', '');
+                    load_classes();
+                }
+            });
             
             // user selector 
-            $('#user_selector').sapnsSelector({});
+            $('#user_selector').sapnsSelector({
+                name: 'user',
+                title: "{{_('User')}}",
+                rc: 'sp_users',
+                rc_title: "{{_('Users')}}",
+                onChange: function() {
+                    console.log('*users');
+                    $('#role_selector').sapnsSelector('setValue', '');
+                    load_classes();
+                }
+            });
             
             $('.btn_denied').click(function() {
                 change_all_selects($(this), 'denied');
@@ -429,8 +446,6 @@
             $('.btn_readwrite').click(function() {
                 change_all_selects($(this), 'read/write');
             });
-            
-            load_classes();
         });
     </script>
 </div>
