@@ -1,0 +1,171 @@
+#options {
+    position: relative;
+    height: 53px;
+    border: 1px solid gray;
+    background-color: lightgray;
+}
+
+#role_option {
+    position: absolute;
+    top: 3px;
+    left: 20px;
+    width: 450px;
+    height: 25px;
+    padding: 10px;
+    border: 1px solid gray;
+    background-color: white;
+}
+
+.option_title {
+    float: left;
+    width: 90px;
+    font-weight: bold;
+    /*font-family: arial;*/
+    font-size: 15px;
+}
+
+#user_option {
+    position: absolute;
+    top: 3px;
+    left: 510px;
+    width: 450px;
+    height: 25px;
+    padding: 10px;
+    border: 1px solid gray;
+    background-color: white;
+}
+
+#main_pane {
+    position: relative;
+    height: 485px;
+    padding: 10px;
+    border: 1px solid gray;
+    background-color: white;
+}
+
+#classes_sidebar {
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    height: 483px;
+    width: 270px;
+    border: 1px solid white;
+    overflow: auto;
+    padding: 10px;
+    font-size: 14px;
+    /*font-family: Arial;*/
+    background-color: lightgray;
+}
+
+.class_row {
+    height: 21px;
+    border: 1px solid gray;
+    padding-left: 10px;
+    cursor: pointer;
+    background-color: gray;
+    margin-bottom: 3px;
+}
+
+.class_row_selected {
+    background-color: orange;
+}
+
+.class_name {
+    font-weight: bold;
+    width: 220px;
+    float: left;
+    overflow: hidden;
+}
+
+.class_name:hover {
+    text-decoration: underline;
+}
+
+#right_content {
+    position: absolute;
+    top: 0px;
+    left: 290px;
+    width: 685px;
+    height: 484px;
+    padding: 10px;
+    border: 1px solid gray; 
+}
+
+#attr_pane {
+    position: relative;
+    height: 300px;
+    /*background-color: cyan;*/
+    margin-bottom: 10px;
+}
+
+#attr_title {
+    height: 30px;
+    padding-left: 10px;
+    font-size: 15px;
+    background-color: lightgray;
+}
+
+#attr_title_caption {
+    width: 540px;
+    float: left;
+}
+
+.btn_denied, .btn_readonly, .btn_readwrite {
+    font-size: 9px;
+}
+
+#attr_list {
+    overflow: auto;
+    height: 250px;
+    background-color: lightgray;
+    padding-left: 10px;
+}
+
+.attr_row {
+    heigth: 21px;
+    padding-left: 10px;
+    margin-bottom: 3px;
+    float: left;
+    background-color: gray;
+    border: 1px solid gray;
+}
+
+.attr_name {
+    width: 538px;
+    float: left;
+}
+
+#actions_pane {
+    position: relative;
+    height: 150px;
+    overflow: auto;
+    /*background-color: gray;*/
+}
+
+#actions_title {
+    height: 30px;
+    padding-left: 10px;
+    font-size: 15px;
+    background-color: lightgray;
+}
+
+#actions_list {
+    overflow: auto;
+    height: 120px;
+    padding-left: 10px;
+    background-color: lightgray;
+}
+
+.action_row {
+    heigth: 21px;
+    padding-left: 10px;
+    margin-bottom: 3px;
+    float: left;
+    background-color: gray;
+    border: 1px solid gray;
+}
+
+.action_name {
+    width: 620px;
+    float: left;
+}

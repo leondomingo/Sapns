@@ -5,181 +5,11 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    <style type="text/css">
-        #options {
-            position: relative;
-            height: 53px;
-            border: 1px solid gray;
-            background-color: lightgray;
-        }
-        
-        #role_option {
-            position: absolute;
-            top: 3px;
-            left: 20px;
-            width: 450px;
-            height: 25px;
-            padding: 10px;
-            border: 1px solid gray;
-            background-color: white;
-        }
-        
-        .option_title {
-            float: left;
-            width: 90px;
-            font-weight: bold;
-            /*font-family: arial;*/
-            font-size: 15px;
-        }
-        
-        #user_option {
-            position: absolute;
-            top: 3px;
-            left: 510px;
-            width: 450px;
-            height: 25px;
-            padding: 10px;
-            border: 1px solid gray;
-            background-color: white;
-        }
-        
-        #main_pane {
-            position: relative;
-            height: 485px;
-            padding: 10px;
-            border: 1px solid gray;
-            background-color: white;
-        }
-        
-        #classes_sidebar {
-            position: absolute;
-            left: 0px;
-            top: 0px;
-            height: 483px;
-            width: 270px;
-            border: 1px solid white;
-            overflow: auto;
-            padding: 10px;
-            font-size: 14px;
-            /*font-family: Arial;*/
-            background-color: lightgray;
-        }
-        
-        .class_row {
-            height: 21px;
-            border: 1px solid gray;
-            padding-left: 10px;
-            cursor: pointer;
-            background-color: gray;
-            margin-bottom: 3px;
-        }
-        
-        .class_row_selected {
-            background-color: orange;
-        }
-        
-        .class_name {
-            font-weight: bold;
-            width: 220px;
-            float: left;
-            overflow: hidden;
-        }
-        
-        .class_name:hover {
-            text-decoration: underline;
-        }
-        
-        #right_content {
-            position: absolute;
-            top: 0px;
-            left: 290px;
-            width: 685px;
-            height: 484px;
-            padding: 10px;
-            border: 1px solid gray; 
-        }
-        
-        #attr_pane {
-            position: relative;
-            height: 300px;
-            /*background-color: cyan;*/
-            margin-bottom: 10px;
-        }
-        
-        #attr_title {
-            height: 30px;
-            padding-left: 10px;
-            font-size: 15px;
-            background-color: lightgray;
-        }
-        
-        #attr_title_caption {
-            width: 540px;
-            float: left;
-        }
-        
-        .btn_denied, .btn_readonly, .btn_readwrite {
-            font-size: 9px;
-        }
-        
-        #attr_list {
-            overflow: auto;
-            height: 250px;
-            background-color: lightgray;
-            padding-left: 10px;
-        }
-        
-        .attr_row {
-            heigth: 21px;
-            padding-left: 10px;
-            margin-bottom: 3px;
-            float: left;
-            background-color: gray;
-            border: 1px solid gray;
-        }
-        
-        .attr_name {
-            width: 538px;
-            float: left;
-        }
-        
-        #actions_pane {
-            position: relative;
-            height: 150px;
-            overflow: auto;
-            /*background-color: gray;*/
-        }
-        
-        #actions_title {
-            height: 30px;
-            padding-left: 10px;
-            font-size: 15px;
-            background-color: lightgray;
-        }
-        
-        #actions_list {
-            overflow: auto;
-            height: 120px;
-            padding-left: 10px;
-            background-color: lightgray;
-        }
-        
-        .action_row {
-            heigth: 21px;
-            padding-left: 10px;
-            margin-bottom: 3px;
-            float: left;
-            background-color: gray;
-            border: 1px solid gray;
-        }
-        
-        .action_name {
-            width: 620px;
-            float: left;
-        }
-    </style>
+    <!--<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.css">-->
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.min.css">
     <script type="text/javascript">
-        {% include 'sapns/dashboard/sapns.selector.js' %}
+        {% include 'sapns/components/sapns.selector.js' %}
+        {#{% include 'sapns/components/sapns.selector.min.js' %}#}
     </script>
 {% endblock %}
 
@@ -251,24 +81,25 @@
                 return;
             }
             
-            console.log(JSON.stringify(data_in)); 
+            //console.log(JSON.stringify(data_in)); 
             
             $.ajax({
                 url: "{{tg.url('/dashboard/privileges/attrp_update')}}",
                 data: data_in,
                 success: function(data) {
                     if (data.status) {
-                        attr_p.attr('id_attr_p', data.id_attr_p);
+                        // attr_p.attr('id_attr_p', data.id_attr_p); 
                     }
                 }
             });
         }        
         
-        function init_events() {
-            
+        function init_attr_events() {
             // attr_access (select) 
             $('.attr_row select').change(attr_access_change);
-                
+        }
+        
+        function init_action_events() {
             // action_granted (checkbox)
             $('.action_row input[type=checkbox]').click(function() {
                 
@@ -276,14 +107,12 @@
                 
                 var data_in = {
                         id_action: action_p.attr('id_action'),
-                        id_action_p: action_p.attr('id_action_p')
+                        granted: $(this).attr('checked')
                 };
                 
                 if(!get_role_user(data_in)) {
                     return;
                 }
-                
-                console.log(JSON.stringify(data_in));
                 
                 $.ajax({
                     url: "{{tg.url('/dashboard/privileges/actionp_update')}}",
@@ -303,8 +132,6 @@
                     id_class: id_class
             };
             
-            data_in.id_role = 1;
-            
             if (get_role_user(data_in)) {
                 // attributes 
                 $('#attr_list').html("<p>{{_('Loading')}}...</p>");
@@ -313,7 +140,7 @@
                     data: data_in, 
                     success: function(data) {
                         $('#attr_list').html(data);
-                        init_events();
+                        init_attr_events();
                     }
                 });
                 
@@ -324,13 +151,14 @@
                     data: data_in,
                     success: function(data) {
                         $('#actions_list').html(data);
+                        init_action_events();
                     }
                 });
 
             }
-            else {
+            /*else {
                 console.log(JSON.stringify(data_in));
-            }
+            }*/
         }
             
         function init_classes_events() {
@@ -344,13 +172,6 @@
             
             // class checkbox 
             $('.class_row input[type=checkbox]').click(function() {
-                
-                console.log('class checkbox');
-                
-                /*
-                var cls = $(this).parent();                
-                console.log(cls.attr('id_class') + '=' + $(this).attr('checked'));
-                */
                 
                 var data_in = {
                         id_class: cls.attr('id_class'),
@@ -367,15 +188,10 @@
                         }
                     });
                 }
-                else {
-                    console.log(JSON.stringify(data_in));
-                }
             });
         }
             
         function load_classes() {
-            
-            console.log('load_classes');
             
             $('#classes_sidebar').html("<p>{{_('Loading')}}...</p>");
             
@@ -384,7 +200,7 @@
                 return;
             }
             
-            console.log(JSON.stringify(data_in));
+            //console.log(JSON.stringify(data_in)); 
             
             $.ajax({
                 url: "{{tg.url('/dashboard/privileges/classes')}}",
@@ -400,7 +216,6 @@
         
         function change_all_selects(button, access) {
             button.parent().parent().find('select').each(function() {
-                //console.log($(this).html());
                 $(this).val(access);
                 this.attr_access_change = attr_access_change;
                 this.attr_access_change();
@@ -416,8 +231,7 @@
                 rc: 'sp_roles',
                 rc_title: "{{_('Roles')}}",
                 onChange: function() {
-                    console.log('*roles*');
-                    $('#user_selector').sapnsSelector('setValue', '');
+                    $('#user_selector').sapnsSelector('setValue', '', true);
                     load_classes();
                 }
             });
@@ -429,8 +243,7 @@
                 rc: 'sp_users',
                 rc_title: "{{_('Users')}}",
                 onChange: function() {
-                    console.log('*users');
-                    $('#role_selector').sapnsSelector('setValue', '');
+                    $('#role_selector').sapnsSelector('setValue', '', true);
                     load_classes();
                 }
             });

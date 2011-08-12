@@ -116,7 +116,7 @@ class User(DeclarativeBase):
                        info={'rum': {'field':'Password'}})
 
     created = Column(DateTime, default=datetime.now)
-
+    
     #{ Special methods
 
     def __repr__(self):

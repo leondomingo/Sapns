@@ -41,12 +41,12 @@
 	}
 	
 	// setValue
-	SapnsSelector.prototype.setValue = function(value) {
+	SapnsSelector.prototype.setValue = function(value, no_callback) {
 	    var change = this.value != value;
         var old_value = this.value;
 
 		this.value = value;
-		if (change && this.onChange) {
+		if (change && this.onChange && !no_callback) {
 		    this.onChange(value, old_value);
 		}
 	}
@@ -152,7 +152,7 @@
 		this.setTitle();
 	}
 
-	$.fn.sapnsSelector = function(arg1, arg2) {
+	$.fn.sapnsSelector = function(arg1, arg2, arg3) {
 		
         if (typeof(arg1) == "object") {
         	
@@ -266,7 +266,7 @@
 			// $(element).sapnsSelector("setValue", 123);
 			// $(element).sapnsSelector("setValue", null);
 			if (arg1 == "setValue") {
-				sapnsSelector.setValue(arg2);
+				sapnsSelector.setValue(arg2, arg3);
 				sapnsSelector.setTitle();
 			}
 			// getValue()

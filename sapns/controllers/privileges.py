@@ -71,25 +71,18 @@ class PrivilegesController(BaseController):
             granted = get_paramw(kw, 'granted', strtobool)
             
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
-            id_user = get_paramw(kw, 'id_user', int, opcional=True)
-            
-            if granted:
-                class_p = SapnsPrivilege()
-                class_p.class_id = id_class
-                class_p.role_id = id_role
-                class_p.user_id = id_user
-                
-                dbs.add(class_p)
+            if id_role:
+                who = dbs.query(SapnsRole).get(id_role)
                 
             else:
-                dbs.query(SapnsPrivilege).\
-                    filter(and_(SapnsPrivilege.class_id == id_class,
-                                SapnsPrivilege.role_id == id_role,
-                                SapnsPrivilege.user_id == id_user,                                
-                                )).\
-                    delete()
-            
-            dbs.flush()           
+                id_user = get_paramw(kw, 'id_user', int, opcional=True)
+                who = dbs.query(SapnsUser).get(id_user)
+                
+            if granted:
+                who.add_privilege(id_class)
+                
+            else:
+                who.remove_privilege(id_class)
             
             return dict(status=True)
         
@@ -100,21 +93,31 @@ class PrivilegesController(BaseController):
     @expose('sapns/privileges/attributes.html')
     def attributes(self, id_class, **kw):
         
+        def _attr_privilege(cond, id_attribute):
+            return dbs.query(SapnsAttrPrivilege).\
+                filter(and_(cond,
+                            SapnsAttrPrivilege.attribute_id == id_attribute)).\
+                first()
+
         id_class = int(id_class)
         id_role = get_paramw(kw, 'id_role', int, opcional=True)
         if id_role:
-            who = dbs.query(SapnsRole).get(id_role)
+            #who = dbs.query(SapnsRole).get(id_role)
+            attr_privilege = lambda id: \
+                _attr_privilege(SapnsAttrPrivilege.role_id == id_role, id)
             
         else:
             id_user = get_paramw(kw, 'id_user', int, opcional=True)
-            who = dbs.query(SapnsUser).get(id_user)
+            #who = dbs.query(SapnsUser).get(id_user)
+            attr_privilege = lambda id: \
+                _attr_privilege(SapnsAttrPrivilege.user_id == id_user, id)
         
         # class
         cls = dbs.query(SapnsClass).get(id_class)
         
         attributes = []
         for attr in cls.attributes:
-            attr_p = who.attr_privilege(attr.attribute_id)
+            attr_p = attr_privilege(attr.attribute_id)
             if not attr_p:
                 attr_p = Dict(access=SapnsAttrPrivilege.ACCESS_DENIED)
             
@@ -183,23 +186,32 @@ class PrivilegesController(BaseController):
         
         logger = logging.getLogger('PrivilegesController.attrp_update')
         try:
+            id_attribute = get_paramw(kw, 'id_attribute', int)
+            access = get_paramw(kw, 'access', str)
+            
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
             id_user = get_paramw(kw, 'id_user', int, opcional=True)
-            id_attribute = get_paramw(kw, 'id_attribute', int)
             
-            id_attr_p = get_paramw(kw, 'id_attr_p', int, opcional=True)
-            if id_attr_p:
-                attr_p = dbs.query(SapnsAttrPrivilege).get(id_attr_p)
+            if id_role:
+                who = dbs.query(SapnsRole).get(id_role)
                 
             else:
-                attr_p = SapnsAttrPrivilege()
-                attr_p.role_id = id_role
-                attr_p.user_id = id_user 
-                attr_p.attribute_id = id_attribute
+                who = dbs.query(SapnsUser).get(id_user)
+                
+            who.add_attr_privilege(id_attribute, access)
             
-            attr_p.access = get_paramw(kw, 'access', str)
-            dbs.add(attr_p)
-            dbs.flush()
+#            id_attr_p = get_paramw(kw, 'id_attr_p', int, opcional=True)
+#            if id_attr_p:
+#                attr_p = dbs.query(SapnsAttrPrivilege).get(id_attr_p)
+#                
+#            else:
+#                attr_p = SapnsAttrPrivilege()
+#                attr_p.role_id = id_role
+#                attr_p.user_id = id_user 
+#                attr_p.attribute_id = id_attribute
+#
+#            dbs.add(attr_p)
+#            dbs.flush()
             
             # reset cache
             if id_user:
@@ -216,7 +228,7 @@ class PrivilegesController(BaseController):
                 _key = '%d_%d' % (attr.class_id, id_user)
                 _cache.remove_value(key=_key)
             
-            return dict(status=True, id_attr_p=attr_p.attr_privilege_id)
+            return dict(status=True)
             
         except Exception, e:
             logger.error(e)
@@ -228,29 +240,46 @@ class PrivilegesController(BaseController):
         
         logger = logging.getLogger('PrivilegesController.atcp_update')
         try:
-            id_action_p = get_paramw(kw, 'id_action_p', int, opcional=True)
+            id_action = get_paramw(kw, 'id_action', int)
+            granted = get_paramw(kw, 'granted', strtobool)
             
-            if id_action_p:
-                # delete
-                action_p = dbs.query(SapnsActPrivilege).\
-                    filter(SapnsActPrivilege.actpriv_id == id_action_p).\
-                    delete()
-                    
-                id_action_p = ''
+            id_role = get_paramw(kw, 'id_role', int, opcional=True)
+            id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            if id_role:
+                who = dbs.query(SapnsRole).get(id_role)
                 
             else:
-                # create
-                action_p = SapnsActPrivilege()
-                action_p.role_id = get_paramw(kw, 'id_role', int, opcional=True)
-                action_p.user_id = get_paramw(kw, 'id_user', int, opcional=True)
-                action_p.action_id = get_paramw(kw, 'id_action', int)
-                dbs.add(action_p)
+                who = dbs.query(SapnsRole).get(id_user)
                 
-                id_action_p = action_p.actpriv_id
+            if granted:
+                logger.info('Creating action privilege')
+                who.add_act_privilege(id_action)
                 
-            dbs.flush()
+            else:
+                logger.info('Deleting action privilege')
+                who.remove_act_privilege(id_action)
             
-            return dict(status=True, id_action_p=id_action_p)
+#            if id_action_p:
+#                # delete
+#                action_p = dbs.query(SapnsActPrivilege).\
+#                    filter(SapnsActPrivilege.actpriv_id == id_action_p).\
+#                    delete()
+#                    
+#                id_action_p = ''
+#                
+#            else:
+#                # create
+#                action_p = SapnsActPrivilege()
+#                action_p.role_id = 
+#                action_p.user_id = 
+#                action_p.action_id = 
+#                dbs.add(action_p)
+#                
+#                id_action_p = action_p.actpriv_id
+#                
+#            dbs.flush()
+            
+            return dict(status=True)
             
         except Exception, e:
             logger.error(e)

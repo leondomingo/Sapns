@@ -1,5 +1,5 @@
 {% for attr in attributes %}
-<div class="attr_row" id_attr_p="{{attr.id or ''}}" id_attr="{{attr.id_attr}}">
+<div class="attr_row" id_attr="{{attr.id_attr}}">
     <div class="attr_name">{{attr.name}}</div>
     <select>
         <option value="denied" {% if
