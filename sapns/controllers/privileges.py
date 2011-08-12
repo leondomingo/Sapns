@@ -119,7 +119,7 @@ class PrivilegesController(BaseController):
         for attr in cls.attributes:
             attr_p = attr_privilege(attr.attribute_id)
             if not attr_p:
-                attr_p = Dict(access=SapnsAttrPrivilege.ACCESS_DENIED)
+                attr_p = Dict(access='') #SapnsAttrPrivilege.ACCESS_DENIED)
             
             attributes.append(Dict(id=attr_p.attr_privilege_id,
                                    access=attr_p.access,
@@ -129,7 +129,8 @@ class PrivilegesController(BaseController):
                                    ))
             
         return dict(attributes=sorted(attributes, 
-                                      cmp=lambda x,y: cmp(x.ins_order, y.ins_order)))
+                                      cmp=lambda x,y: cmp(x.ins_order, y.ins_order)),
+                    show_none=get_paramw(kw, 'id_user', int, opcional=True) != None)
     
     @expose('sapns/privileges/actions.html')
     def actions(self, id_class, **kw):
@@ -150,11 +151,12 @@ class PrivilegesController(BaseController):
         for action in cls.actions:
             
             action_p = who.act_privilege(action.action_id)
-            granted = True
             if not action_p:
-                action_p = Dict()
-                granted = False
-                
+                action_p = Dict(id_action=action.action_id,
+                                name=_(action.name),
+                                granted=False,
+                                )
+            
             pos = None
             if action.type == SapnsAction.TYPE_NEW:
                 pos = 1
@@ -165,10 +167,13 @@ class PrivilegesController(BaseController):
             elif action.type == SapnsAction.TYPE_DELETE:
                 pos = 3
                 
+            elif action.type == SapnsAction.TYPE_DOCS:
+                pos = 4
+                
             actions.append(Dict(id=action_p.actpriv_id,
                                 id_action=action.action_id,
                                 name=_(action.name),
-                                granted=granted,
+                                granted=action_p.granted,
                                 pos=pos,
                                 ))
         
@@ -198,36 +203,12 @@ class PrivilegesController(BaseController):
             else:
                 who = dbs.query(SapnsUser).get(id_user)
                 
-            who.add_attr_privilege(id_attribute, access)
-            
-#            id_attr_p = get_paramw(kw, 'id_attr_p', int, opcional=True)
-#            if id_attr_p:
-#                attr_p = dbs.query(SapnsAttrPrivilege).get(id_attr_p)
-#                
-#            else:
-#                attr_p = SapnsAttrPrivilege()
-#                attr_p.role_id = id_role
-#                attr_p.user_id = id_user 
-#                attr_p.attribute_id = id_attribute
-#
-#            dbs.add(attr_p)
-#            dbs.flush()
-            
-            # reset cache
-            if id_user:
-                ids_user = [id_user]
+            if access:
+                who.add_attr_privilege(id_attribute, access)
                 
-            else:
-                ids_user = [ur.user_id for ur in dbs.query(SapnsUserRole).\
-                            filter(SapnsUserRole.role_id == id_role)]
-                
-            attr = dbs.query(SapnsAttribute).get(id_attribute)
-                
-            for id_user in ids_user:
-                _cache = cache.get_cache('class_get_attributes')
-                _key = '%d_%d' % (attr.class_id, id_user)
-                _cache.remove_value(key=_key)
-            
+            elif isinstance(who, SapnsUser):
+                who.remove_attr_privilege(id_attribute)
+
             return dict(status=True)
             
         except Exception, e:
@@ -258,26 +239,6 @@ class PrivilegesController(BaseController):
             else:
                 logger.info('Deleting action privilege')
                 who.remove_act_privilege(id_action)
-            
-#            if id_action_p:
-#                # delete
-#                action_p = dbs.query(SapnsActPrivilege).\
-#                    filter(SapnsActPrivilege.actpriv_id == id_action_p).\
-#                    delete()
-#                    
-#                id_action_p = ''
-#                
-#            else:
-#                # create
-#                action_p = SapnsActPrivilege()
-#                action_p.role_id = 
-#                action_p.user_id = 
-#                action_p.action_id = 
-#                dbs.add(action_p)
-#                
-#                id_action_p = action_p.actpriv_id
-#                
-#            dbs.flush()
             
             return dict(status=True)
             

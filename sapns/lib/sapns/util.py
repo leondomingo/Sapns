@@ -161,9 +161,9 @@ def update_metadata():
             # # grant access (r/w) to managers
             managers.add_privilege(klass.class_id)
             
-            for m_user in managers.users:
-                #m_user = SapnsUser()
-                SapnsPrivilege.add_privilege(m_user.user_id, klass.class_id)
+#            for m_user in managers.users:
+#                #m_user = SapnsUser()
+#                m_user.add_privilege(klass.class_id)
             
         else:
             logger.warning('.....already exists')
@@ -189,9 +189,9 @@ def update_metadata():
                 # add this action to "managers" role
                 managers.add_act_privilege(action.action_id)
                 
-                for m_user in managers.users:
-                    #m_user = SapnsUser()
-                    m_user.add_act_privilege(action.action_id)
+#                for m_user in managers.users:
+#                    #m_user = SapnsUser()
+#                    m_user.add_act_privilege(action.action_id)
                 
         # create standard actions
         create_action(unicode(l_('New')), SapnsAction.TYPE_NEW)
@@ -235,9 +235,9 @@ def update_metadata():
                 rw_access = SapnsAttrPrivilege.ACCESS_READWRITE
                 managers.add_attr_privilege(attr.attribute_id, rw_access)
                 
-                for m_user in managers.users:
-                    #m_user = SapnsUser()
-                    m_user.add_attr_privilege(attr.attribute_id, rw_access)
+#                for m_user in managers.users:
+#                    #m_user = SapnsUser()
+#                    m_user.add_attr_privilege(attr.attribute_id, rw_access)
                 
             else:
                 logger.warning('.....already exists')

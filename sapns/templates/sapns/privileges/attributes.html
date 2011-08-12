@@ -2,6 +2,9 @@
 <div class="attr_row" id_attr="{{attr.id_attr}}">
     <div class="attr_name">{{attr.name}}</div>
     <select>
+        {% if show_none %}
+        <option value="">({{_('none')}})</option>
+        {% endif %}
         <option value="denied" {% if
            attr.access == 'denied' %} selected {% endif %}>{{_('Denied')}}</option>
         

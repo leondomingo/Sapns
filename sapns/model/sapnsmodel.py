@@ -52,7 +52,7 @@ class SapnsRole(Group):
                 filter(and_(SapnsPrivilege.role_id == self.group_id,
                             SapnsPrivilege.class_id == id_class
                             )).\
-                first() != None
+                first().granted
                 
         _cache = cache.get_cache('role_has_privilege')
         _key = '%s_%d' % (id_class, self.group_id)
@@ -66,7 +66,7 @@ class SapnsRole(Group):
             
     def add_attr_privilege(self, id_attribute, access):
         return SapnsAttrPrivilege.add_privilege(id_attribute, access, id_role=self.group_id)
-        
+    
     def add_act_privilege(self, id_action):
         return SapnsActPrivilege.add_privilege(id_action, id_role=self.group_id)
         
@@ -276,6 +276,9 @@ class SapnsUser(User):
     
     def attr_privilege(self, id_attribute):
         return SapnsAttrPrivilege.get_privilege(id_attribute, id_user=self.user_id)
+    
+    def remove_attr_privilege(self, id_attribute):
+        SapnsAttrPrivilege.remove_privilege(id_attribute, id_user=self.user_id, remove=True)
             
     def add_attr_privilege(self, id_attribute, access):
         return SapnsAttrPrivilege.add_privilege(id_attribute, access, id_user=self.user_id)
@@ -383,6 +386,8 @@ class SapnsUser(User):
         
         dst_path = os.path.join(new_doc.repo.path, '%d' % new_doc.doc_id)
         shutil.copy(pathtofile, dst_path)
+        
+SapnsRole.users = relation(SapnsUser, secondary=user_group_table, backref='roles')
 
 class SapnsShortcut(DeclarativeBase):
     """Shortcuts sapns base table"""
@@ -753,19 +758,25 @@ class SapnsClass(DeclarativeBase):
                             url = SapnsAction.URL_NEW
                             
                         require_id = False
-                        pos = 0
+                        pos = 1
                     
                     elif ac.type == SapnsAction.TYPE_EDIT:
                         if not ac.url:
                             url = SapnsAction.URL_EDIT
                             
-                        pos = 1
+                        pos = 2
                     
                     elif ac.type == SapnsAction.TYPE_DELETE:
                         if not ac.url:
                             url = SapnsAction.URL_DELETE
                             
-                        pos = 2
+                        pos = 3
+                        
+                    elif ac.type == SapnsAction.TYPE_DOCS:
+                        if not ac.url:
+                            url = SapnsAction.URL_DOCS
+                            
+                        pos = 4
     
                     actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
                                         require_id=require_id, pos=pos))
@@ -1028,57 +1039,97 @@ class SapnsPrivilege(DeclarativeBase):
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'), 
                       nullable=False)
+    
+    granted = Column(Boolean, nullable=False, default=True)
+    
+    CACHE_ID = 'user_class_privilege'
 
     @staticmethod
     def has_privilege(id_user, cls):
         
+        logger = logging.getLogger('SapnsPrivilege.has_privilege')
+
         if isinstance(cls, (str, unicode)):
             id_class = SapnsClass.by_name(cls).class_id
             
         else:
             id_class = cls
         
-        priv = dbs.query(SapnsPrivilege).\
-            join((SapnsRole,
-                  SapnsRole.group_id == SapnsPrivilege.role_id)).\
-            join((SapnsUserRole,
-                  and_(SapnsUserRole.role_id == SapnsRole.group_id,
-                       SapnsUserRole.user_id == id_user))).\
-            filter(SapnsPrivilege.class_id == id_class).\
-            first()
+        def _has_privilege():
             
-        if not priv:
-            priv = dbs.query(SapnsPrivilege).\
-                    filter(and_(SapnsPrivilege.user_id == id_user,
-                                SapnsPrivilege.class_id == id_class,
-                                )).\
+            logger.info('> class=%s' % cls)
+            
+            # user
+            priv = SapnsPrivilege.get_privilege(id_class, id_user=id_user)
+            
+            if not priv:
+                # role
+                priv = dbs.query(SapnsPrivilege).\
+                    join((SapnsRole,
+                          SapnsRole.group_id == SapnsPrivilege.role_id)).\
+                    join((SapnsUserRole,
+                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
+                               SapnsUserRole.user_id == id_user))).\
+                    filter(SapnsPrivilege.class_id == id_class).\
                     first()
-                
-        return priv != None
+                    
+            return priv.granted
+        
+        _cache = cache.get_cache(SapnsPrivilege.CACHE_ID)
+        return _cache.get_value(key='%d_%d' % (id_user, id_class),
+                                createfunc=_has_privilege, expiretime=1)
     
     @staticmethod
-    def add_privilege(id_class, **kw):
-        priv = SapnsPrivilege()
+    def get_privilege(id_class, **kw):
+        return dbs.query(SapnsPrivilege).\
+            filter(and_(SapnsPrivilege.class_id == id_class,
+                        SapnsPrivilege.role_id == kw.get('id_role'),
+                        SapnsPrivilege.user_id == kw.get('id_user')
+                        )).\
+            first()
+            
+    @staticmethod
+    def _update_privilege(id_class, granted, **kw):
+        
+        priv = SapnsPrivilege.get_privilege(id_class, **kw)
+        if not priv:
+            priv = SapnsPrivilege()
+
         priv.role_id = kw.get('id_role')
         priv.user_id = kw.get('id_user')
         priv.class_id = id_class
+        priv.granted = granted
         
         dbs.add(priv)
         dbs.flush()
         
-        return priv
+        # reset cache
+        _cache = cache.get_cache(SapnsPrivilege.CACHE_ID)
         
+        def reset_user_cache(id_user):
+            _key = '%d_%d' % (id_user, id_class)
+            _cache.remove_value(key=_key)
+        
+        if kw.get('id_user'):
+            # this user
+            reset_user_cache(kw.get('id_user'))
+            
+        else:
+            # all the users in this role
+            role = dbs.query(SapnsRole).get(kw.get('id_role'))
+            for user in role.users:
+                reset_user_cache(user.user_id)
+        
+        return priv        
+    
+    @staticmethod 
+    def add_privilege(id_class, **kw):
+        return SapnsPrivilege._update_privilege(id_class, True, **kw)
+
     @staticmethod
     def remove_privilege(id_class, **kw):
-        dbs.query(SapnsPrivilege).\
-            filter(and_(SapnsPrivilege.role_id == kw.get('id_role'),
-                        SapnsPrivilege.user_id == kw.get('id_user'),
-                        SapnsPrivilege.class_id == id_class,
-                        )).\
-            delete()
-            
-        dbs.flush()
-
+        return SapnsPrivilege._update_privilege(id_class, False, **kw)
+ 
 class SapnsAttrPrivilege(DeclarativeBase):
     
     __tablename__ = 'sp_attr_privileges'
@@ -1106,14 +1157,10 @@ class SapnsAttrPrivilege(DeclarativeBase):
     ACCESS_READONLY = 'read-only'
     ACCESS_READWRITE = 'read/write'
     
+    CACHE_ID = 'attrpriv_get_access'
+    
     @staticmethod
     def get_privilege(id_attribute, **kw):
-        """
-        **kw
-          id_role  <int>
-          id_user  <int>
-        """
-        
         return dbs.query(SapnsAttrPrivilege).\
             filter(and_(SapnsAttrPrivilege.role_id == kw.get('id_role'),
                         SapnsAttrPrivilege.user_id == kw.get('id_user'),
@@ -1152,38 +1199,62 @@ class SapnsAttrPrivilege(DeclarativeBase):
                     
             return access
             
-        _cache = cache.get_cache('attrpriv_get_access')
+        _cache = cache.get_cache(SapnsAttrPrivilege.CACHE_ID)
         return _cache.get_value(key='%d_%d' % (id_user, id_attribute),
                                 createfunc=_get_access, expiretime=1)
-        
+
     @staticmethod
-    def add_privilege(id_attribute, access, **kw):
+    def _update_privilege(id_attribute, access, **kw):
         
         priv = SapnsAttrPrivilege.get_privilege(id_attribute, **kw)
-        if priv is None:
+        if not priv:
             priv = SapnsAttrPrivilege()
-            priv.user_id = kw.get('id_user')
-            priv.role_id = kw.get('id_role')
-            priv.attribute_id = id_attribute
-            priv.access = access
-            
-        else:
-            priv.access = access
-            
+
+        priv.role_id = kw.get('id_role')
+        priv.user_id = kw.get('id_user')
+        priv.attribute_id = id_attribute
+        priv.access = access
+        
         dbs.add(priv)
         dbs.flush()
+        
+        # reset cache
+        _cache = cache.get_cache(SapnsAttrPrivilege.CACHE_ID)
+        
+        def reset_user_cache(id_user):
+            _key = '%d_%d' % (id_user, id_attribute)
+            _cache.remove_value(key=_key)
+        
+        if kw.get('id_user'):
+            # this user
+            reset_user_cache(kw.get('id_user'))
+            
+        else:
+            # all the users in this role
+            role = dbs.query(SapnsRole).get(kw.get('id_role'))
+            for user in role.users:
+                reset_user_cache(user.user_id)
         
         return priv
         
     @staticmethod
-    def remove_privilege(id_user, id_attribute):
-        dbs.query(SapnsAttrPrivilege).\
-            filter(and_(SapnsAttrPrivilege.user_id == id_user,
-                        SapnsAttrPrivilege.attribute_id == id_attribute,
-                        )).\
-            delete()
+    def add_privilege(id_attribute, access, **kw):
+        return SapnsAttrPrivilege._update_privilege(id_attribute, access, **kw)
+        
+    @staticmethod
+    def remove_privilege(id_attribute, **kw):
+        if kw.get('remove'):
+            dbs.query(SapnsAttrPrivilege).\
+                filter(and_(SapnsAttrPrivilege.attribute_id == id_attribute,
+                            SapnsAttrPrivilege.user_id == kw.get('id_user'),
+                            SapnsAttrPrivilege.role_id == kw.get('id_role'),
+                            )).\
+                delete()
+                
+            dbs.flush()
             
-        dbs.flush()
+        else:
+            SapnsAttrPrivilege._update_privilege(id_attribute, SapnsAttrPrivilege.ACCESS_DENIED, **kw)
         
     @staticmethod
     def cmp_access(a1, a2):
@@ -1268,6 +1339,10 @@ class SapnsActPrivilege(DeclarativeBase):
                      ForeignKey('sp_roles.id',
                                 onupdate='CASCADE', ondelete='CASCADE'))
     
+    granted = Column(Boolean, nullable=False, default=True)
+    
+    CACHE_ID = 'user_act_privilege'
+    
     @staticmethod
     def has_privilege(id_user, id_action):
         
@@ -1275,41 +1350,24 @@ class SapnsActPrivilege(DeclarativeBase):
         #logger.info('user=%d / action=%d' % (id_user, id_action))
         
         def _has_privilege():
-            priv = dbs.query(SapnsActPrivilege).\
-                join((SapnsRole,
-                      SapnsRole.group_id == SapnsActPrivilege.role_id)).\
-                join((SapnsUserRole,
-                      and_(SapnsUserRole.role_id == SapnsRole.group_id,
-                           SapnsUserRole.user_id == id_user))).\
-                filter(SapnsActPrivilege.action_id == id_action).\
-                first()
-                
+            
+            priv = SapnsActPrivilege.get_privilege(id_action, id_user=id_user)
             if not priv:
                 priv = dbs.query(SapnsActPrivilege).\
-                        filter(and_(SapnsActPrivilege.user_id == id_user,
-                                    SapnsActPrivilege.action_id == id_action,
-                                    )).\
-                        first()
-                        
-            return priv != None
+                    join((SapnsRole,
+                          SapnsRole.group_id == SapnsActPrivilege.role_id)).\
+                    join((SapnsUserRole,
+                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
+                               SapnsUserRole.user_id == id_user))).\
+                    filter(SapnsActPrivilege.action_id == id_action).\
+                    first()
+                    
+            return priv.granted
 
-        _cache = cache.get_cache('user_act_privilege')
+        _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
         return _cache.get_value(key='%d_%d' % (id_user, id_action),
-                                createfunc=_has_privilege, expiretime=1)
+                                createfunc=_has_privilege, expiretime=3600)
         
-    @staticmethod
-    def add_privilege(id_action, **kw):
-        
-        action_p = SapnsActPrivilege()
-        action_p.role_id = kw.get('id_role')
-        action_p.user_id = kw.get('id_user')
-        action_p.action_id = id_action
-        
-        dbs.add(action_p)
-        dbs.flush()
-        
-        return action_p
-    
     @staticmethod
     def get_privilege(id_action, **kw):
         return dbs.query(SapnsActPrivilege).\
@@ -1319,14 +1377,46 @@ class SapnsActPrivilege(DeclarativeBase):
             first()
             
     @staticmethod
-    def remove_privilege(id_action, **kw):
-        dbs.query(SapnsActPrivilege).\
-            filter(and_(SapnsActPrivilege.action_id == id_action,
-                        SapnsActPrivilege.role_id == kw.get('id_role'),
-                        SapnsActPrivilege.user_id == kw.get('id_user'))).\
-            delete()
+    def _update_privilege(id_action, granted, **kw):
 
-        dbs.flush()    
+        action_p = SapnsActPrivilege.get_privilege(id_action, **kw)
+        if not action_p:
+            action_p = SapnsActPrivilege()
+        
+        action_p.role_id = kw.get('id_role')
+        action_p.user_id = kw.get('id_user')
+        action_p.action_id = id_action
+        action_p.granted = granted
+        
+        dbs.add(action_p)
+        dbs.flush()
+        
+        # reset cache
+        _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
+        
+        def reset_user_cache(id_user):
+            _key = '%d_%d' % (id_user, id_action)
+            _cache.remove_value(key=_key)
+        
+        if kw.get('id_user'):
+            # this user
+            reset_user_cache(kw.get('id_user'))
+            
+        else:
+            # all the users in this role
+            role = dbs.query(SapnsRole).get(kw.get('id_role'))
+            for user in role.users:
+                reset_user_cache(user.user_id)
+        
+        return action_p
+
+    @staticmethod
+    def add_privilege(id_action, **kw):
+        return SapnsActPrivilege._update_privilege(id_action, True, **kw)
+    
+    @staticmethod
+    def remove_privilege(id_action, **kw):
+        SapnsActPrivilege._update_privilege(id_action, False, **kw)
 
 class SapnsView(DeclarativeBase):
     """Views in Sapns"""

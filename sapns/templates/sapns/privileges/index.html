@@ -174,7 +174,7 @@
             $('.class_row input[type=checkbox]').click(function() {
                 
                 var data_in = {
-                        id_class: cls.attr('id_class'),
+                        id_class: $(this).parent().attr('id_class'),
                         granted: $(this).attr('checked')
                 };
                 
