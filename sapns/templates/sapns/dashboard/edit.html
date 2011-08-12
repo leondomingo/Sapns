@@ -10,7 +10,7 @@
     {{ util.dateformat() }}
     {{ util.qtip2() }}
     <script type="text/javascript">
-        {% include 'sapns/dashboard/sapns.selector.js' %}
+        {% include 'sapns/components/sapns.selector.min.js' %}
     </script>
 {% endblock %}
 
@@ -292,7 +292,8 @@
                     });
                 }
                 
-                /*var alert_msg = "{{_('The following fields must be filled:')}}";
+                /* {#
+                var alert_msg = "{{_('The following fields must be filled:')}}";
                 alert_msg += '<br>';
                 for (var i=0; i<required_attrs.length; i++) {
                     alert_msg += 
@@ -317,7 +318,8 @@
                         		$('#edit-dialog').dialog('close');
                         	}
                         }
-                    });*/
+                    });
+                #}*/
             }
             else {
                 $('#edit-form').append(params).submit();

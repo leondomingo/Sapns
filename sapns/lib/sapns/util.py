@@ -187,6 +187,7 @@ def update_metadata():
         create_action(unicode(l_('Edit')), SapnsAction.TYPE_EDIT)
         create_action(unicode(l_('Delete')), SapnsAction.TYPE_DELETE)
         create_action(unicode(l_('List')), SapnsAction.TYPE_LIST)
+        create_action(unicode(l_('Docs')), SapnsAction.TYPE_DOCS)
             
         first_ref = False
         for i, col in enumerate(tbl['columns']):

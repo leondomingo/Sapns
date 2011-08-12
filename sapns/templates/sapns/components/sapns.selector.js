@@ -43,13 +43,15 @@
 	// setValue
 	SapnsSelector.prototype.setValue = function(value) {
 	    var change = this.value != value;
-		
+        var old_value = this.value;
+
 		this.value = value;
 		if (change && this.onChange) {
-		    this.onChange(this);
+		    this.onChange(value, old_value);
 		}
 	}
 	
+	// getValue
 	SapnsSelector.prototype.getValue = function() {
 		return this.value;
 	}

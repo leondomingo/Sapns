@@ -17,6 +17,7 @@ from sapns.controllers.users import UsersController
 from sapns.controllers.shortcuts import ShortcutsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController
+from sapns.controllers.docs import DocsController
 
 from neptuno.postgres.search import search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr
@@ -44,6 +45,7 @@ class DashboardController(BaseController):
     sc = ShortcutsController()
     messages = MessagesController()
     privileges = PrivilegesController()
+    docs = DocsController()
 
     @expose('sapns/dashboard/index.html')
     @require(predicates.not_anonymous())
@@ -171,6 +173,7 @@ class DashboardController(BaseController):
                    if act['type'] in [SapnsAction.TYPE_NEW,
                                       SapnsAction.TYPE_EDIT,
                                       SapnsAction.TYPE_DELETE,
+                                      SapnsAction.TYPE_DOCS,
                                       SapnsAction.TYPE_PROCESS,
                                      ]]
 

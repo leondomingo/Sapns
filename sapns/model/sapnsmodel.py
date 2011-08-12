@@ -1227,19 +1227,21 @@ class SapnsAction(DeclarativeBase):
         relation(SapnsShortcut, backref='action',
                  primaryjoin=action_id == SapnsShortcut.action_id)
     
-    TYPE_NEW = 'new'
-    TYPE_EDIT = 'edit'
-    TYPE_DELETE = 'delete'
-    TYPE_REPORT = 'report'
+    TYPE_NEW =     'new'
+    TYPE_EDIT =    'edit'
+    TYPE_DELETE =  'delete'
+    TYPE_DOCS =    'docs'
+    TYPE_REPORT =  'report'
     TYPE_PROCESS = 'process'
-    TYPE_LIST = 'list'
-    TYPE_OBJECT = 'object'
-    TYPE_GROUP = 'group'
+    TYPE_LIST =    'list'
+    TYPE_OBJECT =  'object'
+    TYPE_GROUP =   'group'
     
     # default URL
-    URL_NEW = '/dashboard/new'
-    URL_EDIT = '/dashboard/edit'
+    URL_NEW =    '/dashboard/new'
+    URL_EDIT =   '/dashboard/edit'
     URL_DELETE = '/dashboard/delete'
+    URL_DOCS =   '/dashboard/docs'
     
     def __unicode__(self):
         return u'<SapnsAction: "%s" type=%s>' % (self.name, self.type)
@@ -1484,6 +1486,10 @@ class SapnsRepo(DeclarativeBase):
     name = Column(Unicode(50), nullable=False)
     path = Column(Unicode(255))
     
+    def abs_path(self):
+        REPO_BASE_PATH = config.get('app.repo_base')
+        return os.path.join(REPO_BASE_PATH, self.path)
+    
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.path)
     
@@ -1508,6 +1514,10 @@ class SapnsDoc(DeclarativeBase):
     doctype_id = Column('id_doctype', Integer, 
                         ForeignKey('sp_doctypes.id',
                                    onupdate='CASCADE', ondelete='SET NULL'))
+    
+    docformat_id = Column('id_docformat', Integer,
+                          ForeignKey('sp_docformats.id',
+                                     onupdate='CASCADE', ondelete='RESTRICT'))
     
     def __unicode__(self):
         return u'%s' % self.title
@@ -1543,6 +1553,19 @@ class SapnsDocType(DeclarativeBase):
     def __repr__(self):
         return unicode(self).encode('utf-8')
     
+class SapnsDocFormat(DeclarativeBase):
+    
+    __tablename__ = 'sp_docformats'
+    
+    docformat_id = Column('id', Integer, primary_key=True, autoincrement=True)
+    name = Column(Unicode(80), nullable=False)
+    extension = Column(Unicode(5), nullable=False)
+    mime_type = Column(Unicode(30), nullable=False)
+    description = Column(Text)
+    
+    docs = relation(SapnsDoc, backref='docformat',
+                    primaryjoin=docformat_id == SapnsDoc.docformat_id)
+    
 class SapnsAssignedDoc(DeclarativeBase):
     
     __tablename__ = 'sp_assigned_docs'
@@ -1560,6 +1583,5 @@ class SapnsAssignedDoc(DeclarativeBase):
     object_id = Column(Integer)
     
 SapnsDoc.assigned_docs = \
-    relation(SapnsAssignedDoc,
-             backref='doc',
+    relation(SapnsAssignedDoc, backref='doc',
              primaryjoin=SapnsDoc.doc_id == SapnsAssignedDoc.doc_id)

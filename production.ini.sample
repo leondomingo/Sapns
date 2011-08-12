@@ -31,6 +31,12 @@ beaker.session.key = sapns
 beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
 beaker.cache.type = memory
 
+# If you'd like to fine-tune the individual locations of the cache data dirs
+# for the Cache data, or the Session saves, un-comment the desired settings
+# here:
+#beaker.cache.data_dir = %(here)s/data/cache
+#beaker.session.data_dir = %(here)s/data/sessions
+
 # Sapns settings
 pg_path = /usr/bin
 views_prefix = _view_
@@ -56,12 +62,7 @@ app.subtitle = Web Information System
 app.company_url = http://www.sapns.org
 #app.root_folder = 
 app.home = /dashboard
-
-# If you'd like to fine-tune the individual locations of the cache data dirs
-# for the Cache data, or the Session saves, un-comment the desired settings
-# here:
-#beaker.cache.data_dir = %(here)s/data/cache
-#beaker.session.data_dir = %(here)s/data/sessions
+app.repo_base = %(here)s/sapns/public/repo
 
 # pick the form for your database
 # %(here) may include a ':' character on Windows environments; this can

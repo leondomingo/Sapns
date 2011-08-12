@@ -50,15 +50,34 @@ def bootstrap(command, conf, vars):
         
         model.DBSession.add(p_views)
         
+        # permission: utilities
         p_util = model.Permission()
         p_util.permission_name = u'utilities'
         p_util.description = u'Utilites'
         p_util.groups.append(managers)
         
         model.DBSession.add(p_util)
-        
         model.DBSession.flush()
 
+        p_util.groups.append(managers)
+        model.DBSession.add(p_util)
+
+        # permission: docs        
+        p_docs = model.Permission()
+        p_docs.permission_name = u'docs'
+        p_docs.description = 'Documents management'
+        p_docs.groups.append(managers)
+        
+        model.DBSession.add(p_docs)
+
+        # repo (docs)
+        main_repo = model.SapnsRepo()
+        main_repo.name = u'Main repo'
+        main_repo.path = ''
+        
+        model.DBSession.add(main_repo)
+        model.DBSession.flush()
+        
         transaction.commit()
     except IntegrityError:
         print 'Warning, there was a problem adding your auth data, it may have already been added:'
