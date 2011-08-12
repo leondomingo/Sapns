@@ -48,7 +48,7 @@
     left: 0px;
     top: 0px;
     height: 483px;
-    width: 270px;
+    width: 315px;
     border: 1px solid white;
     overflow: auto;
     padding: 10px;
@@ -72,7 +72,7 @@
 
 .class_name {
     font-weight: bold;
-    width: 220px;
+    width: 228px;
     float: left;
     overflow: hidden;
 }
@@ -81,11 +81,15 @@
     text-decoration: underline;
 }
 
+.class_granted, .attr_granted, .action_granted {
+	font-size: 10px;
+}
+
 #right_content {
     position: absolute;
     top: 0px;
-    left: 290px;
-    width: 685px;
+    left: 335px;
+    width: 640px;
     height: 484px;
     padding: 10px;
     border: 1px solid gray; 
@@ -106,7 +110,7 @@
 }
 
 #attr_title_caption {
-    width: 540px;
+    width: 500px;
     float: left;
 }
 
@@ -131,7 +135,7 @@
 }
 
 .attr_name {
-    width: 538px;
+    width: 513px;
     float: left;
 }
 
@@ -166,6 +170,6 @@
 }
 
 .action_name {
-    width: 620px;
+    width: 540px;
     float: left;
 }

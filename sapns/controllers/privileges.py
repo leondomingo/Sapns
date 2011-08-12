@@ -38,6 +38,7 @@ class PrivilegesController(BaseController):
     @expose('sapns/privileges/classes.html')
     def classes(self, **kw):
         
+        id_user = get_paramw(kw, 'id_user', int, opcional=True)
         id_role = get_paramw(kw, 'id_role', int, opcional=True)
         if id_role:
             who = dbs.query(SapnsRole).get(id_role)
@@ -45,11 +46,17 @@ class PrivilegesController(BaseController):
                 return who.has_privilege(id_class, no_cache=True)
             
         else:
-            id_user = get_paramw(kw, 'id_user', int, opcional=True)
             who = dbs.query(SapnsUser).get(id_user)
+            #who = SapnsUser()
             def has_privilege(id_class):
-                cls = dbs.query(SapnsClass).get(id_class)                
-                return who.has_privilege(cls.name, no_cache=True)
+                priv = who.get_privilege(id_class)
+                if priv:
+                    return priv.granted
+                
+                return None
+                    
+                #cls = dbs.query(SapnsClass).get(id_class)
+                #return who.has_privilege(cls.name, no_cache=True)
 
         classes = []
         for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
@@ -59,7 +66,7 @@ class PrivilegesController(BaseController):
                                 granted=has_privilege(cls.class_id),
                                 ))
         
-        return dict(classes=classes)
+        return dict(classes=classes, show_none=id_user != None)
     
     @expose('json')
     def classp_update(self, **kw):
@@ -77,6 +84,7 @@ class PrivilegesController(BaseController):
             else:
                 id_user = get_paramw(kw, 'id_user', int, opcional=True)
                 who = dbs.query(SapnsUser).get(id_user)
+                #who = SapnsUser()
                 
             if granted:
                 who.add_privilege(id_class)
@@ -100,6 +108,7 @@ class PrivilegesController(BaseController):
                 first()
 
         id_class = int(id_class)
+        id_user = get_paramw(kw, 'id_user', int, opcional=True)
         id_role = get_paramw(kw, 'id_role', int, opcional=True)
         if id_role:
             #who = dbs.query(SapnsRole).get(id_role)
@@ -107,7 +116,6 @@ class PrivilegesController(BaseController):
                 _attr_privilege(SapnsAttrPrivilege.role_id == id_role, id)
             
         else:
-            id_user = get_paramw(kw, 'id_user', int, opcional=True)
             #who = dbs.query(SapnsUser).get(id_user)
             attr_privilege = lambda id: \
                 _attr_privilege(SapnsAttrPrivilege.user_id == id_user, id)
@@ -130,18 +138,18 @@ class PrivilegesController(BaseController):
             
         return dict(attributes=sorted(attributes, 
                                       cmp=lambda x,y: cmp(x.ins_order, y.ins_order)),
-                    show_none=get_paramw(kw, 'id_user', int, opcional=True) != None)
+                    show_none=id_user != None)
     
     @expose('sapns/privileges/actions.html')
     def actions(self, id_class, **kw):
         
         id_class = int(id_class)
+        id_user = get_paramw(kw, 'id_user', int, opcional=True)
         id_role = get_paramw(kw, 'id_role', int, opcional=True)
         if id_role:
             who = dbs.query(SapnsRole).get(id_role)
             
         else:
-            id_user = get_paramw(kw, 'id_user', int, opcional=True)
             who = dbs.query(SapnsUser).get(id_user)
         
         # class
@@ -154,7 +162,7 @@ class PrivilegesController(BaseController):
             if not action_p:
                 action_p = Dict(id_action=action.action_id,
                                 name=_(action.name),
-                                granted=False,
+                                granted=None,
                                 )
             
             pos = None
@@ -184,7 +192,7 @@ class PrivilegesController(BaseController):
             else:
                 return cmp(x.pos, y.pos)
         
-        return dict(actions=sorted(actions, cmp=cmp_action))
+        return dict(actions=sorted(actions, cmp=cmp_action), show_none=id_user != None)
     
     @expose('json')
     def attrp_update(self, **kw):

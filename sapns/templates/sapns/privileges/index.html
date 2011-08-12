@@ -5,11 +5,11 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    <!--<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.css">-->
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.css">
+    <!--<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.min.css">-->
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.selector.js' %}
-        {#{% include 'sapns/components/sapns.selector.min.js' %}#}
+        {#{% include 'sapns/components/sapns.selector.js' %}#}
+        {% include 'sapns/components/sapns.selector.min.js' %}
     </script>
 {% endblock %}
 
@@ -100,14 +100,14 @@
         }
         
         function init_action_events() {
-            // action_granted (checkbox)
-            $('.action_row input[type=checkbox]').click(function() {
+            // action_granted (select) 
+            $('.action_row select').change(function() {
                 
                 var action_p = $(this).parent();
                 
                 var data_in = {
                         id_action: action_p.attr('id_action'),
-                        granted: $(this).attr('checked')
+                        granted: $(this).val()
                 };
                 
                 if(!get_role_user(data_in)) {
@@ -119,7 +119,6 @@
                     data: data_in,
                     success: function(data) {
                         if (data.status) {
-                            action_p.attr('id_action_p', data.id_action_p);
                         }
                     }
                 });
@@ -170,12 +169,12 @@
                 load_privileges($(this).parent().attr('id_class'));
             });
             
-            // class checkbox 
-            $('.class_row input[type=checkbox]').click(function() {
+            // class select 
+            $('.class_row select').change(function() {
                 
                 var data_in = {
                         id_class: $(this).parent().attr('id_class'),
-                        granted: $(this).attr('checked')
+                        granted: $(this).val()
                 };
                 
                 if (get_role_user(data_in)) { 

@@ -1,6 +1,13 @@
 {% for act in actions %}
 <div class="action_row" id_action="{{act.id_action}}">
     <div class="action_name">{{act.name}}</div>
-    <input type="checkbox" {% if act.granted %} checked {% endif %}>
+    <select class="action_granted">
+        {% if show_none %}
+        <option value="" {% if act.granted == None %} selected {% endif %}>({{_('none')}})</option>
+        {% endif %}
+        <option value="true" {% if act.granted == True %} selected {% endif %}>{{_('Yes')}}</option>
+        <option value="false" {% if act.granted == False %} selected {% endif %}>{{_('No')}}</option>
+    </select>
+    {#<input type="checkbox" {% if act.granted %} checked {% endif %}>#}
 </div>
 {% endfor %}

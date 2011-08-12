@@ -273,6 +273,9 @@ class SapnsUser(User):
     
     def remove_privilege(self, id_class):
         SapnsPrivilege.remove_privilege(id_class, id_user=self.user_id)
+        
+    def get_privilege(self, id_class):
+        return SapnsPrivilege.get_privilege(id_class, id_user=self.user_id)
     
     def attr_privilege(self, id_attribute):
         return SapnsAttrPrivilege.get_privilege(id_attribute, id_user=self.user_id)

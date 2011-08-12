@@ -1,6 +1,13 @@
 {% for cls in classes %}
 <div class="class_row" id_class="{{cls.id}}">
     <div class="class_name" title="{{cls.name}}">{{cls.name|escape}}</div>
-    <input type="checkbox" {% if cls.granted %} checked {% endif %}>
+    <select class="class_granted">
+        {% if show_none %}
+        <option value="" {% if cls.granted == None %} selected {% endif %}>({{_('none')}})</option>
+        {% endif %}
+        <option value="true" {% if cls.granted == True %} selected {% endif %}>{{_('Yes')}}</option>
+        <option value="false" {% if cls.granted == False %} selected {% endif %}>{{_('No')}}</option>
+    </select>
+    {#<input type="checkbox" {% if cls.granted %} checked {% endif %}>#}
 </div>
 {% endfor %}
