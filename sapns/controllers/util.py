@@ -13,6 +13,7 @@ from repoze.what import authorize
 from sapns.model import DBSession as dbs
 from sapns.lib.base import BaseController
 import sapns.lib.sapns.util as libutil
+from sapns.lib.sapns.update.update import Update
 
 import re
 import logging
@@ -27,12 +28,13 @@ class UtilController(BaseController):
     @expose('sapns/message.html')
     def init(self):
         set_lang('en')
-        self.update_metadata()
-        libutil.create_data_exploration()
+        #libutil.update_metadata()
+        #libutil.create_data_exploration()
+        Update().__call__()
         
         return dict(message=_('Initialization was completed successfully'),
                     came_from=url('/'))
-    
+        
     @expose('sapns/util/index.html')
     def index(self, came_from='/'):
         return dict(page='util', came_from=came_from)

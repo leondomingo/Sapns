@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 
-import os
 import sys
+import os
 import re
 import logging
+import datetime as dt
 import subprocess as sp
 from pylons.i18n import ugettext as _
 from tg import config
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUpdates
 from neptuno.dict import Dict
-from todo import TODO 
+from todo import TODO
 
-logger = logging.getLogger('Update.__call__')
-current_path = ''
+logger = logging.getLogger('Update')
+current_path = os.path.dirname(os.path.abspath(__file__))
+#sys.path.append(current_path)
 
 class Update(object):
     
@@ -41,29 +43,43 @@ class Update(object):
             
             u = Dict(**u)
             if not SapnsUpdates.by_code(u.code):
-
-                # type of update
-                if u.type.lower() == 'sql':
-                    logger.info(_('Executing SQL script...'))
-                    os.environ['PGPASSWORD'] = self.password
-                    
-                    call = [os.path.join(self.pg_path, 'psql'),
-                            '-h', self.host, 
-                            '-U', self.user, 
-                            '-d', self.db,
-                            '-f', os.path.join(current_path, u.filename)]
-                    
-                    if self.port:
-                        call.append('-p')
-                        # ":<port>"
-                        call.append(self.port[1:])
-                    
-                    sp.check_call(call)
                 
-                elif u.type.lower() == 'py':
-                    logger.info(_('Executing Python script...'))
-                    module = __import__(u.module, None, None, ['update'])
-                    module.update()
+                new_u = SapnsUpdates()
+                new_u.code = u.code
+                new_u.description = u.desc
+                new_u.exec_date = dt.datetime.now()
+                
+                try:
+                    # SQL
+                    if u.type.lower() == 'sql':
+                        logger.info(_('Executing SQL script...'))
+                        
+                        call = [os.path.join(self.pg_path, 'psql'),
+                                '-h', self.host, 
+                                '-U', self.user, 
+                                '-d', self.db,
+                                '-f', os.path.join(current_path, u.filename)]
+                        
+                        if self.port:
+                            call.append('-p')
+                            # ":<port>"
+                            call.append(self.port[1:])
+                            
+                        sp.check_call(call, env=dict(PGPASSWORD=self.password))
+                    
+                    # python
+                    elif u.type.lower() == 'py':
+                        logger.info(_('Executing Python script...'))
+                        module = __import__('sapns.lib.sapns.update.%s' % u.module, 
+                                            None, None, ['update'])
+                        module.update()
+                        
+                    # save
+                    dbs.add(new_u)
+                    dbs.commit()
+                        
+                except Exception, e:
+                    logger.error(e)
                     
             else:
                 logger.warning(_('Skipping [%s]' % u.code))
