@@ -137,10 +137,14 @@ def make_update(args, mode):
                     try:
                         # .py
                         if m_issue.group(4):
-                            # Python
-                            sys.stdout.write(_('Executing Python script...\n'))
-                            module = __import__(m_issue.group(3), None, None, ['update'])
-                            module.update()
+                            try:
+                                # Python
+                                sys.stdout.write(_('Executing Python script...\n'))
+                                module = __import__(m_issue.group(3), None, None, ['update'])
+                                module.update()
+                                
+                            except Exception:
+                                raise Exception('[%s] failed!' % current_issue)
 
                         # SQL
                         elif ext == '.sql':
@@ -164,7 +168,7 @@ def make_update(args, mode):
                         f_done.write('%s\n' % current_issue)
 
                     except Exception, e:
-                        sys.stderr.write(str(e))
+                        sys.stderr.write('%s\n' % e)
 
     finally:
         f_todo.close()
@@ -175,6 +179,9 @@ if __name__ == '__main__':
     args = parse_args()
     mode = args.mode or 'post'
     load_config(args.conf_file)
+    
+    import logging.config
+    logging.config.fileConfig(args.conf_file)
 
     with set_tmpl_context_cm():
         with set_language_context_manager(language=args.lang):    

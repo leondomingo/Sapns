@@ -30,10 +30,24 @@ class PrivilegesController(BaseController):
     
     @expose('sapns/privileges/index.html')
     def index(self, **kw):
+        
+        id_role = get_paramw(kw, 'id_role', int, opcional=True)
+        id_user = get_paramw(kw, 'id_user', int, opcional=True)
+        
         came_from = kw.get('came_from', '/')
         page = _('Privilege management')
         
-        return dict(page=page, came_from=came_from)
+        return dict(page=page, id_role=id_role, id_user=id_user, came_from=came_from)
+    
+    @expose()
+    def roles(self, id_role, **kw):
+        kw.update(id_role=id_role)
+        redirect(url('/dashboard/privileges', params=kw))
+        
+    @expose()
+    def users(self, id_user, **kw):
+        kw.update(id_user=id_user)
+        redirect(url('/dashboard/privileges', params=kw))
     
     @expose('sapns/privileges/classes.html')
     def classes(self, **kw):
@@ -75,7 +89,7 @@ class PrivilegesController(BaseController):
         try:
             
             id_class = get_paramw(kw, 'id_class', int)
-            granted = get_paramw(kw, 'granted', strtobool)
+            granted = get_paramw(kw, 'granted', strtobool, opcional=True)
             
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
             if id_role:
@@ -90,7 +104,7 @@ class PrivilegesController(BaseController):
                 who.add_privilege(id_class)
                 
             else:
-                who.remove_privilege(id_class)
+                who.remove_privilege(id_class, delete=granted is None)
             
             return dict(status=True)
         
@@ -164,8 +178,10 @@ class PrivilegesController(BaseController):
                                 name=_(action.name),
                                 granted=None,
                                 )
+                
+                if not id_user:
+                    action_p.granted = False
             
-            pos = None
             if action.type == SapnsAction.TYPE_NEW:
                 pos = 1
                 
@@ -177,6 +193,9 @@ class PrivilegesController(BaseController):
                 
             elif action.type == SapnsAction.TYPE_DOCS:
                 pos = 4
+                
+            else:
+                pos = 100
                 
             actions.append(Dict(id=action_p.actpriv_id,
                                 id_action=action.action_id,
@@ -199,6 +218,8 @@ class PrivilegesController(BaseController):
         
         logger = logging.getLogger('PrivilegesController.attrp_update')
         try:
+            logger.info(kw)
+            
             id_attribute = get_paramw(kw, 'id_attribute', int)
             access = get_paramw(kw, 'access', str)
             

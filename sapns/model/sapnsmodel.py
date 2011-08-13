@@ -43,7 +43,7 @@ class SapnsRole(Group):
     def add_privilege(self, id_class):
         return SapnsPrivilege.add_privilege(id_class, id_role=self.group_id)
         
-    def remove_privilege(self, id_class):
+    def remove_privilege(self, id_class, **kw):
         SapnsPrivilege.remove_privilege(id_class, id_role=self.group_id)
             
     def has_privilege(self, id_class, no_cache=False):
@@ -271,8 +271,8 @@ class SapnsUser(User):
     def add_privilege(self, id_class):
         return SapnsPrivilege.add_privilege(id_class, id_user=self.user_id)
     
-    def remove_privilege(self, id_class):
-        SapnsPrivilege.remove_privilege(id_class, id_user=self.user_id)
+    def remove_privilege(self, id_class, delete=False):
+        SapnsPrivilege.remove_privilege(id_class, id_user=self.user_id, delete=delete)
         
     def get_privilege(self, id_class):
         return SapnsPrivilege.get_privilege(id_class, id_user=self.user_id)
@@ -754,8 +754,6 @@ class SapnsClass(DeclarativeBase):
                     if url and url[-1] != '/':
                         url += '/'
                         
-                    require_id = True
-                    pos = None
                     if ac.type == SapnsAction.TYPE_NEW:
                         if not ac.url:
                             url = SapnsAction.URL_NEW
@@ -780,6 +778,10 @@ class SapnsClass(DeclarativeBase):
                             url = SapnsAction.URL_DOCS
                             
                         pos = 4
+                        
+                    else:
+                        require_id = True
+                        pos = 100
     
                     actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
                                         require_id=require_id, pos=pos))
@@ -793,9 +795,9 @@ class SapnsClass(DeclarativeBase):
         
             return sorted(actions, cmp=cmp_act)
         
-        _cache = cache.get_cache('sorted_actions')
-        return _cache.get_value(key=self.class_id, createfunc=_sorted_actions,
-                                expiretime=1)
+        _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
+        return _cache.get_value(key='cls_%d' % self.class_id, 
+                                createfunc=_sorted_actions, expiretime=3600)
     
     def insertion(self):
         """
@@ -1095,16 +1097,25 @@ class SapnsPrivilege(DeclarativeBase):
     def _update_privilege(id_class, granted, **kw):
         
         priv = SapnsPrivilege.get_privilege(id_class, **kw)
-        if not priv:
-            priv = SapnsPrivilege()
-
-        priv.role_id = kw.get('id_role')
-        priv.user_id = kw.get('id_user')
-        priv.class_id = id_class
-        priv.granted = granted
-        
-        dbs.add(priv)
-        dbs.flush()
+        if not kw.get('delete'):            
+            
+            if not priv:
+                priv = SapnsPrivilege()
+    
+            priv.role_id = kw.get('id_role')
+            priv.user_id = kw.get('id_user')
+            priv.class_id = id_class
+            priv.granted = granted
+            
+            dbs.add(priv)
+            dbs.flush()
+            
+        elif priv:
+            dbs.query(SapnsPrivilege).\
+                filter(SapnsPrivilege.privilege_id == priv.privilege_id).\
+                delete()
+                
+            dbs.flush()
         
         # reset cache
         _cache = cache.get_cache(SapnsPrivilege.CACHE_ID)
@@ -1356,6 +1367,7 @@ class SapnsActPrivilege(DeclarativeBase):
             
             priv = SapnsActPrivilege.get_privilege(id_action, id_user=id_user)
             if not priv:
+                #logger.info('No está definido el privilegio sobre esta acción. Buscamos por el rol')
                 priv = dbs.query(SapnsActPrivilege).\
                     join((SapnsRole,
                           SapnsRole.group_id == SapnsActPrivilege.role_id)).\
@@ -1365,7 +1377,11 @@ class SapnsActPrivilege(DeclarativeBase):
                     filter(SapnsActPrivilege.action_id == id_action).\
                     first()
                     
-            return priv.granted
+            if priv:
+                return priv.granted
+            
+            else:
+                return False
 
         _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
         return _cache.get_value(key='%d_%d' % (id_user, id_action),
@@ -1398,8 +1414,8 @@ class SapnsActPrivilege(DeclarativeBase):
         _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
         
         def reset_user_cache(id_user):
-            _key = '%d_%d' % (id_user, id_action)
-            _cache.remove_value(key=_key)
+            _cache.remove_value(key='%d_%d' % (id_user, id_action))
+            _cache.remove_value(key='cls_%d' % action_p.action.class_id)
         
         if kw.get('id_user'):
             # this user
@@ -1420,6 +1436,10 @@ class SapnsActPrivilege(DeclarativeBase):
     @staticmethod
     def remove_privilege(id_action, **kw):
         SapnsActPrivilege._update_privilege(id_action, False, **kw)
+        
+SapnsAction.privileges = \
+    relation(SapnsActPrivilege, backref='action',
+             primaryjoin=SapnsAction.action_id == SapnsActPrivilege.action_id)
 
 class SapnsView(DeclarativeBase):
     """Views in Sapns"""

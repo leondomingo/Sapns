@@ -2,7 +2,7 @@
 #0000               post    example/example.sql
 #0000               post    example/example.py
 # Sapns initialization
-#init                 post    sapns_init.init  .py
+init                 post    sapns_init.init  .py
 get_roles           post    sapns_init/get_roles.function.sql
 has_role            post    sapns_init/has_role.function.sql
 sp_classes          post    sapns_init/sp_classes.view.sql

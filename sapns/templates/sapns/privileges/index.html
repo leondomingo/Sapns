@@ -9,11 +9,12 @@
     <!--<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.min.css">-->
     <script type="text/javascript">
         {#{% include 'sapns/components/sapns.selector.js' %}#}
-        {% include 'sapns/components/sapns.selector.min.js' %}
+        {#{% include 'sapns/components/sapns.selector.min.js' %}#}
     </script>
 {% endblock %}
 
 {% block middle %}
+{#
 <div id="options">
     <div id="role_option">
         <div class="option_title">{{_('Roles')}}</div>
@@ -25,240 +26,38 @@
         <div id="user_selector"></div>
     </div>
 </div>
+#}
 
 <div id="main_pane">
-    <div id="classes_sidebar"></div>
+    <div id="classes_sidebar">
+        <div id="classes_title">{{_('Classes')}}</div>
+        <div id="classes_list"></div>
+    </div>
     
     <div id="right_content">
         <div id="attr_pane">
             <div id="attr_title">
               <div id="attr_title_caption">{{_('Attributes')}}</div>
-              <button class="btn_denied">DE</button>
-              <button class="btn_readonly">R-O</button>
-              <button class="btn_readwrite">R/W</button>
+              <button id="btn_denied" title="{{_('Denied')}}">DE</button>
+              <button id="btn_readonly" title="{{_('Read-only')}}">R-O</button>
+              <button id="btn_readwrite" title="{{_('Read/Write')}}">R/W</button>
             </div>
             <div id="attr_list"></div>
         </div>
         
         <div id="actions_pane">
-            <div id="actions_title">{{_('Actions')}}</div>
+            <div id="actions_title">
+                <div id="actions_title_caption">{{_('Actions')}}</div>
+                <button id="btn_yes">{{_('Yes')}}</button>
+                <button id="btn_no">{{_('No')}}</button>
+            </div>
             <div id="actions_list"></div>
         </div>
     </div>
     
     <script type="text/javascript">
-    
-        function get_role_user(data_in) {
-            
-            var id_role = $('#role_selector').sapnsSelector('getValue');
-            var id_user = $('#user_selector').sapnsSelector('getValue');
-            
-            if (id_role != '') {
-                data_in.id_role = id_role;
-            }
-            else if (id_user != '') {
-                data_in.id_user = id_user; 
-            }
-            else {
-                alert("{{_('Please, select a user or role')}}");
-                return false;
-            }
-            
-            return true;
-        }
-        
-        function attr_access_change() {
-
-            var attr_p = $(this).parent();
-            
-            var data_in = {
-                    id_attribute: attr_p.attr('id_attr'),
-                    id_attr_p: attr_p.attr('id_attr_p'),
-                    access: $(this).val()
-            };
-            
-            if(!get_role_user(data_in)) {
-                return;
-            }
-            
-            //console.log(JSON.stringify(data_in)); 
-            
-            $.ajax({
-                url: "{{tg.url('/dashboard/privileges/attrp_update')}}",
-                data: data_in,
-                success: function(data) {
-                    if (data.status) {
-                        // attr_p.attr('id_attr_p', data.id_attr_p); 
-                    }
-                }
-            });
-        }        
-        
-        function init_attr_events() {
-            // attr_access (select) 
-            $('.attr_row select').change(attr_access_change);
-        }
-        
-        function init_action_events() {
-            // action_granted (select) 
-            $('.action_row select').change(function() {
-                
-                var action_p = $(this).parent();
-                
-                var data_in = {
-                        id_action: action_p.attr('id_action'),
-                        granted: $(this).val()
-                };
-                
-                if(!get_role_user(data_in)) {
-                    return;
-                }
-                
-                $.ajax({
-                    url: "{{tg.url('/dashboard/privileges/actionp_update')}}",
-                    data: data_in,
-                    success: function(data) {
-                        if (data.status) {
-                        }
-                    }
-                });
-            });
-        }
-        
-        function load_privileges(id_class) {
-
-            var data_in = {
-                    id_class: id_class
-            };
-            
-            if (get_role_user(data_in)) {
-                // attributes 
-                $('#attr_list').html("<p>{{_('Loading')}}...</p>");
-                $.ajax({
-                    url: "{{tg.url('/dashboard/privileges/attributes')}}",
-                    data: data_in, 
-                    success: function(data) {
-                        $('#attr_list').html(data);
-                        init_attr_events();
-                    }
-                });
-                
-                // actions 
-                $('#actions_list').html("<p>{{_('Loading')}}...</p>");
-                $.ajax({
-                    url: "{{tg.url('/dashboard/privileges/actions')}}",
-                    data: data_in,
-                    success: function(data) {
-                        $('#actions_list').html(data);
-                        init_action_events();
-                    }
-                });
-
-            }
-            /*else {
-                console.log(JSON.stringify(data_in));
-            }*/
-        }
-            
-        function init_classes_events() {
-            // class name click 
-            $('.class_name').click(function() {
-                $('.class_row').removeClass('class_row_selected');
-                $(this).parent().addClass('class_row_selected');                
-                
-                load_privileges($(this).parent().attr('id_class'));
-            });
-            
-            // class select 
-            $('.class_row select').change(function() {
-                
-                var data_in = {
-                        id_class: $(this).parent().attr('id_class'),
-                        granted: $(this).val()
-                };
-                
-                if (get_role_user(data_in)) { 
-                    $.ajax({
-                        url: "{{tg.url('/dashboard/privileges/classp_update')}}",
-                        data: data_in,
-                        success: function(data) {
-                            if (data.status) {
-                            }
-                        }
-                    });
-                }
-            });
-        }
-            
-        function load_classes() {
-            
-            $('#classes_sidebar').html("<p>{{_('Loading')}}...</p>");
-            
-            var data_in = {}
-            if (!get_role_user(data_in)) {
-                return;
-            }
-            
-            //console.log(JSON.stringify(data_in)); 
-            
-            $.ajax({
-                url: "{{tg.url('/dashboard/privileges/classes')}}",
-                data: data_in,
-                success: function(data) {
-                    $('#classes_sidebar').html(data);
-                    init_classes_events();
-                    // Select the first class 
-                    $('.class_name:first').click();
-                }
-            });
-        }
-        
-        function change_all_selects(button, access) {
-            button.parent().parent().find('select').each(function() {
-                $(this).val(access);
-                this.attr_access_change = attr_access_change;
-                this.attr_access_change();
-            });            
-        }
-    
-        $(document).ready(function() {
-
-            // role selector 
-            $('#role_selector').sapnsSelector({
-                name: 'role',
-                title: "{{_('Role')}}",
-                rc: 'sp_roles',
-                rc_title: "{{_('Roles')}}",
-                onChange: function() {
-                    $('#user_selector').sapnsSelector('setValue', '', true);
-                    load_classes();
-                }
-            });
-            
-            // user selector 
-            $('#user_selector').sapnsSelector({
-                name: 'user',
-                title: "{{_('User')}}",
-                rc: 'sp_users',
-                rc_title: "{{_('Users')}}",
-                onChange: function() {
-                    $('#role_selector').sapnsSelector('setValue', '', true);
-                    load_classes();
-                }
-            });
-            
-            $('.btn_denied').click(function() {
-                change_all_selects($(this), 'denied');
-            });
-            
-            $('.btn_readonly').click(function() {
-                change_all_selects($(this), 'read-only');
-            });
-
-            $('.btn_readwrite').click(function() {
-                change_all_selects($(this), 'read/write');
-            });
-        });
+        {#{% include 'sapns/privileges/privileges.js' %}#}
+        {% include 'sapns/privileges/privileges.min.js' %}
     </script>
 </div>
 {% endblock %}

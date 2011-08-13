@@ -1,13 +1,12 @@
 # -*- coding: utf-8 -*-
 
 from tg import config
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
+from pylons.i18n import lazy_ugettext as l_
 
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsClass, SapnsAction, SapnsAttribute,\
-    SapnsUser, SapnsShortcut, SapnsPrivilege, SapnsAttrPrivilege, SapnsRole,\
-    SapnsUserRole, SapnsActPrivilege
-
+    SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole
+    
 import logging
 from sqlalchemy import MetaData
 from sqlalchemy.sql.expression import and_
