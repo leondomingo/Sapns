@@ -23,7 +23,7 @@ class Privileges(object):
         ap_u.class_id = users.class_id
         ap_u.name = u'Privileges'
         ap_u.type = SapnsAction.TYPE_PROCESS
-        ap_r.url = u'/dashboard/privileges/users/'
+        ap_u.url = u'/dashboard/privileges/users/'
         
         dbs.add(ap_r)
         dbs.flush()

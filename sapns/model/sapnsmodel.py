@@ -1414,8 +1414,11 @@ class SapnsActPrivilege(DeclarativeBase):
         _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
         
         def reset_user_cache(id_user):
-            _cache.remove_value(key='%d_%d' % (id_user, id_action))
-            _cache.remove_value(key='cls_%d' % action_p.action.class_id)
+            try:
+                _cache.remove_value(key='%d_%d' % (id_user, id_action))
+                _cache.remove_value(key='cls_%d' % action_p.action.class_id)
+            except:
+                pass
         
         if kw.get('id_user'):
             # this user

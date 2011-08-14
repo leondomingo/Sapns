@@ -79,7 +79,7 @@ class Update(object):
                         
                     # save
                     dbs.add(new_u)
-                    dbs.commit()
+                    dbs.flush()
                         
                 except Exception, e:
                     dbs.rollback()
