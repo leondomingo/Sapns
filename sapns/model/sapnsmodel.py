@@ -755,6 +755,9 @@ class SapnsClass(DeclarativeBase):
                     if url and url[-1] != '/':
                         url += '/'
                         
+                    require_id = True
+                    pos = 100
+                        
                     if ac.type == SapnsAction.TYPE_NEW:
                         if not ac.url:
                             url = SapnsAction.URL_NEW
@@ -779,10 +782,6 @@ class SapnsClass(DeclarativeBase):
                             url = SapnsAction.URL_DOCS
                             
                         pos = 4
-                        
-                    else:
-                        require_id = True
-                        pos = 100
     
                     actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
                                         require_id=require_id, pos=pos))
