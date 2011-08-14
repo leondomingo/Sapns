@@ -15,3 +15,22 @@
         </div>
     </div>
 {% endif %}
+<div id="language_selector">
+    <select>
+        <option>{{_('Select your language')}}</option>
+        <option value="en">English</option>
+        <option value="es">Español</option>
+    </select>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#language_selector select').change(function() {
+            $.ajax({
+                url: "{{tg.url('/setlang')}}",
+                data: { lang: $('#language_selector option:selected').val() },
+                success: function() {}
+            });
+        });
+    });
+</script>

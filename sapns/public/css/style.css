@@ -298,8 +298,8 @@ clear:both;
 
 .sp_logout {
 	position: absolute;
-	left: 680px;
-	top: 65px;
+	left: 690px;
+	top: 20px;
     /*margin-left: 67%; 
     width: 300px;*/
     border: 1px solid;
@@ -329,6 +329,16 @@ clear:both;
 
 .sp-logout-btn:hover {
 	background-color: orange;
+}
+
+#language_selector {
+	position: absolute;
+	left: 875px;
+	top: 70px;
+}
+
+#language_selector select {
+	font-size: 9px;
 }
 
 .sp-button {
