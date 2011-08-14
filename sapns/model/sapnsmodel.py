@@ -13,7 +13,8 @@ from pylons import cache
 
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
-from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text
+from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text,\
+    DateTime
 from sqlalchemy.orm import relation
 from sqlalchemy.exc import NoSuchTableError
 
@@ -1722,3 +1723,17 @@ class SapnsAssignedDoc(DeclarativeBase):
 SapnsDoc.assigned_docs = \
     relation(SapnsAssignedDoc, backref='doc',
              primaryjoin=SapnsDoc.doc_id == SapnsAssignedDoc.doc_id)
+    
+class SapnsUpdates(DeclarativeBase):
+    
+    __tablename__ = 'sp_updates'
+    
+    update_id = Column('id', Integer, primary_key=True)
+    code = Column(Unicode(20), nullable=False)
+    description = Column(Text)
+    exec_date = Column(DateTime)
+    
+    @staticmethod
+    def by_code(code):
+        return dbs.query(SapnsUpdates).\
+            filter(SapnsUpdates.code == code).first()
