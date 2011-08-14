@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import sys
 import os
 import re
 import logging
@@ -15,7 +14,6 @@ from todo import TODO
 
 logger = logging.getLogger('Update')
 current_path = os.path.dirname(os.path.abspath(__file__))
-#sys.path.append(current_path)
 
 class Update(object):
     
@@ -23,7 +21,7 @@ class Update(object):
         logger.info(_('Loading settings...'))
         
         # postgresql://postgres:mypassword@localhost:5432/mydb
-        m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', str(dbs.bind))
+        m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', unicode(dbs.bind))
         if m_session:
             self.user = m_session.group(1)
             self.password = m_session.group(2)
@@ -31,8 +29,6 @@ class Update(object):
             self.port = m_session.group(4)
             self.db = m_session.group(5)
             self.pg_path = config.get('pg_path', '/usr/bin/')
-            
-            logger.info('OK')
             
         else:
             raise Exception(_('It was not possible to get connection data'))
@@ -49,27 +45,34 @@ class Update(object):
                 new_u.description = u.desc
                 new_u.exec_date = dt.datetime.now()
                 
+                logger.info('[%s] %s (%s)' % (u.code, u.desc, u.type.upper()))
+                
                 try:
                     # SQL
                     if u.type.lower() == 'sql':
-                        logger.info(_('Executing SQL script...'))
-                        
-                        call = [os.path.join(self.pg_path, 'psql'),
-                                '-h', self.host, 
-                                '-U', self.user, 
-                                '-d', self.db,
-                                '-f', os.path.join(current_path, u.filename)]
-                        
-                        if self.port:
-                            call.append('-p')
-                            # ":<port>"
-                            call.append(self.port[1:])
+                        #logger.info(_('Executing SQL script...'))
+                        f_sql = file(os.path.join(current_path, u.filename), 'rb')
+                        try:
+                            #dbs.execute(f_sql.read())
+                            call = [os.path.join(self.pg_path, 'psql'),
+                                    '-h', self.host, 
+                                    '-U', self.user,
+                                    '-d', self.db,
+                                    ]
                             
-                        sp.check_call(call, env=dict(PGPASSWORD=self.password))
-                    
+                            if self.port:
+                                # ":<port>"
+                                call += ['-p', self.port[1:]]
+                            
+                            sp.check_call(call, env=dict(PGPASSWORD=self.password),
+                                          stdin=f_sql)                            
+                            
+                        finally:
+                            f_sql.close()
+                        
                     # python
                     elif u.type.lower() == 'py':
-                        logger.info(_('Executing Python script...'))
+                        #logger.info(_('Executing Python script...'))
                         module = __import__('sapns.lib.sapns.update.%s' % u.module, 
                                             None, None, ['update'])
                         module.update()
@@ -79,6 +82,7 @@ class Update(object):
                     dbs.commit()
                         
                 except Exception, e:
+                    dbs.rollback()
                     logger.error(e)
                     
             else:

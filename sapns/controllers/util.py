@@ -28,11 +28,17 @@ class UtilController(BaseController):
     @expose('sapns/message.html')
     def init(self):
         set_lang('en')
-        #libutil.update_metadata()
-        #libutil.create_data_exploration()
-        Update().__call__()
+        libutil.update_metadata()
+        libutil.create_data_exploration()
         
         return dict(message=_('Initialization was completed successfully'),
+                    came_from=url('/'))
+        
+    @expose('sapns/message.html')
+    def update(self):
+        Update().__call__()
+        
+        return dict(message=_('Update was completed successfully'),
                     came_from=url('/'))
         
     @expose('sapns/util/index.html')
