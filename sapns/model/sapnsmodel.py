@@ -28,7 +28,7 @@ from neptuno.dict import Dict
 __all__ = ['SapnsAction', 'SapnsAssignedDoc', 'SapnsAttrPrivilege', 'SapnsClass',
            'SapnsDoc', 'SapnsDocType', 'SapnsMessage', 'SapnsMessageTo',
            'SapnsPrivilege', 'SapnsRepo', 'SapnsReport', 'SapnsReportParam',
-           'SapnsRole', 'SapnsShortcut', 'SapnsUser', 'SapnsUserRole',
+           'SapnsRole', 'SapnsShortcut', 'SapnsUpdates', 'SapnsUser', 'SapnsUserRole',
            'SapnsView', 'SapnsViewColumn', 'SapnsViewFilter', 'SapnsViewOrder',
            'SapnsViewRelation', 
           ]
@@ -1305,21 +1305,21 @@ class SapnsAction(DeclarativeBase):
         relation(SapnsShortcut, backref='action',
                  primaryjoin=action_id == SapnsShortcut.action_id)
     
-    TYPE_NEW =     'new'
-    TYPE_EDIT =    'edit'
-    TYPE_DELETE =  'delete'
-    TYPE_DOCS =    'docs'
-    TYPE_REPORT =  'report'
-    TYPE_PROCESS = 'process'
-    TYPE_LIST =    'list'
-    TYPE_OBJECT =  'object'
-    TYPE_GROUP =   'group'
+    TYPE_NEW =     u'new'
+    TYPE_EDIT =    u'edit'
+    TYPE_DELETE =  u'delete'
+    TYPE_DOCS =    u'docs'
+    TYPE_REPORT =  u'report'
+    TYPE_PROCESS = u'process'
+    TYPE_LIST =    u'list'
+    TYPE_OBJECT =  u'object'
+    TYPE_GROUP =   u'group'
     
     # default URL
-    URL_NEW =    '/dashboard/new'
-    URL_EDIT =   '/dashboard/edit'
-    URL_DELETE = '/dashboard/delete'
-    URL_DOCS =   '/dashboard/docs'
+    URL_NEW =    u'/dashboard/new'
+    URL_EDIT =   u'/dashboard/edit'
+    URL_DELETE = u'/dashboard/delete'
+    URL_DOCS =   u'/dashboard/docs'
     
     def __unicode__(self):
         return u'<SapnsAction: "%s" type=%s>' % (self.name, self.type)
@@ -1728,7 +1728,7 @@ class SapnsUpdates(DeclarativeBase):
     __tablename__ = 'sp_updates'
     
     update_id = Column('id', Integer, primary_key=True)
-    code = Column(Unicode(20), nullable=False)
+    code = Column(Unicode(50), nullable=False)
     description = Column(Text)
     exec_date = Column(DateTime)
     
