@@ -4,7 +4,7 @@ from tg import config
 from pylons.i18n import lazy_ugettext as l_
 
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsClass, SapnsAction, SapnsAttribute,\
+from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute,\
     SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole
     
 import logging
@@ -171,14 +171,15 @@ def update_metadata():
             
         # create an action
         def create_action(name, type_):
-            action = dbs.query(SapnsAction).\
-                        filter(and_(SapnsAction.class_id == klass.class_id,
-                                    SapnsAction.type == type_)).\
+            action = dbs.query(SapnsPermission).\
+                        filter(and_(SapnsPermission.class_id == klass.class_id,
+                                    SapnsPermission.type == type_)).\
                         first()
                             
             if not action:
-                action = SapnsAction()
-                action.name = name
+                action = SapnsPermission()
+                action.name = name.lower()
+                action.display_name = name
                 action.type = type_
                 action.class_id = klass.class_id
                 
@@ -193,11 +194,11 @@ def update_metadata():
 #                    m_user.add_act_privilege(action.action_id)
                 
         # create standard actions
-        create_action(unicode(l_('New')), SapnsAction.TYPE_NEW)
-        create_action(unicode(l_('Edit')), SapnsAction.TYPE_EDIT)
-        create_action(unicode(l_('Delete')), SapnsAction.TYPE_DELETE)
-        create_action(unicode(l_('List')), SapnsAction.TYPE_LIST)
-        create_action(unicode(l_('Docs')), SapnsAction.TYPE_DOCS)
+        create_action(unicode(l_('New')), SapnsPermission.TYPE_NEW)
+        create_action(unicode(l_('Edit')), SapnsPermission.TYPE_EDIT)
+        create_action(unicode(l_('Delete')), SapnsPermission.TYPE_DELETE)
+        create_action(unicode(l_('List')), SapnsPermission.TYPE_LIST)
+        create_action(unicode(l_('Docs')), SapnsPermission.TYPE_DOCS)
             
         first_ref = False
         for i, col in enumerate(tbl['columns']):
@@ -233,10 +234,6 @@ def update_metadata():
                 # grant access (r/w) to managers
                 rw_access = SapnsAttrPrivilege.ACCESS_READWRITE
                 managers.add_attr_privilege(attr.attribute_id, rw_access)
-                
-#                for m_user in managers.users:
-#                    #m_user = SapnsUser()
-#                    m_user.add_attr_privilege(attr.attribute_id, rw_access)
                 
             else:
                 logger.warning('.....already exists')
@@ -337,15 +334,16 @@ def create_data_exploration():
                     first()
             
             # look for this table "list" action
-            act_table = dbs.query(SapnsAction).\
-                filter(and_(SapnsAction.type == SapnsAction.TYPE_LIST,
-                            SapnsAction.class_id == cls.class_id)).\
+            act_table = dbs.query(SapnsPermission).\
+                filter(and_(SapnsPermission.type == SapnsPermission.TYPE_LIST,
+                            SapnsPermission.class_id == cls.class_id)).\
                 first()
                             
             if not act_table:
-                act_table = SapnsAction()
-                act_table.name = unicode(l_('List'))
-                act_table.type = SapnsAction.TYPE_LIST
+                act_table = SapnsPermission()
+                act_table.name = SapnsPermission.TYPE_LIST
+                act_table.display_name = unicode(l_('List'))
+                act_table.type = SapnsPermission.TYPE_LIST
                 act_table.class_id = cls.class_id
                 
                 dbs.add(act_table)
@@ -362,7 +360,7 @@ def create_data_exploration():
                 
             sc_table = dbs.query(SapnsShortcut).\
                     filter(and_(SapnsShortcut.parent_id == sc_parent,
-                                SapnsShortcut.action_id == act_table.action_id,
+                                SapnsShortcut.permission_id == act_table.permission_id,
                                 SapnsShortcut.user_id == us.user_id,
                                 )).\
                     first()
@@ -373,7 +371,7 @@ def create_data_exploration():
                 sc_table.title = tbl['name']
                 sc_table.parent_id = sc_parent
                 sc_table.user_id = us.user_id
-                sc_table.action_id = act_table.action_id
+                sc_table.permission_id = act_table.permission_id
                 sc_table.order = i
     
                 dbs.add(sc_table)

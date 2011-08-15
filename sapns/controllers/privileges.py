@@ -16,7 +16,7 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 
 from sapns.model.sapnsmodel import SapnsUser , SapnsClass,\
-    SapnsRole, SapnsAttrPrivilege, SapnsAction, SapnsActPrivilege,\
+    SapnsRole, SapnsAttrPrivilege, SapnsPermission, \
     SapnsPrivilege, SapnsUserRole, SapnsAttribute
 from neptuno.dict import Dict
 from neptuno.util import get_paramw, strtobool
@@ -182,16 +182,16 @@ class PrivilegesController(BaseController):
                 if not id_user:
                     action_p.granted = False
             
-            if action.type == SapnsAction.TYPE_NEW:
+            if action.type == SapnsPermission.TYPE_NEW:
                 pos = 1
                 
-            elif action.type == SapnsAction.TYPE_EDIT:
+            elif action.type == SapnsPermission.TYPE_EDIT:
                 pos = 2
                 
-            elif action.type == SapnsAction.TYPE_DELETE:
+            elif action.type == SapnsPermission.TYPE_DELETE:
                 pos = 3
                 
-            elif action.type == SapnsAction.TYPE_DOCS:
+            elif action.type == SapnsPermission.TYPE_DOCS:
                 pos = 4
                 
             else:
