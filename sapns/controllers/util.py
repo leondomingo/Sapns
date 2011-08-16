@@ -28,6 +28,8 @@ class UtilController(BaseController):
     @expose('sapns/message.html')
     def init(self):
         set_lang('en')
+        logger = logging.getLogger('UtilController.init')
+        logger.info('update_metadata')
         libutil.update_metadata()
         libutil.create_data_exploration()
         

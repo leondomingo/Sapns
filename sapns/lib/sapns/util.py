@@ -159,11 +159,7 @@ def update_metadata():
             
             # # grant access (r/w) to managers
             managers.add_privilege(klass.class_id)
-            
-#            for m_user in managers.users:
-#                #m_user = SapnsUser()
-#                m_user.add_privilege(klass.class_id)
-            
+
         else:
             logger.warning('.....already exists')
             
@@ -178,7 +174,7 @@ def update_metadata():
                             
             if not action:
                 action = SapnsPermission()
-                action.name = name.lower()
+                action.permission_name = '%s#%s' % (klass.name, name.lower())
                 action.display_name = name
                 action.type = type_
                 action.class_id = klass.class_id
@@ -187,11 +183,10 @@ def update_metadata():
                 dbs.flush()
                 
                 # add this action to "managers" role
-                managers.add_act_privilege(action.action_id)
-                
-#                for m_user in managers.users:
-#                    #m_user = SapnsUser()
-#                    m_user.add_act_privilege(action.action_id)
+                #managers = SapnsRole()
+                managers.permissions.append(action)
+                dbs.flush()
+                #managers.add_act_privilege(action.action_id)
                 
         # create standard actions
         create_action(unicode(l_('New')), SapnsPermission.TYPE_NEW)
@@ -341,7 +336,7 @@ def create_data_exploration():
                             
             if not act_table:
                 act_table = SapnsPermission()
-                act_table.name = SapnsPermission.TYPE_LIST
+                act_table.permission_name = '%s#%s' % (cls.name, SapnsPermission.TYPE_LIST)
                 act_table.display_name = unicode(l_('List'))
                 act_table.type = SapnsPermission.TYPE_LIST
                 act_table.class_id = cls.class_id

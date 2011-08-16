@@ -21,7 +21,7 @@ except ImportError:
 
 from sqlalchemy import Table, ForeignKey, Column
 from sqlalchemy.types import Unicode, Integer, DateTime
-from sqlalchemy.orm import relation, synonym
+from sqlalchemy.orm import relation, synonym, backref
 
 from sapns.model import DeclarativeBase, metadata, DBSession
 
@@ -209,8 +209,7 @@ class Permission(DeclarativeBase):
 
     #{ Relations
 
-    groups = relation(Group, secondary=group_permission_table,
-                      backref='permissions')
+    groups = relation(Group, secondary=group_permission_table, backref='permissions')
 
     #{ Special methods
 
