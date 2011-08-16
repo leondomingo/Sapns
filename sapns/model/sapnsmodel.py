@@ -295,6 +295,18 @@ class SapnsUser(User):
             
     def add_attr_privilege(self, id_attribute, access):
         return SapnsAttrPrivilege.add_privilege(id_attribute, access, id_user=self.user_id)
+    
+    def has_permission(self, name):
+        return dbs.query(SapnsPermission).\
+            join((SapnsRolePermission,
+                  SapnsRolePermission.permission_id == SapnsPermission.permission_id)).\
+            join((SapnsRole,
+                  SapnsRole.group_id == SapnsRolePermission.role_id)).\
+            join((SapnsUserRole,
+                  SapnsUserRole.role_id == SapnsRole.group_id)).\
+            filter(and_(SapnsUserRole.user_id == self.user_id,
+                        SapnsPermission.permission_name == name)).\
+            first() != None
             
 #    def act_privilege(self, id_action):
 #        return SapnsActPrivilege.get_privilege(id_action, id_user=self.user_id)

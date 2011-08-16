@@ -9,6 +9,7 @@ from repoze.what import predicates
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 import sapns.config.app_cfg as app_cfg
+import sapns.lib.sapns.predicates as sp_predicates
 
 # controllers
 from sapns.controllers.views import ViewsController
@@ -33,6 +34,7 @@ import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
+from sqlalchemy.sql.expression import and_
 
 __all__ = ['DashboardController']
 
@@ -111,7 +113,7 @@ class DashboardController(BaseController):
         logger.info('Parent class: %s' % cls_.name)
         logger.info('Child class: %s' % ch_cls_.name)
              
-        if not user.has_privilege(cls_.name):
+        if not user.has_privilege(cls_.name) or not user.has_permission('%s#list' % cls):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -317,7 +319,7 @@ class DashboardController(BaseController):
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
-        if not user.has_privilege(cls.name):
+        if not user.has_privilege(cls.name) or not user.has_permission('%s#edit' % cls):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -437,8 +439,15 @@ class DashboardController(BaseController):
         logger = logging.getLogger(__name__ + '/edit')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        class_ = SapnsClass.by_name(cls)        
-        if not user.has_privilege(class_.name):
+        class_ = SapnsClass.by_name(cls)
+        
+        if id:
+            p = user.has_permission('%s#edit' % cls)
+        
+        else:
+            p = user.has_permission('%s#new' % cls)
+        
+        if not user.has_privilege(class_.name) or not p:
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -559,7 +568,7 @@ class DashboardController(BaseController):
             cls_ = SapnsClass.by_name(cls)
             
             # check privilege on this class
-            if not user.has_privilege(cls_.name):
+            if not user.has_privilege(cls_.name) or not user.has_permission('%s#delete' % cls):
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
             
