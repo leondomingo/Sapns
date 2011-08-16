@@ -320,7 +320,7 @@ class DashboardController(BaseController):
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         if not user.has_privilege(cls.name) or \
-        not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT)):
+        not user.has_permission('%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT)):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
