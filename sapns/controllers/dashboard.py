@@ -9,7 +9,6 @@ from repoze.what import predicates
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 import sapns.config.app_cfg as app_cfg
-import sapns.lib.sapns.predicates as sp_predicates
 
 # controllers
 from sapns.controllers.views import ViewsController
