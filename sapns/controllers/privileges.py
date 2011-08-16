@@ -16,7 +16,7 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 
 from sapns.model.sapnsmodel import SapnsUser , SapnsClass,\
-    SapnsRole, SapnsAttrPrivilege, SapnsAction, SapnsActPrivilege,\
+    SapnsRole, SapnsAttrPrivilege, SapnsPermission, SapnsRolePermission, \
     SapnsPrivilege, SapnsUserRole, SapnsAttribute
 from neptuno.dict import Dict
 from neptuno.util import get_paramw, strtobool
@@ -158,13 +158,13 @@ class PrivilegesController(BaseController):
     def actions(self, id_class, **kw):
         
         id_class = int(id_class)
-        id_user = get_paramw(kw, 'id_user', int, opcional=True)
+        #id_user = get_paramw(kw, 'id_user', int, opcional=True)
         id_role = get_paramw(kw, 'id_role', int, opcional=True)
         if id_role:
             who = dbs.query(SapnsRole).get(id_role)
             
-        else:
-            who = dbs.query(SapnsUser).get(id_user)
+#        else:
+#            who = dbs.query(SapnsUser).get(id_user)
         
         # class
         cls = dbs.query(SapnsClass).get(id_class)
@@ -172,35 +172,34 @@ class PrivilegesController(BaseController):
         actions = []
         for action in cls.actions:
             
-            action_p = who.act_privilege(action.action_id)
-            if not action_p:
-                action_p = Dict(id_action=action.action_id,
-                                name=_(action.name),
-                                granted=None,
-                                )
+#            action_p = who.act_privilege(action.action_id)
+#            if not action_p:
+#                action_p = Dict(id_action=action.action_id,
+#                                name=_(action.name),
+#                                granted=False, #None,
+#                                )
                 
-                if not id_user:
-                    action_p.granted = False
+#                if not id_user:
+#                    action_p.granted = False
             
-            if action.type == SapnsAction.TYPE_NEW:
+            if action.type == SapnsPermission.TYPE_NEW:
                 pos = 1
                 
-            elif action.type == SapnsAction.TYPE_EDIT:
+            elif action.type == SapnsPermission.TYPE_EDIT:
                 pos = 2
                 
-            elif action.type == SapnsAction.TYPE_DELETE:
+            elif action.type == SapnsPermission.TYPE_DELETE:
                 pos = 3
                 
-            elif action.type == SapnsAction.TYPE_DOCS:
+            elif action.type == SapnsPermission.TYPE_DOCS:
                 pos = 4
                 
             else:
                 pos = 100
                 
-            actions.append(Dict(id=action_p.actpriv_id,
-                                id_action=action.action_id,
-                                name=_(action.name),
-                                granted=action_p.granted,
+            actions.append(Dict(id_action=action.permission_id,
+                                name=_(action.display_name),
+                                granted=who.has_permission(action.permission_id),
                                 pos=pos,
                                 ))
         
@@ -211,7 +210,7 @@ class PrivilegesController(BaseController):
             else:
                 return cmp(x.pos, y.pos)
         
-        return dict(actions=sorted(actions, cmp=cmp_action), show_none=id_user != None)
+        return dict(actions=sorted(actions, cmp=cmp_action))
     
     @expose('json')
     def attrp_update(self, **kw):
@@ -248,27 +247,36 @@ class PrivilegesController(BaseController):
     @expose('json')
     def actionp_update(self, **kw):
         
-        logger = logging.getLogger('PrivilegesController.atcp_update')
+        logger = logging.getLogger('PrivilegesController.actionp_update')
         try:
             id_action = get_paramw(kw, 'id_action', int)
             granted = get_paramw(kw, 'granted', strtobool)
             
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
-            id_user = get_paramw(kw, 'id_user', int, opcional=True)
-            if id_role:
-                who = dbs.query(SapnsRole).get(id_role)
+            #id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            #if id_role:
+            who = dbs.query(SapnsRole).get(id_role)
                 
-            else:
-                who = dbs.query(SapnsRole).get(id_user)
+#            else:
+#                who = dbs.query(SapnsUser).get(id_user)
+                
+            action = dbs.query(SapnsPermission).get(id_action)
                 
             if granted:
                 logger.info('Creating action privilege')
-                who.add_act_privilege(id_action)
+                who.permissions_.append(action)
                 
             else:
                 logger.info('Deleting action privilege')
-                who.remove_act_privilege(id_action)
+                who.permissions_.remove(action)
+                
+            dbs.flush()
             
+            # reset cache
+            _cache = cache.get_cache(SapnsPermission.CACHE_ID)
+            for user in who.users_:
+                _cache.remove_value(key='%d_%d' % (user.user_id, action.class_id))
+
             return dict(status=True)
             
         except Exception, e:

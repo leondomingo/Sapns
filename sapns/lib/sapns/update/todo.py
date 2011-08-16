@@ -14,8 +14,8 @@ TODO = [
     dict(code='init: has_role', desc='has_role', type='sql', 
          filename='init/has_role.function.sql'),
     # sp_actions
-    dict(code='init: sp_actions', desc='sp_actions', type='sql', 
-         filename='init/sp_actions.view.sql'),
+    dict(code='init: sp_permission', desc='sp_permission', type='sql', 
+         filename='init/sp_permission.view.sql'),
     # sp_attr_privileges
     dict(code='init: sp_attr_privileges', desc='sp_attr_privileges', type='sql', 
          filename='init/sp_attr_privileges.view.sql'),

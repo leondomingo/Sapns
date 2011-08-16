@@ -19,21 +19,26 @@ from sqlalchemy.orm import relation
 from sqlalchemy.exc import NoSuchTableError
 
 from sapns.model import DeclarativeBase, DBSession as dbs
-from sapns.model.auth import User, user_group_table, Group
+from sapns.model.auth import User, user_group_table, Group, Permission,\
+    group_permission_table
 
 import logging
 from neptuno.util import datetostr
 from neptuno.dict import Dict
 
-__all__ = ['SapnsAction', 'SapnsAssignedDoc', 'SapnsAttrPrivilege', 'SapnsClass',
-           'SapnsDoc', 'SapnsDocType', 'SapnsMessage', 'SapnsMessageTo',
-           'SapnsPrivilege', 'SapnsRepo', 'SapnsReport', 'SapnsReportParam',
-           'SapnsRole', 'SapnsShortcut', 'SapnsUpdates', 'SapnsUser', 'SapnsUserRole',
+__all__ = ['SapnsAssignedDoc', 'SapnsAttrPrivilege', 'SapnsAttribute', 'SapnsClass',
+           'SapnsDoc', 'SapnsDocFormat', 'SapnsDocType', 'SapnsMessage', 
+           'SapnsMessageTo', 'SapnsPermission', 'SapnsPrivilege', 'SapnsRepo', 
+           'SapnsReport', 'SapnsReportParam', 'SapnsRole', 'SapnsRolePermission', 
+           'SapnsShortcut', 'SapnsUpdates', 'SapnsUser', 'SapnsUserRole',
            'SapnsView', 'SapnsViewColumn', 'SapnsViewFilter', 'SapnsViewOrder',
            'SapnsViewRelation', 
           ]
 
 class SapnsRole(Group):
+    
+    users_ = relation('SapnsUser', secondary=user_group_table, backref='roles')
+    permissions_ = relation('SapnsPermission', secondary=group_permission_table, backref='roles')
     
     @staticmethod
     def by_name(role_name):
@@ -68,17 +73,20 @@ class SapnsRole(Group):
     def add_attr_privilege(self, id_attribute, access):
         return SapnsAttrPrivilege.add_privilege(id_attribute, access, id_role=self.group_id)
     
-    def add_act_privilege(self, id_action):
-        return SapnsActPrivilege.add_privilege(id_action, id_role=self.group_id)
-        
-    def act_privilege(self, id_action):
-        return SapnsActPrivilege.get_privilege(id_action, id_role=self.group_id)
-        
-    def has_act_privilege(self, id_action):
-        return self.act_privilege(id_action) != None
+    def has_permission(self, id_permission):
+        return SapnsRolePermission.has_permission(self.group_id, id_permission)
     
-    def remove_act_privilege(self, id_action):
-        SapnsActPrivilege.remove_privilege(id_action, id_role=self.group_id)
+#    def add_act_privilege(self, id_action):
+#        return SapnsActPrivilege.add_privilege(id_action, id_role=self.group_id)
+#
+#    def act_privilege(self, id_action):
+#        return SapnsActPrivilege.get_privilege(id_action, id_role=self.group_id)
+#
+#    def has_act_privilege(self, id_action):
+#        return self.act_privilege(id_action) != None
+#
+#    def remove_act_privilege(self, id_action):
+#        SapnsActPrivilege.remove_privilege(id_action, id_role=self.group_id)
 
 class SapnsUserRole(DeclarativeBase):
     
@@ -124,11 +132,11 @@ class SapnsUser(User):
             logger.info('Getting shortcuts of [%d]' % id_parent)
             
             shortcuts = []
-            for sc, ac, cl in dbs.query(SapnsShortcut, SapnsAction, SapnsClass).\
-                    outerjoin((SapnsAction,
-                               SapnsAction.action_id == SapnsShortcut.action_id)).\
+            for sc, ac, cl in dbs.query(SapnsShortcut, SapnsPermission, SapnsClass).\
+                    outerjoin((SapnsPermission,
+                               SapnsPermission.permission_id == SapnsShortcut.permission_id)).\
                     outerjoin((SapnsClass, 
-                               SapnsClass.class_id == SapnsAction.class_id)).\
+                               SapnsClass.class_id == SapnsPermission.class_id)).\
                     filter(and_(SapnsShortcut.user_id == self.user_id,
                                 SapnsShortcut.parent_id == id_parent)).\
                     order_by(SapnsShortcut.order):
@@ -231,10 +239,11 @@ class SapnsUser(User):
     def from_list(self, title, url):
         
         # new action
-        action_link = SapnsAction()
+        action_link = SapnsPermission()
         action_link.class_id = None
-        action_link.type = SapnsAction.TYPE_OBJECT
-        action_link.name = title
+        action_link.type = SapnsPermission.TYPE_OBJECT
+        action_link.permission_name = title
+        action_link.display_name = title
         action_link.url = url
         
         dbs.add(action_link)
@@ -286,18 +295,30 @@ class SapnsUser(User):
             
     def add_attr_privilege(self, id_attribute, access):
         return SapnsAttrPrivilege.add_privilege(id_attribute, access, id_user=self.user_id)
-            
-    def act_privilege(self, id_action):
-        return SapnsActPrivilege.get_privilege(id_action, id_user=self.user_id)
-            
-    def add_act_privilege(self, id_action):
-        SapnsActPrivilege.add_privilege(id_action, id_user=self.user_id)
-            
-    def has_act_privilege(self, id_action):
-        return SapnsActPrivilege.has_privilege(self.user_id, id_action)
     
-    def remove_act_privilege(self, id_action):
-        SapnsActPrivilege.remove_privilege(id_action, id_user=self.user_id)
+    def has_permission(self, name):
+        return dbs.query(SapnsPermission).\
+            join((SapnsRolePermission,
+                  SapnsRolePermission.permission_id == SapnsPermission.permission_id)).\
+            join((SapnsRole,
+                  SapnsRole.group_id == SapnsRolePermission.role_id)).\
+            join((SapnsUserRole,
+                  SapnsUserRole.role_id == SapnsRole.group_id)).\
+            filter(and_(SapnsUserRole.user_id == self.user_id,
+                        SapnsPermission.permission_name == name)).\
+            first() != None
+            
+#    def act_privilege(self, id_action):
+#        return SapnsActPrivilege.get_privilege(id_action, id_user=self.user_id)
+#            
+#    def add_act_privilege(self, id_action):
+#        SapnsActPrivilege.add_privilege(id_action, id_user=self.user_id)
+#            
+#    def has_act_privilege(self, id_action):
+#        return SapnsActPrivilege.has_privilege(self.user_id, id_action)
+#    
+#    def remove_act_privilege(self, id_action):
+#        SapnsActPrivilege.remove_privilege(id_action, id_user=self.user_id)
     
     def get_view_name(self, cls):
         
@@ -391,7 +412,7 @@ class SapnsUser(User):
         dst_path = os.path.join(new_doc.repo.path, '%d' % new_doc.doc_id)
         shutil.copy(pathtofile, dst_path)
         
-SapnsRole.users = relation(SapnsUser, secondary=user_group_table, backref='roles')
+#SapnsRole.users_ = relation(SapnsUser, secondary=user_group_table, backref='roles')
 
 class SapnsShortcut(DeclarativeBase):
     """Shortcuts sapns base table"""
@@ -410,9 +431,9 @@ class SapnsShortcut(DeclarativeBase):
                                 onupdate='CASCADE', ondelete='CASCADE'), 
                      nullable=False)
     
-    action_id = Column('id_action', Integer, 
-                       ForeignKey('sp_actions.id', 
-                                  onupdate='CASCADE', ondelete='SET NULL')) #, nullable=False)
+    permission_id = Column('id_permission', Integer,
+                           ForeignKey('sp_permission.id',
+                                      onupdate='CASCADE', ondelete='SET NULL')) #, nullable=False)
     
     def __str__(self):
         return unicode(self).encode('utf-8')
@@ -743,13 +764,17 @@ class SapnsClass(DeclarativeBase):
             #user = 
             
             actions = []
-            for ac in dbs.query(SapnsAction).\
-                    filter(and_(SapnsAction.class_id == self.class_id,
-                                SapnsAction.type != SapnsAction.TYPE_LIST,
+            for ac in dbs.query(SapnsPermission).\
+                    filter(and_(SapnsPermission.class_id == self.class_id,
+                                SapnsPermission.type != None,
+                                SapnsPermission.type != SapnsPermission.TYPE_LIST,
                                 )):
                 
                 # does this user has privilege on this action?
-                if SapnsActPrivilege.has_privilege(id_user, ac.action_id):
+                user = dbs.query(SapnsUser).get(id_user)
+                p_id = [p.permission_id for p in user.permissions]
+                if ac.permission_id in p_id: 
+                # SapnsActPrivilege.has_privilege(id_user, ac.action_id):
                     
                     url = ac.url
                     if url and url[-1] != '/':
@@ -758,33 +783,33 @@ class SapnsClass(DeclarativeBase):
                     require_id = True
                     pos = 100
                         
-                    if ac.type == SapnsAction.TYPE_NEW:
+                    if ac.type == SapnsPermission.TYPE_NEW:
                         if not ac.url:
-                            url = SapnsAction.URL_NEW
+                            url = SapnsPermission.URL_NEW
                             
                         require_id = False
                         pos = 1
                     
-                    elif ac.type == SapnsAction.TYPE_EDIT:
+                    elif ac.type == SapnsPermission.TYPE_EDIT:
                         if not ac.url:
-                            url = SapnsAction.URL_EDIT
+                            url = SapnsPermission.URL_EDIT
                             
                         pos = 2
                     
-                    elif ac.type == SapnsAction.TYPE_DELETE:
+                    elif ac.type == SapnsPermission.TYPE_DELETE:
                         if not ac.url:
-                            url = SapnsAction.URL_DELETE
+                            url = SapnsPermission.URL_DELETE
                             
                         pos = 3
                         
-                    elif ac.type == SapnsAction.TYPE_DOCS:
+                    elif ac.type == SapnsPermission.TYPE_DOCS:
                         if not ac.url:
-                            url = SapnsAction.URL_DOCS
+                            url = SapnsPermission.URL_DOCS
                             
                         pos = 4
-    
-                    actions.append(Dict(title=_(ac.name), type=ac.type, url=url, 
-                                        require_id=require_id, pos=pos))
+                        
+                    actions.append(Dict(title=_(ac.display_name), type=ac.type, 
+                                        url=url, require_id=require_id, pos=pos))
                 
             def cmp_act(x, y):
                 if x.pos == y.pos:
@@ -795,8 +820,8 @@ class SapnsClass(DeclarativeBase):
         
             return sorted(actions, cmp=cmp_act)
         
-        _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
-        return _cache.get_value(key='cls_%d' % self.class_id, 
+        _cache = cache.get_cache(SapnsPermission.CACHE_ID)
+        return _cache.get_value(key='%d_%d' % (id_user, self.class_id), 
                                 createfunc=_sorted_actions, expiretime=3600)
     
     def insertion(self):
@@ -1285,25 +1310,22 @@ class SapnsAttrPrivilege(DeclarativeBase):
             
         return cmp(value(a1), value(a2))
 
-class SapnsAction(DeclarativeBase):
+class SapnsPermission(Permission):
     """List of available actions in Sapns"""
     
-    __tablename__ = 'sp_actions'
+    #__tablename__ = 'sp_actions'
     
-    action_id = Column('id', Integer, autoincrement=True, primary_key=True)
+    #action_id = Column('id', Integer, autoincrement=True, primary_key=True)
 
-    name = Column(Unicode(100), nullable=False)
-    url = Column(Unicode(200)) #, nullable=False)
-    type = Column(Unicode(20), nullable=False)
+    #name = Column(Unicode(100), nullable=False)
+    display_name = Column(Unicode(50), nullable=False)
+    url = Column(Unicode(200))
+    type = Column(Unicode(20))
     
     # TODO: puede ser nulo? (nullable=False)
     class_id = Column('id_class', Integer, 
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'))
-    
-    shortcuts = \
-        relation(SapnsShortcut, backref='action',
-                 primaryjoin=action_id == SapnsShortcut.action_id)
     
     TYPE_NEW =     u'new'
     TYPE_EDIT =    u'edit'
@@ -1321,128 +1343,47 @@ class SapnsAction(DeclarativeBase):
     URL_DELETE = u'/dashboard/delete'
     URL_DOCS =   u'/dashboard/docs'
     
+    CACHE_ID = 'user_actions'
+    
     def __unicode__(self):
         return u'<SapnsAction: "%s" type=%s>' % (self.name, self.type)
     
     def __str__(self):
         return unicode(self).encode('utf-8')
     
-    def has_privilege(self, id_user):
-        return SapnsActPrivilege.has_privilege(id_user, self.action_id)
-    
-SapnsClass.actions = relation(SapnsAction, backref='class_',
-                              primaryjoin=SapnsClass.class_id == SapnsAction.class_id)
-    
-class SapnsActPrivilege(DeclarativeBase):
-    
-    __tablename__ = 'sp_act_privileges'
-    __table_args__ = (UniqueConstraint('id_user', 'id_action'),
-                      UniqueConstraint('id_role', 'id_action'), {})
+#    def has_privilege(self, id_user):
+#        return SapnsRolePermission.has_privilege(id_user, self.action_id)
+
+SapnsPermission.shortcuts = \
+        relation(SapnsShortcut, backref='action',
+                 primaryjoin= SapnsPermission.permission_id == SapnsShortcut.permission_id)
 
     
-    actpriv_id = Column('id', Integer, primary_key=True)
-    action_id = Column('id_action', Integer, 
-                       ForeignKey('sp_actions.id',
-                                  onupdate='CASCADE', ondelete='CASCADE'))
+SapnsClass.actions = \
+    relation(SapnsPermission, backref='class_',
+             primaryjoin=SapnsClass.class_id == SapnsPermission.class_id)
     
-    user_id = Column('id_user', Integer,
-                     ForeignKey('sp_users.id',
-                                onupdate='CASCADE', ondelete='CASCADE'))
+class SapnsRolePermission(DeclarativeBase):
+
+    __tablename__ = 'sp_role_permission'
+    __table_args__ = (None, dict(useexisting=True))
     
-    role_id = Column('id_role', Integer,
+    permission_id = Column('id_permission', Integer,
+                           ForeignKey('sp_permission.id',
+                                      onupdate="CASCADE", ondelete="CASCADE"),
+                           primary_key=True)
+                          
+    role_id = Column('id_role', Integer, 
                      ForeignKey('sp_roles.id',
-                                onupdate='CASCADE', ondelete='CASCADE'))
-    
-    granted = Column(Boolean, nullable=False, default=True)
-    
-    CACHE_ID = 'user_act_privilege'
+                                onupdate="CASCADE", ondelete="CASCADE"), 
+                     primary_key=True)
     
     @staticmethod
-    def has_privilege(id_user, id_action):
-        
-        #logger = logging.getLogger('SapnsActPrivilege.has_privilege')
-        #logger.info('user=%d / action=%d' % (id_user, id_action))
-        
-        def _has_privilege():
-            
-            priv = SapnsActPrivilege.get_privilege(id_action, id_user=id_user)
-            if not priv:
-                #logger.info('No está definido el privilegio sobre esta acción. Buscamos por el rol')
-                priv = dbs.query(SapnsActPrivilege).\
-                    join((SapnsRole,
-                          SapnsRole.group_id == SapnsActPrivilege.role_id)).\
-                    join((SapnsUserRole,
-                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
-                               SapnsUserRole.user_id == id_user))).\
-                    filter(SapnsActPrivilege.action_id == id_action).\
-                    first()
-                    
-            if priv:
-                return priv.granted
-            
-            else:
-                return False
-
-        _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
-        return _cache.get_value(key='%d_%d' % (id_user, id_action),
-                                createfunc=_has_privilege, expiretime=3600)
-        
-    @staticmethod
-    def get_privilege(id_action, **kw):
-        return dbs.query(SapnsActPrivilege).\
-            filter(and_(SapnsActPrivilege.action_id == id_action,
-                        SapnsActPrivilege.role_id == kw.get('id_role'),
-                        SapnsActPrivilege.user_id == kw.get('id_user'))).\
-            first()
-            
-    @staticmethod
-    def _update_privilege(id_action, granted, **kw):
-
-        action_p = SapnsActPrivilege.get_privilege(id_action, **kw)
-        if not action_p:
-            action_p = SapnsActPrivilege()
-        
-        action_p.role_id = kw.get('id_role')
-        action_p.user_id = kw.get('id_user')
-        action_p.action_id = id_action
-        action_p.granted = granted
-        
-        dbs.add(action_p)
-        dbs.flush()
-        
-        # reset cache
-        _cache = cache.get_cache(SapnsActPrivilege.CACHE_ID)
-        
-        def reset_user_cache(id_user):
-            try:
-                _cache.remove_value(key='%d_%d' % (id_user, id_action))
-                _cache.remove_value(key='cls_%d' % action_p.action.class_id)
-            except:
-                pass
-        
-        if kw.get('id_user'):
-            # this user
-            reset_user_cache(kw.get('id_user'))
-            
-        else:
-            # all the users in this role
-            role = dbs.query(SapnsRole).get(kw.get('id_role'))
-            for user in role.users:
-                reset_user_cache(user.user_id)
-        
-        return action_p
-
-    @staticmethod
-    def add_privilege(id_action, **kw):
-        return SapnsActPrivilege._update_privilege(id_action, True, **kw)
-    
-    @staticmethod
-    def remove_privilege(id_action, **kw):
-        SapnsActPrivilege._update_privilege(id_action, False, **kw)
-        
-SapnsAction.privileges = \
-    relation(SapnsActPrivilege, backref='action',
-             primaryjoin=SapnsAction.action_id == SapnsActPrivilege.action_id)
+    def has_permission(id_role, id_permission):
+        return dbs.query(SapnsRolePermission).\
+            filter(and_(SapnsRolePermission.role_id == id_role,
+                        SapnsRolePermission.permission_id == id_permission)).\
+            first() != None
 
 class SapnsView(DeclarativeBase):
     """Views in Sapns"""
