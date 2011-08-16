@@ -16,7 +16,7 @@ def bootstrap(command, conf, vars):
         
         logger.info('User "manager"')
         # user
-        u = model.User()
+        u = model.SapnsUser()
         u.user_name = u'manager'
         u.display_name = u'Superuser Of The System'
         u.email_address = u'manager@somedomain.com'
@@ -27,11 +27,11 @@ def bootstrap(command, conf, vars):
         logger.info('Role "managers"')
     
         # "managers" role
-        managers = model.Group()
+        managers = model.SapnsRole()
         managers.group_name = u'managers'
         managers.display_name = u'Managers Group'
     
-        managers.users.append(u)
+        managers.users_.append(u)
     
         model.DBSession.add(managers)
         
@@ -40,7 +40,7 @@ def bootstrap(command, conf, vars):
         p_man.permission_name = u'manage'
         p_man.display_name = u'manage'
         p_man.description = u'This permission give an administrative right to the bearer'
-        p_man.groups.append(managers)
+        p_man.roles.append(managers)
     
         model.DBSession.add(p_man)
         
@@ -48,7 +48,7 @@ def bootstrap(command, conf, vars):
         p_users.permission_name = u'users'
         p_users.display_name = u'users'
         p_users.description = u'User management permission'
-        p_users.groups.append(managers)
+        p_users.roles.append(managers)
         
         model.DBSession.add(p_users)
 
@@ -56,7 +56,7 @@ def bootstrap(command, conf, vars):
         p_views.permission_name = u'views'
         p_views.display_name = u'views'
         p_views.description = u'Views management permission'
-        p_views.groups.append(managers)
+        p_views.roles.append(managers)
         
         model.DBSession.add(p_views)
         
@@ -65,12 +65,12 @@ def bootstrap(command, conf, vars):
         p_util.permission_name = u'utilities'
         p_util.display_name = u'utilities'
         p_util.description = u'Utilites'
-        p_util.groups.append(managers)
+        p_util.roles.append(managers)
         
         model.DBSession.add(p_util)
         model.DBSession.flush()
 
-        p_util.groups.append(managers)
+        p_util.roles.append(managers)
         model.DBSession.add(p_util)
 
         # permission: docs        
@@ -78,7 +78,7 @@ def bootstrap(command, conf, vars):
         p_docs.permission_name = u'docs'
         p_docs.display_name = u'docs'
         p_docs.description = u'Documents management'
-        p_docs.groups.append(managers)
+        p_docs.roles.append(managers)
         
         model.DBSession.add(p_docs)
 
