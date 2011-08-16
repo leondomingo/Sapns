@@ -183,10 +183,8 @@ def update_metadata():
                 dbs.flush()
                 
                 # add this action to "managers" role
-                #managers = SapnsRole()
-                managers.permissions.append(action)
+                managers.permissions_.append(action)
                 dbs.flush()
-                #managers.add_act_privilege(action.action_id)
                 
         # create standard actions
         create_action(unicode(l_('New')), SapnsPermission.TYPE_NEW)
@@ -345,7 +343,8 @@ def create_data_exploration():
                 dbs.flush()
                 
                 # add to "managers" role
-                managers.add_act_privilege(act_table.action_id)
+                managers.permissions_.append(act_table)
+                dbs.flush()
                 
             # project
             sc_parent = sc_project.shortcut_id

@@ -112,7 +112,8 @@ class DashboardController(BaseController):
         logger.info('Parent class: %s' % cls_.name)
         logger.info('Child class: %s' % ch_cls_.name)
              
-        if not user.has_privilege(cls_.name) or not user.has_permission('%s#list' % cls):
+        if not user.has_privilege(cls_.name) or \
+        not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_LIST)):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -318,7 +319,8 @@ class DashboardController(BaseController):
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
-        if not user.has_privilege(cls.name) or not user.has_permission('%s#edit' % cls):
+        if not user.has_privilege(cls.name) or \
+        not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT)):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -441,10 +443,10 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         if id:
-            p = user.has_permission('%s#edit' % cls)
+            p = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT))
         
         else:
-            p = user.has_permission('%s#new' % cls)
+            p = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_NEW))
         
         if not user.has_privilege(class_.name) or not p:
             redirect(url('/message',
@@ -567,7 +569,8 @@ class DashboardController(BaseController):
             cls_ = SapnsClass.by_name(cls)
             
             # check privilege on this class
-            if not user.has_privilege(cls_.name) or not user.has_permission('%s#delete' % cls):
+            if not user.has_privilege(cls_.name) or \
+            not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_DELETE)):
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
             
