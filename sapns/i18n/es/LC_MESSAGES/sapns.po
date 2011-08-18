@@ -400,11 +400,8 @@ msgid "Oops, something went wrong..."
 msgstr "Ups, algo fue mal..."
 
 #: sapns/templates/sapns/dashboard/grid.html:106
-msgid ""
-"For your information this object is related with other objects in the "
-"following classes:"
-msgstr "Para tu información este objeto está relacionado con otros objetos en las"
-" siguientes clases:"
+msgid "For your information this object is related with other objects in the following classes:"
+msgstr "Para tu información este objeto está relacionado con otros objetos en las siguientes clases:"
 
 #: sapns/templates/sapns/dashboard/grid.html:126
 #: sapns/templates/sapns/dashboard/grid.html:136
@@ -456,8 +453,7 @@ msgstr "No hay resultados"
 #: sapns/templates/sapns/dashboard/grid.html:493
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
-msgstr "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta "
-"%(pos1)d"
+msgstr "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta %(pos1)d"
 
 #: sapns/templates/sapns/dashboard/grid.html:500
 msgid "All"
