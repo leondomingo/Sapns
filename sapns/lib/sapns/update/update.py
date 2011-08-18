@@ -51,24 +51,18 @@ class Update(object):
                     # SQL
                     if u.type.lower() == 'sql':
                         #logger.info(_('Executing SQL script...'))
-                        f_sql = file(os.path.join(current_path, u.filename), 'rb')
-                        try:
-                            #dbs.execute(f_sql.read())
-                            call = [os.path.join(self.pg_path, 'psql'),
-                                    '-h', self.host, 
-                                    '-U', self.user,
-                                    '-d', self.db,
-                                    ]
-                            
-                            if self.port:
-                                # ":<port>"
-                                call += ['-p', self.port[1:]]
-                            
-                            sp.check_call(call, env=dict(PGPASSWORD=self.password),
-                                          stdin=f_sql)                            
-                            
-                        finally:
-                            f_sql.close()
+                        call = [os.path.join(self.pg_path, 'psql'),
+                                '-h', self.host, 
+                                '-U', self.user,
+                                '-d', self.db,
+                                '-f', os.path.join(current_path, u.filename) 
+                                ]
+                        
+                        if self.port:
+                            # ":<port>"
+                            call += ['-p', self.port[1:]]
+                        
+                        sp.check_call(call, env=dict(PGPASSWORD=self.password))
                         
                     # python
                     elif u.type.lower() == 'py':
