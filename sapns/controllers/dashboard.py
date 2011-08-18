@@ -113,7 +113,7 @@ class DashboardController(BaseController):
         logger.info('Child class: %s' % ch_cls_.name)
              
         if not user.has_privilege(cls_.name) or \
-        not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_LIST)):
+        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
