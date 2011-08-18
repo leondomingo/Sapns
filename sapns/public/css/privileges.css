@@ -93,8 +93,15 @@
     text-decoration: underline;
 }
 
-.class_granted, .attr_granted, .action_granted {
+.class_granted, .action_granted {
 	font-size: 10px;
+	text-align: center;
+}
+
+.attr_granted {
+	font-size: 10px;
+	width: 110px;
+	text-align: center;
 }
 
 #right_content {
@@ -147,7 +154,7 @@
 }
 
 .attr_name {
-    width: 513px;
+    width: 492px;
     float: left;
 }
 
@@ -182,6 +189,6 @@
 }
 
 .action_name {
-    width: 540px;
+    width: 554px;
     float: left;
 }

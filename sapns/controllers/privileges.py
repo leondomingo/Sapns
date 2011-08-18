@@ -2,7 +2,7 @@
 """Privilege management controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect, request, require
+from tg import expose, url, redirect
 
 # third party imports
 from pylons import cache
@@ -16,8 +16,7 @@ from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 
 from sapns.model.sapnsmodel import SapnsUser , SapnsClass,\
-    SapnsRole, SapnsAttrPrivilege, SapnsPermission, SapnsRolePermission, \
-    SapnsPrivilege, SapnsUserRole, SapnsAttribute
+    SapnsRole, SapnsAttrPrivilege, SapnsPermission
 from neptuno.dict import Dict
 from neptuno.util import get_paramw, strtobool
 from sqlalchemy.sql.expression import and_
