@@ -981,7 +981,8 @@ class SapnsClass(DeclarativeBase):
     
             class_attributes = []
             for attr in dbs.query(SapnsAttribute).\
-                    filter(SapnsAttribute.class_id == self.class_id):
+                    filter(SapnsAttribute.class_id == self.class_id).\
+                    order_by(SapnsAttribute.insertion_order):
                 
                 if class_attr_priv.has_key(attr.attribute_id) and \
                 class_attr_priv[attr.attribute_id].access != SapnsAttrPrivilege.ACCESS_DENIED:
