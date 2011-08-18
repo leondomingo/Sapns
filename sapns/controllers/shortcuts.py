@@ -82,7 +82,7 @@ class ShortcutsController(BaseController):
             
         except Exception, e:
             logger.error(e)
-            return dict(status=False)
+            return dict(status=False) #, message=str(e).decode('utf-8'))
         
     @expose('json')
     @require(predicates.not_anonymous())

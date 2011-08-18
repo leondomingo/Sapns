@@ -182,7 +182,7 @@ class SapnsUser(User):
                 sc_copy.title = sc.title
                 sc_copy.parent_id = sc.parent_id
                 sc_copy.user_id = self.user_id
-                sc_copy.action_id = sc.action_id
+                sc_copy.permission_id = sc.permission_id
                 sc_copy.order = sc.order
                 
                 dbs.add(sc_copy)
@@ -251,7 +251,7 @@ class SapnsUser(User):
         
         # new shortcut
         sc_link = SapnsShortcut()
-        sc_link.action_id = action_link.action_id
+        sc_link.permission_id = action_link.permission_id
         sc_link.title = title
         sc_link.user_id = self.user_id
         
@@ -496,7 +496,7 @@ class SapnsShortcut(DeclarativeBase):
             new_sc = SapnsShortcut()
             new_sc.user_id = self.user_id
             new_sc.title = sc.title
-            new_sc.action_id = sc.action_id
+            new_sc.permission_id = sc.permission_id
             
         else:
             new_sc = dbs.query(SapnsShortcut).get(id_shortcut)

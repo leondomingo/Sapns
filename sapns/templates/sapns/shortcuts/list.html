@@ -19,7 +19,7 @@
     <input type="hidden" name="came_from" />
 </form>
 
-<div>
+<div id="sc_list">
     {% for sc in shortcuts %}
     <div class="sp_shortcut" sc_id="{{sc.id}}" sc_parent="{{sc.parent}}"
         cls="{{sc.cls}}" sc_order="{{sc.order}}"
