@@ -7,4 +7,4 @@ select attr.id, attr.name as "Name", attr.title as "Title",
   attr.reference_order as "Reference order", 
   cls.name as "Class"
 from sp_attributes attr
-join sp_classes cls on cls.id = attr.id_class
+join sp_classes cls on cls.id = attr.id_class;

@@ -4,7 +4,7 @@ import os
 import re
 import logging
 import datetime as dt
-import subprocess as sp
+#import subprocess as sp
 from pylons.i18n import ugettext as _
 from tg import config
 from sapns.model import DBSession as dbs
@@ -39,30 +39,36 @@ class Update(object):
             
             u = Dict(**u)
             if not SapnsUpdates.by_code(u.code):
-                
-                new_u = SapnsUpdates()
-                new_u.code = u.code
-                new_u.description = u.desc
-                new_u.exec_date = dt.datetime.now()
-                
-                logger.info('[%s] %s (%s)' % (u.code, u.desc, u.type.upper()))
+
+                logger.info('[%s] %s (%s)' % (u.code, u.desc or '', u.type.upper()))
                 
                 try:
                     # SQL
                     if u.type.lower() == 'sql':
                         #logger.info(_('Executing SQL script...'))
-                        call = [os.path.join(self.pg_path, 'psql'),
-                                '-h', self.host, 
-                                '-U', self.user,
-                                '-d', self.db,
-                                '-f', os.path.join(current_path, u.filename) 
-                                ]
-                        
-                        if self.port:
-                            # ":<port>"
-                            call += ['-p', self.port[1:]]
-                        
-                        sp.check_call(call, env=dict(PGPASSWORD=self.password))
+                        f_sql = file(os.path.join(current_path, u.filename), 'rb')
+                        try:
+                            sql_text = f_sql.read()
+                            for script in sql_text.split(';'):
+                                if script.strip():
+                                    dbs.execute(script.strip())
+                                    dbs.flush()
+                                
+                        finally:
+                            f_sql.close()
+
+#                        call = [os.path.join(self.pg_path, 'psql'),
+#                                '-h', self.host, 
+#                                '-U', self.user,
+#                                '-d', self.db,
+#                                '-f', os.path.join(current_path, u.filename) 
+#                                ]
+#                        
+#                        if self.port:
+#                            # ":<port>"
+#                            call += ['-p', self.port[1:]]
+#                        
+#                        sp.check_call(call, env=dict(PGPASSWORD=self.password))
                         
                     # python
                     elif u.type.lower() == 'py':
@@ -71,7 +77,12 @@ class Update(object):
                                             None, None, ['update'])
                         module.update()
                         
-                    # save
+                    # save "update"
+                    new_u = SapnsUpdates()
+                    new_u.code = u.code
+                    new_u.description = u.desc
+                    new_u.exec_date = dt.datetime.now()
+                
                     dbs.add(new_u)
                     dbs.flush()
                         
