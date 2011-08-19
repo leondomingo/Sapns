@@ -4,7 +4,7 @@ import os
 import re
 import logging
 import datetime as dt
-import encodings.codecs
+import encodings
 _open = encodings.codecs.open
 from pylons.i18n import ugettext as _
 from tg import config
