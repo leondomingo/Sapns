@@ -49,7 +49,7 @@ class Update(object):
                         f_sql = file(os.path.join(current_path, u.filename), 'rb')
                         try:
                             sql_text = f_sql.read()
-                            for script in sql_text.split(';'):
+                            for script in sql_text.split('--#'):
                                 if script.strip():
                                     dbs.execute(script.strip())
                                     dbs.flush()
