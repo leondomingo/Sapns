@@ -443,12 +443,12 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         if id:
-            p = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT))
+            perm = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT))
         
         else:
-            p = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_NEW))
+            perm = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_NEW))
         
-        if not user.has_privilege(class_.name) or not p:
+        if not user.has_privilege(class_.name) or not perm:
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
