@@ -4,7 +4,7 @@
 from tg import response, expose, require, url, request, redirect, config
 from pylons.i18n import ugettext as _, lazy_ugettext as l_
 from tg.i18n import set_lang, get_lang
-from repoze.what import predicates
+from repoze.what import predicates as p
 
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
@@ -49,7 +49,7 @@ class DashboardController(BaseController):
     docs = DocsController()
 
     @expose('sapns/dashboard/index.html')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def index(self, sc_type='list', sc_parent=None):
         curr_lang = get_lang()
 
@@ -83,7 +83,7 @@ class DashboardController(BaseController):
         redirect(url('/dashboard/util/init'))
 
     @expose('sapns/dashboard/listof.html')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def list(self, cls, q='', **params):
         
         logger = logging.getLogger(__name__ + '/list')
@@ -215,7 +215,7 @@ class DashboardController(BaseController):
                               totalp=totalp, total=ds.count, total_pag=total_pag))
     
     @expose('sapns/dashboard/search.html')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def search(self, **params):
         logger = logging.getLogger(__name__ + '/search')
         logger.info(params)
@@ -262,7 +262,7 @@ class DashboardController(BaseController):
         return ds 
     
     @expose(content_type='text/csv')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def tocsv(self, cls, **kw):
         ds = self.export(cls, **kw)
         
@@ -272,7 +272,7 @@ class DashboardController(BaseController):
         return ds.to_csv()
     
     @expose(content_type='application/excel')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def toxls(self, cls, **kw):
         ds = self.export(cls, **kw)
 
@@ -286,7 +286,7 @@ class DashboardController(BaseController):
         return xl_file.getvalue()
     
     @expose('json')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def title(self, cls, id):
         logger = logging.getLogger(__name__ + '/title')
         try:
@@ -298,7 +298,7 @@ class DashboardController(BaseController):
             return dict(status=False, message=str(e))        
     
     @expose()
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def save(self, cls, id='', **params):
         """
         IN
@@ -423,7 +423,7 @@ class DashboardController(BaseController):
                                          came_from='')))
         
     @expose('sapns/dashboard/edit.html')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def new(self, cls, came_from='/dashboard', **kw):
         
         if not kw:
@@ -434,7 +434,7 @@ class DashboardController(BaseController):
         redirect(url('/dashboard/edit/%s' % cls), params=kw)
         
     @expose('sapns/dashboard/edit.html')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def edit(self, cls, id='', came_from='/dashboard', **params):
         
         logger = logging.getLogger(__name__ + '/edit')
@@ -559,7 +559,7 @@ class DashboardController(BaseController):
     
     @expose('sapns/dashboard/delete.html')
     @expose('json')
-    @require(predicates.not_anonymous())
+    @require(p.not_anonymous())
     def delete(self, cls, id, came_from='/dashboard'):
         
         logger = logging.getLogger(__name__ + '/delete')
@@ -613,7 +613,7 @@ class DashboardController(BaseController):
             return dict(status=False, message=str(e), rel_tables=rel_tables)
         
     @expose('sapns/order/insert.html')
-    @require(predicates.has_permission('manage'))
+    @require(p.has_permission('manage'))
     def ins_order(self, cls='', came_from='/dashboard'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -668,7 +668,7 @@ class DashboardController(BaseController):
                                      came_from='')))
     
     @expose('sapns/order/reference.html')
-    @require(predicates.has_permission('manage'))
+    @require(p.has_permission('manage'))
     def ref_order(self, cls, came_from=''):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -708,3 +708,8 @@ class DashboardController(BaseController):
             redirect(url('/message', 
                          params=dict(message=_('Reference order for "%s" has been successfully updated' % cls_title), 
                                      came_from='')))
+            
+    @expose('sapns/components/sapns.selector.example.html')
+    @require(p.in_group('managers'))
+    def test_selector(self):
+        return {}

@@ -21,7 +21,7 @@
 			return;
 		}
 		
-		set(this, 'name', '');
+		set(this, 'name', 'sel_' + Math.floor(Math.random()*999999));
 		set(this, 'value', '');
 		set(this, 'title', '');
 		set(this, 'rc', '');
@@ -105,14 +105,23 @@
 	    }
 		
 		// search params
-		var params = {};
-		if (this.search_params != null) {
-			params = this.search_params;
-		}
+		var params = {
+		        cls: this.rc,
+		        q: q,
+		        rp: this.dialog.results
+		};
 		
-		params.cls = this.rc;
-		params.q = q;
-		params.rp = this.dialog.results;
+		if (this.search_params != null) {
+		    if (typeof(this.search_params) == 'object') {
+		        for (k in this.search_params) {
+		            params[k] = this.search_params[k];
+		        }
+		    }
+		    else if (typeof(this.search_params) == 'function') {
+		        params.search_params = this.search_params;
+		        params.search_params();
+		    }
+		}
 
 		// search
 		$.ajax({
@@ -206,10 +215,19 @@
 			
 			this.append(select_button);
 			
+			// dialog title
+			var dialog_title = '';
+			if (typeof(sapnsSelector.rc_title) == 'string') {
+			    dialog_title = sapnsSelector.rc_title;
+			}
+			else if (typeof(sapnsSelector.rc_title) == 'function'){
+			    dialog_title = sapnsSelector.rc_title();
+			}
+			
 			this.find('#sb_' + sapnsSelector.name).click(function() {
 
 				$('#dialog-' + sapnsSelector.name).dialog({
-	                title: sapnsSelector.rc_title,
+	                title: dialog_title,
 	                width: sapnsSelector.dialog.width,
 	                height: sapnsSelector.dialog.height,
 	                resizable: false,

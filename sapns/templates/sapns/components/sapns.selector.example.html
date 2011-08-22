@@ -10,23 +10,38 @@
         
         $(document).ready(function() {
             $('#selector-alumno').sapnsSelector({
-                name: 'alumno',
-                value: 1166,
-                title: 'Alumno',
-                rc: 'alumnos',
-                rc_title: 'Alumnos',
+                //name: 'classes',
+                value: 1,
+                title: 'Class',
+                rc: 'sp_classes',
+                rc_title: function() {
+                    // this = sapnsSelector 
+                    return 'Esto es una prueba con "' + this.name + '"';
+                    //return new Date().toString();
+                },
                 dialog: {results: 3, height: 380},
-                search_url: "",
-                search_params: {fecha: obtener_fecha, id_grupo: 100}
+                //search_url: "",
+                //search_params: {fecha: obtener_fecha, id_grupo: 100}
                 // ,read_only: true 
             });
             
             $('#selector-profesor').sapnsSelector({
-                name: 'profesor',
+                //name: 'profesor',
                 value: 40,
-                title: 'Profesor',
-                rc: 'personal',
-                rc_title: 'Personal'
+                title: 'Attribute',
+                rc: 'sp_attributes',
+                rc_title: 'Attributes',
+                search_params: {
+                    //cls: 'sp_classes'
+                    q: 'perm'
+                }
+                /*
+                search_params: function() {
+                    var self = this;
+                    self.cls = 'sp_classes';
+                    self.q = 'perm';
+                }
+                */
             });
         });
     </script>

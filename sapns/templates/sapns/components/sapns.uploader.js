@@ -21,7 +21,7 @@
             return;
         }
         
-        set(this, 'name', Math.floor(Math.random()*999999));
+        set(this, 'name', 'upl_' + Math.floor(Math.random()*999999));
         set(this, 'file_name', '');
         set(this, 'uploaded_file', '');
         this.uploaded = false;
