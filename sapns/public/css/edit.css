@@ -97,6 +97,10 @@
     margin-left: 1%;
 }
 
+.sp_integer_field, .sp_float_field {
+	margin-left: 1%;
+}
+
 .sp-time-field {
     margin-left: 1%;
     width: 70px;

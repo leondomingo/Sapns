@@ -12,6 +12,7 @@
     <script type="text/javascript">
         {% include 'sapns/components/sapns.selector.min.js' %}
     </script>
+    <script type="text/javascript" src="{{tg.url('/js/fields.js')}}"></script>
 {% endblock %}
 
 {% block header %}
@@ -113,8 +114,21 @@
                 margin-bottom: 2px;">{{attr.title|escape}}</div>
 
         <div>
+        
+        <!-- Integer -->
+        {% if attr.type == 'int' and attr.related_class == None %}
+        <input class="sp_integer_field" type="text"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value or ''}}">
+            
+        <!-- Float -->
+        {% elif attr.type == 'float' %}
+        <input class="sp_float_field" type="text"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value or ''}}">
+        
         <!-- {# Boolean #} -->
-        {%- if attr.type == 'bool' %}
+        {%- elif attr.type == 'bool' %}
         <input class="sp-checkbox-field" type="checkbox"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value %} checked {% endif %}>
@@ -375,6 +389,20 @@
             
             {% endif %}
         {% endfor %}
+        
+        $('.sp_float_field').keydown(function(e) {
+            fields.num_field_keydown($(this), e);
+        });
+        
+        $('.sp_integer_field').keydown(function(e) {
+            fields.num_field_keydown($(this), e, true);
+        });
+        
+        $('.sp-time-field').keydown(function(e) {
+            fields.time_field_keydown(e);
+        }).change(function() {
+            fields.time_field_change($(this));
+        });
     });
 </script>
 {% endblock %}
