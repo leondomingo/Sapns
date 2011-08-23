@@ -141,7 +141,7 @@ class DashboardController(BaseController):
             p_cls = cls_.attr_by_name(ch_attr).related_class
             p_title = SapnsClass.object_title(p_cls.name, parent_id)
             
-            caption = _('%s of [%s]' % (ch_cls_.title, p_title))
+            caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
         elif caption is None:
             caption = ch_cls_.title
@@ -664,7 +664,7 @@ class DashboardController(BaseController):
             
         else:
             redirect(url('/message', 
-                         params=dict(message=_('Insertion order for "%s" has been successfully updated' % cls_title), 
+                         params=dict(message=_('Insertion order for "%s" has been successfully updated') % cls_title, 
                                      came_from='')))
     
     @expose('sapns/order/reference.html')
@@ -706,7 +706,7 @@ class DashboardController(BaseController):
             
         else:
             redirect(url('/message', 
-                         params=dict(message=_('Reference order for "%s" has been successfully updated' % cls_title), 
+                         params=dict(message=_('Reference order for "%s" has been successfully updated') % cls_title, 
                                      came_from='')))
             
     @expose('sapns/components/sapns.selector.example.html')

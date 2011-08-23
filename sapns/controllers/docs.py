@@ -226,7 +226,7 @@ class DocsController(BaseController):
             
             repo = dbs.query(SapnsRepo).get(id_repo)
             if not repo:
-                raise Exception(_('Repo [%d] was not found' % id_repo))
+                raise Exception(_('Repo [%d] was not found') % id_repo)
             
             f.file.seek(0)
             with file(os.path.join(repo.abs_path(), file_name), 'wb') as fu:
@@ -251,7 +251,7 @@ class DocsController(BaseController):
             
             repo = dbs.query(SapnsRepo).get(id_repo)
             if not repo:
-                raise Exception(_('Repo [%d] was not found' % id_repo))
+                raise Exception(_('Repo [%d] was not found') % id_repo)
             
             path_file = os.path.join(repo.abs_path(), file_name) 
             if os.access(path_file, os.F_OK):
