@@ -71,6 +71,21 @@
     margin-left: 1%;
 }
 
+.url_field_text {
+    width: 85%;
+    max-width: 85%;
+    min-width: 85%;
+    margin-left: 1%;
+    font-family: Courier;
+    font-weight: bold;
+    /*font-size: 12px;*/
+    border: 1px solid gray;
+}
+
+.url_field_text:focus {
+	border: 1px solid orange;
+}
+
 .sp-select-field {
     width: 97%;
     margin-left: 1%;

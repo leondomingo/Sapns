@@ -572,6 +572,8 @@ class SapnsClass(DeclarativeBase):
     
     # attributes (SapnsAttribute)
     
+    CACHE_ID_ATTR = 'class_get_attributes'
+    
     def __unicode__(self):
         return u'%s (%s)' % (self.name, self.title)
     
@@ -940,6 +942,8 @@ class SapnsClass(DeclarativeBase):
             _cmp = SapnsAttrPrivilege.cmp_access
             
             class_attr_priv = {}
+            i = 0
+            last_attr = None
             
             # role based
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
@@ -952,40 +956,44 @@ class SapnsClass(DeclarativeBase):
                     join((SapnsAttribute,
                           and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
                                SapnsAttribute.class_id == self.class_id,
-                               ))):
-                
-                logger.info(attr_priv.access)
-                
+                               ))).\
+                    filter(SapnsAttrPrivilege.access != SapnsAttrPrivilege.ACCESS_DENIED).\
+                    order_by(SapnsAttribute.insertion_order):
+
+                if last_attr != attr_priv.attribute_id:
+                    i += 1
+                    
+                last_attr = attr_priv.attribute_id
+
                 if class_attr_priv.has_key(attr_priv.attribute_id):
                     if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
-                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
+                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access, pos=i)
     
                 else:
-                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-                    
-            # user based                    
-            for attr_priv in dbs.query(SapnsAttrPrivilege).\
-                    join((SapnsAttribute,
-                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
-                               SapnsAttribute.class_id == self.class_id,
-                               SapnsAttrPrivilege.user_id == id_user
-                               ))):
-                
-                if class_attr_priv.has_key(attr_priv.attribute_id):
-                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
-                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-    
-                else:
-                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-                    
+                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access, pos=i)
+
+#            # user based
+#            for attr_priv in dbs.query(SapnsAttrPrivilege).\
+#                    join((SapnsAttribute,
+#                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
+#                               SapnsAttribute.class_id == self.class_id,
+#                               SapnsAttrPrivilege.user_id == id_user
+#                               ))):
+#                
+#                if class_attr_priv.has_key(attr_priv.attribute_id):
+#                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
+#                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
+#    
+#                else:
+#                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
     
             class_attributes = []
             for attr in dbs.query(SapnsAttribute).\
                     filter(SapnsAttribute.class_id == self.class_id).\
                     order_by(SapnsAttribute.insertion_order):
                 
-                if class_attr_priv.has_key(attr.attribute_id) and \
-                class_attr_priv[attr.attribute_id].access != SapnsAttrPrivilege.ACCESS_DENIED:
+                if class_attr_priv.has_key(attr.attribute_id): 
+                # and class_attr_priv[attr.attribute_id].access != SapnsAttrPrivilege.ACCESS_DENIED:
                     class_attributes.append(
                         Dict(id=attr.attribute_id,
                              name=attr.name,
@@ -994,10 +1002,11 @@ class SapnsClass(DeclarativeBase):
                              required=attr.required,
                              related_class_id=attr.related_class_id,
                             ))
-                
-            return zip(class_attributes, class_attr_priv.values())
+            
+            return zip(class_attributes, sorted(class_attr_priv.values(), 
+                                                cmp=lambda x, y: cmp(x.pos, y.pos)))
         
-        _cache = cache.get_cache('class_get_attributes')
+        _cache = cache.get_cache(SapnsClass.CACHE_ID_ATTR)
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
                                 createfunc=_get_attributes, expiretime=3600)
 
@@ -1028,6 +1037,7 @@ class SapnsAttribute(DeclarativeBase):
     TYPE_TIME = 'time'
     TYPE_DATETIME = 'datetime'
     TYPE_IMAGE = 'img'
+    TYPE_URL = 'url'
     
     type = Column(Unicode(20), nullable=False)
     required = Column(Boolean, DefaultClause('false'), default=False)
@@ -1035,6 +1045,8 @@ class SapnsAttribute(DeclarativeBase):
     insertion_order = Column(Integer)
     visible = Column(Boolean, DefaultClause('true'), default=True)
     #is_collection = Column(Boolean, DefaultClause('false'), default=False)
+    
+    attr_priv = relation('SapnsAttrPrivilege', backref='attribute')
     
     def __unicode__(self):
         return u'<%s> %s %s (%s)' % (unicode(self.class_), self.title, self.name)
@@ -1260,10 +1272,14 @@ class SapnsAttrPrivilege(DeclarativeBase):
         
         # reset cache
         _cache = cache.get_cache(SapnsAttrPrivilege.CACHE_ID)
+        _cache2 = cache.get_cache(SapnsClass.CACHE_ID_ATTR)
         
         def reset_user_cache(id_user):
             _key = '%d_%d' % (id_user, id_attribute)
             _cache.remove_value(key=_key)
+            
+            _key2 = '%d_%d' % (priv.attribute.class_id, id_user)
+            _cache2.remove_value(key=_key2)
         
         if kw.get('id_user'):
             # this user

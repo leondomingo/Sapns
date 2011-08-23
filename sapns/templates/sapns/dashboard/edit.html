@@ -4,7 +4,8 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}" >
+    {#<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}" >#}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}" >
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
@@ -12,7 +13,8 @@
     <script type="text/javascript">
         {% include 'sapns/components/sapns.selector.min.js' %}
     </script>
-    <script type="text/javascript" src="{{tg.url('/js/fields.js')}}"></script>
+    {#<script type="text/javascript" src="{{tg.url('/js/fields.js')}}"></script>#}
+    <script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
 {% endblock %}
 
 {% block header %}
@@ -115,13 +117,13 @@
 
         <div>
         
-        <!-- Integer -->
+        <!-- {# Integer #} -->
         {% if attr.type == 'int' and attr.related_class == None %}
         <input class="sp_integer_field" type="text"
             {% if attr.read_only %} disabled {% endif %}
             value="{{attr.value or ''}}">
             
-        <!-- Float -->
+        <!-- {# Float #} -->
         {% elif attr.type == 'float' %}
         <input class="sp_float_field" type="text"
             {% if attr.read_only %} disabled {% endif %}
@@ -149,6 +151,16 @@
         {%- elif attr.type == 'memo' %}
         <textarea class="sp-text-field sp-memo-field"
             {% if attr.read_only %} disabled {% endif %}>{{attr.value|escape}}</textarea>
+            
+        <!-- {# URL #} -->
+        {%- elif attr.type == 'url' %}
+        <div class="url_field">
+        <input class="url_field_text" type="text"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value}}">
+            
+        <button class="url_field_btn sp-button">{{_('Go to link')}}</button>
+        </div>
         
         {%- elif attr.related_class != None %}
         <!-- {# Select #} -->
@@ -198,6 +210,21 @@
                 params += 
                     '<input type="hidden" name="fld_' + name + '" ' + 
                         'value="' + value + '">\n';
+            });
+            
+            // {# url #} 
+            $('.url_field_text').each(function() {
+                var parent = $(this).parent().parent().parent();
+                var name = parent.attr('name');
+                var required = parent.attr('required');
+                var value = $(this).val();
+                        
+                if (required == 'true' && value == '') {
+                    required_attrs.push($(this));
+                }
+                
+                params +=
+                    '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
             });
             
             // {# checkbox #} 
@@ -402,6 +429,14 @@
             fields.time_field_keydown(e);
         }).change(function() {
             fields.time_field_change($(this));
+        });
+        
+        $('.url_field_btn').click(function() {
+            var url = $(this).parent().find('.url_field_text').val();
+            if (url.trim()) {
+                $('<form method="get" action="' + url + '" target="_blank">' +
+                   '</form>').appendTo('body').submit().remove();
+            }
         });
     });
 </script>

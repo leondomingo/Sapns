@@ -46,15 +46,3 @@ time_field_change: function(fld) {
     }
 }
 };
-
-/*$(document).ready(function() {
-    $('.float_field').keydown(function(e) {
-        num_field_keydown($(this), e, true);
-    });
-
-    $('.time_field').keydown(function(e) {
-        time_field_keydown(e);
-    }).change(function() {
-        time_field_change($(this));
-    });
-});*/
