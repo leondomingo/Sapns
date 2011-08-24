@@ -213,6 +213,106 @@ class DashboardController(BaseController):
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
                               totalp=totalp, total=ds.count, total_pag=total_pag))
+
+    @expose('sapns/components/sapns.grid/grid.html')
+    @require(p.not_anonymous())
+    def grid(self, cls, q='', **params):
+        
+        logger = logging.getLogger('DashboardController.grid')
+
+        # picking up parameters
+        rp = params.get('rp', 10)
+        pag_n = params.get('pag_n', 1)
+        
+        # collections
+        ch_attr = params.get('ch_attr')
+        parent_id = params.get('parent_id')
+        
+        # does this user have permission on this table?
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        
+        cls_ = SapnsClass.by_name(cls)
+        ch_cls_ = SapnsClass.by_name(cls, parent=False)        
+            
+        logger.info('Parent class: %s' % cls_.name)
+        logger.info('Child class: %s' % ch_cls_.name)
+             
+        if not user.has_privilege(cls_.name) or \
+        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
+            redirect(url('/message', 
+                         params=dict(message=_('Sorry, you do not have privilege on this class'))))
+        
+        rp = int(rp)
+        pag_n = int(pag_n)
+        pos = (pag_n-1) * rp
+
+        view = user.get_view_name(ch_cls_.name)
+            
+        date_fmt = config.get('formats.date', default='%m/%d/%Y')
+        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
+        
+        logger.info('search...%s / q=%s' % (view, q))
+        
+        # collection
+        col = None
+        if ch_attr and parent_id:
+            col = (cls, ch_attr, parent_id,)
+            
+            p_cls = cls_.attr_by_name(ch_attr).related_class
+            p_title = SapnsClass.object_title(p_cls.name, parent_id)
+            
+            caption = _('%s of [%s]') % (ch_cls_.title, p_title)
+            
+        elif caption is None:
+            caption = ch_cls_.title
+            
+        # get dataset
+        ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
+                    strtodatef=strtodate_, collection=col) 
+        
+        # Reading global settings
+        ds.date_fmt = date_fmt
+        ds.time_fmt = config.get('formats.time', default='%H:%M')
+        ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
+        ds.true_const = _('Yes')
+        ds.false_const = _('No')
+        
+        ds.float_fmt = app_cfg.format_float
+        
+        data = ds.to_data()
+        
+        cols = []
+        for col in ds.labels:
+            w = 125
+            if col == 'id':
+                w = 60
+                
+            cols.append(dict(title=col, width=w, align='center'))
+        
+        # total number of pages
+        total_pag = 1
+        if rp > 0:
+            total_pag = ds.count/rp
+            
+            if ds.count % rp != 0:
+                total_pag += 1
+            
+            if total_pag == 0:
+                total_pag = 1
+        
+        # rows in this page
+        this_page = ds.count - pos
+        if rp and this_page > rp:
+            this_page = rp
+            
+        return dict(ch_attr=ch_attr, parent_id=parent_id,
+                    grid=dict(caption=caption, name=cls, cls=cls_.name,
+                              search_url=url('/dashboard/grid/'), 
+                              cols=cols, data=data, 
+                              pag_n=pag_n, rp=rp, pos=pos,
+                              this_page=this_page, total=ds.count, total_pag=total_pag))
+
+
     
     @expose('sapns/dashboard/search.html')
     @require(p.not_anonymous())

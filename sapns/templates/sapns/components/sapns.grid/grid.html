@@ -1,0 +1,126 @@
+{#{% macro show(page, _, q, grid, show_ids, link=None, came_from=None, 
+    with_search=True, with_pager=True, with_actions=True, can_edit=False,
+    rel_classes=None, ch_attr=None, parent_id=None, exportable=True) %#}
+    
+<!-- Grid -->
+<div id="grid-dialog" style="display: none;"></div>
+<!--<div class="sp-grid-container" id="{{grid.name}}" cls="{{grid.cls}}">-->
+<div style="overflow: auto; clear: left;">
+<table class="sp-grid">
+    <tr>
+    <td class="sp-col-title">#</td>
+    {# <!-- Column titles --> #}
+    {% for col in grid.cols %}
+    <td class="sp-col-title" style="width: {{col.width}}px;">{{col.title|escape}}</td>
+    {% endfor %}
+    </tr>
+    
+    <!-- {# Data rows #} -->
+    {% for row in grid.data %}
+        <!-- Fill in grid -->
+        <tr class="sp-grid-row">
+        <td title="{{loop.index}}"><input class="sp-grid-rowid" type="checkbox" 
+            id_row="{{row[0]}}"></td>
+        {% for cell in row %}
+        <td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}};
+            width: {{grid.cols[loop.index0].width}}px;"
+            
+            {% if cell %}
+            title="{{cell|escape}}"
+            {% else %}
+            title="({{_('empty')}})"
+            {% endif %}
+            
+            {% if __can_edit and loop.index0 == 0 %}
+            clickable="false">
+            <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from={{link}}" 
+                target="">{{cell|escape}}</a>
+            {% else %}
+            clickable="true">
+            {% if ('%s'|format(cell))|length > 30 %}
+                {{cell[:30]|escape}}...
+            {% else %}
+                {{cell|escape}}
+            {% endif %}
+            {% endif %}
+        </td>
+        {% endfor %}
+        </tr>
+    {% else %}
+        <!-- {# No results #} -->
+        <tr class="sp-grid-row" style="width: 100%;">
+            <td class="sp-grid-cell sp-grid-noresults" 
+                colspan="{{grid.cols|length + 1}}">{{_('No results')}}</td>
+        </tr>
+    {% endfor %}
+</table>
+</div>
+
+{% if with_pager %}
+<!-- {# Grid pager #} -->
+<div class="sp-grid-pager">
+    <div class="sp-grid-pager-desc">
+        {{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, 
+            total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.this_page)}}
+    </div>
+    <select class="sp-button sp-grid-rp">
+        <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
+        <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
+        <option value="100" {% if grid.rp == 100 %}selected{% endif %}>100</option>
+        <option value="0"   {% if grid.rp == 0 %}selected{% endif %}>{{_('All')}}</option>
+    </select>
+    
+    {% macro form_newpage(pag_n, fl=False) %}
+    <form method="post" action="{{grid.search_url + grid.cls}}"
+        {% if fl %} style="float: left;" {% endif %}>
+        <input type="hidden" name="caption" value="{{grid.caption}}">
+        <input type="hidden" name="q" value="{{q}}">
+        <input type="hidden" name="rp" value="{{grid.rp}}">
+        <input type="hidden" name="pag_n" value="{{pag_n}}">
+        <!--<input type="hidden" name="show_ids" value="{{show_ids}}">-->
+        <!--<input type="hidden" name="came_from" value="{{came_from}}">-->
+        <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}">
+        <input type="hidden" name="parent_id" value="{{parent_id or ''}}">
+    {% endmacro %}
+    
+    <!-- {# first page #} -->
+    {{ form_newpage(1) }}
+        <input class="sp-button sp-grid-pag-back" type="submit" value="|<<" 
+            title="{{_('page 1')}}">
+    </form>
+    
+    <!-- {# previous page #} -->
+    {{ form_newpage(grid.pag_n-1) }}
+        {% if grid.pag_n-1 > 0 %}
+        <input class="sp-button sp-grid-pag-back" type="submit" value="<<" 
+            title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}">
+        {% else %}
+        <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled >
+        {% endif %}
+    </form>
+    
+    <div>
+        <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}" readonly>
+    </div>
+    
+    <!-- {# next page #} -->
+    {{ form_newpage(grid.pag_n+1, fl=True) }}
+        {% if grid.pag_n+1 <= grid.total_pag %}
+        <input class="sp-button sp-grid-pag-forth" type="submit" value=">>" 
+            title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}" >
+        {% else %}
+        <input class="sp-button sp-grid-pag-forth" type="button" value=">>" disabled >
+        {% endif %}
+    </form>
+
+    <!-- {# last page #} -->
+    {{ form_newpage(grid.total_pag) }}
+        <input class="sp-button sp-grid-pag-forth" type="submit" value=">>|"
+            title="{{_('page %(p)d')|format(p=grid.total_pag)}}" >
+    </form>
+</div>
+<!-- with_pager -->
+{% endif %}
+
+<!-- sp-grid-container -->
+<!--</div> -->
