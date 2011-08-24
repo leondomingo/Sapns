@@ -18,7 +18,7 @@ from sapns.model.sapnsmodel import SapnsUser , SapnsDoc, SapnsRepo,\
 
 import os
 import logging
-import simplejson as sj
+import simplejson as sj #@UnresolvedImport
 from neptuno.dataset import DataSet
 from neptuno.postgres.search import search
 from neptuno.dict import Dict
@@ -36,44 +36,55 @@ class DocsController(BaseController):
     
     @expose('sapns/docs/index.html')
     def index(self, cls, id, **kw):
+        
+        # TODO: comprobar permisos
 
         class_ = SapnsClass.by_name(cls)
         id_object = int(id)
         
-        came_from = kw.get('came_from')
+        filters = [('id_class', class_.class_id), ('id_object', id_object)]
+        ds = search(dbs, '_view_sp_docs', filters=filters)
         
-        meta = sa.MetaData(bind=dbs.bind)
-        tbl_doc = sa.Table('sp_docs', meta, autoload=True)
-        tbl_doct = sa.Table('sp_doctypes', meta, autoload=True)
-        tbl_docf = sa.Table('sp_docformats', meta, autoload=True)
-        tbl_adoc = sa.Table('sp_assigned_docs', meta, autoload=True)
-        tbl_repo = sa.Table('sp_repos', meta, autoload=True)
-        tbl_usr = sa.Table('sp_users', meta, autoload=True)
-        
-        qry = tbl_doc.\
-            join(tbl_adoc, tbl_adoc.c.id == tbl_doc.c.id).\
-            outerjoin(tbl_doct, tbl_doct.c.id == tbl_doc.c.id_doctype).\
-            join(tbl_docf, tbl_docf.c.id == tbl_doc.c.id_docformat).\
-            join(tbl_usr, tbl_usr.c.id == tbl_doc.c.id_author).\
-            join(tbl_repo, tbl_repo.c.id == tbl_doc.c.id_repo)
+        cols = []
+        for col in ds.labels:
+            w = 125
+            if col == 'id':
+                w = 60
+                
+            cols.append(dict(title=col, width=w, align='center'))
             
-        sel = sa.select([tbl_doc.c.id,
-                         tbl_doc.c.title.label('title'),
-                         tbl_docf.c.name.label('format'),
-                         tbl_doct.c.name.label('type'),
-                         tbl_usr.c.display_name.label('author'),
-                         tbl_repo.c.name.label('repo'),
-                         ], from_obj=qry,
-                        whereclause=and_(tbl_adoc.c.id_class == class_.class_id,
-                                         tbl_adoc.c.object_id == id_object,
-                                         ))
-
-        doclist = search(dbs, sel)
+        rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
+        #show_ids = strtobool(show_ids)
+        pos = (pag_n-1) * rp
+            
+        # total number of pages
+        total_pag = 1
+        if rp > 0:
+            total_pag = ds.count/rp
+            
+            if ds.count % rp != 0:
+                total_pag += 1
+            
+            if total_pag == 0:
+                total_pag = 1
         
+        # rows in this page
+        totalp = ds.count - pos
+        if rp and totalp > rp:
+            totalp = rp
+
         return dict(page='object-docs', 
                     obj=dict(id_class=class_.class_id, id=id_object,
                              title=SapnsClass.object_title(cls, id_object)),
-                    doclist=doclist, came_from=came_from)
+                    grid=dict(caption='Docs', name='docs', cls='sp_docs',
+                              search_url=url('/dashboard/docs/'), 
+                              cols=cols, 
+                              data=ds.to_data(), 
+                              actions=[], 
+                              pag_n=pag_n, rp=rp, pos=pos,
+                              totalp=totalp, total=ds.count, total_pag=total_pag
+                              ))
     
     @expose('sapns/docs/index.html')
     @require(authorize.has_any_permission('manage', 'docs'))
