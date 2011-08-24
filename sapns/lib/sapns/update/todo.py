@@ -25,6 +25,8 @@ TODO = [
     # sp_classes
     dict(code='init: sp_classes', desc='sp_classes', type='sql', 
          filename='init/sp_classes.view.sql'),
+    # sp_docs
+    dict(code='init: sp_docs', type='sql', filename='init/sp_docs.view.sql'),
     # sp_users
     dict(code='init: sp_users', desc='sp_users', type='sql', 
          filename='init/sp_users.view.sql'),
