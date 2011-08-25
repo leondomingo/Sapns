@@ -813,3 +813,9 @@ class DashboardController(BaseController):
     @require(p.in_group('managers'))
     def test_selector(self):
         return {}
+    
+    @expose('sapns/components/sapns.grid/grid_test.html')
+    @require(p.in_group('managers'))
+    def test_grid(self):
+        return {}
+    

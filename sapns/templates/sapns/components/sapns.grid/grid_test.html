@@ -1,0 +1,86 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>Insert title here</title>
+{% import 'sapns/dashboard/util.html' as u %}
+
+{{ u.jquery() }}
+{{ u.jquery_ui() }}
+<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
+<script type="text/javascript">
+    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+</script>
+
+</head>
+<body>
+    <div id="g"></div>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            
+            $('#g').sapnsGrid({
+                //caption: 'Grid test',
+                caption: function() {
+                    return 'Grid test (func)';
+                },
+                q: 'hooola',
+                /*
+                data: {
+                    cols: [{title: 'id', width: 30}, 
+                           {title: 'uno', align: 'right'}, 
+                           {title: 'dos', width: 300}, 
+                           {title: 'tres', align: 'left'}],
+                    data: [[1, 1.1, 2.2, 3.3],
+                           [2, 1.11, 2.22, 3.33],
+                           [3, 'hola', 'mundo!', 'lalaklaksdñlas kdñlaksdñlaksdñlaksdñlaksdñlaksdñlask dñlas dkñlas dkñlasdkñlasdksdfsdfds']
+                    ]
+                },
+                */
+                data: function() {
+                    return {
+                        cols: [{title: 'id', width: 30}, 
+                               {title: 'Úno', align: 'right'}, 
+                               {title: 'đæßß', width: 300}, 
+                               {title: 'trEs', align: 'left'}],
+                        //data: [[1, 100, 200, 300]],
+                        data: function() {
+                            return [[1, 11, 22, 33],
+                                    [2],
+                                    [3, 11, null, 33]
+                            ];
+                        }
+                    };
+                },
+                /*actions: [{title: 'act1', url: 'act1', type: 'process'},
+                          {title: 'act2', url: 'act2', type: 'process'},
+                          {title: 'act3', url: 'act3', type: 'process'}
+                          ],*/
+                actions: function() {
+                    return [{title: 'act1_f', url: 'act1', type: 'process'},
+                            {title: 'act2_f', url: 'act2', type: 'process'},
+                            {title: 'act3_f', url: 'act3', type: 'process'},
+                            {title: 'act4_f',
+                             type: {
+                                 id:'act4_f', 
+                                 f: function(id) {
+                                     alert('act4_f: hooola! ' + id);
+                                 }
+                             }
+                            },
+                            {title: 'act5_f',
+                             type: {
+                                 id:'act5_f',                                    
+                                 f: function(id) {
+                                     alert('act5_f: byyyyyye! ' + id);
+                                 }
+                             },
+                             require_id: false
+                            }
+                           ]
+                },
+                exportable: true
+            });
+        });
+    </script>
+</body>
+</html>

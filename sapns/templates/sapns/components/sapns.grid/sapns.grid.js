@@ -33,6 +33,9 @@
          */
         
         set(this, 'caption', '');
+        if (typeof(this.caption) == 'function') {
+            this.caption = this.caption();
+        }
         set(this, 'name', 'grid_' + Math.floor(Math.random()*999999));
         set(this, 'cls', null);
         set(this, 'with_search', true);
@@ -43,9 +46,19 @@
         set(this, 'q', '');
         set(this, 'ch_attr', '');
         set(this, 'parent_id', '');
-        set(this, 'cols', []);
         set(this, 'data', {});
+        if (typeof(this.data) == 'function') {
+            this.data = this.data();
+        }
+        
         set(this, 'actions', []);
+        if (typeof(this.actions) == 'function') {
+            this.actions = this.actions();
+        }
+        
+        set(this, 'exportable', true);
+        
+        set(this, 'with_pager', true);
         set(this, 'pag_n', 1);
         set(this, 'rp', 10);
         set(this, 'pos', 0);
@@ -159,7 +172,7 @@
             this.append('<div id="grid-dialog" style="display: none;"></div>');
             
             var g_content = '';            
-            g_content += '<div class="sp-grid-container" id="' + g.name + '" cls="' + g.cls '">';
+            g_content += '<div class="sp-grid-container" id="' + g.name + '" cls="' + g.cls + '">';
             
             if (g.caption) {
                 g_content += '<div class="sp-grid-caption">' + g.caption + '</div>';
@@ -199,293 +212,173 @@
             
             this.append(g_content);
             
-            var g_table = '<div style="overflow: auto; clear: left;">' +
+            var g_table = 
+                '<div style="overflow: auto; clear: left;">' +
                 '<table class="sp-grid">' +
                     '<tr>' +
                     '<td class="sp-col-title">#</td>';
             
-            for (var i=0, l=g.cols.length; i<l; i++) {
-                var col = g.cols[i];
-                g_table += '<td class="sp-col-title" style="width: ' + col.width + 'px;">' + col.title + '</td>';
+            //console.log(JSON.stringify(g));
+            for (var i=0, l=g.data.cols.length; i<l; i++) {
+                var col = g.data.cols[i];
+                //console.log(col);
+                var wd = col.width;
+                if (!wd) {
+                    wd = 60;
+                }
+                
+                g_table += '<td class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</td>';
             }
             
             g_table += '</tr>';
             
-            for (var i=0, ld=g.data.length; i<ld; i++) {
+            var data = g.data.data;
+            if (typeof(data) == 'function') {
+                data = data();
+            }
+            
+            var ld = data.length;
+            //console.log(ld);
+            if (ld > 0) {
+            for (var i=0; i<ld; i++) {
                 
-                var row = g.data[i];
+                var row = data[i];
                 
                 g_table += '<tr class="sp-grid-row">' +
-                    '<td title="{{loop.index}}"><input class="sp-grid-rowid" type="checkbox" id_row="{{row[0]}}"></td>';
+                    '<td title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></td>';
                 
                 for (var j=0, lr=row.length; j<lr; j++) {
-                    g_table += '<td class="sp-grid-cell" style="text-align: {{grid.cols[loop.index0].align}} width: {{grid.cols[loop.index0].width}}px;"' +
-                            
-                            {% if cell %}
-                            title="{{cell|escape}}"
-                            {% else %}
-                            title="({{_('empty')}})"
-                            {% endif %}
-                            
-                            {% if __can_edit and loop.index0 == 0 %}
-                            clickable="false">
-                            <a href="/dashboard/edit/{{grid.cls}}/{{cell}}/?came_from={{link}}" 
-                                target="">{{cell|escape}}</a>
-                            {% else %}
-                            clickable="true">
-                            {% if ('%s'|format(cell))|length > 30 %}
-                                {{cell[:30]|escape}}...
-                            {% else %}
-                                {{cell|escape}}
-                            {% endif %}
-                            {% endif %}
-                        </td>
-                        {% endfor %}
-                        </tr>
-                    {% else %}
-                        {# <!-- No results --> #}
-                        <tr class="sp-grid-row" style="width: 100%;">
-                            <td class="sp-grid-cell sp-grid-noresults" 
-                                colspan="{{grid.cols|length + 1}}">{{_('No results')}}</td>
-                        </tr>
-                    {% endfor %}
-
-                </table>
-                </div>
-
-                {% if with_pager %}
-                {# <!-- Grid pager --> #}
-                <div class="sp-grid-pager">
-                    <div class="sp-grid-pager-desc">
-                        {{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')|format(curr_page=grid.pag_n, 
-                            total_page=grid.total_pag, pos0=grid.pos+1, pos1=grid.pos + grid.totalp)}}
-                    </div>
-                    <select class="sp-button sp-grid-rp">
-                        <option value="10"  {% if grid.rp == 10 %}selected{% endif %}>10</option>
-                        <option value="50"  {% if grid.rp == 50 %}selected{% endif %}>50</option>
-                        <option value="100" {% if grid.rp == 100 %}selected{% endif %}>100</option>
-                        <option value="0"   {% if grid.rp == 0 %}selected{% endif %}>{{_('All')}}</option>
-                    </select>
+                    var col = g.data.cols[j];
+                    var al = col.align;
+                    if (!al) {
+                        al = 'center';
+                    }
                     
-                    {% macro form_newpage(pag_n, fl=False) %}
-                    <form method="post" action="{{grid.search_url + grid.cls}}"
-                        {% if fl %} style="float: left;" {% endif %}>
-                        <input type="hidden" name="caption" value="{{grid.caption}}">
-                        <input type="hidden" name="q" value="{{q}}">
-                        <input type="hidden" name="rp" value="{{grid.rp}}">
-                        <input type="hidden" name="pag_n" value="{{pag_n}}">
-                        <input type="hidden" name="show_ids" value="{{show_ids}}">
-                        <input type="hidden" name="came_from" value="{{came_from}}">
-                        <input type="hidden" name="ch_attr" value="{{ch_attr or ''}}">
-                        <input type="hidden" name="parent_id" value="{{parent_id or ''}}">
-                    {% endmacro %}
+                    var wd = col.width;
+                    if (!wd) {
+                        wd = 60;
+                    }
                     
-                    <!-- {# first page #} -->
-                    {{ form_newpage(1) }}
-                        <input class="sp-button sp-grid-pag-back" type="submit" value="|<<" 
-                            title="{{_('page 1')}}">
-                    </form>
+                    var cell = row[j];
+                    if (!cell) {
+                        cell = '';
+                    }
                     
-                    <!-- {# previous page #} -->
-                    {# {% if grid.pag_n-1 > 0 %} #}
-                    {{ form_newpage(grid.pag_n-1) }}
-                        {% if grid.pag_n-1 > 0 %}
-                        <input class="sp-button sp-grid-pag-back" type="submit" value="<<" 
-                            title="{{_('page %(p)d')|format(p=grid.pag_n-1)}}">
-                        {% else %}
-                        <input class="sp-button sp-grid-pag-back" type="button" value="<<" disabled >
-                        {% endif %}
-                    </form>
-                    {# {% endif %} #}
+                    g_table += '<td class="sp-grid-cell" style="text-align: ' + al + '; width: ' + wd + 'px;"';
                     
-                    <div>
-                        <input class="sp-grid-current-page" type="text" value="{{grid.pag_n}}" readonly>
-                    </div>
+                    if (cell) {
+                        g_table += 'title="' + cell + '"';
+                    }
+                    else {
+                        g_table += 'title="({{_("empty")}})"';
+                    }
                     
-                    <!-- {# next page #} -->
-                    {{ form_newpage(grid.pag_n+1, fl=True) }}
-                        {% if grid.pag_n+1 <= grid.total_pag %}
-                        <input class="sp-button sp-grid-pag-forth" type="submit" value=">>" 
-                            title="{{_('page %(p)d')|format(p=grid.pag_n+1)}}" >
-                        {% else %}
-                        <input class="sp-button sp-grid-pag-forth" type="button" value=">>" disabled >
-                        {% endif %}
-                    </form>
-
-                    <!-- {# last page #} -->
-                    {{ form_newpage(grid.total_pag) }}
-                        <input class="sp-button sp-grid-pag-forth" type="submit" value=">>|"
-                            title="{{_('page %(p)d')|format(p=grid.total_pag)}}" >
-                    </form>
-                </div>
-                {% endif %}
-
-                {% if with_actions and grid.actions %}
-                <!-- {# Grid actions #} -->
-                <div class="sp-grid-actions">
-                    <div class="sp-grid-actions-title">{{_('Actions')}}:</div>
-                    {% for act in grid.actions %}
-                    <div style="float: left;">
-                    <form class="action-form" method="post" action0="{{act.url}}"> <!-- target="_blank"> -->
-                        <input type="hidden" name="cls" value="{{grid.cls}}">
-                        <input type="hidden" name="came_from" value="{{link or ''}}">
-                        
-                        {% if parent_id %}
-                        <input type="hidden" name="_{{ch_attr}}" value="{{parent_id}}">
-                        {% endif %}
-                        
-                        <!-- {#
-                        {% if link != None %}
-                        <input type="hidden" name="came_from" value="{{link}}" >
-                        {% else %}
-                        <input type="hidden" name="came_from" value="{{came_from}}" >
-                        {% endif %}
-                        #}-->
-                        <input class="sp-button sp-grid-action" type="button" value="{{act.title|escape}}"
-                            title="{{act.url}}" url="{{act.url}}" action-type="{{act.type}}"
-                            require_id="{{act.require_id|lower}}" >
-                    </form>
-                    </div>
-                    {% endfor %}
+                    g_table += 'clickable="true">';
                     
-                    <!-- action for exporting (Excel, CSV) -->
-                    {% if exportable %}
-                    <div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">
-                        <select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">
-                            <option value="">({{_('Export')}})</option>
-                            <option value="csv">CSV</option>
-                            <option value="excel">Excel</option>
-                        </select>
-                        <!-- <button id="btn-export" class="sp-button">{{_('Export')}}</button> -->
-                    </div>
-                    {% endif %}
-                </div>
-                {% endif %}
-
-                {% if rel_classes %}
-                <div id="rel-classes" style="clear: left;">
-                <div class="sp-grid-relatedinfo-title">{{_('Related info')}}</div>
-                <select id="rel-classes-sel" style="font-size: 11px;">
-                {% for rc in rel_classes %}
-                <option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>
-                {% endfor %}
-                </select>
-                <input id="rel-classes-show" class="sp-button" type="button" value="{{_('Show')}}" >
-                <form id="rel-classes-form" method="post" action="" 
-                    target="_blank">
-                </form>
-                </div>
-                {% endif %}
-                </div>
-                {% endmacro %}            
-            
-            // dialog
-            this.append('<div id="dialog-' + sapnsSelector.name + '" style="display: none;"></div>'); 
-
-            // select text
-            var select_text = '<input id="st_' + sapnsSelector.name + '"' + 
-                ' class="sp-select-text"' + 
-                ' type="text" readonly' + 
-                ' value=""';
-            
-            if (sapnsSelector.read_only) {
-                select_text += ' disabled';
-            }
-            
-            select_text += '>';
-            
-            this.append(select_text);
-            
-            // double-click to edit the selected object (if there's any)
-            this.find('#st_' + sapnsSelector.name).dblclick(function() {
-                var cls = sapnsSelector.getClass();
-                var id = sapnsSelector.getValue();
-                if (id != '') {
-                    var url_edit = sapnsSelector.edit_url;
-                    var form_edit =
-                        '<form action="' + url_edit + '" method="post" target="_blank">' +
-                            '<input type="hidden" name="cls" value="' + cls + '">' +   
-                            '<input type="hidden" name="id" value="' + id + '">' +
-                            '<input type="hidden" name="came_from" value="">' +
-                        '</form>';
-                        
-                    $(form_edit).appendTo('body').submit().remove();
+                    if (cell.length > 30) {
+                        g_table += (cell+'').substr(0, 30) + '...';
+                    }
+                    else {
+                        g_table += cell;
+                    }
+                    
+                    g_table += '</td>';
                 }
-            });
-            
-            // select_button
-            var select_button = '<button id="sb_' + sapnsSelector.name + '"' +
-                ' class="sp-button sp-select-button" ' +
-                ' title=\'Set a value for "' + sapnsSelector.title + '"\'' +
-                ' style="font-weight: bold;"';
-            
-            if (sapnsSelector.read_only) {
-                select_button += ' disabled';
+                
+                g_table += '</tr>';
+            }
+            }
+            else {
+                g_table += 
+                    '<tr class="sp-grid-row" style="width: 100%;">' +
+                        '<td class="sp-grid-cell sp-grid-noresults"' + 
+                            ' colspan="' + (g.data.cols.length+1) + '">{{_("No results")}}</td>' +
+                    '</tr>';
             }
             
-            select_button += '>...</button>';
+            g_table += '</table></div>';
             
-            this.append(select_button);
+            this.append(g_table);
             
-            // dialog title
-            var dialog_title = '';
-            if (typeof(sapnsSelector.rc_title) == 'string') {
-                dialog_title = sapnsSelector.rc_title;
-            }
-            else if (typeof(sapnsSelector.rc_title) == 'function'){
-                dialog_title = sapnsSelector.rc_title();
+            // pager
+            var g_pager = '';
+            if (g.with_pager) {
             }
             
-            this.find('#sb_' + sapnsSelector.name).click(function() {
-
-                $('#dialog-' + sapnsSelector.name).dialog({
-                    title: dialog_title,
-                    width: sapnsSelector.dialog.width,
-                    height: sapnsSelector.dialog.height,
-                    resizable: false,
-                    modal: true,
-                    buttons: {
-                        "{{_('Ok')}}": function() {
-                            // {# get the id of the selected row #} 
-                            var id_selected = '';
-                            $('#dialog-' + sapnsSelector.name + ' .sp-grid .sp-grid-rowid').each(function() {
-                                if ($(this).attr('checked') == true) {
-                                    id_selected = $(this).attr('id_row');
-                                }
-                            });
-                            
-                            sapnsSelector.setValue(id_selected);
-                            sapnsSelector.setTitle();
-                            
-                            $('#dialog-' + sapnsSelector.name).dialog('close');
-                        },
-                        "{{_('Cancel')}}": function() {
-                            $('#dialog-' + sapnsSelector.name).dialog('close');
+            this.append(g_pager);
+            
+            // actions
+            var g_actions = '';
+            var act_f = [];
+            if (g.actions.length > 0) {
+                g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+                for (var i=0, l=g.actions.length; i<l; i++) {
+                    
+                    var act = g.actions[i];
+                    
+                    var req_id = act.require_id;
+                    if (req_id === undefined) {
+                        req_id = true;
+                    }
+                    
+                    if (typeof(act.type) === 'string') {
+                        g_actions += '<div style="float: left;">' +
+                            '<form class="action-form" method="post" action0="' + act.url + '">' +
+                            '<input type="hidden" name="cls" value="' + g.cls + '">' +
+                            '<input type="hidden" name="came_from" value="' + g.link + '">';
+                        
+                        if (g.parent_id) {
+                            g_actions += '<input type="hidden" name="_' + g.ch_attr + '" value="' + g.parent_id + '">';
                         }
+    
+                        g_actions += '<input class="sp-button sp-grid-action" type="button" value="' + act.title + '"' +
+                            ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
+                            ' require_id="' + req_id + '" >';
+                        
+                        g_actions += '</form></div>';
+                    }
+                    else {
+                        g_actions += 
+                            '<div style="float: left;">' +
+                                '<button id="' + act.type.id + '" class="sp-button sp-grid-action" ' +
+                                    ' require_id="' + req_id + '" >' + act.title + '</button>' +
+                            '</div>';
+                        
+                        act_f.push(act.type);
+                    }
+                }
+            }
+            
+            // export
+            if (g.exportable) {
+                g_actions += 
+                    '<div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">' +
+                    '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
+                        '<option value="">({{_("Export")}})</option>' +
+                        '<option value="csv">CSV</option>' +
+                        '<option value="excel">Excel</option>' +
+                    '</select>' +
+                    '</div>';
+            }
+            
+            this.append(g_actions);
+            
+            // assign functions to actions
+            for (var i=0, l=act_f.length; i<l; i++) {
+                $('#' + act_f[i].id).data('_func', act_f[i].f);
+                
+                $('#' + act_f[i].id).click(function() {
+                    if ($(this).attr('require_id') == 'true') {
+                     // TODO: obtener id seleccionado y pasárselo a la función
+                        var selected_id = 123;
+                        $(this).data('_func')(selected_id);
+                    }
+                    else {
+                        $(this).data('_func')();
                     }
                 });
-                
-                sapnsSelector.click_search('');
-            });
-            
-            sapnsSelector.setTitle();
-            
-            // remove button
-            var remove_button = '';
-            if (!sapnsSelector.read_only) {
-                remove_button += '<button id="rb_' + sapnsSelector.name + '"' +
-                    ' class="sp-button sp-empty-button"' +
-                    ' title=\'Remove value of "' + sapnsSelector.title + '"\'' +
-                    ' style="font-weight: bold; color: red;">X</button>';
             }
-        
-            this.append(remove_button);
             
-            this.find('#rb_' + sapnsSelector.name).click(function() {
-                sapnsSelector.remove();
-            });
-            
-            //this.sapnsSelector = sapnsSelector;
             this.data('sapnsGrid', g);
         }
         else if (typeof(arg1) == "string") {
