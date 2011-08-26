@@ -21,6 +21,7 @@
             
             $('#g').sapnsGrid({
                 //caption: 'Grid test',
+                cls: 'grupos',
                 caption: function() {
                     return 'Grid test (func)';
                 },
@@ -43,7 +44,10 @@
                         url: "{{tg.url('/dashboard/test_search/')}}",
                         data: {
                             p1: rp,
-                            p2: pos
+                            p2: pos,
+                            q: q,
+                            rp: rp,
+                            pos: pos
                         },
                         _success: function(g, data) {
                             if (data.status) {
@@ -65,7 +69,9 @@
                 cols: [{title: 'id', width: 30}, 
                        {title: 'Úno', align: 'right'}, 
                        {title: 'đæßß', width: 300}, 
-                       {title: 'trEs', align: 'left'}],
+                       {title: 'trEs', align: 'left'},
+                       {title: 'CUATRO'}
+                       ],
                 data: function() {
                     return [[1, 11, 22, 33],
                             [2],
@@ -78,9 +84,9 @@
                           {title: 'act3', url: 'act3', type: 'process'}
                           ],*/
                 actions: function() {
-                    return [{title: 'act1_f', url: 'act1', type: 'process'},
-                            {title: 'act2_f', url: 'act2', type: 'process'},
-                            {title: 'act3_f', url: 'act3', type: 'process'},
+                    return [{title: 'New', url: '/act1', type: 'new'},
+                            {title: 'Edit', url: '/act2', type: 'edit'},
+                            {title: 'Delete', url: '/act3', type: 'delete'},
                             {title: 'act4_f',
                              type: {
                                  id:'act4_f', 

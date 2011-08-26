@@ -821,12 +821,12 @@ class DashboardController(BaseController):
     
     @expose('json')
     @require(p.in_group('managers'))
-    def test_search(self, p1, p2):
+    def test_search(self, **kw):
         return dict(status=True,
-                    data=[[p1, 1.1, 2.2, 3.3],
-                          [p2],
-                          [p1, 111, 211, 311, 411, 511, 611],
-                          [p2, 11, None, 33]
+                    data=[[kw.get('p1'), 1.1, 2.2, 3.3],
+                          [kw.get('p2')],
+                          [3, kw.get('q'), 211, 311, 411, 511, 611],
+                          [kw.get('rp'), 11, None, kw.get('pos')],
                          ])
     
     

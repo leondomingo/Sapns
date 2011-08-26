@@ -37,7 +37,7 @@
             this.caption = this.caption();
         }
         set(this, 'name', 'grid_' + Math.floor(Math.random()*999999));
-        set(this, 'cls', null);
+        set(this, 'cls', '');
         set(this, 'with_search', true);
         set(this, 'search_func', function() {});
         set(this, 'search_url', "{{tg.url('/dashboard/list/')}}");
@@ -271,6 +271,138 @@
             self.loadData();
         }
     }
+    
+    SapnsGrid.prototype.std_new = function() {
+        console.log('std_new');
+        var self = this;
+        return;
+    }
+    
+    SapnsGrid.prototype.std_edit = function(id) {
+        console.log('std_edit');
+        var self = this;
+        
+        console.log(id);
+        
+        return;
+    }
+    
+    SapnsGrid.prototype.std_delete = function(ids) {
+    // {# default DELETE action #} 
+    //function delete_action(button, selected_row, id) {
+        console.log('std_delete');
+        var self = this;
+        
+        var cls = self.cls;
+        console.log(cls);
+        
+        console.log(ids);
+        
+        return;
+        
+        var url = button.attr('url');
+        
+        var delete_html = 
+            "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
+            "<p id='object-title'></p>";
+            
+        var error_html =
+            "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
+            "<div id='delete-error-message'></div>";
+        
+        $('#grid-dialog').html(delete_html);
+            
+        // {# get object's title #} 
+        var title = '';
+        $.ajax({
+            url: "/dashboard/title",
+            type: "get",
+            dataType: "json",
+            data: {
+                cls: cls,
+                id: id,         
+            },
+            success: function(res) {
+                if (res.status) {
+                    $('#grid-dialog #object-title').html(res.title);
+                }
+            },
+            error: function() {
+                // {# alert('error!'); #} 
+            }
+        });
+
+        $('#grid-dialog').dialog({
+            width: 650,
+            height: 210,
+            resizable: false,
+            modal: true,
+            title: "{{_('Delete')}}",
+            buttons: {
+                "{{_('Ok')}}": function() {
+                    $.ajax({
+                        url: url,
+                        type: "get",
+                        dataType: "json",
+                        data: {
+                            cls: cls,
+                            id: id,
+                        },
+                        success: function(res) {
+                            if (res.status) {
+                                selected_row.remove();
+                                $('#grid-dialog').dialog('close');
+                            }
+                            else {
+                                $('#grid-dialog').dialog('close');
+                                
+                                var message = "<p style='color: gray;'>" + res.message + "</p>";
+
+                                if (res.rel_tables != undefined && res.rel_tables.length > 0) {
+                                    message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
+                                    message += "<ul>";
+                                    
+                                    for (var i=0; i<res.rel_tables.length; i++) {
+                                        var title = res.rel_tables[i].class_title;
+                                        var attr_title = res.rel_tables[i].attr_title;
+                                        message += '<li><span style="font-weight: bold;">' + title + '</span>' + 
+                                          ' (<span style="color: gray;">' + attr_title + '</span>)</li>';
+                                    }
+                                    
+                                    message += "</ul>";
+                                }
+                                
+                                // {# load message #} 
+                                $('#grid-dialog').html(error_html).find('#delete-error-message').html(message);
+                                
+                                // {# show error dialog #} 
+                                $('#grid-dialog').dialog({
+                                    width: 700,
+                                    height: 250,
+                                    buttons: {"{{_('Close')}}": function() {
+                                        $('#grid-dialog').dialog('close');
+                                    }}
+                                });
+                            }
+                        },
+                        error: function() {
+                            $('#grid-dialog').dialog('close');
+                            $('#grid-dialog').html(error_html).dialog({
+                                buttons: {
+                                    "{{_('Close')}}": function() {
+                                        $('#grid-dialog').dialog('close');
+                                    }
+                                }
+                            });
+                        },
+                    });
+                },
+                "{{_('Cancel')}}": function() {
+                    $('#grid-dialog').dialog('close');
+                }
+            }
+        });
+    }
 
     $.fn.sapnsGrid = function(arg1, arg2, arg3) {
         
@@ -364,6 +496,7 @@
             
             // actions
             var g_actions = '';
+            var act = [];
             var act_f = [];
             if (g.actions.length > 0) {
                 g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
@@ -387,7 +520,7 @@
                             g_actions += '<input type="hidden" name="_' + g.ch_attr + '" value="' + g.parent_id + '">';
                         }
     
-                        g_actions += '<input class="sp-button sp-grid-action" type="button" value="' + act.title + '"' +
+                        g_actions += '<input class="sp-button sp-grid-action standard_action" type="button" value="' + act.title + '"' +
                             ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
                             ' require_id="' + req_id + '" >';
                         
@@ -418,6 +551,48 @@
 
             this.append(g_content+g_table+g_pager+g_actions+'</div>');
             g.loadData();
+            
+            // standard actions
+            $('.standard_action').live('click', function(event) {
+                
+                // action form 
+                var form = $(this).parent();
+                
+                // child attribute 
+                var ch_attr = $('#' + g.name + ' .sp-search-form input[name=ch_attr]').val();
+                
+                // if CTRL is pressed open in a new tab 
+                form.attr('target', '');
+                if (event.ctrlKey) {
+                    form.attr('target', '_blank');
+                }
+                
+                var url = $(this).attr('url');
+                var action_type = $(this).attr('action-type')
+                console.log(action_type + ': ' + url);
+                if ($(this).attr('require_id') == 'true') {
+                    var selected_ids = g.getSelectedIds();
+                    if (selected_ids.length > 0) {
+                        // edit
+                        if (action_type == 'edit') {
+                            g.std_edit(selected_ids[0], url);
+                        }
+                        // delete
+                        else if (action_type == 'delete') {
+                            g.std_delete(selected_ids, url);
+                        }
+                    }
+                    else {
+                        // new
+                        if (action_type == 'new') {
+                            g.std_new(url);
+                        }
+                    }
+                }
+                else {
+                    $(this).data('_func')();
+                }
+            });
             
             // assign functions to actions
             for (var i=0, l=act_f.length; i<l; i++) {
@@ -450,6 +625,9 @@
             // getSelectedIds
             else if (arg1 == "getSelectedIds") {
                 return g.getSelectedIds();
+            }
+            else if (arg1 == "delete") {
+                g.std_delete();
             }
             // TODO: other sapnsSelector methods
         }
