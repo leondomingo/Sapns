@@ -819,3 +819,14 @@ class DashboardController(BaseController):
     def test_grid(self):
         return {}
     
+    @expose('json')
+    @require(p.in_group('managers'))
+    def test_search(self, p1, p2):
+        return dict(status=True,
+                    data=[[p1, 1.1, 2.2, 3.3],
+                          [p2],
+                          [p1, 111, 211, 311, 411, 511, 611],
+                          [p2, 11, None, 33]
+                         ])
+    
+    

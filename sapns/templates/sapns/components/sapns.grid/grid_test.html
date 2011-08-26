@@ -37,28 +37,30 @@
                     ]
                 },
                 */
-                //with_search: false, 
-                search_func: {
-                    url: '',
-                    data: {
-                        p1: 1,
-                        p2: 22
-                    },
-                    _success: function(g, data) {
-                        if (data.status) {
-                            g.data = data.data;
-                            g.loadData();
-                        }
-                    }
-                },
+                //with_search: false,
                 search_func: function(q, rp, pos) {
+                    return {
+                        url: "{{tg.url('/dashboard/test_search/')}}",
+                        data: {
+                            p1: rp,
+                            p2: pos
+                        },
+                        _success: function(g, data) {
+                            if (data.status) {
+                                g.data = data.data;
+                                g.loadData();
+                            }
+                        }
+                    };
+                },
+                /*search_func: function(q, rp, pos) {
                     //console.log([q, rp, pos].join(', ')); 
                     return [[1, 1.1, 2.2, 3.3],
                             [2],
                             [222, 111, 211, 311, 411, 511, 611],
                             [33, 11, null, 33]
                            ];
-                },
+                },*/
                 default_: { col_width: 10, col_align: 'right' },
                 cols: [{title: 'id', width: 30}, 
                        {title: 'Úno', align: 'right'}, 
