@@ -20,28 +20,18 @@
         $(document).ready(function() {
             
             $('#g').sapnsGrid({
-                //caption: 'Grid test',
                 cls: 'grupos',
+                //caption: 'Grid test', 
                 caption: function() {
                     return 'Grid test (func)';
                 },
                 q: 'hooola',
-                /*
-                data: {
-                    cols: [{title: 'id', width: 30}, 
-                           {title: 'uno', align: 'right'}, 
-                           {title: 'dos', width: 300}, 
-                           {title: 'tres', align: 'left'}],
-                    data: [[1, 1.1, 2.2, 3.3],
-                           [2, 1.11, 2.22, 3.33],
-                           [3, 'hola', 'mundo!', 'lalaklaksdñlas kdñlaksdñlaksdñlaksdñlaksdñlaksdñlask dñlas dkñlas dkñlasdkñlasdksdfsdfds']
-                    ]
-                },
-                */
+                //q: '',
                 //with_search: false,
-                search_func: function(q, rp, pos) {
+                search_func_: function(q, rp, pos) {
                     return {
                         url: "{{tg.url('/dashboard/test_search/')}}",
+                        //type: "post",
                         data: {
                             p1: rp,
                             p2: pos,
@@ -65,13 +55,14 @@
                             [33, 11, null, 33]
                            ];
                 },*/
-                default_: { col_width: 10, col_align: 'right' },
+                //default_: { col_width: 10, col_align: 'left' },
                 cols: [{title: 'id', width: 30}, 
-                       {title: 'Úno', align: 'right'}, 
+                       {title: 'Úno', align: 'right', width: 100}, 
                        {title: 'đæßß', width: 300}, 
                        {title: 'trEs', align: 'left'},
                        {title: 'CUATRO'}
                        ],
+                /*
                 data: function() {
                     return [[1, 11, 22, 33],
                             [2],
@@ -79,6 +70,7 @@
                             [3, 11, null, 33]
                        ];
                 },
+                */
                 /*actions: [{title: 'act1', url: 'act1', type: 'process'},
                           {title: 'act2', url: 'act2', type: 'process'},
                           {title: 'act3', url: 'act3', type: 'process'}
@@ -108,7 +100,9 @@
                 },
                 exportable: true
             });
-        });
+        }); //.sapnsGrid('search');
+        
+        //$('#g').sapnsGrid('search');
     </script>
 </body>
 </html>

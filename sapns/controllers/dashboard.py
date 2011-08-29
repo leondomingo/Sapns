@@ -208,7 +208,8 @@ class DashboardController(BaseController):
                     # related classes
                     rel_classes=rel_classes,
                     link=('/dashboard/list/%s/?' % cls) + urlencode(link_data),
-                    grid=dict(caption=caption, name=cls, cls=cls_.name,
+                    grid=dict(caption=caption, #name=cls, 
+                              cls=cls_.name,
                               search_url=url('/dashboard/list/'), 
                               cols=cols, data=data, 
                               actions=actions, pag_n=pag_n, rp=rp, pos=pos,
@@ -822,11 +823,15 @@ class DashboardController(BaseController):
     @expose('json')
     @require(p.in_group('managers'))
     def test_search(self, **kw):
+        import jinja2
         return dict(status=True,
                     data=[[kw.get('p1'), 1.1, 2.2, 3.3],
                           [kw.get('p2')],
                           [3, kw.get('q'), 211, 311, 411, 511, 611],
                           [kw.get('rp'), 11, None, kw.get('pos')],
+                          [100, u'León', jinja2.escape(u'<!-- -->')],
+                          [200, u'€łđŋ', jinja2.escape(u'<a></a>')],
+                          [300, jinja2.escape(u'<a href="#">Google</a>')],
                          ])
     
     

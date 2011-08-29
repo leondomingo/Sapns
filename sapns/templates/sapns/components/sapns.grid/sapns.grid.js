@@ -70,84 +70,8 @@
         set(this, 'total', 0);
         set(this, 'total_pag', 0);
     }
-    
-    // setValue
-    SapnsGrid.prototype.setValue = function(value, no_callback) {
-        var change = this.value != value;
-        var old_value = this.value;
 
-        this.value = value;
-        if (change && this.onChange && !no_callback) {
-            this.onChange(value, old_value);
-        }
-    }
-    
-    // getValue
-    SapnsGrid.prototype.getValue = function() {
-        return this.value;
-    }
-
-    // click_search
-    SapnsGrid.prototype.click_search = function(q) {
-        
-        var sapnsSelector = this;
-        var dialog_name = "#dialog-" + this.name;
-        
-        if (q == undefined) {
-            q = $(dialog_name + ' .sp-search-text').val();
-        }
-        
-        // search params
-        var params = {
-                cls: this.rc,
-                q: q,
-                rp: this.dialog.results
-        };
-        
-        if (this.search_params != null) {
-            if (typeof(this.search_params) == 'object') {
-                for (k in this.search_params) {
-                    params[k] = this.search_params[k];
-                }
-            }
-            else if (typeof(this.search_params) == 'function') {
-                params.search_params = this.search_params;
-                params.search_params();
-            }
-        }
-
-        // search
-        $.ajax({
-            url: this.search_url,
-            type: 'post',
-            dataType: 'html',
-            data: params,
-            success: function(res) {
-                $(dialog_name).html(res);
-                
-                $(dialog_name + ' .sp-search-button').click(function() {
-                    sapnsSelector.click_search();
-                });
-                
-                $(dialog_name + ' .sp-search-text').keypress(function(event) {
-                    sapnsSelector.search_kp(event);
-                }).val(q).focus();
-            },
-            error: function(f, status, error) {
-                alert('error!');
-                sapnsSelector.click_search();
-                // {# $(dialog_name).dialog('close'); #} 
-            }
-        });
-    }
-
-    // search_kp
-    SapnsGrid.prototype.search_kp = function(event) {
-        if (event.which == 13) {
-            this.click_search();
-        }
-    }
-    
+    // getSelectedIds
     SapnsGrid.prototype.getSelectedIds = function() {
         var self = this;
         var selected_ids = [];
@@ -161,7 +85,9 @@
         return selected_ids;
     }
     
+    // loadData
     SapnsGrid.prototype.loadData = function() {
+        
         var self = this;
         var g_table = 
             '<table class="sp-grid">' +
@@ -171,7 +97,7 @@
         if (typeof(cols) == 'function') {
             cols = cols();
         }
-
+        
         for (var i=0, l=cols.length; i<l; i++) {
             var col = cols[i];
             var wd = col.width;
@@ -251,33 +177,40 @@
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
     }
     
-    SapnsGrid.prototype.search = function() {
+    // search
+    SapnsGrid.prototype.search = function(q) {
         var self = this;
         
-        self.q = $('#' + self.name + ' .sp-search-txt').val();
+        //self.q = $('#' + self.name + ' .sp-search-txt').val();
+        self.q = q;
         
-        self.data = self.search_func(self.q, self.rp, self.pos);
-        if (self.data.length === undefined) {
-            // it's an object
-            self.data.success = function(data) {
-                self.data._success(self, data);
+        var data = self.search_func(self.q, self.rp, self.pos);
+        if (data) {
+            self.data = data;
+            if (self.data.length === undefined) {
+                // it's an object
+                self.data.success = function(data) {
+                    self.data._success(self, data);
+                }
+                
+                $.ajax(self.data);
             }
-            
-            $.ajax(self.data);
-        }
-        else {
-            // it's an array
-            self.data = self.data;
-            self.loadData();
+            else {
+                // it's an array
+                //self.data = self.data;
+                self.loadData();
+            }
         }
     }
     
+    // std_new
     SapnsGrid.prototype.std_new = function() {
         console.log('std_new');
         var self = this;
         return;
     }
     
+    // std_edit
     SapnsGrid.prototype.std_edit = function(id) {
         console.log('std_edit');
         var self = this;
@@ -287,16 +220,13 @@
         return;
     }
     
+    // std_delete
     SapnsGrid.prototype.std_delete = function(ids) {
-    // {# default DELETE action #} 
-    //function delete_action(button, selected_row, id) {
+
         console.log('std_delete');
         var self = this;
         
         var cls = self.cls;
-        console.log(cls);
-        
-        console.log(ids);
         
         return;
         
@@ -409,6 +339,7 @@
         if (typeof(arg1) == "object") {
             
             var g = new SapnsGrid(arg1);
+            this.data('sapnsGrid', g);
             
             this.append('<div id="grid-dialog" style="display: none;"></div>');
             
@@ -550,7 +481,6 @@
             }
 
             this.append(g_content+g_table+g_pager+g_actions+'</div>');
-            g.loadData();
             
             // standard actions
             $('.standard_action').live('click', function(event) {
@@ -611,16 +541,27 @@
                 });
             }
 
-            this.data('sapnsGrid', g);
+            g.search(g.q)
         }
         else if (typeof(arg1) == "string") {
             
-            var g = this.data('sapnsGrid');
+            console.log([arg1, arg2, arg3].join(', '));
+            
+            var grid = this.data('sapnsGrid');
             
             // setValue(arg2)
             // $(element).sapnsSelector("setValue", 123);
             // $(element).sapnsSelector("setValue", null);
-            if (arg1 == "setValue") {
+            if (arg1 == "loadData") {
+                g.loadData();
+            }
+            else if (arg1 == "search") {
+                var q = '';
+                if (arg2) {
+                    q = arg2;
+                }
+                
+                g.search(q);
             }
             // getSelectedIds
             else if (arg1 == "getSelectedIds") {
