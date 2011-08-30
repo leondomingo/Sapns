@@ -824,8 +824,26 @@ class DashboardController(BaseController):
     @require(p.in_group('managers'))
     def test_search(self, **kw):
         import jinja2
+        import random
+        random.seed()
+        
+        ds = search(dbs, '_view_cursos', q=kw.get('q'), rp=int(kw.get('rp', 10)))
+        
+        def r():
+            return random.randint(1, 1000) / 1.23
+        
         return dict(status=True,
-                    data=[[kw.get('p1'), 1.1, 2.2, 3.3],
+                    cols_=[dict(title='id', width=30),
+                          dict(title='ABC', align='right', width=100),
+                          dict(title='DEF', width=300),
+                          dict(title='GHI', align='left'),
+                          dict(title='cuATro'),
+                          dict(title='five'),
+                          dict(title='SIX', width=200, align='right'),
+                         ],
+                    cols=ds.labels,
+                    data=ds.to_data(),
+                    data_=[[kw.get('p1'), r(), r(), r()],
                           [kw.get('p2')],
                           [3, kw.get('q'), 211, 311, 411, 511, 611],
                           [kw.get('rp'), 11, None, kw.get('pos')],

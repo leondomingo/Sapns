@@ -21,17 +21,6 @@
             return;
         }
         
-        /*
-         * caption=caption, 
-         * name=cls, 
-         * cls=cls_.name,
-         * search_url=url('/dashboard/list/'),
-         * cols=cols, 
-         * data=data,
-         * actions=actions, pag_n=pag_n, rp=rp, pos=pos,
-         * totalp=totalp, total=ds.count, total_pag=total_pag
-         */
-        
         set(this, 'caption', '');
         if (typeof(this.caption) == 'function') {
             this.caption = this.caption();
@@ -39,10 +28,27 @@
         set(this, 'name', 'grid_' + Math.floor(Math.random()*999999));
         set(this, 'cls', '');
         set(this, 'with_search', true);
-        set(this, 'search_func', function() {});
-        set(this, 'search_url', "{{tg.url('/dashboard/list/')}}");
+        set(this, 'search_func', function(q, rp, pos) {
+            return {
+                url: "{{tg.url('/dashboard/test_search/')}}",
+                data: {
+                    q: q,
+                    rp: rp,
+                    pos: pos
+                },
+                _success: function(g, resp) {
+                    if (resp.status) {
+                        if (resp.cols) {
+                            g.cols = resp.cols;
+                        }
+                        g.data = resp.data;
+                        g.loadData();
+                    }
+                }
+            };
+        });
+        
         set(this, 'show_ids', false);
-        set(this, 'came_from', '');
         set(this, 'link', '');
         set(this, 'q', '');
         set(this, 'ch_attr', '');
@@ -180,24 +186,22 @@
     // search
     SapnsGrid.prototype.search = function(q) {
         var self = this;
-        
-        //self.q = $('#' + self.name + ' .sp-search-txt').val();
         self.q = q;
         
         var data = self.search_func(self.q, self.rp, self.pos);
         if (data) {
-            self.data = data;
-            if (self.data.length === undefined) {
+            if (data.length === undefined) {
                 // it's an object
-                self.data.success = function(data) {
-                    self.data._success(self, data);
+                
+                data.success = function(data_) {
+                    data._success(self, data_);
                 }
                 
-                $.ajax(self.data);
+                $.ajax(data);
             }
             else {
                 // it's an array
-                //self.data = self.data;
+                self.data = data;
                 self.loadData();
             }
         }
@@ -354,18 +358,28 @@
                 
                 g_content += 
                     '<div><div style="float: left;">' +
+                    /*
                     '<form class="sp-search-form" method="post" action="' + g.search_url + g.cls + '">' +
                         '<input type="hidden" name="caption" value="' + g.caption + '">' +
                         '<input type="hidden" name="show_ids" value="' + g.show_ids + '">' +
-                        '<input type="hidden" name="came_from" value="' + g.came_from + '">' +
+                        '<input type="hidden" name="came_from" value="' + g.came_from + '">' +*/
                         '<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
+                        /*
                         '<input type="hidden" name="ch_attr" value="' + g.ch_attr + '">' +
                         '<input type="hidden" name="parent_id" value="' + g.parent_id + '">' +
-                        '<input class="sp-button sp-search-btn" type="button" value="{{_("Search...")}}">' +
-                    '</form></div>'
+                        */
+                        '<button class="sp-button sp-search-btn">{{_("Search...")}}</button></div>';                     
+                    //'</form></div>'
                         
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
-                    g.search();
+                    g.search($('#' + g.name + ' .sp-search-txt').val());
+                });
+                
+                $('#' + g.name + ' .sp-search-txt').live('keypress', function(event) {
+                    // "Intro" key pressed
+                    if (event.which == 13) {
+                        g.search($(this).val());
+                    }
                 });
 
                 if (g.link) {

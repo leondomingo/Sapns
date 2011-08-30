@@ -25,10 +25,11 @@
                 caption: function() {
                     return 'Grid test (func)';
                 },
-                q: 'hooola',
+                q: '',
+                rp: 3,
                 //q: '',
                 //with_search: false,
-                search_func_: function(q, rp, pos) {
+                search_func__: function(q, rp, pos) {
                     return {
                         url: "{{tg.url('/dashboard/test_search/')}}",
                         //type: "post",
@@ -41,6 +42,7 @@
                         },
                         _success: function(g, data) {
                             if (data.status) {
+                                g.cols = data.cols;
                                 g.data = data.data;
                                 g.loadData();
                             }
