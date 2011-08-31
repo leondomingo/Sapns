@@ -29,18 +29,18 @@
                 rp: 3,
                 //q: '',
                 //with_search: false,
-                search_func__: function(q, rp, pos) {
+                search_func: function(q, rp, pos) {
+                    var g = this;
                     return {
                         url: "{{tg.url('/dashboard/test_search/')}}",
                         //type: "post",
                         data: {
-                            p1: rp,
-                            p2: pos,
+                            cls: g.cls,
                             q: q,
                             rp: rp,
                             pos: pos
                         },
-                        _success: function(g, data) {
+                        success: function(data) {
                             if (data.status) {
                                 g.cols = data.cols;
                                 g.data = data.data;
@@ -73,11 +73,23 @@
                        ];
                 },
                 */
-                /*actions: [{title: 'act1', url: 'act1', type: 'process'},
-                          {title: 'act2', url: 'act2', type: 'process'},
-                          {title: 'act3', url: 'act3', type: 'process'}
-                          ],*/
-                actions: function() {
+                actions_: function() {
+                    var g = this;
+                    return {
+                        url: "{{tg.url('/dashboard/actions/')}}",
+                        data: {
+                            cls: g.cls
+                        },
+                        success: function(data) {
+                        }
+                    };
+                },
+                actions: [{title: 'act1', url: '/act1', type: 'process'},
+                          {title: 'act2', url: '/act2', type: 'process'},
+                          {title: 'act3', url: '/act3', type: 'process'}
+                          ],
+                actions_: function() {
+                    //console.log(this.cls);
                     return [{title: 'New', url: '/act1', type: 'new'},
                             {title: 'Edit', url: '/act2', type: 'edit'},
                             {title: 'Delete', url: '/act3', type: 'delete'},

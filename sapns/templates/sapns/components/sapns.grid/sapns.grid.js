@@ -29,9 +29,11 @@
         set(this, 'cls', '');
         set(this, 'with_search', true);
         set(this, 'search_func', function(q, rp, pos) {
+            var self = this;
             return {
                 url: "{{tg.url('/dashboard/test_search/')}}",
                 data: {
+                    cls: self.cls,
                     q: q,
                     rp: rp,
                     pos: pos
@@ -192,11 +194,6 @@
         if (data) {
             if (data.length === undefined) {
                 // it's an object
-                
-                data.success = function(data_) {
-                    data._success(self, data_);
-                }
-                
                 $.ajax(data);
             }
             else {
@@ -205,6 +202,164 @@
                 self.loadData();
             }
         }
+    }
+    
+    SapnsGrid.prototype._loadActions = function(actions) {
+        
+        var g = this;
+        var g_actions = '';
+        var act_f = []
+        
+        if (actions.length > 0) {
+            g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+            for (var i=0, l=actions.length; i<l; i++) {
+                
+                var act = actions[i];
+                
+                var req_id = act.require_id;
+                if (req_id === undefined) {
+                    req_id = true;
+                }
+                
+                if (typeof(act.type) === 'string') {
+                    g_actions += 
+                        '<div style="float: left;">' +
+                            '<form class="action-form" method="post" action0="' + act.url + '">' +
+                            '<input type="hidden" name="cls" value="' + g.cls + '">' +
+                            '<input type="hidden" name="came_from" value="' + g.link + '">';
+                    
+                    if (g.parent_id) {
+                        g_actions += '<input type="hidden" name="_' + g.ch_attr + '" value="' + g.parent_id + '">';
+                    }
+
+                    g_actions += '<input class="sp-button sp-grid-action standard_action" type="button" value="' + act.title + '"' +
+                        ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
+                        ' require_id="' + req_id + '" >';
+                    
+                    g_actions += '</form></div>';
+                }
+                else {
+                    g_actions += 
+                        '<div style="float: left;">' +
+                            '<button id="' + act.type.id + '" class="sp-button sp-grid-action" ' +
+                                ' require_id="' + req_id + '" >' + act.title + '</button>' +
+                        '</div>';
+                    
+                    act_f.push(act.type);
+                }
+            }
+        }
+        
+        // assign functions to actions
+        for (var i=0, l=act_f.length; i<l; i++) {
+            $('#' + act_f[i].id).data('_func', act_f[i].f);
+            
+            $('#' + act_f[i].id).live('click', function() {
+                if ($(this).attr('require_id') == 'true') {
+                    var selected_ids = g.getSelectedIds();
+                    if (selected_ids.length > 0) {
+                        $(this).data('_func')(selected_ids[0]);
+                    }
+                }
+                else {
+                    $(this).data('_func')();
+                }
+            });
+        }        
+        
+        return g_actions;
+    }
+    
+    SapnsGrid.prototype.loadActions = function() {
+        
+        var g = this;
+        var g_actions = '';
+        
+        var actions;
+        if (!g.actions) {
+            actions = g.actions_func();
+            if (actions) {
+                if (actions.length === undefined) {
+                    // it's an object
+                    // TODO: llamar a "g._loadActions(...)" en el "success"
+                    /*
+                    function wrapper_success (data) {
+                        var actions = actions.success(data);
+                        g._loadActions(actions);                        
+                    };
+                    
+                    actions.success = wrapper_success;
+                    */
+                    
+                    $.ajax(actions);
+                }
+                else {
+                    // it's an array
+                    g.actions = actions;
+                    g_actions += g._loadActions(g.actions);
+                }
+            }
+        }
+        else {
+            //actions = g.actions;
+            g_actions += g._loadActions(g.actions);
+        }
+        
+        
+        // export
+        if (g.exportable) {
+            g_actions += 
+                '<div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">' +
+                '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
+                    '<option value="">({{_("Export")}})</option>' +
+                    '<option value="csv">CSV</option>' +
+                    '<option value="excel">Excel</option>' +
+                '</select></div>';
+        }
+
+        // standard actions
+        $('.standard_action').live('click', function(event) {
+            
+            // action form 
+            var form = $(this).parent();
+            
+            // child attribute 
+            var ch_attr = $('#' + g.name + ' .sp-search-form input[name=ch_attr]').val();
+            
+            // if CTRL is pressed open in a new tab 
+            form.attr('target', '');
+            if (event.ctrlKey) {
+                form.attr('target', '_blank');
+            }
+            
+            var url = $(this).attr('url');
+            var action_type = $(this).attr('action-type')
+            console.log(action_type + ': ' + url);
+            if ($(this).attr('require_id') == 'true') {
+                var selected_ids = g.getSelectedIds();
+                if (selected_ids.length > 0) {
+                    // edit
+                    if (action_type == 'edit') {
+                        g.std_edit(selected_ids[0], url);
+                    }
+                    // delete
+                    else if (action_type == 'delete') {
+                        g.std_delete(selected_ids, url);
+                    }
+                }
+                else {
+                    // new
+                    if (action_type == 'new') {
+                        g.std_new(url);
+                    }
+                }
+            }
+            else {
+                $(this).data('_func')();
+            }
+        });
+        
+        $('#' + g.name + ' .actions').html(g_actions);
     }
     
     // std_new
@@ -439,121 +594,9 @@
             if (g.with_pager) {
             }
             
-            // actions
-            var g_actions = '';
-            var act = [];
-            var act_f = [];
-            if (g.actions.length > 0) {
-                g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
-                for (var i=0, l=g.actions.length; i<l; i++) {
-                    
-                    var act = g.actions[i];
-                    
-                    var req_id = act.require_id;
-                    if (req_id === undefined) {
-                        req_id = true;
-                    }
-                    
-                    if (typeof(act.type) === 'string') {
-                        g_actions += 
-                            '<div style="float: left;">' +
-                                '<form class="action-form" method="post" action0="' + act.url + '">' +
-                                '<input type="hidden" name="cls" value="' + g.cls + '">' +
-                                '<input type="hidden" name="came_from" value="' + g.link + '">';
-                        
-                        if (g.parent_id) {
-                            g_actions += '<input type="hidden" name="_' + g.ch_attr + '" value="' + g.parent_id + '">';
-                        }
-    
-                        g_actions += '<input class="sp-button sp-grid-action standard_action" type="button" value="' + act.title + '"' +
-                            ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
-                            ' require_id="' + req_id + '" >';
-                        
-                        g_actions += '</form></div>';
-                    }
-                    else {
-                        g_actions += 
-                            '<div style="float: left;">' +
-                                '<button id="' + act.type.id + '" class="sp-button sp-grid-action" ' +
-                                    ' require_id="' + req_id + '" >' + act.title + '</button>' +
-                            '</div>';
-                        
-                        act_f.push(act.type);
-                    }
-                }
-            }
+            this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
             
-            // export
-            if (g.exportable) {
-                g_actions += 
-                    '<div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">' +
-                    '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
-                        '<option value="">({{_("Export")}})</option>' +
-                        '<option value="csv">CSV</option>' +
-                        '<option value="excel">Excel</option>' +
-                    '</select></div>';
-            }
-
-            this.append(g_content+g_table+g_pager+g_actions+'</div>');
-            
-            // standard actions
-            $('.standard_action').live('click', function(event) {
-                
-                // action form 
-                var form = $(this).parent();
-                
-                // child attribute 
-                var ch_attr = $('#' + g.name + ' .sp-search-form input[name=ch_attr]').val();
-                
-                // if CTRL is pressed open in a new tab 
-                form.attr('target', '');
-                if (event.ctrlKey) {
-                    form.attr('target', '_blank');
-                }
-                
-                var url = $(this).attr('url');
-                var action_type = $(this).attr('action-type')
-                console.log(action_type + ': ' + url);
-                if ($(this).attr('require_id') == 'true') {
-                    var selected_ids = g.getSelectedIds();
-                    if (selected_ids.length > 0) {
-                        // edit
-                        if (action_type == 'edit') {
-                            g.std_edit(selected_ids[0], url);
-                        }
-                        // delete
-                        else if (action_type == 'delete') {
-                            g.std_delete(selected_ids, url);
-                        }
-                    }
-                    else {
-                        // new
-                        if (action_type == 'new') {
-                            g.std_new(url);
-                        }
-                    }
-                }
-                else {
-                    $(this).data('_func')();
-                }
-            });
-            
-            // assign functions to actions
-            for (var i=0, l=act_f.length; i<l; i++) {
-                $('#' + act_f[i].id).data('_func', act_f[i].f);
-                
-                $('#' + act_f[i].id).live('click', function() {
-                    if ($(this).attr('require_id') == 'true') {
-                        var selected_ids = g.getSelectedIds();
-                        if (selected_ids.length > 0) {
-                            $(this).data('_func')(selected_ids[0]);
-                        }
-                    }
-                    else {
-                        $(this).data('_func')();
-                    }
-                });
-            }
+            g.loadActions();
 
             g.search(g.q)
         }
