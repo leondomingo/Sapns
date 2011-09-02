@@ -5,3 +5,4 @@ production.ini
 .settings/
 *.pyc
 data/
+sapns.egg-info/
