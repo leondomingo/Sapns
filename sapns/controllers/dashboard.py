@@ -846,7 +846,7 @@ class DashboardController(BaseController):
                           dict(title='five'),
                           dict(title='SIX', width=200, align='right'),
                          ],
-                    cols=cols,
+                    cols__=cols,
                     data=ds.to_data(),
                     data_=[[kw.get('p1'), r(), r(), r()],
                           [kw.get('p2')],

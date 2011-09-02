@@ -28,28 +28,7 @@
         set(this, 'name', 'grid_' + Math.floor(Math.random()*999999));
         set(this, 'cls', '');
         set(this, 'with_search', true);
-        set(this, 'search_func', function(q, rp, pos) {
-            var self = this;
-            return {
-                url: "{{tg.url('/dashboard/test_search/')}}",
-                data: {
-                    cls: self.cls,
-                    q: q,
-                    rp: rp,
-                    pos: pos
-                },
-                _success: function(g, resp) {
-                    if (resp.status) {
-                        if (resp.cols) {
-                            g.cols = resp.cols;
-                        }
-                        g.data = resp.data;
-                        g.loadData();
-                    }
-                }
-            };
-        });
-        
+        set(this, 'search_params', {});
         set(this, 'show_ids', false);
         set(this, 'link', '');
         set(this, 'q', '');
@@ -190,18 +169,31 @@
         var self = this;
         self.q = q;
         
-        var data = self.search_func(self.q, self.rp, self.pos);
-        if (data) {
-            if (data.length === undefined) {
-                // it's an object
-                $.ajax(data);
+        $.ajax($.extend({
+            url: "{{tg.url('/dashboard/test_search/')}}",
+            data: {
+                cls: self.cls, 
+                q: self.q, 
+                rp: self.rp, 
+                pos: self.pos
+            },
+            success: function(data) {
+                if (data.status) {
+                    // cols
+                    if (data.cols) {
+                        self.cols = data.cols;
+                    }
+                    
+                    // actions
+                    if (data.actions) {
+                        self.actions = data.actios;
+                    }
+                    
+                    self.data = data.data;
+                    self.loadData();
+                }
             }
-            else {
-                // it's an array
-                self.data = data;
-                self.loadData();
-            }
-        }
+        }, self.search_params));
     }
     
     SapnsGrid.prototype._loadActions = function(actions) {
@@ -275,36 +267,25 @@
         var g = this;
         var g_actions = '';
         
-        var actions;
-        if (!g.actions) {
-            actions = g.actions_func();
-            if (actions) {
-                if (actions.length === undefined) {
-                    // it's an object
-                    // TODO: llamar a "g._loadActions(...)" en el "success"
-                    /*
-                    function wrapper_success (data) {
-                        var actions = actions.success(data);
-                        g._loadActions(actions);                        
-                    };
-                    
-                    actions.success = wrapper_success;
-                    */
-                    
-                    $.ajax(actions);
-                }
-                else {
-                    // it's an array
-                    g.actions = actions;
-                    g_actions += g._loadActions(g.actions);
-                }
+        if (g.actions) {
+            if (g.actions.length === undefined) {
+                // it's an object
+                $.ajax($.extend({
+                    url: "{{tg.url('/dashboard/actions/')}}",
+                    data: {
+                        cls: self.cls
+                    },
+                    success: function(data) {
+                        if (data.status) {
+                            g.actions = data.actions;
+                        }
+                    }
+                }, 
+                self.actions));
             }
-        }
-        else {
-            //actions = g.actions;
+            
             g_actions += g._loadActions(g.actions);
         }
-        
         
         // export
         if (g.exportable) {

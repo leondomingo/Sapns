@@ -26,28 +26,12 @@
                     return 'Grid test (func)';
                 },
                 q: '',
-                rp: 3,
+                //rp: 3,
                 //q: '',
                 //with_search: false,
-                search_func: function(q, rp, pos) {
-                    var g = this;
-                    return {
-                        url: "{{tg.url('/dashboard/test_search/')}}",
-                        //type: "post",
-                        data: {
-                            cls: g.cls,
-                            q: q,
-                            rp: rp,
-                            pos: pos
-                        },
-                        success: function(data) {
-                            if (data.status) {
-                                g.cols = data.cols;
-                                g.data = data.data;
-                                g.loadData();
-                            }
-                        }
-                    };
+                search_params: {
+                    url: "{{tg.url('/dashboard/test_search/')}}",
+                    data: { cls: 'alumnos', rp: 1 }
                 },
                 /*search_func: function(q, rp, pos) {
                     //console.log([q, rp, pos].join(', ')); 
@@ -73,22 +57,17 @@
                        ];
                 },
                 */
-                actions_: function() {
-                    var g = this;
-                    return {
-                        url: "{{tg.url('/dashboard/actions/')}}",
-                        data: {
-                            cls: g.cls
-                        },
-                        success: function(data) {
-                        }
-                    };
+                action_params: {
+                    url: "",
+                    data: {
+                    }
                 },
-                actions: [{title: 'act1', url: '/act1', type: 'process'},
+                actions_: {},
+                actions_a: [{title: 'act1', url: '/act1', type: 'process'},
                           {title: 'act2', url: '/act2', type: 'process'},
                           {title: 'act3', url: '/act3', type: 'process'}
                           ],
-                actions_: function() {
+                actions_f: function() {
                     //console.log(this.cls);
                     return [{title: 'New', url: '/act1', type: 'new'},
                             {title: 'Edit', url: '/act2', type: 'edit'},
