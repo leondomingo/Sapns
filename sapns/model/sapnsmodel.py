@@ -1049,7 +1049,7 @@ class SapnsAttribute(DeclarativeBase):
     attr_priv = relation('SapnsAttrPrivilege', backref='attribute')
     
     def __unicode__(self):
-        return u'<%s> %s %s (%s)' % (unicode(self.class_), self.title, self.name)
+        return u'<%s> %s %s (%s)' % (unicode(self.class_), self.title, self.name, self.type)
     
     def __repr__(self):
         return unicode(self).encode('utf-8')
