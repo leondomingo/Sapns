@@ -32,7 +32,11 @@
         	$('#grid').sapnsGrid({
         	    cls: "{{grid.cls}}",
         	    caption: "{{grid.caption}}",
-        	    actions: {}
+        	    q: "{{grid.q}}", 
+        	    rp: "{{grid.rp}}", 
+        	    pag_n: "{{grid.pag_n}}",
+        	    actions: {},
+        	    url_base: "/dashboard/list/{{grid.cls}}"
         	});
         	
         	$('#grid .sp-search-txt').focus();

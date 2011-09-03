@@ -67,6 +67,7 @@ catch(e) {
         set(this, 'cols', []);
         set(this, 'data', {});
         set(this, 'height', 470);
+        set(this, 'url_base', '');
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -243,11 +244,11 @@ catch(e) {
                     }
                     
                     // update pager
-                    var pos = (self.pag_n-1) * self.rp;
+                    var pos = (self.pag_n-1) * self.rp*1;
 
                     var params = {
-                            curr_page: self.pag_n,
-                            total_page: self.total_pag,
+                            curr_page: self.pag_n*1,
+                            total_page: self.total_pag*1,
                             pos0: pos+1,
                             pos1: pos+self.this_page
                     };
@@ -294,21 +295,19 @@ catch(e) {
                 }
                 
                 if (typeof(act.type) === 'string') {
-                    g_actions += 
-                        '<div style="float: left;">' +
+                    g_actions += '<div style="float: left;">';
+                    /*
                             '<form class="action-form" method="post" action0="' + act.url + '">' +
                             '<input type="hidden" name="cls" value="' + self.cls + '">' +
                             '<input type="hidden" name="came_from" value="' + self.link + '">';
                     
                     if (self.parent_id) {
                         g_actions += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
-                    }
+                    }*/
 
-                    g_actions += '<input class="sp-button sp-grid-action standard_action" type="button" value="' + act.title + '"' +
+                    g_actions += '<button class="sp-button sp-grid-action standard_action" ' +
                         ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
-                        ' require_id="' + req_id + '" >';
-                    
-                    g_actions += '</form></div>';
+                        ' require_id="' + req_id + '" >' + act.title + '</button></div>';
                 }
                 else {
                     g_actions += 
@@ -388,41 +387,64 @@ catch(e) {
         $('.standard_action').live('click', function(event) {
             
             // action form 
-            var form = $(this).parent();
+            //var form = $(this).parent();
+            
+            function form(action, target) {
+                return '<form type="post" action="' + action + '" target="' + target + '">' +
+                    '<input type="hidden" name="came_from" value="' + self.url_base + '">' +
+                    '</form>';
+            }
             
             // child attribute 
-            var ch_attr = $('#' + self.name + ' .sp-search-form input[name=ch_attr]').val();
+            var ch_attr = self.ch_attr; //$('#' + self.name + ' .sp-search-form input[name=ch_attr]').val();
             
             // if CTRL is pressed open in a new tab 
-            form.attr('target', '');
+            //form.attr('target', '');
+            var target = '';
             if (event.ctrlKey) {
-                form.attr('target', '_blank');
+                //form.attr('target', '_blank');
+                target = '_blank';
             }
             
             var url = $(this).attr('url');
             var action_type = $(this).attr('action-type')
-            console.log(action_type + ': ' + url);
-            if ($(this).attr('require_id') == 'true') {
-                var selected_ids = g.getSelectedIds();
-                if (selected_ids.length > 0) {
-                    // edit
-                    if (action_type == 'edit') {
-                        self.std_edit(selected_ids[0], url);
-                    }
-                    // delete
-                    else if (action_type == 'delete') {
-                        self.std_delete(selected_ids, url);
+            var _func = $(this).attr('_func');
+            //console.log(action_type + ': ' + url);
+            if (!_func) {
+                
+                var a = $(this).attr('url');
+                if (a[a.length-1] != '/') {
+                    a += '/';
+                }
+
+                if ($(this).attr('require_id') == 'true') {
+                    
+                    var selected_ids = self.getSelectedIds();
+                                        
+                    if (selected_ids.length > 0) {
+                        // edit (std)
+                        if (action_type == 'edit') {
+                            //self.std_edit(selected_ids[0], url);
+                            a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
+                            $(form(a, target)).appendTo('body').submit().remove();
+                        }
+                        // delete (std)
+                        else if (action_type == 'delete') {
+                            //self.std_delete(selected_ids, url);
+                        }
                     }
                 }
                 else {
-                    // new
+                    // new (std)
                     if (action_type == 'new') {
-                        self.std_new(url);
+                        //self.std_new(url);
+                        a += self.cls;
+                        $(form(a, target)).appendTo('body').submit().remove();
                     }
                 }
             }
             else {
-                $(this).data('_func')();
+                _func();
             }
         });
     }
@@ -736,7 +758,7 @@ catch(e) {
             // $(element).sapnsSelector("setValue", 123);
             // $(element).sapnsSelector("setValue", null);
             if (arg1 == "loadData") {
-                g.loadData();
+                grid.loadData();
             }
             else if (arg1 == "search") {
                 var q = '';
@@ -744,14 +766,15 @@ catch(e) {
                     q = arg2;
                 }
                 
-                g.search(q);
+                grid.search(q);
             }
             // getSelectedIds
             else if (arg1 == "getSelectedIds") {
-                return g.getSelectedIds();
+                return grid.getSelectedIds();
             }
+            // delete
             else if (arg1 == "delete") {
-                g.std_delete();
+                grid.std_delete();
             }
             // TODO: other sapnsSelector methods
         }

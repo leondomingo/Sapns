@@ -85,6 +85,10 @@ class DashboardController(BaseController):
     def list(self, cls, **params):
         
         #logger = logging.getLogger(__name__ + '/list')
+        
+        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
+        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
 
         came_from = params.get('came_from', '')
         if came_from:
@@ -121,22 +125,10 @@ class DashboardController(BaseController):
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
-#        elif caption is None:
-#            caption = ch_cls_.title
-            
-#        # actions for this class
-#        actions = cls_.sorted_actions(user.user_id)
-#        actions = [act for act in actions \
-#                   if act['type'] in [SapnsPermission.TYPE_NEW,
-#                                      SapnsPermission.TYPE_EDIT,
-#                                      SapnsPermission.TYPE_DELETE,
-#                                      SapnsPermission.TYPE_DOCS,
-#                                      SapnsPermission.TYPE_PROCESS,
-#                                     ]]
-
-        return dict(page='list', came_from=came_from, 
+        return dict(page=_('list of %s') % cls_.name, came_from=came_from, 
                     grid=dict(cls=cls_.name,
                               caption=caption,
+                              q=q, rp=rp, pag_n=pag_n,
                               # collection
                               ch_attr=ch_attr, parent_id=parent_id,
                               # related classes
@@ -144,11 +136,12 @@ class DashboardController(BaseController):
         
     @expose('json')
     @require(p.not_anonymous())
-    def grid(self, cls, q='', **params):
+    def grid(self, cls, **params):
         
         #logger = logging.getLogger('DashboardController.grid')
 
         # picking up parameters
+        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
         rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
         pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
         pos = (pag_n-1) * rp
