@@ -98,7 +98,7 @@
 	SapnsSelector.prototype.click_search = function(q) {
 		
 		var sapnsSelector = this;
-		var dialog_name = "#dialog-" + this.name;
+		var dialog_name = "#dialog_" + this.name;
 		
 		if (q == undefined) {
 	        q = $(dialog_name + ' .sp-search-text').val();
@@ -126,19 +126,20 @@
 		// search
 		$.ajax({
 	        url: this.search_url,
-	        type: 'post',
+	        //type: 'post',
 	        dataType: 'html',
 	        data: params,
 	        success: function(res) {
 	            $(dialog_name).html(res);
 	            
-	            $(dialog_name + ' .sp-search-button').click(function() {
+	            /*$(dialog_name + ' .sp-search-button').click(function() {
 	                sapnsSelector.click_search();
 	            });
 	            
 	            $(dialog_name + ' .sp-search-text').keypress(function(event) {
 	                sapnsSelector.search_kp(event);
 	            }).val(q).focus();
+	            */
 	        },
 	        error: function(f, status, error) {
 	            alert('error!');
@@ -234,13 +235,9 @@
 	                modal: true,
 	                buttons: {
 	                    "{{_('Ok')}}": function() {
-	                        // {# get the id of the selected row #} 
-	                        var id_selected = '';
-	                        $('#dialog-' + sapnsSelector.name + ' .sp-grid .sp-grid-rowid').each(function() {
-	                            if ($(this).attr('checked') == true) {
-	                                id_selected = $(this).attr('id_row');
-	                            }
-	                        });
+	                        // get the id of the selected row
+	                        
+	                        var id_selected = $('#dialog-' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
 	                        
 	                        sapnsSelector.setValue(id_selected);
 	                        sapnsSelector.setTitle();

@@ -20,9 +20,8 @@ from sapns.controllers.privileges import PrivilegesController
 from sapns.controllers.docs import DocsController
 
 from neptuno.postgres.search import search
-from neptuno.util import strtobool, strtodate, strtotime, datetostr
+from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 
-from tg.controllers.util import urlencode
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission
 
@@ -33,7 +32,6 @@ import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
-from sqlalchemy.sql.expression import and_
 
 __all__ = ['DashboardController']
 
@@ -84,17 +82,10 @@ class DashboardController(BaseController):
 
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
-    def list(self, cls, q='', **params):
+    def list(self, cls, **params):
         
-        logger = logging.getLogger(__name__ + '/list')
-        #logger.info('params=%s' % params)
+        #logger = logging.getLogger(__name__ + '/list')
 
-        # picking up parameters
-        rp = params.get('rp', 10)
-        pag_n = params.get('pag_n', 1)
-        caption = params.get('caption')
-        show_ids = params.get('show_ids', 'false')
-        
         came_from = params.get('came_from', '')
         if came_from:
             came_from = url(came_from)
@@ -109,8 +100,8 @@ class DashboardController(BaseController):
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
             
-        logger.info('Parent class: %s' % cls_.name)
-        logger.info('Child class: %s' % ch_cls_.name)
+        #logger.info('Parent class: %s' % cls_.name)
+        #logger.info('Child class: %s' % ch_cls_.name)
              
         if not user.has_privilege(cls_.name) or \
         not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
@@ -118,112 +109,49 @@ class DashboardController(BaseController):
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
         
-        rp = int(rp)
-        pag_n = int(pag_n)
-        show_ids = strtobool(show_ids)
-        pos = (pag_n-1) * rp
-
-        view = user.get_view_name(ch_cls_.name)
-            
-        date_fmt = config.get('formats.date', default='%m/%d/%Y')
-        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
-        
-        logger.info('search...%s / q=%s' % (view, q))
-        
         # related classes
         rel_classes = cls_.related_classes()
         
         # collection
-        col = None
+        caption = ch_cls_.title
         if ch_attr and parent_id:
-            col = (cls, ch_attr, parent_id,)
             
             p_cls = cls_.attr_by_name(ch_attr).related_class
             p_title = SapnsClass.object_title(p_cls.name, parent_id)
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
-        elif caption is None:
-            caption = ch_cls_.title
+#        elif caption is None:
+#            caption = ch_cls_.title
             
-        # get dataset
-        ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    show_ids=show_ids, strtodatef=strtodate_, collection=col) 
-        
-        # Reading global settings
-        ds.date_fmt = date_fmt
-        ds.time_fmt = config.get('formats.time', default='%H:%M')
-        ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
-        ds.true_const = _('Yes')
-        ds.false_const = _('No')
-        
-        ds.float_fmt = app_cfg.format_float
-        
-        data = ds.to_data()
-        
-        cols = []
-        for col in ds.labels:
-            w = 125
-            if col == 'id':
-                w = 60
-                
-            cols.append(dict(title=col, width=w, align='center'))
-        
-        # actions for this class
-        actions = cls_.sorted_actions(user.user_id)
-        actions = [act for act in actions \
-                   if act['type'] in [SapnsPermission.TYPE_NEW,
-                                      SapnsPermission.TYPE_EDIT,
-                                      SapnsPermission.TYPE_DELETE,
-                                      SapnsPermission.TYPE_DOCS,
-                                      SapnsPermission.TYPE_PROCESS,
-                                     ]]
+#        # actions for this class
+#        actions = cls_.sorted_actions(user.user_id)
+#        actions = [act for act in actions \
+#                   if act['type'] in [SapnsPermission.TYPE_NEW,
+#                                      SapnsPermission.TYPE_EDIT,
+#                                      SapnsPermission.TYPE_DELETE,
+#                                      SapnsPermission.TYPE_DOCS,
+#                                      SapnsPermission.TYPE_PROCESS,
+#                                     ]]
 
-        # total number of pages
-        total_pag = 1
-        if rp > 0:
-            total_pag = ds.count/rp
-            
-            if ds.count % rp != 0:
-                total_pag += 1
-            
-            if total_pag == 0:
-                total_pag = 1
+        return dict(page='list', came_from=came_from, 
+                    grid=dict(cls=cls_.name,
+                              caption=caption,
+                              # collection
+                              ch_attr=ch_attr, parent_id=parent_id,
+                              # related classes
+                              rel_classes=rel_classes))
         
-        # rows in this page
-        totalp = ds.count - pos
-        if rp and totalp > rp:
-            totalp = rp
-            
-        link_data = dict(q=q, rp=rp, pag_n=pag_n, caption=caption, show_ids=show_ids)
-        
-        if ch_attr and parent_id:
-            link_data['ch_attr'] = ch_attr
-            link_data['parent_id'] = parent_id
-            
-        return dict(page='list',
-                    q=q, show_ids=show_ids, came_from=came_from,
-                    # collection
-                    ch_attr=ch_attr, parent_id=parent_id,
-                    # related classes
-                    rel_classes=rel_classes,
-                    link=('/dashboard/list/%s/?' % cls) + urlencode(link_data),
-                    grid=dict(caption=caption, #name=cls, 
-                              cls=cls_.name,
-                              search_url=url('/dashboard/list/'), 
-                              cols=cols, data=data, 
-                              actions=actions, pag_n=pag_n, rp=rp, pos=pos,
-                              totalp=totalp, total=ds.count, total_pag=total_pag))
-
-    @expose('sapns/components/sapns.grid/grid.html')
+    @expose('json')
     @require(p.not_anonymous())
     def grid(self, cls, q='', **params):
         
-        logger = logging.getLogger('DashboardController.grid')
+        #logger = logging.getLogger('DashboardController.grid')
 
         # picking up parameters
-        rp = params.get('rp', 10)
-        pag_n = params.get('pag_n', 1)
+        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
+        pos = (pag_n-1) * rp
         
         # collections
         ch_attr = params.get('ch_attr')
@@ -235,38 +163,27 @@ class DashboardController(BaseController):
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
             
-        logger.info('Parent class: %s' % cls_.name)
-        logger.info('Child class: %s' % ch_cls_.name)
+        #logger.info('Parent class: %s' % cls_.name)
+        #logger.info('Child class: %s' % ch_cls_.name)
              
         if not user.has_privilege(cls_.name) or \
         not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
-            redirect(url('/message', 
-                         params=dict(message=_('Sorry, you do not have privilege on this class'))))
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
         
-        rp = int(rp)
-        pag_n = int(pag_n)
-        pos = (pag_n-1) * rp
-
+        # get view name
         view = user.get_view_name(ch_cls_.name)
             
         date_fmt = config.get('formats.date', default='%m/%d/%Y')
         strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
-        logger.info('search...%s / q=%s' % (view, q))
+        #logger.info('search...%s / q=%s' % (view, q))
         
         # collection
         col = None
         if ch_attr and parent_id:
             col = (cls, ch_attr, parent_id,)
-            
-            p_cls = cls_.attr_by_name(ch_attr).related_class
-            p_title = SapnsClass.object_title(p_cls.name, parent_id)
-            
-            caption = _('%s of [%s]') % (ch_cls_.title, p_title)
-            
-        elif caption is None:
-            caption = ch_cls_.title
-            
+
         # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
                     strtodatef=strtodate_, collection=col) 
@@ -279,8 +196,6 @@ class DashboardController(BaseController):
         ds.false_const = _('No')
         
         ds.float_fmt = app_cfg.format_float
-        
-        data = ds.to_data()
         
         cols = []
         for col in ds.labels:
@@ -306,14 +221,42 @@ class DashboardController(BaseController):
         if rp and this_page > rp:
             this_page = rp
             
-        return dict(ch_attr=ch_attr, parent_id=parent_id,
-                    grid=dict(caption=caption, name=cls, cls=cls_.name,
-                              search_url=url('/dashboard/grid/'), 
-                              cols=cols, data=data, 
-                              pag_n=pag_n, rp=rp, pos=pos,
-                              this_page=this_page, total=ds.count, total_pag=total_pag))
+        return dict(status=True, cols=cols, data=ds.to_data(), 
+                    this_page=this_page, total_count=ds.count, total_pag=total_pag)
+            
+#        return dict(ch_attr=ch_attr, parent_id=parent_id,
+#                    grid=dict(caption=caption, name=cls, cls=cls_.name,
+#                              search_url=url('/dashboard/grid/'), 
+#                              cols=cols, data=data, 
+#                              pag_n=pag_n, rp=rp, pos=pos,
+#                              this_page=this_page, total=ds.count, total_pag=total_pag))
 
-
+    @expose('json')
+    @require(p.not_anonymous())
+    def grid_actions(self, cls, **kw):
+        
+        # does this user have permission on this table?
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        
+        cls_ = SapnsClass.by_name(cls)
+        #ch_cls_ = SapnsClass.by_name(cls, parent=False)        
+             
+        if not user.has_privilege(cls_.name) or \
+        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
+        
+        # actions for this class
+        actions = cls_.sorted_actions(user.user_id)
+        actions = [act for act in actions \
+                   if act['type'] in [SapnsPermission.TYPE_NEW,
+                                      SapnsPermission.TYPE_EDIT,
+                                      SapnsPermission.TYPE_DELETE,
+                                      SapnsPermission.TYPE_DOCS,
+                                      SapnsPermission.TYPE_PROCESS,
+                                     ]]
+        
+        return dict(status=True, actions=actions)
     
     @expose('sapns/dashboard/search.html')
     @require(p.not_anonymous())
@@ -846,7 +789,7 @@ class DashboardController(BaseController):
                           dict(title='five'),
                           dict(title='SIX', width=200, align='right'),
                          ],
-                    cols__=cols,
+                    cols=cols,
                     data=ds.to_data(),
                     data_=[[kw.get('p1'), r(), r(), r()],
                           [kw.get('p2')],

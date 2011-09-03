@@ -1,5 +1,35 @@
 /* Sapns grid */
 
+function load_script(src) {
+    //console.log('Loading from: ' + src);
+    var fileref = document.createElement('script');
+    fileref.setAttribute("type", "text/javascript");
+    fileref.setAttribute("src", src);
+    document.getElementsByTagName("head")[0].appendChild(fileref)
+}
+
+function load_css(href) {
+    var fileref = document.createElement("link");
+    fileref.setAttribute("rel", "stylesheet");
+    fileref.setAttribute("type", "text/css");
+    fileref.setAttribute("href", href);
+}
+
+try {
+    sprintf;
+}
+catch (e) {
+    load_script("{{tg.url('/js/sprintf.min.js')}}");
+}
+
+/*try {
+    qtip;
+}
+catch(e) {
+    load_css("{{tg.url('/js/qtip2/jquery.qtip.min.css')}}");
+    load_script("{{tg.url('/js/qtip2/jquery.qtip.min.js')}}");
+}*/
+
 (function($) {
 
     // SapnsGrid (constructor)
@@ -36,13 +66,14 @@
         set(this, 'parent_id', '');
         set(this, 'cols', []);
         set(this, 'data', {});
+        set(this, 'height', 470);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
         set(this.default_, 'col_align', 'center', this.default_);
         set(this.default_, 'empty_value', '', this.default_);
         
-        set(this, 'actions', []);
+        set(this, 'actions', null);
         if (typeof(this.actions) == 'function') {
             this.actions = this.actions();
         }
@@ -52,10 +83,10 @@
         set(this, 'with_pager', true);
         set(this, 'pag_n', 1);
         set(this, 'rp', 10);
-        set(this, 'pos', 0);
-        set(this, 'totalp', 0);
-        set(this, 'total', 0);
+        set(this, 'this_page', 0);
+        set(this, 'total_count', 0);
         set(this, 'total_pag', 0);
+        this.ajx_data = '{}';
     }
 
     // getSelectedIds
@@ -76,6 +107,7 @@
     SapnsGrid.prototype.loadData = function() {
         
         var self = this;
+        
         var g_table = 
             '<table class="sp-grid">' +
             '<tr><td class="sp-col-title">#</td>';
@@ -167,38 +199,86 @@
     // search
     SapnsGrid.prototype.search = function(q) {
         var self = this;
+        
         self.q = q;
         
-        $.ajax($.extend({
-            url: "{{tg.url('/dashboard/test_search/')}}",
+        var loading = '<div style="padding: 10px; font-size: 15px; ' + 
+            'font-weight: bold; color: gray;">{{_("Loading")}}...</div>';
+        $('#' + self.name).find('.sp-grid-parent').html(loading);
+        
+        var ajx = $.extend(true, {
+            url: "{{tg.url('/dashboard/grid/')}}",
             data: {
                 cls: self.cls, 
                 q: self.q, 
                 rp: self.rp, 
-                pos: self.pos
+                pag_n: self.pag_n
             },
-            success: function(data) {
-                if (data.status) {
+            success: function(response) {
+                if (response.status) {
+                    
+                    // this page
+                    if (response.this_page) {
+                        self.this_page = response.this_page;
+                    }
+                    
+                    // total_count
+                    if (response.total_count) {
+                        self.total_count = response.total_count;
+                    }
+                    
+                    // total_pag
+                    if (response.total_pag) {
+                        self.total_pag = response.total_pag;
+                    }
+                    
                     // cols
-                    if (data.cols) {
-                        self.cols = data.cols;
+                    if (response.cols) {
+                        self.cols = response.cols;
                     }
                     
                     // actions
-                    if (data.actions) {
-                        self.actions = data.actios;
+                    if (response.actions) {
+                        self.actions = response.actions;
                     }
                     
-                    self.data = data.data;
+                    // update pager
+                    var pos = (self.pag_n-1) * self.rp;
+
+                    var params = {
+                            curr_page: self.pag_n,
+                            total_page: self.total_pag,
+                            pos0: pos+1,
+                            pos1: pos+self.this_page
+                    };
+                    
+                    var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
+                    
+                    $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
+                    $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
+                    
+                    self.data = response.data;
                     self.loadData();
                 }
             }
-        }, self.search_params));
+        }, self.search_params);
+        
+        var curr_ajx_data = JSON.stringify(ajx.data);
+        if (self.ajx_data) {
+            if (self.ajx_data === curr_ajx_data) {
+                self.loadData();
+            }
+            else {
+                $.ajax(ajx);
+            }
+        }
+        
+        self.ajx_data = curr_ajx_data;
     }
     
     SapnsGrid.prototype._loadActions = function(actions) {
         
-        var g = this;
+        var self = this;
         var g_actions = '';
         var act_f = []
         
@@ -217,11 +297,11 @@
                     g_actions += 
                         '<div style="float: left;">' +
                             '<form class="action-form" method="post" action0="' + act.url + '">' +
-                            '<input type="hidden" name="cls" value="' + g.cls + '">' +
-                            '<input type="hidden" name="came_from" value="' + g.link + '">';
+                            '<input type="hidden" name="cls" value="' + self.cls + '">' +
+                            '<input type="hidden" name="came_from" value="' + self.link + '">';
                     
-                    if (g.parent_id) {
-                        g_actions += '<input type="hidden" name="_' + g.ch_attr + '" value="' + g.parent_id + '">';
+                    if (self.parent_id) {
+                        g_actions += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
                     }
 
                     g_actions += '<input class="sp-button sp-grid-action standard_action" type="button" value="' + act.title + '"' +
@@ -248,7 +328,7 @@
             
             $('#' + act_f[i].id).live('click', function() {
                 if ($(this).attr('require_id') == 'true') {
-                    var selected_ids = g.getSelectedIds();
+                    var selected_ids = self.getSelectedIds();
                     if (selected_ids.length > 0) {
                         $(this).data('_func')(selected_ids[0]);
                     }
@@ -257,38 +337,10 @@
                     $(this).data('_func')();
                 }
             });
-        }        
-        
-        return g_actions;
-    }
-    
-    SapnsGrid.prototype.loadActions = function() {
-        
-        var g = this;
-        var g_actions = '';
-        
-        if (g.actions) {
-            if (g.actions.length === undefined) {
-                // it's an object
-                $.ajax($.extend({
-                    url: "{{tg.url('/dashboard/actions/')}}",
-                    data: {
-                        cls: self.cls
-                    },
-                    success: function(data) {
-                        if (data.status) {
-                            g.actions = data.actions;
-                        }
-                    }
-                }, 
-                self.actions));
-            }
-            
-            g_actions += g._loadActions(g.actions);
         }
         
         // export
-        if (g.exportable) {
+        if (self.exportable) {
             g_actions += 
                 '<div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">' +
                 '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
@@ -298,6 +350,40 @@
                 '</select></div>';
         }
 
+        return g_actions;
+    }
+    
+    SapnsGrid.prototype.loadActions = function() {
+        
+        var self = this;
+        var g_actions = '';
+        
+        if (self.actions != null) {
+            if (self.actions.length === undefined) {
+                // it's an object
+                var ajx = $.extend(true, {
+                    url: "{{tg.url('/dashboard/grid_actions/')}}",
+                    type: "post",
+                    data: {
+                        cls: self.cls
+                    },
+                    success: function(response) {
+                        if (response.status) {
+                            self.actions = response.actions;
+                        }
+                        
+                        $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                    }
+                }, 
+                self.actions);
+                
+                $.ajax(ajx);
+            }
+            else {
+                $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+            }
+        }
+        
         // standard actions
         $('.standard_action').live('click', function(event) {
             
@@ -305,7 +391,7 @@
             var form = $(this).parent();
             
             // child attribute 
-            var ch_attr = $('#' + g.name + ' .sp-search-form input[name=ch_attr]').val();
+            var ch_attr = $('#' + self.name + ' .sp-search-form input[name=ch_attr]').val();
             
             // if CTRL is pressed open in a new tab 
             form.attr('target', '');
@@ -321,17 +407,17 @@
                 if (selected_ids.length > 0) {
                     // edit
                     if (action_type == 'edit') {
-                        g.std_edit(selected_ids[0], url);
+                        self.std_edit(selected_ids[0], url);
                     }
                     // delete
                     else if (action_type == 'delete') {
-                        g.std_delete(selected_ids, url);
+                        self.std_delete(selected_ids, url);
                     }
                 }
                 else {
                     // new
                     if (action_type == 'new') {
-                        g.std_new(url);
+                        self.std_new(url);
                     }
                 }
             }
@@ -339,8 +425,6 @@
                 $(this).data('_func')();
             }
         });
-        
-        $('#' + g.name + ' .actions').html(g_actions);
     }
     
     // std_new
@@ -494,18 +578,8 @@
                 
                 g_content += 
                     '<div><div style="float: left;">' +
-                    /*
-                    '<form class="sp-search-form" method="post" action="' + g.search_url + g.cls + '">' +
-                        '<input type="hidden" name="caption" value="' + g.caption + '">' +
-                        '<input type="hidden" name="show_ids" value="' + g.show_ids + '">' +
-                        '<input type="hidden" name="came_from" value="' + g.came_from + '">' +*/
                         '<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
-                        /*
-                        '<input type="hidden" name="ch_attr" value="' + g.ch_attr + '">' +
-                        '<input type="hidden" name="parent_id" value="' + g.parent_id + '">' +
-                        */
                         '<button class="sp-button sp-search-btn">{{_("Search...")}}</button></div>';                     
-                    //'</form></div>'
                         
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
                     g.search($('#' + g.name + ' .sp-search-txt').val());
@@ -534,7 +608,9 @@
                 g_content += '</div>';
             }
             
-            var g_table = '<div class="sp-grid-parent" style="overflow: auto; clear: left;"></div>';
+            var g_table = 
+                '<div class="sp-grid-parent" style="overflow: auto; clear: left; ' + 
+                    'height: ' + g.height + 'px; background-color: transparent;"></div>';
             
             // if the row is selected, then mark the checkbox
             $('.sp-grid-cell').live('click', function() {
@@ -573,6 +649,75 @@
             // pager
             var g_pager = '';
             if (g.with_pager) {
+                g_pager += '<div class="sp-grid-pager">';
+                g_pager += '<div class="sp-grid-pager-desc"></div>';
+                
+                var sel_10 = '', sel_50 = '', sel_100 = '', sel_all = '';
+                var sel = ' selected';
+                var another_value = '';
+                if (g.rp == 10) {
+                    sel_10 = sel;
+                }
+                else if (g.rp == 50) {
+                    sel_50 = sel;
+                }
+                else if (g.rp == 100) {
+                    sel_100 = sel;
+                }
+                else if (g.rp == 0) {
+                    sel_all = sel;
+                }
+                else {
+                    another_value = '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
+                }
+                
+                g_pager += 
+                    '<select class="sp-button sp-grid-rp">' +
+                    another_value +
+                    '<option value="10"' + sel_10 + '>10</option>' +
+                    '<option value="50"' + sel_50 + '>50</option>' +
+                    '<option value="100"' + sel_100 + '>100</option>' +
+                    '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
+                    '</select>' +
+                    '<button class="sp-button first-page" style="float: left;" title="{{_("page 1")}}">|&lt;&lt;</button>' +
+                    '<button class="sp-button page-back" style="float: left;" title="{{_("page 1")}}">&lt;&lt;</button>' +
+                    '<div>' +
+                    '<input class="sp-grid-current-page" type="text" style="text-align: center;" readonly>' +
+                    '</div>' +
+                    '<button class="sp-button page-forth" style="float: left;" title="{{_("page 1")}}">&gt;&gt</button>' +
+                    '<button class="sp-button last-page" style="float: left;" title="{{_("page 1")}}">&gt;&gt|</button>';
+                
+                g_pager += '</div>';
+                
+                $('#' + g.name + ' .sp-grid-rp').live('change', function() {
+                    g.rp = $(this).val();
+                    g.pag_n = 1;
+                    g.search(g.q);
+                });
+                
+                $('#' + g.name + ' .first-page').live('click', function() {
+                    g.pag_n = 1;
+                    g.search(g.q);
+                });
+                
+                $('#' + g.name + ' .page-back').live('click', function() {
+                    if (g.pag_n > 1) {
+                        g.pag_n -= 1;
+                        g.search(g.q);
+                    }
+                });
+                
+                $('#' + g.name + ' .page-forth').live('click', function() {
+                    if (g.pag_n < g.total_pag) {
+                        g.pag_n += 1;
+                        g.search(g.q);
+                    }
+                });
+                
+                $('#' + g.name + ' .last-page').live('click', function() {
+                    g.pag_n = g.total_pag;
+                    g.search(g.q);
+                });
             }
             
             this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');

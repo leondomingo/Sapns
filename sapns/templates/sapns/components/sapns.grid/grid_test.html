@@ -10,7 +10,7 @@
 {#{{ u.qtip2() }}#}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
 <script type="text/javascript">
-    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
 </script>
 
 </head>
@@ -26,12 +26,12 @@
                     return 'Grid test (func)';
                 },
                 q: '',
-                //rp: 3,
-                //q: '',
+                rp: 10,
+                //height: 700,
                 //with_search: false,
-                search_params: {
+                search_params_: {
                     url: "{{tg.url('/dashboard/test_search/')}}",
-                    data: { cls: 'alumnos', rp: 1 }
+                    data: { cls: 'alumnos' }
                 },
                 /*search_func: function(q, rp, pos) {
                     //console.log([q, rp, pos].join(', ')); 
@@ -42,32 +42,18 @@
                            ];
                 },*/
                 //default_: { col_width: 10, col_align: 'left' },
-                cols: [{title: 'id', width: 30}, 
+                cols_: [{title: 'id', width: 30}, 
                        {title: 'Úno', align: 'right', width: 100}, 
                        {title: 'đæßß', width: 300}, 
                        {title: 'trEs', align: 'left'},
                        {title: 'CUATRO'}
                        ],
-                /*
-                data: function() {
-                    return [[1, 11, 22, 33],
-                            [2],
-                            [2.2, 1, 2, 3, 4, 5, 6],
-                            [3, 11, null, 33]
-                       ];
-                },
-                */
-                action_params: {
-                    url: "",
-                    data: {
-                    }
-                },
                 actions_: {},
                 actions_a: [{title: 'act1', url: '/act1', type: 'process'},
                           {title: 'act2', url: '/act2', type: 'process'},
                           {title: 'act3', url: '/act3', type: 'process'}
                           ],
-                actions_f: function() {
+                actions: function() {
                     //console.log(this.cls);
                     return [{title: 'New', url: '/act1', type: 'new'},
                             {title: 'Edit', url: '/act2', type: 'edit'},

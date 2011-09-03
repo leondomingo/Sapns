@@ -19,17 +19,23 @@
 
 {% block middle %}
     {{ super() }}
-    {{ grid_html.js_select_row(_) }}
-    {{ grid_html.js_functions(_) }}
-    {{ grid_html.show(page, _, q, grid, show_ids, link=link, 
-        came_from=came_from, can_edit=True, 
-        rel_classes=rel_classes, ch_attr=ch_attr, parent_id=parent_id) }}
+        
+    <div id="grid"></div>
         
     <script type="text/javascript">
+        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
-        	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title)); 
+        	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title));
+        	
+        	$('#grid').sapnsGrid({
+        	    cls: "{{grid.cls}}",
+        	    caption: "{{grid.caption}}",
+        	    actions: {}
+        	});
+        	
+        	$('#grid .sp-search-txt').focus();
         });
     </script>
 {% endblock %}
