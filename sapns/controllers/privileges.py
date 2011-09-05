@@ -30,13 +30,18 @@ class PrivilegesController(BaseController):
     @expose('sapns/privileges/index.html')
     def index(self, **kw):
         
-        id_role = get_paramw(kw, 'id_role', int, opcional=True)
-        id_user = get_paramw(kw, 'id_user', int, opcional=True)
+        logger = logging.getLogger('PrivilegesController.index')
+        try:
+            id_role = get_paramw(kw, 'id_role', int, opcional=True)
+            id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            
+            came_from = kw.get('came_from', '/')
+            page = _('Privilege management')
+            
+            return dict(page=page, id_role=id_role, id_user=id_user, came_from=came_from)
         
-        came_from = kw.get('came_from', '/')
-        page = _('Privilege management')
-        
-        return dict(page=page, id_role=id_role, id_user=id_user, came_from=came_from)
+        except Exception, e:
+            logger.error(e)
     
     @expose()
     def roles(self, id_role, **kw):
@@ -51,35 +56,41 @@ class PrivilegesController(BaseController):
     @expose('sapns/privileges/classes.html')
     def classes(self, **kw):
         
-        id_user = get_paramw(kw, 'id_user', int, opcional=True)
-        id_role = get_paramw(kw, 'id_role', int, opcional=True)
-        if id_role:
-            who = dbs.query(SapnsRole).get(id_role)
-            def has_privilege(id_class):
-                return who.has_privilege(id_class, no_cache=True)
-            
-        else:
-            who = dbs.query(SapnsUser).get(id_user)
-            #who = SapnsUser()
-            def has_privilege(id_class):
-                priv = who.get_privilege(id_class)
-                if priv:
-                    return priv.granted
+        logger = logging.getLogger('PrivilegesController.classes')
+        try:
+            id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            id_role = get_paramw(kw, 'id_role', int, opcional=True)
+            if id_role:
+                logger.info('role')
+                who = dbs.query(SapnsRole).get(id_role)
+                def has_privilege(id_class):
+                    return who.has_privilege(id_class, no_cache=True)
                 
-                return None
+            else:
+                who = dbs.query(SapnsUser).get(id_user)
+                #who = SapnsUser()
+                def has_privilege(id_class):
+                    priv = who.get_privilege(id_class)
+                    if priv:
+                        return priv.granted
                     
-                #cls = dbs.query(SapnsClass).get(id_class)
-                #return who.has_privilege(cls.name, no_cache=True)
-
-        classes = []
-        for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
-            classes.append(Dict(id=cls.class_id,
-                                id_class_p=None,
-                                name=cls.title,
-                                granted=has_privilege(cls.class_id),
-                                ))
+                    return None
+                        
+                    #cls = dbs.query(SapnsClass).get(id_class)
+                    #return who.has_privilege(cls.name, no_cache=True)
+    
+            classes = []
+            for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
+                classes.append(Dict(id=cls.class_id,
+                                    id_class_p=None,
+                                    name=cls.title,
+                                    granted=has_privilege(cls.class_id),
+                                    ))
+            
+            return dict(classes=classes, show_none=id_user != None)
         
-        return dict(classes=classes, show_none=id_user != None)
+        except Exception, e:
+            logger.error(e)
     
     @expose('json')
     def classp_update(self, **kw):

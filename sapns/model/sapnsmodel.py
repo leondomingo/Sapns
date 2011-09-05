@@ -54,11 +54,17 @@ class SapnsRole(Group):
             
     def has_privilege(self, id_class, no_cache=False):
         def _has_privilege():
-            return dbs.query(SapnsPrivilege).\
+            priv = dbs.query(SapnsPrivilege).\
                 filter(and_(SapnsPrivilege.role_id == self.group_id,
                             SapnsPrivilege.class_id == id_class
                             )).\
-                first().granted
+                first()
+                
+            if priv:
+                return priv.granted
+            
+            else:
+                return False
                 
         _cache = cache.get_cache('role_has_privilege')
         _key = '%s_%d' % (id_class, self.group_id)
