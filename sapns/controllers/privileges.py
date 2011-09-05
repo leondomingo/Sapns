@@ -97,12 +97,12 @@ class PrivilegesController(BaseController):
         
         logger = logging.getLogger('PrivilegesController.classp_update')
         try:
-            
             id_class = get_paramw(kw, 'id_class', int)
             granted = get_paramw(kw, 'granted', strtobool, opcional=True)
             
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
             if id_role:
+                logger.info('role=%d' % id_role)
                 who = dbs.query(SapnsRole).get(id_role)
                 
             else:
@@ -114,7 +114,7 @@ class PrivilegesController(BaseController):
                 who.add_privilege(id_class)
                 
             else:
-                who.remove_privilege(id_class, delete=granted is None)
+                who.remove_privilege(id_class) #, delete=granted is None)
             
             return dict(status=True)
         

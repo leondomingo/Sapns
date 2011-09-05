@@ -85,21 +85,24 @@ function init_classes_events() {
     // class select 
     $('.class_row select').change(function() {
         
-        var data_in = {
-                id_class: $(this).parent().attr('id_class'),
-                granted: $(this).val()
-        };
-        
-        if (get_role_user(data_in)) { 
-            $.ajax({
-                url: "{{tg.url('/dashboard/privileges/classp_update')}}",
-                data: data_in,
-                success: function(data) {
-                    if (data.status) {
-                    }
+        var data_in = $.extend(true, 
+                $('#classes_list').data('data_in'), 
+                {
+                    id_class: $(this).parent().attr('id_class'),
+                    granted: $(this).val()
                 }
-            });
-        }
+        );
+        
+        //if (get_role_user(data_in)) { 
+        $.ajax({
+            url: "{{tg.url('/dashboard/privileges/classp_update')}}",
+            data: data_in,
+            success: function(data) {
+                if (data.status) {
+                }
+            }
+        });
+        //}
     });
 }
     

@@ -1140,6 +1140,8 @@ class SapnsPrivilege(DeclarativeBase):
     @staticmethod
     def _update_privilege(id_class, granted, **kw):
         
+        #logger = logging.getLogger('SapnsPrivileges._update_privilege')
+        
         priv = SapnsPrivilege.get_privilege(id_class, **kw)
         if not kw.get('delete'):            
             
