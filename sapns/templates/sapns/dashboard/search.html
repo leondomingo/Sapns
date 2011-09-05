@@ -4,18 +4,20 @@
 {#{{ util.qtip2() }}#}
 
 <div>
-    <div id="_{{grid.cls}}" class="sapns_grid"></div>
+    <div id="{{grid.name}}" class="sapns_grid"></div>
 </div>
 
 <script type="text/javascript">
     {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
     $(document).ready(function() {
-        $('#_{{grid.cls}}').sapnsGrid({
+        $('#{{grid.name}}').sapnsGrid({
             cls: "{{grid.cls}}",
             caption: "",
             actions: [],
+            with_pager: false,
+            exportable: false
         });
         
-        $('#_{{grid.cls}} .sp-search-txt').focus();
+        $('#{{grid.name}} .sp-search-txt').focus();
     });
 </script>

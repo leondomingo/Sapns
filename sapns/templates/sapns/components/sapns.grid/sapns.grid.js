@@ -255,9 +255,53 @@ catch(e) {
                     
                     var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
                     
+                    $('#' + self.name + ' .first-page').attr('title', "{{_('page 1')}}");
+                    
+                    // page-back
+                    if (params.curr_page > 1) {
+                        var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page-1});
+                        $('#' + self.name + ' .page-back').
+                            attr('title', prev_page).
+                            attr('disabled', false);
+                    }
+                    else {
+                        $('#' + self.name + ' .page-back').attr('disabled', true);
+                    }
+                    
+                    // page-forth
+                    if (params.curr_page < params.total_page) {
+                        var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page+1}); 
+                        $('#' + self.name + ' .page-forth').
+                            attr('title', next_page).
+                            attr('disabled', false);
+                    }
+                    else {
+                        $('#' + self.name + ' .page-forth').attr('disabled', true);
+                    }
+                    
+                    // last-page
+                    var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
+                    $('#' + self.name + ' .last-page').attr('title', last_page);
+                    
                     $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
                     $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
                     
+                    try {
+                        $('.sp-grid-cell').qtip({
+                            content: {
+                                text: true
+                            },
+                            position: {
+                                my: "left top",
+                                at: "bottom center"
+                            },
+                            style: "ui-tooltip-dark ui-tooltip-rounded"
+                        });
+                    } catch (e) {
+                        console.log(e);
+                        // qtip2 is not loaded
+                    }
+
                     self.data = response.data;
                     self.loadData();
                 }
@@ -653,21 +697,6 @@ catch(e) {
                 }
             });
             
-            try {
-                $('.sp-grid-cell').qtip({
-                    content: {
-                        text: true
-                    },
-                    position: {
-                        my: "left top",
-                        at: "bottom center"
-                    },
-                    style: "ui-tooltip-dark ui-tooltip-rounded"
-                });
-            } catch (e) {
-                // qtip2 is not loaded
-            }
-            
             // pager
             var g_pager = '';
             if (g.with_pager) {
@@ -701,13 +730,13 @@ catch(e) {
                     '<option value="100"' + sel_100 + '>100</option>' +
                     '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
                     '</select>' +
-                    '<button class="sp-button first-page" style="float: left;" title="{{_("page 1")}}">|&lt;&lt;</button>' +
-                    '<button class="sp-button page-back" style="float: left;" title="{{_("page 1")}}">&lt;&lt;</button>' +
+                    '<button class="sp-button first-page" style="float: left;">|&lt;&lt;</button>' +
+                    '<button class="sp-button page-back" style="float: left;">&lt;&lt;</button>' +
                     '<div>' +
                     '<input class="sp-grid-current-page" type="text" style="text-align: center;" readonly>' +
                     '</div>' +
-                    '<button class="sp-button page-forth" style="float: left;" title="{{_("page 1")}}">&gt;&gt</button>' +
-                    '<button class="sp-button last-page" style="float: left;" title="{{_("page 1")}}">&gt;&gt|</button>';
+                    '<button class="sp-button page-forth" style="float: left;">&gt;&gt</button>' +
+                    '<button class="sp-button last-page" style="float: left;">&gt;&gt|</button>';
                 
                 g_pager += '</div>';
                 
@@ -745,25 +774,25 @@ catch(e) {
             this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
             
             g.loadActions();
-
             g.search(g.q)
         }
         else if (typeof(arg1) == "string") {
             
-            console.log([arg1, arg2, arg3].join(', '));
-            
             var grid = this.data('sapnsGrid');
             
-            // setValue(arg2)
-            // $(element).sapnsSelector("setValue", 123);
-            // $(element).sapnsSelector("setValue", null);
+            // loadData
             if (arg1 == "loadData") {
                 grid.loadData();
             }
+            // search
             else if (arg1 == "search") {
                 var q = '';
                 if (arg2) {
                     q = arg2;
+                }
+                
+                if (grid.with_search) {
+                    $('#'+grid.name + ' .sp-search-txt').val(q);
                 }
                 
                 grid.search(q);

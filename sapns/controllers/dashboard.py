@@ -254,11 +254,20 @@ class DashboardController(BaseController):
     @expose('sapns/dashboard/search.html')
     @require(p.not_anonymous())
     def search(self, **params):
+        
+        import random
+        random.seed()
+        
         logger = logging.getLogger(__name__ + '/search')
         logger.info(params)
         
-        params['caption'] = ''
-        return self.list(**params)
+        #params['caption'] = ''
+        g = self.list(**params)
+        
+        logger.info(g)
+        g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
+        
+        return g
     
     def export(self, cls, **kw):
         """
@@ -332,16 +341,16 @@ class DashboardController(BaseController):
         
         except Exception, e:
             logger.error(e)
-            return dict(status=False, message=str(e))        
+            return dict(status=False, message=str(e).decode('utf-8'))        
     
     @expose()
     @require(p.not_anonymous())
-    def save(self, cls, id='', **params):
+    def save(self, cls, **params):
         """
         IN
           cls          <unicode>
-          id           <int>
           params
+            id         <int>
             came_from  <unicode>
             fld_*      ???        Fields to be saved
         """
@@ -350,6 +359,7 @@ class DashboardController(BaseController):
         logger.info(params)
 
         cls = SapnsClass.by_name(cls)
+        id_ = get_paramw(params, 'id', int, opcional=True)
         came_from = params.get('came_from') #, '/dashboard/list?cls=%s' % cls.name)
         quiet = strtobool(params.get('quiet', 'false'))
         
@@ -365,8 +375,8 @@ class DashboardController(BaseController):
         # init "update" dictionary
         update = {}
         
-        if id:
-            update['id'] = int(id)
+        if id_:
+            update['id'] = int(id_)
             
         READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
                            SapnsAttrPrivilege.ACCESS_DENIED]
@@ -450,7 +460,6 @@ class DashboardController(BaseController):
 
         if not quiet:
             # come back
-            logger.info('came_from = %s' % came_from)
             if came_from:
                 redirect(url(came_from))
                 
@@ -472,14 +481,18 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit.html')
     @require(p.not_anonymous())
-    def edit(self, cls, id='', came_from='/dashboard', **params):
+    def edit(self, cls, id='', **params):
         
         logger = logging.getLogger(__name__ + '/edit')
+        
+        came_from = get_paramw(params, 'came_from', unicode, opcional=True,
+                               por_defecto='/dashboard')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         class_ = SapnsClass.by_name(cls)
         
         if id:
+            id = int(id)
             perm = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT))
         
         else:
@@ -597,7 +610,9 @@ class DashboardController(BaseController):
     @expose('sapns/dashboard/delete.html')
     @expose('json')
     @require(p.not_anonymous())
-    def delete(self, cls, id, came_from='/dashboard'):
+    def delete(self, cls, id_, **kw):
+        
+        #came_from = get_paramw(kw, 'came_from', opcional=True, por_defecto='/dashboard')
         
         logger = logging.getLogger(__name__ + '/delete')
         rel_tables = []
@@ -615,7 +630,7 @@ class DashboardController(BaseController):
             meta = MetaData(dbs.bind)
             tbl = Table(cls_.name, meta, autoload=True)
             
-            this_record = dbs.execute(tbl.select(tbl.c.id == id)).fetchone()
+            this_record = dbs.execute(tbl.select(tbl.c.id == id_)).fetchone()
             if not this_record:
                 return dict(status=False, message=_('Record does not exist'))
 
@@ -628,7 +643,7 @@ class DashboardController(BaseController):
                 rtbl = Table(rcls['name'], meta, autoload=True)
                 attr_name = rcls['attr_name']
                 
-                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id))
+                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id_))
                 robj = dbs.execute(sel).fetchone()
                 
                 if robj != None:
@@ -639,7 +654,7 @@ class DashboardController(BaseController):
                     logger.info('---No related objects have been found')
                     
             # delete record
-            tbl.delete(tbl.c.id == id).execute()
+            tbl.delete(tbl.c.id == id_).execute()
             dbs.flush()
             
             # success!
@@ -650,8 +665,8 @@ class DashboardController(BaseController):
             return dict(status=False, message=str(e), rel_tables=rel_tables)
         
     @expose('sapns/order/insert.html')
-    @require(p.has_permission('manage'))
-    def ins_order(self, cls='', came_from='/dashboard'):
+    @require(p.in_group(u'managers'))
+    def ins_order(self, cls, came_from='/dashboard'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
@@ -667,6 +682,7 @@ class DashboardController(BaseController):
                     title=class_.title, came_from=url(came_from))
 
     @expose()
+    @require(p.in_group(u'managers'))
     def ins_order_save(self, attributes='', title='', came_from=''):
         
         # save insertion order
@@ -705,7 +721,7 @@ class DashboardController(BaseController):
                                      came_from='')))
     
     @expose('sapns/order/reference.html')
-    @require(p.has_permission('manage'))
+    @require(p.in_group(u'managers'))
     def ref_order(self, cls, came_from=''):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -722,6 +738,7 @@ class DashboardController(BaseController):
                     came_from=came_from)
     
     @expose()
+    @require(p.in_group(u'managers'))
     def ref_order_save(self, attributes='', came_from=''):
         
         # save reference order

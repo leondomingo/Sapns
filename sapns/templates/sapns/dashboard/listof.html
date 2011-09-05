@@ -23,7 +23,8 @@
     <div id="grid"></div>
         
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+        {#{% include 'sapns/components/sapns.grid/sapns.grid.js' %}#}
+        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
@@ -36,7 +37,7 @@
         	    rp: "{{grid.rp}}", 
         	    pag_n: "{{grid.pag_n}}",
         	    actions: {},
-        	    url_base: "/dashboard/list/{{grid.cls}}"
+        	    url_base: "/dashboard/list/{{grid.cls}}",
         	});
         	
         	$('#grid .sp-search-txt').focus();
