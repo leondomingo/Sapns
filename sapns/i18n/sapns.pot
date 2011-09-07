@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.2\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-08-18 10:52+0200\n"
+"POT-Creation-Date: 2011-09-07 19:12+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,8 +68,13 @@ msgstr ""
 msgid "Repo [%d] was not found"
 msgstr ""
 
-#: sapns/controllers/privileges.py:38
-msgid "Privilege management"
+#: sapns/controllers/privileges.py:42
+#, python-format
+msgid "Privilege management for \"%s\""
+msgstr ""
+
+#: sapns/controllers/privileges.py:319
+msgid "Role privileges copy"
 msgstr ""
 
 #: sapns/controllers/root.py:66 sapns/controllers/myapp/root.py:66
@@ -151,25 +156,25 @@ msgstr ""
 msgid "Project"
 msgstr ""
 
-#: sapns/lib/sapns/update/update.py:21
+#: sapns/lib/sapns/update/update.py:22
 msgid "Loading settings..."
 msgstr ""
 
-#: sapns/lib/sapns/update/update.py:34
+#: sapns/lib/sapns/update/update.py:35
 msgid "It was not possible to get connection data"
 msgstr ""
 
-#: sapns/lib/sapns/update/update.py:89
+#: sapns/lib/sapns/update/update.py:83
 #, python-format
 msgid "Skipping [%s]"
 msgstr ""
 
-#: sapns/templates/myapp/base.html:30 sapns/templates/sapns/base.html:25
+#: sapns/templates/myapp/base.html:30 sapns/templates/sapns/base.html:26
 msgid "You are in"
 msgstr ""
 
-#: sapns/templates/myapp/base.html:34 sapns/templates/sapns/base.html:29
-#: sapns/templates/sapns/dashboard/edit.html:93
+#: sapns/templates/myapp/base.html:34 sapns/templates/sapns/base.html:30
+#: sapns/templates/sapns/dashboard/edit.html:96
 msgid "return"
 msgstr ""
 
@@ -193,7 +198,7 @@ msgstr ""
 msgid "This window will be closed in"
 msgstr ""
 
-#: sapns/templates/sapns/components/sapns.selector.js:218
+#: sapns/templates/sapns/components/sapns.selector.js:236
 #: sapns/templates/sapns/components/sapns.selector.min.js:2
 #: sapns/templates/sapns/dashboard/grid.html:86
 #: sapns/templates/sapns/dashboard/grid.html:361
@@ -205,12 +210,13 @@ msgstr ""
 msgid "Ok"
 msgstr ""
 
-#: sapns/templates/sapns/components/sapns.selector.js:232
+#: sapns/templates/sapns/components/sapns.selector.js:250
 #: sapns/templates/sapns/components/sapns.selector.min.js:2
 #: sapns/templates/sapns/dashboard/grid.html:144
 #: sapns/templates/sapns/dashboard/grid.html:383
 #: sapns/templates/sapns/docs/index.html:248
 #: sapns/templates/sapns/docs/index.html:424
+#: sapns/templates/sapns/privileges/copy.html:66
 #: sapns/templates/sapns/shortcuts/list.html:187
 #: sapns/templates/sapns/shortcuts/list.html:231
 #: sapns/templates/sapns/shortcuts/list.html:305
@@ -339,44 +345,48 @@ msgstr ""
 msgid "Do you really want to delete this record?"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:55
+#: sapns/templates/sapns/dashboard/edit.html:58
 #: sapns/templates/sapns/dashboard/grid.html:600
 msgid "Related info"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:61
+#: sapns/templates/sapns/dashboard/edit.html:64
 #: sapns/templates/sapns/dashboard/grid.html:606
 msgid "Show"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:71
+#: sapns/templates/sapns/dashboard/edit.html:74
 #: sapns/templates/sapns/dashboard/grid.html:559
 #: sapns/templates/sapns/privileges/index.html:50
 msgid "Actions"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:73
+#: sapns/templates/sapns/dashboard/edit.html:76
 #: sapns/templates/sapns/privileges/attributes.html:6
 #: sapns/templates/sapns/privileges/classes.html:6
 msgid "none"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:78
+#: sapns/templates/sapns/dashboard/edit.html:81
 msgid "Go"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:87
+#: sapns/templates/sapns/dashboard/edit.html:90
 #: sapns/templates/sapns/order/insert.html:65
 #: sapns/templates/sapns/order/reference.html:128
 #: sapns/templates/sapns/users/edit.html:67
 msgid "Save"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:262
+#: sapns/templates/sapns/dashboard/edit.html:162
+msgid "Go to link"
+msgstr ""
+
+#: sapns/templates/sapns/dashboard/edit.html:303
 msgid "Check required fields!"
 msgstr ""
 
-#: sapns/templates/sapns/dashboard/edit.html:279
+#: sapns/templates/sapns/dashboard/edit.html:320
 msgid "this field is required"
 msgstr ""
 
@@ -530,7 +540,7 @@ msgid "Document author"
 msgstr ""
 
 #: sapns/templates/sapns/docs/index.html:322
-#: sapns/templates/sapns/privileges/privileges.js:179
+#: sapns/templates/sapns/privileges/privileges.js:182
 msgid "Users"
 msgstr ""
 
@@ -612,6 +622,18 @@ msgstr ""
 msgid "Read/Write"
 msgstr ""
 
+#: sapns/templates/sapns/privileges/copy.html:46
+msgid "Select the roles you want to copy their privileges from into "
+msgstr ""
+
+#: sapns/templates/sapns/privileges/copy.html:63
+msgid "Copy"
+msgstr ""
+
+#: sapns/templates/sapns/privileges/copy.html:112
+msgid "You have to select one role at least"
+msgstr ""
+
 #: sapns/templates/sapns/privileges/index.html:33
 msgid "Classes"
 msgstr ""
@@ -622,20 +644,20 @@ msgstr ""
 
 #: sapns/templates/sapns/privileges/privileges.js:54
 #: sapns/templates/sapns/privileges/privileges.js:65
-#: sapns/templates/sapns/privileges/privileges.js:108
+#: sapns/templates/sapns/privileges/privileges.js:111
 #: sapns/templates/sapns/privileges/privileges.min.js:1
 msgid "Loading"
 msgstr ""
 
-#: sapns/templates/sapns/privileges/privileges.js:158
+#: sapns/templates/sapns/privileges/privileges.js:161
 msgid "Role"
 msgstr ""
 
-#: sapns/templates/sapns/privileges/privileges.js:160
+#: sapns/templates/sapns/privileges/privileges.js:163
 msgid "Roles"
 msgstr ""
 
-#: sapns/templates/sapns/privileges/privileges.js:177
+#: sapns/templates/sapns/privileges/privileges.js:180
 #: sapns/templates/sapns/users/edit.html:85
 msgid "User"
 msgstr ""
