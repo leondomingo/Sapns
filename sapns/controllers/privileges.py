@@ -12,6 +12,7 @@ from repoze.what import authorize #, predicates
 
 # project specific imports
 import logging
+import simplejson as sj
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 
@@ -35,8 +36,10 @@ class PrivilegesController(BaseController):
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
             id_user = get_paramw(kw, 'id_user', int, opcional=True)
             
+            role = dbs.query(SapnsRole).get(id_role)
+            
             came_from = kw.get('came_from', '/')
-            page = _('Privilege management')
+            page = _('Privilege management for "%s"') % role.group_name 
             
             return dict(page=page, id_role=id_role, id_user=id_user, came_from=came_from)
         
@@ -293,8 +296,43 @@ class PrivilegesController(BaseController):
             logger.error(e)
             return dict(status=False, message=str(e).decode('utf-8'))
         
+    @expose('sapns/privileges/copy.html')
+    def copy(self, id, **kw):
         
+        id_role = int(id)
+        this_role = dbs.query(SapnsRole).get(id_role)
+        came_from = kw.get('came_from', '/')
         
+        roles = []
+        for r in dbs.query(SapnsRole).\
+            filter(SapnsRole.group_id != id_role).\
+            order_by(SapnsRole.display_name):
+            #r = SapnsRole()
+            
+            roles.append(dict(id=r.group_id,
+                              name=r.group_name
+                              ))
+
+        return dict(this_role=dict(id=this_role.group_id, 
+                                   name=this_role.group_name),
+                    roles=roles,
+                    page=_('Role privileges copy'), came_from=came_from)
         
+    @expose('json')
+    def _copy(self, **kw):
         
+        logger = logging.getLogger('PrivilegesController._copy')
+        try:
+            to = get_paramw(kw, 'to', int)
+            role_to = dbs.query(SapnsRole).get(to)
+            
+            from_roles = get_paramw(kw, 'from', sj.loads)
+            
+            for id_from in from_roles:
+                role_to.copy_privileges_from(id_from)
+            
+            return dict(status=True)
         
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)

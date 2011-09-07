@@ -1,0 +1,117 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as u %}
+
+{% block head %}
+    {{ super() }}
+    {{ u.jquery() }}
+    {{ u.jquery_ui() }}
+    <style type="text/css">
+        #main {
+            padding: 10px;
+        }
+        
+        #title {
+            height: 35px;
+            font-size: 15px;
+        }
+        
+        #roles_list {
+            height: 500px;
+        }
+        
+        .role_row {
+            height: 25px;
+            width: 250px;
+            border: 1px solid gray;
+            padding-top: 5px;
+            padding-left: 10px;
+            font-size: 12px;
+            margin-bottom: 2px;
+        }
+        
+        .role_name {
+            float: left;
+            font-weight: bold;
+            width: 220px;
+        }
+        
+        .role_title {
+            font-weight: bold;
+        }
+    </style>
+{% endblock %}
+
+{% block middle %}
+    <div id="main">
+        <div id="title">{{_('Select the roles you want to copy their privileges from into ')}}
+            <span class="role_title">{{this_role.name}}</span>:</div>
+        <div id="roles_list">
+        {% if roles %}
+        {% for r in roles %}
+        <div class="role_row">
+            <div class="role_name">{{r.name}}</div>
+            <input type="checkbox" id_role="{{r.id}}">
+        </div> 
+        {% endfor %}
+        {% else %}
+        <div style="color: maroon;">{{_('There is no other role in the system besides <span style="font-weight: bold;">%s</span>'|format(this_role.name))}}</div>
+        {% endif %}
+        </div>
+        
+        <div>
+            {% if roles %}
+            <button id="copy" style="float: left;">{{_('Copy')}}</button>
+            {% endif %}
+            <form id="cancel_form" action="{{came_from}}">
+                <input type="submit" value="{{_('Cancel')}}">
+            </form>
+        </div>
+    </div>
+    <div id="msg" style="display: none;">
+        <p style="font-size: 15px;">Copying privileges</p>
+        <p style="font-size: 9px;">Please, wait...</p>
+    </div>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#copy').click(function() {
+                var roles = $('input[type=checkbox]:checked');
+                var selected_roles = [];
+                for (var i=0, l=roles.length; i<l; i++) {
+                    var r = $(roles[i]);
+                    selected_roles.push(r.attr('id_role'));
+                }
+                
+                if (selected_roles.length > 0) {
+                    $('#msg').dialog({
+                        resizable: false,
+                        modal: true
+                    });
+                    
+                    $('.ui-dialog-titlebar').hide();
+                    
+                    $.ajax({
+                        url: "{{tg.url('/dashboard/privileges/_copy')}}",
+                        data: {
+                            to: {{this_role.id}},
+                            from: JSON.stringify(selected_roles)
+                        },
+                        success: function(data) {
+                            if (data.status) {
+                                $('#msg').dialog('close');
+                                $('#cancel_form').submit();
+                            }
+                            else {
+                                $('#msg').dialog('close');
+                                alert('Error!');
+                            }
+                        }
+                    });
+                }
+                else {
+                    alert("{{_('You have to select one role at least')}}");
+                }
+            });
+        });
+    </script>
+{% endblock %}

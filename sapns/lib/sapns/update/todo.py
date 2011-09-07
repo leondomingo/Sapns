@@ -34,4 +34,7 @@ TODO = [
     # roles/users privileges
     dict(code='init: roles/users privileges', type='py', 
          module='init.privileges'),
+    # roles: copy privileges
+    dict(code='init: copy privileges', type='py', 
+         module='init.copy_privileges'),
 ]

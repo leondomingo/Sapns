@@ -82,6 +82,83 @@ class SapnsRole(Group):
     def has_permission(self, id_permission):
         return SapnsRolePermission.has_permission(self.group_id, id_permission)
     
+    def copy_privileges_from(self, id_from_role):
+        
+        #logger = logging.getLogger('SapnsRole.copy_privileges_from')
+
+        # class privileges
+        for old_p in dbs.query(SapnsPrivilege).\
+                filter(SapnsPrivilege.role_id == id_from_role):
+            
+            new_p = dbs.query(SapnsPrivilege).\
+                filter(and_(SapnsPrivilege.role_id == self.group_id,
+                            SapnsPrivilege.class_id == old_p.class_id,
+                            )).\
+                first()
+            
+            if not new_p:
+                new_p = SapnsPrivilege()
+                new_p.role_id = self.group_id
+                new_p.class_id = old_p.class_id
+                
+            new_p.granted = old_p.granted
+                
+            dbs.add(new_p)
+            dbs.flush()
+        
+        # attribute privileges
+        for old_attrp in dbs.query(SapnsAttrPrivilege).\
+                filter(SapnsAttrPrivilege.role_id == id_from_role):
+            
+            new_attrp = dbs.query(SapnsAttrPrivilege).\
+                    filter(and_(SapnsAttrPrivilege.role_id == self.group_id,
+                                SapnsAttrPrivilege.attribute_id == old_attrp.attribute_id
+                                )).\
+                    first()
+                    
+            if not new_attrp:
+                new_attrp = SapnsAttrPrivilege()
+                new_attrp.role_id = self.group_id
+                new_attrp.attribute_id = old_attrp.attribute_id
+            
+            new_attrp.access = old_attrp.access
+                
+            dbs.add(new_attrp)
+            dbs.flush()
+        
+        # permissions
+        for perm in dbs.query(SapnsPermission):
+            
+            p0 = dbs.query(SapnsRolePermission).\
+                    filter(and_(SapnsRolePermission.role_id == id_from_role,
+                                SapnsRolePermission.permission_id == perm.permission_id,
+                                )).\
+                    first()
+                    
+            if p0:
+                p = dbs.query(SapnsRolePermission).\
+                        filter(and_(SapnsRolePermission.role_id == self.group_id,
+                                    SapnsRolePermission.permission_id == perm.permission_id,
+                                    )).\
+                        first()
+                        
+                if not p:
+                    new_rp = SapnsRolePermission()
+                    new_rp.role_id = self.group_id
+                    new_rp.permission_id = perm.permission_id
+                    dbs.add(new_rp)
+                    dbs.flush()
+                    
+            else:
+                # borrar el permiso
+                p = dbs.query(SapnsRolePermission).\
+                        filter(and_(SapnsRolePermission.role_id == self.group_id,
+                                    SapnsRolePermission.permission_id == perm.permission_id,
+                                    )).\
+                        delete()
+                        
+                dbs.flush()
+                   
 #    def add_act_privilege(self, id_action):
 #        return SapnsActPrivilege.add_privilege(id_action, id_role=self.group_id)
 #
@@ -576,7 +653,8 @@ class SapnsClass(DeclarativeBase):
                              ForeignKey('sp_classes.id', 
                                         onupdate='CASCADE', ondelete='CASCADE'))
     
-    # attributes (SapnsAttribute)
+    #attributess
+    privileges = relation('SapnsPrivilege', backref='class_')
     
     CACHE_ID_ATTR = 'class_get_attributes'
     
@@ -1088,6 +1166,7 @@ class SapnsPrivilege(DeclarativeBase):
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'), 
                       nullable=False)
+    # class_
     
     granted = Column(Boolean, nullable=False, default=True)
     
