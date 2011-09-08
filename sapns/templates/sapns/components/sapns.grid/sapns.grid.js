@@ -104,6 +104,21 @@ catch(e) {
         return selected_ids;
     }
     
+    // getRow
+    SapnsGrid.prototype.getRow = function(id) {
+        var self = this;
+        var row = null;
+        $('#' + self.name + ' .sp-grid-row').each(function() {
+            var rowid = $(this).find('.sp-grid-rowid');
+            if (rowid.attr('id_row') == id) {
+                row = rowid.parent();
+                return;
+            }
+        });
+        
+        return row;
+    }
+    
     // loadData
     SapnsGrid.prototype.loadData = function() {
         
@@ -198,8 +213,20 @@ catch(e) {
     }
     
     // search
-    SapnsGrid.prototype.search = function(q) {
+    SapnsGrid.prototype.search = function(q, force) {
         var self = this;
+        
+        if (force == undefined) {
+            force = false;
+        }
+        
+        if (q == undefined) {
+            q = self.q;
+        }
+        
+        if (self.q != q) {
+            self.pag_n = 1;
+        }
         
         self.q = q;
         
@@ -310,7 +337,7 @@ catch(e) {
         
         var curr_ajx_data = JSON.stringify(ajx.data);
         if (self.ajx_data) {
-            if (self.ajx_data === curr_ajx_data) {
+            if (self.ajx_data === curr_ajx_data && !force) {
                 self.loadData();
             }
             else {
@@ -434,8 +461,9 @@ catch(e) {
             //var form = $(this).parent();
             
             function form(action, target) {
+                var came_from = self.url_base + '?q=' + window.encodeURI(self.q) + '&rp=' + self.rp + '&pag_n=' + self.pag_n;
                 return '<form type="post" action="' + action + '" target="' + target + '">' +
-                    '<input type="hidden" name="came_from" value="' + self.url_base + '">' +
+                    '<input type="hidden" name="came_from" value="' + came_from + '">' +
                     '</form>';
             }
             
@@ -474,7 +502,7 @@ catch(e) {
                         }
                         // delete (std)
                         else if (action_type == 'delete') {
-                            //self.std_delete(selected_ids, url);
+                            self.std_delete(selected_ids, url);
                         }
                     }
                 }
@@ -511,16 +539,13 @@ catch(e) {
     }
     
     // std_delete
-    SapnsGrid.prototype.std_delete = function(ids) {
-
-        console.log('std_delete');
+    SapnsGrid.prototype.std_delete = function(ids, url) {
+        
         var self = this;
-        
         var cls = self.cls;
+        var id = ids[0];
         
-        return;
-        
-        var url = button.attr('url');
+        //console.log('std_delete ' + id + ' ' + url);
         
         var delete_html = 
             "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
@@ -566,11 +591,11 @@ catch(e) {
                         dataType: "json",
                         data: {
                             cls: cls,
-                            id: id,
+                            id_: id,
                         },
                         success: function(res) {
                             if (res.status) {
-                                selected_row.remove();
+                                self.search(self.q, true);
                                 $('#grid-dialog').dialog('close');
                             }
                             else {
@@ -760,6 +785,7 @@ catch(e) {
                 
                 $('#' + g.name + ' .page-forth').live('click', function() {
                     if (g.pag_n < g.total_pag) {
+                        g.pag_n *= 1
                         g.pag_n += 1;
                         g.search(g.q);
                     }
