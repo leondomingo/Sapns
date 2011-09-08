@@ -422,7 +422,7 @@ class DashboardController(BaseController):
                              params=dict(message=_('The record has been successfully saved'),
                                          came_from='')))
         
-    @expose('sapns/dashboard/edit.html')
+    @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
     def new(self, cls, came_from='/dashboard', **kw):
         
@@ -433,7 +433,7 @@ class DashboardController(BaseController):
             
         redirect(url('/dashboard/edit/%s' % cls), params=kw)
         
-    @expose('sapns/dashboard/edit.html')
+    @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
     def edit(self, cls, id='', came_from='/dashboard', **params):
         
