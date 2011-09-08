@@ -5,29 +5,11 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    {#<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.css">#}
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges.min.css">
-    <script type="text/javascript">
-        {#{% include 'sapns/components/sapns.selector.js' %}#}
-        {#{% include 'sapns/components/sapns.selector.min.js' %}#}
-    </script>
+    {#<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.css">#}
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.min.css">
 {% endblock %}
 
 {% block middle %}
-{#
-<div id="options">
-    <div id="role_option">
-        <div class="option_title">{{_('Roles')}}</div>
-        <div id="role_selector"></div>
-    </div>
-    
-    <div id="user_option">
-        <div class="option_title">{{_('Users')}}</div>
-        <div id="user_selector"></div>
-    </div>
-</div>
-#}
-
 <div id="main_pane">
     <div id="classes_sidebar">
         <div id="classes_title">{{_('Classes')}}</div>

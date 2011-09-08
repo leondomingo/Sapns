@@ -5,40 +5,8 @@
     {{ super() }}
     {{ u.jquery() }}
     {{ u.jquery_ui() }}
-    <style type="text/css">
-        #main {
-            padding: 10px;
-        }
-        
-        #title {
-            height: 35px;
-            font-size: 15px;
-        }
-        
-        #roles_list {
-            height: 500px;
-        }
-        
-        .role_row {
-            height: 25px;
-            width: 250px;
-            border: 1px solid gray;
-            padding-top: 5px;
-            padding-left: 10px;
-            font-size: 12px;
-            margin-bottom: 2px;
-        }
-        
-        .role_name {
-            float: left;
-            font-weight: bold;
-            width: 220px;
-        }
-        
-        .role_title {
-            font-weight: bold;
-        }
-    </style>
+    {#<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.copy.css">#}
+    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.copy.min.css">
 {% endblock %}
 
 {% block middle %}
@@ -68,8 +36,8 @@
         </div>
     </div>
     <div id="msg" style="display: none;">
-        <p style="font-size: 15px;">Copying privileges</p>
-        <p style="font-size: 9px;">Please, wait...</p>
+        <p style="font-size: 15px;">{{_('Copying privileges')}}</p>
+        <p style="font-size: 9px;">{{_('Please, wait')}}...</p>
     </div>
     
     <script type="text/javascript">

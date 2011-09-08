@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-09-07 19:12+0200\n"
+"POT-Creation-Date: 2011-09-08 08:59+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -34,14 +34,14 @@ msgstr "%s de [%s]"
 #: sapns/controllers/dashboard.py:157
 #: sapns/templates/sapns/privileges/actions.html:8
 #: sapns/templates/sapns/privileges/classes.html:8
-#: sapns/templates/sapns/privileges/index.html:51
+#: sapns/templates/sapns/privileges/index.html:33
 msgid "Yes"
 msgstr "Sí"
 
 #: sapns/controllers/dashboard.py:158
 #: sapns/templates/sapns/privileges/actions.html:9
 #: sapns/templates/sapns/privileges/classes.html:9
-#: sapns/templates/sapns/privileges/index.html:52
+#: sapns/templates/sapns/privileges/index.html:34
 msgid "No"
 msgstr "No"
 
@@ -188,7 +188,7 @@ msgstr "Estás en"
 
 #: sapns/templates/myapp/base.html:34
 #: sapns/templates/sapns/base.html:30
-#: sapns/templates/sapns/dashboard/edit.html:96
+#: sapns/templates/sapns/dashboard/edit/edit.html:96
 msgid "return"
 msgstr "volver"
 
@@ -231,7 +231,7 @@ msgstr "Aceptar"
 #: sapns/templates/sapns/dashboard/grid.html:383
 #: sapns/templates/sapns/docs/index.html:248
 #: sapns/templates/sapns/docs/index.html:424
-#: sapns/templates/sapns/privileges/copy.html:66
+#: sapns/templates/sapns/privileges/copy.html:34
 #: sapns/templates/sapns/shortcuts/list.html:187
 #: sapns/templates/sapns/shortcuts/list.html:231
 #: sapns/templates/sapns/shortcuts/list.html:305
@@ -360,51 +360,6 @@ msgstr "Diciembre"
 msgid "Do you really want to delete this record?"
 msgstr "¿Seguro que quieres borrar este registro?"
 
-#: sapns/templates/sapns/dashboard/edit.html:58
-#: sapns/templates/sapns/dashboard/grid.html:600
-msgid "Related info"
-msgstr "Información relacionada"
-
-#: sapns/templates/sapns/dashboard/edit.html:64
-#: sapns/templates/sapns/dashboard/grid.html:606
-msgid "Show"
-msgstr "Mostrar"
-
-#: sapns/templates/sapns/dashboard/edit.html:74
-#: sapns/templates/sapns/dashboard/grid.html:559
-#: sapns/templates/sapns/privileges/index.html:50
-msgid "Actions"
-msgstr "Acciones"
-
-#: sapns/templates/sapns/dashboard/edit.html:76
-#: sapns/templates/sapns/privileges/attributes.html:6
-#: sapns/templates/sapns/privileges/classes.html:6
-msgid "none"
-msgstr "ninguno"
-
-#: sapns/templates/sapns/dashboard/edit.html:81
-msgid "Go"
-msgstr "Ir"
-
-#: sapns/templates/sapns/dashboard/edit.html:90
-#: sapns/templates/sapns/order/insert.html:65
-#: sapns/templates/sapns/order/reference.html:128
-#: sapns/templates/sapns/users/edit.html:67
-msgid "Save"
-msgstr "Guardar"
-
-#: sapns/templates/sapns/dashboard/edit.html:162
-msgid "Go to link"
-msgstr "Ir al enlace"
-
-#: sapns/templates/sapns/dashboard/edit.html:303
-msgid "Check required fields!"
-msgstr "Comprueba los campos requeridos"
-
-#: sapns/templates/sapns/dashboard/edit.html:320
-msgid "this field is required"
-msgstr "este campo es requerido"
-
 #: sapns/templates/sapns/dashboard/grid.html:54
 msgid "Oops, something went wrong..."
 msgstr "Ups, algo fue mal..."
@@ -480,10 +435,26 @@ msgstr "página 1"
 msgid "page %(p)d"
 msgstr "página %(p)d"
 
+#: sapns/templates/sapns/dashboard/grid.html:559
+#: sapns/templates/sapns/dashboard/edit/edit.html:74
+#: sapns/templates/sapns/privileges/index.html:32
+msgid "Actions"
+msgstr "Acciones"
+
 #: sapns/templates/sapns/dashboard/grid.html:588
 #: sapns/templates/sapns/dashboard/grid.html:592
 msgid "Export"
 msgstr "Exportar"
+
+#: sapns/templates/sapns/dashboard/grid.html:600
+#: sapns/templates/sapns/dashboard/edit/edit.html:58
+msgid "Related info"
+msgstr "Información relacionada"
+
+#: sapns/templates/sapns/dashboard/grid.html:606
+#: sapns/templates/sapns/dashboard/edit/edit.html:64
+msgid "Show"
+msgstr "Mostrar"
 
 #: sapns/templates/sapns/dashboard/index.html:23
 msgid "up"
@@ -492,6 +463,37 @@ msgstr "subir"
 #: sapns/templates/sapns/dashboard/search.html:10
 msgid "Search.."
 msgstr "Buscar..."
+
+#: sapns/templates/sapns/dashboard/edit/edit.html:76
+#: sapns/templates/sapns/privileges/attributes.html:6
+#: sapns/templates/sapns/privileges/classes.html:6
+msgid "none"
+msgstr "ninguno"
+
+#: sapns/templates/sapns/dashboard/edit/edit.html:81
+msgid "Go"
+msgstr "Ir"
+
+#: sapns/templates/sapns/dashboard/edit/edit.html:90
+#: sapns/templates/sapns/order/insert.html:65
+#: sapns/templates/sapns/order/reference.html:128
+#: sapns/templates/sapns/users/edit.html:67
+msgid "Save"
+msgstr "Guardar"
+
+#: sapns/templates/sapns/dashboard/edit/edit.html:169
+msgid "Go to link"
+msgstr "Ir al enlace"
+
+#: sapns/templates/sapns/dashboard/edit/edit.js:118
+#: sapns/templates/sapns/dashboard/edit/edit.min.js:2
+msgid "Check required fields!"
+msgstr "Comprueba los campos requeridos"
+
+#: sapns/templates/sapns/dashboard/edit/edit.js:135
+#: sapns/templates/sapns/dashboard/edit/edit.min.js:2
+msgid "this field is required"
+msgstr "este campo es requerido"
 
 #: sapns/templates/sapns/docs/edit.html:3
 #: sapns/templates/sapns/docs/list.html:4
@@ -623,37 +625,45 @@ msgid "\"%s\" visible"
 msgstr "\"%s\" visible"
 
 #: sapns/templates/sapns/privileges/attributes.html:9
-#: sapns/templates/sapns/privileges/index.html:41
+#: sapns/templates/sapns/privileges/index.html:23
 msgid "Denied"
 msgstr "Denegado"
 
 #: sapns/templates/sapns/privileges/attributes.html:12
-#: sapns/templates/sapns/privileges/index.html:42
+#: sapns/templates/sapns/privileges/index.html:24
 msgid "Read-only"
 msgstr "Sólo-lectura"
 
 #: sapns/templates/sapns/privileges/attributes.html:15
-#: sapns/templates/sapns/privileges/index.html:43
+#: sapns/templates/sapns/privileges/index.html:25
 msgid "Read/Write"
 msgstr "Lectura/Escritura"
 
-#: sapns/templates/sapns/privileges/copy.html:46
+#: sapns/templates/sapns/privileges/copy.html:14
 msgid "Select the roles you want to copy their privileges from into "
 msgstr "Selecciona los roles de los que quieres copiar sus privilegios en"
 
-#: sapns/templates/sapns/privileges/copy.html:63
+#: sapns/templates/sapns/privileges/copy.html:31
 msgid "Copy"
 msgstr "Copiar"
 
-#: sapns/templates/sapns/privileges/copy.html:112
+#: sapns/templates/sapns/privileges/copy.html:39
+msgid "Copying privileges"
+msgstr "Copiando privilegios"
+
+#: sapns/templates/sapns/privileges/copy.html:40
+msgid "Please, wait"
+msgstr "Por favor, espera"
+
+#: sapns/templates/sapns/privileges/copy.html:80
 msgid "You have to select one role at least"
 msgstr "Tienes que seleccionar al menos un rol"
 
-#: sapns/templates/sapns/privileges/index.html:33
+#: sapns/templates/sapns/privileges/index.html:15
 msgid "Classes"
 msgstr "Clases"
 
-#: sapns/templates/sapns/privileges/index.html:40
+#: sapns/templates/sapns/privileges/index.html:22
 msgid "Attributes"
 msgstr "Atributos"
 

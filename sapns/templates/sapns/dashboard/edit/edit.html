@@ -1,0 +1,198 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+{% import 'sapns/dashboard/datefield.js' as df %}
+
+{% block head %}
+    {{ super() }}
+    {#<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}" >#}
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}" >
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.dateformat() }}
+    {{ util.qtip2() }}
+    <script type="text/javascript">
+        {% include 'sapns/components/sapns.selector.min.js' %}
+    </script>
+    {#<script type="text/javascript" src="{{tg.url('/js/fields.js')}}"></script>#}
+    <script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
+{% endblock %}
+
+{% block header %}
+{% endblock %}
+
+{% block middle %}
+<div id="edit-dialog" style="display: none;"></div>
+
+<form id="edit-form" method="post" action="{{tg.url('/dashboard/save/%s' % cls)}}">
+    <input type="hidden" name="id" value="{{id}}">
+    <input type="hidden" name="came_from" value="{{came_from}}">
+</form>
+
+<div class="sp-edit-panel">
+    <div id="edit-header">
+    
+    <div style="position: absolute; width: 350px; height: 145px; top: 5px; z-index: -1;
+        background-color: transparent;">
+        <div style="">
+            <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
+            <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
+        </div>
+    </div>
+    
+    <div style="position: absolute; left: 360px; top: 5px; padding-right: 10px; 
+        width: 617px; background-color: transparent;">
+    
+    <!-- {# Title of the object #} -->
+    <div style="font-size: 25px; text-align: right;">{{title}}</div>
+
+    {%- if reference %}
+    <div style="margin-left: 0; font-size: 15px; color: black; 
+        background-color: none; text-align: right;">[{{reference}}]</div>
+    {% endif %}
+    
+    <div style="height: 10px;"></div>
+    
+    <!-- related classes -->
+    {% if id and related_classes|length > 0 %}
+    <div id="rel-classes">
+        <div id="rel-classes-title">{{_('Related info')}} <span class="related-classes-count">[{{related_classes|length}}]</span></div>
+        <select id="rel-classes-sel">
+        {% for rc in related_classes %}
+        <option ch_attr="{{rc.attr_name}}" cls="{{rc.name}}">{{rc.title}} ({{rc.attr_title}})</option>
+        {% endfor %}
+        </select>
+        <button id="rel-classes-show" class="sp-button" style="width: 63px;">{{_('Show')}}</button>
+        <form id="rel-classes-form" method="post" action="" target="_blank">
+            <input type="hidden" name="parent_id" value="{{id}}">
+        </form>
+    </div>
+    {% endif %}
+    
+    <!-- actions -->
+    {% if id and actions|length > 0 %}
+    <div id="actions">
+        <div id="actions-title">{{_('Actions')}} <span class="actions-count">[{{actions|length}}]</span></div>
+        <select id="actions-sel" row_id="{{id}}">
+        <option selected>({{_('none')}})</option>
+        {% for act in actions %}
+        <option value="{{act.url}}">{{act.title|escape}}</option>
+        {% endfor %}
+        </select>
+        <button id="action-go" class="sp-button" style="width: 63px;">{{_('Go')}}</button>
+        <form id="action-form" method="post" action="" target="_blank">
+            <!--<input type="hidden" name="id" value="{{id}}">-->
+            <input type="hidden" name="came_from" value="">
+        </form>
+    </div>
+    {% endif %}
+    
+    <div class="sp-save-button">
+        <button id="save-button" class="sp-button">{{_('Save')}}</button>
+    </div>
+    </div>
+    
+    {% if came_from %}
+    <div id="edit-back">
+        <button id="back-button" class="sp-button">{{_('return')}}</button>
+    </div>
+    {% endif %}
+    </div>
+    
+    <div style="height: 175px;">&nbsp;</div>
+    
+    {%- for attr in attributes %}
+    <div class="sp-edit-field" name="{{attr.name}}"
+        {% if attr.required %}
+        required="true"
+        {% else %}
+        required="false" 
+        {% endif %}
+        
+        {% if attr.read_only %}
+        read_only="true"
+        {% else %}
+        read_only="false"
+        {% endif %}
+        
+        attr-title="{{attr.title}}">
+        
+        <div class="sp-label-field" 
+            style="margin-left: 10px; 
+                margin-top: 4px;
+                {% if attr.required %} font-weight: bold;  {% endif %}
+                margin-bottom: 2px;">{{attr.title|escape}}</div>
+
+        <div>
+        
+        <!-- {# Integer #} -->
+        {% if attr.type == 'int' and attr.related_class == None %}
+        <input class="sp_integer_field" type="text"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value or ''}}">
+            
+        <!-- {# Float #} -->
+        {% elif attr.type == 'float' %}
+        <input class="sp_float_field" type="text"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value or ''}}">
+        
+        <!-- {# Boolean #} -->
+        {%- elif attr.type == 'bool' %}
+        <input class="sp-checkbox-field" type="checkbox"
+            {% if attr.read_only %} disabled {% endif %}
+            {% if attr.value %} checked {% endif %}>
+        
+        <!-- {# Date #} -->
+        {%- elif attr.type == 'date' %}
+        <input class="sp-date-field" type="text"
+            {% if attr.read_only %} disabled {% endif %} 
+            value="{{attr.value}}">
+        
+        <!-- {# Time #} -->
+        {%- elif attr.type == 'time' %}
+        <input class="sp-time-field" type="text"
+            {% if attr.read_only %} disabled {% endif %} 
+            value="{{attr.value}}">            
+        
+        <!-- {# Memo #} -->
+        {%- elif attr.type == 'memo' %}
+        <textarea class="sp-text-field sp-memo-field"
+            {% if attr.read_only %} disabled {% endif %}>{{attr.value|escape}}</textarea>
+            
+        <!-- {# URL #} -->
+        {%- elif attr.type == 'url' %}
+        <div class="url_field">
+        <input class="url_field_text" type="text"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value}}">
+            
+        <button class="url_field_btn sp-button">{{_('Go to link')}}</button>
+        </div>
+        
+        {%- elif attr.related_class != None %}
+        <!-- {# Select #} -->
+        <div id="selector-{{attr.name}}" class="sp-select-field sp_selector"
+            attr_name="{{attr.name}}" attr_value="{{attr.value}}" 
+            attr_title="{{attr.title}}" attr_rc="{{attr.related_class}}" 
+            attr_rc_title="{{attr.related_class_title}}"></div>
+        {%- else %}
+        <!-- {# Everything else #} -->
+        <input class="sp-text-field" type="text" 
+            value="{{attr.value|escape}}"
+            {% if attr.read_only %} disabled {% endif %}>
+        {% endif %}
+        </div>
+    </div>
+    {% endfor %}
+    <div style="height: 40px;">
+    </div>
+</div>
+
+<script type="text/javascript">
+    {#{% include 'sapns/dashboard/edit/edit.js' %}#}
+    {% include 'sapns/dashboard/edit/edit.min.js' %}
+</script>
+{% endblock %}
+
+{% block footer %}
+{% endblock %}
