@@ -30,6 +30,34 @@ $(document).ready(function() {
                 '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
         });
         
+        // integer
+        $('.sp_integer_field').each(function() {
+            var name = $(this).parent().parent().attr('name');
+            var required = $(this).parent().parent().attr('required');
+            var value = $(this).val();
+                    
+            if (required == 'true' && value == '') {
+                required_attrs.push($(this));
+            }
+            
+            params += 
+                '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
+        });
+        
+        // float
+        $('.sp_float_field').each(function() {
+            var name = $(this).parent().parent().attr('name');
+            var required = $(this).parent().parent().attr('required');
+            var value = $(this).val();
+                    
+            if (required == 'true' && value == '') {
+                required_attrs.push($(this));
+            }
+            
+            params += 
+                '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
+        });
+        
         // {# url #} 
         $('.url_field_text').each(function() {
             var parent = $(this).parent().parent().parent();
@@ -108,8 +136,7 @@ $(document).ready(function() {
             }
             
             params += 
-                '<input type="hidden" name="fld_' + name + '" ' + 
-                    'value="' + sel_value + '">\n';
+                '<input type="hidden" name="fld_' + name + '" value="' + sel_value + '">\n';
         });
         
         if (required_attrs.length > 0) {
@@ -165,8 +192,7 @@ $(document).ready(function() {
         
         var params = '';
         params += '<input type="hidden" name="parent_id" value="{{id}}">\n';
-        params += '<input type="hidden" name="ch_attr" ' +
-           'value="' + option.attr('ch_attr') + '">\n';
+        params += '<input type="hidden" name="ch_attr" value="' + option.attr('ch_attr') + '">\n';
            
         $('#rel-classes-form').attr('action', action).html(params).submit();
     });
