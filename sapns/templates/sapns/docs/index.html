@@ -117,21 +117,24 @@
 
     {{super()}}
 
-    {{ grid_html.js_select_row(_) }}
+    {#{{ grid_html.js_select_row(_) }}
     {{ grid_html.js_functions(_) }}
-    {{ grid_html.show(page, _, q, grid, show_ids, link=link, came_from=came_from) }}
+    {{ grid_html.show(page, _, q, grid, show_ids, link=link, came_from=came_from) }}#}
+    <div id="docs"></div>
 
     <!-- <div id="docs_list">{{ doc.doclist(tg, _, doclist) }}</div> -->
 
-    <div id="doclist_actions">
+    {#<div id="doclist_actions">
         <button id="btn_add_doc" class="doc_action">{{_('Add')}}</button>
         <button id="btn_edit_doc" class="doc_action">{{_('Edit')}}</button>
         <button id="btn_del_doc" class="doc_action">{{_('Delete')}}</button>
-    </div>
+    </div>#}
     
     <div id="docs_dialog" style="display: none;"></div>
 
     <script type="text/javascript">
+        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+        {#{% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}#}
         $(document).ready(function() {
             
             // the object assigned to these documents 
@@ -228,7 +231,8 @@
                                             if (data.status) {
                                                 $('.ui-tooltip').remove();
                                                 $('#docs_dialog').dialog('close');
-                                                // TODO: update list of docs 
+                                                // update list of docs 
+                                                $('#docs').sapnsGrid('search', true);
                                             }
                                         }
                                     });
@@ -355,86 +359,107 @@
                 
             };
             
-            // Add 
-            $('#btn_add_doc').click(function() {
-                edit_doc();
-            });
-            
-            var no_selected_doc = "{{_('No selected doc')}}";
-            
-            // Edit 
-            $('#btn_edit_doc').click(function() {
-                if ($('.row_check:checked').length > 0) {
-                    edit_doc($('.row_check:checked:first').attr('doc_id'));
-                }
-                else {
-                    alert(no_selected_doc);
-                }
-            });
-            
             // Delete 
-            $('#btn_del_doc').click(function() {
-                if ($('.row_check:checked').length > 0) {
-
-                    var delete_file = function(id_doc, callback) {
-                        $.ajax({
-                            url: "{{tg.url('/dashboard/docs/delete')}}",
-                            data: {
-                                id_doc: id_doc
-                            },
-                            success: function(data) {
-                                if (data.status) {
-                                    callback();
-                                }
-                                else {
-                                }
-                            }
-                        });
-                    }
+            var delete_doc = function(id_doc) {
+                
+                var delete_file = function(id_doc, callback) {
                     
-                    var id_doc = $('.row_check:checked:first').attr('doc_id');
-                    
-                    var delete_message = 
-                        "<p>{{_('Do you want to delete this doc?')}}</p>" +
-                        '<p id="doc_to_delete" style="font-style: italic;"></p>';
-                        
-                    $('#docs_dialog').html(delete_message);
-                        
                     $.ajax({
-                        url: "{{tg.url('/dashboard/title')}}",
+                        url: "{{tg.url('/dashboard/docs/delete')}}",
                         data: {
-                            cls: 'sp_docs',
-                            id: id_doc
+                            id_doc: id_doc
                         },
                         success: function(data) {
                             if (data.status) {
-                                $('#doc_to_delete').html(data.title);
+                                callback();
+                            }
+                            else {
                             }
                         }
                     });
+                }
                     
-                    $('#docs_dialog').dialog({
-                        modal: true,
-                        resizable: false,
-                        title: "{{_('Delete document')}}",
-                        buttons: {
-                            "{{_('Ok')}}": function() {
-                                var callback_success = function() {
-                                    $('#docs_dialog').dialog('close');
-                                    $('.row_check:checked:first').parent().parent().remove();
-                                }
-                                
-                                delete_file(id_doc, callback_success);
-                            },
-                            "{{_('Cancel')}}": function() {
-                                $('#docs_dialog').dialog('close');
-                            }
+                var delete_message = 
+                    "<p>{{_('Do you want to delete this doc?')}}</p>" +
+                    '<p id="doc_to_delete" style="font-style: italic;"></p>';
+                    
+                $('#docs_dialog').html(delete_message);
+                    
+                $.ajax({
+                    url: "{{tg.url('/dashboard/title')}}",
+                    data: {
+                        cls: 'sp_docs',
+                        id: id_doc
+                    },
+                    success: function(data) {
+                        if (data.status) {
+                            $('#doc_to_delete').html(data.title);
                         }
-                    });
-                }
-                else {
-                    alert(no_selected_doc);
-                }
+                    }
+                });
+                
+                $('#docs_dialog').dialog({
+                    modal: true,
+                    resizable: false,
+                    title: "{{_('Delete document')}}",
+                    buttons: {
+                        "{{_('Ok')}}": function() {
+                            var callback_success = function() {
+                                $('#docs_dialog').dialog('close');
+                                $('#docs').sapnsGrid('search', true);
+                            }
+                            
+                            delete_file(id_doc, callback_success);
+                        },
+                        "{{_('Cancel')}}": function() {
+                            $('#docs_dialog').dialog('close');
+                        }
+                    }
+                });
+            };
+            
+            $('.sp-search-txt').focus();
+            
+            $('#docs').sapnsGrid({
+                cls: "{{grid.cls}}",
+                caption: "{{grid.caption}}",
+                search_params: {
+                    url: "{{tg.url('/dashboard/docs/search/')}}",
+                    data: { 
+                        cls: "{{grid.cls}}", 
+                        id: "{{grid.id_object}}"*1 
+                    }
+                },
+                actions: [
+                    {title: "{{_('Add')}}",
+                     type: {
+                        id: "add", 
+                        f: function() { edit_doc(); }
+                     },
+                     require_id: false
+                    },
+                    {title: "{{_('Edit')}}",
+                     type: {
+                          id: "edit",
+                          f: edit_doc
+                     }
+                    },
+                    {title: "{{_('Download')}}",
+                     type: {
+                         id: "download",
+                         f: function() {
+                             alert('downloading...');
+                         }
+                     }
+                    },
+                    {title: "{{_('Delete')}}", 
+                     type: {
+                         id: "delete",
+                         f: delete_doc
+                     },
+                     require_id: true
+                    }
+                ]
             });
         });
     </script>

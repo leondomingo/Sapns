@@ -240,7 +240,9 @@ catch(e) {
                 cls: self.cls, 
                 q: self.q, 
                 rp: self.rp, 
-                pag_n: self.pag_n
+                pag_n: self.pag_n,
+                ch_attr: self.ch_attr,
+                parent_id: self.parent_id
             },
             success: function(response) {
                 if (response.status) {
@@ -325,7 +327,7 @@ catch(e) {
                             style: "ui-tooltip-dark ui-tooltip-rounded"
                         });
                     } catch (e) {
-                        console.log(e);
+                        // console.log(e);
                         // qtip2 is not loaded
                     }
 
@@ -348,11 +350,27 @@ catch(e) {
         self.ajx_data = curr_ajx_data;
     }
     
+    SapnsGrid.prototype.warningSelectedId = function() {
+        var self = this;
+        
+        $('#grid-dialog_' + self.name).
+        html("<p style='text-align: center'>{{_('You must select a row before click on this action')}}</p>"). 
+        dialog({
+            resizable: false,
+            height: 100,
+            width: 450,
+            modal: true,
+            draggable: false
+        });
+    }
+    
     SapnsGrid.prototype._loadActions = function(actions) {
+        
+        //console.log('_loadActions: ' + actions.length);
         
         var self = this;
         var g_actions = '';
-        var act_f = []
+        //var act_f = []
         
         if (actions.length > 0) {
             g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
@@ -367,15 +385,6 @@ catch(e) {
                 
                 if (typeof(act.type) === 'string') {
                     g_actions += '<div style="float: left;">';
-                    /*
-                            '<form class="action-form" method="post" action0="' + act.url + '">' +
-                            '<input type="hidden" name="cls" value="' + self.cls + '">' +
-                            '<input type="hidden" name="came_from" value="' + self.link + '">';
-                    
-                    if (self.parent_id) {
-                        g_actions += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
-                    }*/
-
                     g_actions += '<button class="sp-button sp-grid-action standard_action" ' +
                         ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
                         ' require_id="' + req_id + '" >' + act.title + '</button></div>';
@@ -386,27 +395,8 @@ catch(e) {
                             '<button id="' + act.type.id + '" class="sp-button sp-grid-action" ' +
                                 ' require_id="' + req_id + '" >' + act.title + '</button>' +
                         '</div>';
-                    
-                    act_f.push(act.type);
                 }
             }
-        }
-        
-        // assign functions to actions
-        for (var i=0, l=act_f.length; i<l; i++) {
-            $('#' + act_f[i].id).data('_func', act_f[i].f);
-            
-            $('#' + act_f[i].id).live('click', function() {
-                if ($(this).attr('require_id') == 'true') {
-                    var selected_ids = self.getSelectedIds();
-                    if (selected_ids.length > 0) {
-                        $(this).data('_func')(selected_ids[0]);
-                    }
-                }
-                else {
-                    $(this).data('_func')();
-                }
-            });
         }
         
         // export
@@ -443,6 +433,7 @@ catch(e) {
                         }
                         
                         $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                        
                     }
                 }, 
                 self.actions);
@@ -451,17 +442,46 @@ catch(e) {
             }
             else {
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                
+                // assign functions to actions
+                for (var i=0, l=self.actions.length; i<l; i++) {
+                    
+                    var act = self.actions[i];
+                    
+                    if (typeof(act.type) == 'object') {
+                        $('#' + act.type.id).data('_func', act.type.f);
+                        
+                        $('#' + act.type.id).live('click', function() {
+                            if ($(this).attr('require_id') == 'true') {
+                                var selected_ids = self.getSelectedIds();
+                                if (selected_ids.length > 0) {
+                                    $(this).data('_func')(selected_ids[0]);
+                                }
+                                else {
+                                    self.warningSelectedId();
+                                }
+                            }
+                            else {
+                                $(this).data('_func')();
+                            }
+                        });
+                    }
+                }
             }
         }
         
         // standard actions
         $('.standard_action').live('click', function(event) {
             
-            // action form 
-            //var form = $(this).parent();
+            //console.log('standard action');
             
             function form(action, target) {
-                var came_from = self.url_base + '?q=' + window.encodeURI(self.q) + '&rp=' + self.rp + '&pag_n=' + self.pag_n;
+                var came_from = '';
+                if (target != '_blank') {
+                    var came_from = self.url_base + '?q=' + window.encodeURI(self.q) + 
+                        '&rp=' + self.rp + '&pag_n=' + self.pag_n;
+                }
+                
                 return '<form type="post" action="' + action + '" target="' + target + '">' +
                     '<input type="hidden" name="came_from" value="' + came_from + '">' +
                     '</form>';
@@ -471,17 +491,15 @@ catch(e) {
             var ch_attr = self.ch_attr; //$('#' + self.name + ' .sp-search-form input[name=ch_attr]').val();
             
             // if CTRL is pressed open in a new tab 
-            //form.attr('target', '');
             var target = '';
             if (event.ctrlKey) {
-                //form.attr('target', '_blank');
                 target = '_blank';
             }
             
             var url = $(this).attr('url');
             var action_type = $(this).attr('action-type')
             var _func = $(this).attr('_func');
-            //console.log(action_type + ': ' + url);
+            //console.log(action_type + ': ' + url + ' ' + _func);
             if (!_func) {
                 
                 var a = $(this).attr('url');
@@ -494,16 +512,20 @@ catch(e) {
                     var selected_ids = self.getSelectedIds();
                                         
                     if (selected_ids.length > 0) {
-                        // edit (std)
-                        if (action_type == 'edit') {
-                            //self.std_edit(selected_ids[0], url);
-                            a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        }
                         // delete (std)
-                        else if (action_type == 'delete') {
+                        if (action_type == 'delete') {
                             self.std_delete(selected_ids, url);
                         }
+                        // other standard actions
+                        else { //(action_type == 'edit') {
+                            //self.std_edit(selected_ids[0], url);
+                            a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
+                            //console.log(a + ' ' + target);
+                            $(form(a, target)).appendTo('body').submit().remove();
+                        }
+                    }
+                    else {
+                        self.warningSelectedId();
                     }
                 }
                 else {
@@ -522,21 +544,25 @@ catch(e) {
     }
     
     // std_new
+    /*
     SapnsGrid.prototype.std_new = function() {
-        console.log('std_new');
+        //console.log('std_new');
         var self = this;
         return;
     }
+    */
     
     // std_edit
+    /*
     SapnsGrid.prototype.std_edit = function(id) {
-        console.log('std_edit');
+        //console.log('std_edit');
         var self = this;
         
         console.log(id);
         
         return;
     }
+    */
     
     // std_delete
     SapnsGrid.prototype.std_delete = function(ids, url) {
@@ -555,9 +581,9 @@ catch(e) {
             "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
             "<div id='delete-error-message'></div>";
         
-        $('#grid-dialog').html(delete_html);
+        $('#grid-dialog_' + self.name).html(delete_html);
             
-        // {# get object's title #} 
+        // get object's title 
         var title = '';
         $.ajax({
             url: "/dashboard/title",
@@ -569,15 +595,15 @@ catch(e) {
             },
             success: function(res) {
                 if (res.status) {
-                    $('#grid-dialog #object-title').html(res.title);
+                    $('#grid-dialog_' + self.name + ' #object-title').html(res.title);
                 }
             },
             error: function() {
-                // {# alert('error!'); #} 
+                // alert('error!'); 
             }
         });
 
-        $('#grid-dialog').dialog({
+        $('#grid-dialog_' + self.name).dialog({
             width: 650,
             height: 210,
             resizable: false,
@@ -596,10 +622,10 @@ catch(e) {
                         success: function(res) {
                             if (res.status) {
                                 self.search(self.q, true);
-                                $('#grid-dialog').dialog('close');
+                                $('#grid-dialog_' + self.name).dialog('close');
                             }
                             else {
-                                $('#grid-dialog').dialog('close');
+                                $('#grid-dialog_' + self.name).dialog('close');
                                 
                                 var message = "<p style='color: gray;'>" + res.message + "</p>";
 
@@ -618,24 +644,24 @@ catch(e) {
                                 }
                                 
                                 // {# load message #} 
-                                $('#grid-dialog').html(error_html).find('#delete-error-message').html(message);
+                                $('#grid-dialog_' + self.name).html(error_html).find('#delete-error-message').html(message);
                                 
                                 // {# show error dialog #} 
-                                $('#grid-dialog').dialog({
+                                $('#grid-dialog_' + self.name).dialog({
                                     width: 700,
                                     height: 250,
                                     buttons: {"{{_('Close')}}": function() {
-                                        $('#grid-dialog').dialog('close');
+                                        $('#grid-dialog_' + self.name).dialog('close');
                                     }}
                                 });
                             }
                         },
                         error: function() {
-                            $('#grid-dialog').dialog('close');
-                            $('#grid-dialog').html(error_html).dialog({
+                            $('#grid-dialog_' + self.name).dialog('close');
+                            $('#grid-dialog_' + self.name).html(error_html).dialog({
                                 buttons: {
                                     "{{_('Close')}}": function() {
-                                        $('#grid-dialog').dialog('close');
+                                        $('#grid-dialog_' + self.name).dialog('close');
                                     }
                                 }
                             });
@@ -643,7 +669,7 @@ catch(e) {
                     });
                 },
                 "{{_('Cancel')}}": function() {
-                    $('#grid-dialog').dialog('close');
+                    $('#grid-dialog_' + self.name).dialog('close');
                 }
             }
         });
@@ -656,7 +682,7 @@ catch(e) {
             var g = new SapnsGrid(arg1);
             this.data('sapnsGrid', g);
             
-            this.append('<div id="grid-dialog" style="display: none;"></div>');
+            this.append('<div id="grid-dialog_' + g.name + '" style="display: none;"></div>');
             
             var g_content = '';            
             g_content += '<div class="sp-grid-container" id="' + g.name + '" cls="' + g.cls + '">';
@@ -804,33 +830,37 @@ catch(e) {
         }
         else if (typeof(arg1) == "string") {
             
-            var grid = this.data('sapnsGrid');
+            var self = this.data('sapnsGrid');
             
             // loadData
             if (arg1 == "loadData") {
-                grid.loadData();
+                self.loadData();
             }
             // search
             else if (arg1 == "search") {
                 var q = '';
-                if (arg2) {
+                
+                if (typeof(arg2) == 'boolean') {
+                    q = self.q;
+                }
+                else if (arg2) {
                     q = arg2;
                 }
                 
-                if (grid.with_search) {
-                    $('#'+grid.name + ' .sp-search-txt').val(q);
+                if (self.with_search) {
+                    $('#'+self.name + ' .sp-search-txt').val(q);
                 }
                 
-                grid.search(q);
+                self.search(q, true);
             }
             // getSelectedIds
             else if (arg1 == "getSelectedIds") {
-                return grid.getSelectedIds();
+                return self.getSelectedIds();
             }
             // delete
-            else if (arg1 == "delete") {
-                grid.std_delete();
-            }
+            /*else if (arg1 == "delete") {
+                self.std_delete();
+            }*/
             // TODO: other sapnsSelector methods
         }
         

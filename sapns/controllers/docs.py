@@ -8,7 +8,7 @@ from tg import expose, url, config, redirect, request, require
 from pylons import cache
 from pylons.i18n import ugettext as _
 from pylons.i18n import lazy_ugettext as l_
-from repoze.what import authorize, predicates
+from repoze.what import authorize, predicates as p
 
 # project specific imports
 from sapns.lib.base import BaseController
@@ -35,15 +35,42 @@ class DocsController(BaseController):
     allow_only = authorize.not_anonymous()
     
     @expose('sapns/docs/index.html')
-    def index(self, cls, id, **kw):
+    def default(self, cls, id, **kw):
         
         # TODO: comprobar permisos
-
+        
         class_ = SapnsClass.by_name(cls)
         id_object = int(id)
         
+        title = SapnsClass.object_title(cls, id_object)
+        
+        return dict(page='',
+                    came_from=kw.get('came_from'), 
+                    obj=dict(id_class=class_.class_id, 
+                             id=id_object,
+                             title=title),
+                    grid=dict(caption=_('Documents of [%s]') % title,
+                              cls=cls,
+                              id_object=id_object,
+                              ))
+        
+    @expose('json')
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    def search(self, cls, id, **kw):
+        
+        class_ = SapnsClass.by_name(cls)
+        id_object = int(id)
+        
+        # picking up parameters
+        q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
+        rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
+        pos = (pag_n-1) * rp
+        
         filters = [('id_class', class_.class_id), ('id_object', id_object)]
-        ds = search(dbs, '_view_sp_docs', filters=filters)
+        view_name = '%ssp_docs' % config.get('views_prefix', '_view_') 
+        ds = search(dbs, view_name, q=q.encode('utf-8'), rp=rp, offset=pos,
+                    filters=filters)
         
         cols = []
         for col in ds.labels:
@@ -52,11 +79,6 @@ class DocsController(BaseController):
                 w = 60
                 
             cols.append(dict(title=col, width=w, align='center'))
-            
-        rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
-        pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
-        #show_ids = strtobool(show_ids)
-        pos = (pag_n-1) * rp
             
         # total number of pages
         total_pag = 1
@@ -73,21 +95,17 @@ class DocsController(BaseController):
         totalp = ds.count - pos
         if rp and totalp > rp:
             totalp = rp
-
-        return dict(page='object-docs', 
-                    obj=dict(id_class=class_.class_id, id=id_object,
-                             title=SapnsClass.object_title(cls, id_object)),
-                    grid=dict(caption='Docs', name='docs', cls='sp_docs',
-                              search_url=url('/dashboard/docs/'), 
-                              cols=cols, 
-                              data=ds.to_data(), 
-                              actions=[], 
-                              pag_n=pag_n, rp=rp, pos=pos,
-                              totalp=totalp, total=ds.count, total_pag=total_pag
-                              ))
+            
+        # rows in this page
+        this_page = ds.count - pos
+        if rp and this_page > rp:
+            this_page = rp
+            
+        return dict(status=True, cols=cols, data=ds.to_data(), 
+                    this_page=this_page, total_count=ds.count, total_pag=total_pag)
     
     @expose('sapns/docs/index.html')
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def all(self, **kw):
         came_from = kw.get('came_from')
         
@@ -250,6 +268,11 @@ class DocsController(BaseController):
         except Exception, e:
             logger.error(e)
             return sj.dumps(dict(status=False, message=str(e).decode('utf-8')))
+        
+    @expose()
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    def download(self, id_doc):
+        pass
         
     @expose('json')
     @require(authorize.has_any_permission('manage', 'docs'))

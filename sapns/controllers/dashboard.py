@@ -125,7 +125,7 @@ class DashboardController(BaseController):
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
-        return dict(page=_('list of %s') % cls_.name, came_from=came_from, 
+        return dict(page=_('list of %s') % cls_.title.lower(), came_from=came_from, 
                     grid=dict(cls=cls_.name,
                               caption=caption,
                               q=q, rp=rp, pag_n=pag_n,

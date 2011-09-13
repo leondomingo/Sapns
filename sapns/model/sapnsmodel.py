@@ -1355,10 +1355,10 @@ class SapnsPermission(Permission):
     TYPE_GROUP =   u'group'
     
     # default URL
-    URL_NEW =    u'/dashboard/new'
-    URL_EDIT =   u'/dashboard/edit'
-    URL_DELETE = u'/dashboard/delete'
-    URL_DOCS =   u'/dashboard/docs'
+    URL_NEW =    u'/dashboard/new/'
+    URL_EDIT =   u'/dashboard/edit/'
+    URL_DELETE = u'/dashboard/delete/'
+    URL_DOCS =   u'/dashboard/docs/'
     
     CACHE_ID = 'user_actions'
     
