@@ -2,7 +2,7 @@
 """Documents controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect, request, require
+from tg import expose, config, request, require, response
 
 # third party imports
 from pylons import cache
@@ -14,17 +14,16 @@ from repoze.what import authorize, predicates as p
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser , SapnsDoc, SapnsRepo,\
-    SapnsAssignedDoc, SapnsClass, SapnsDocType, SapnsDocFormat
+    SapnsAssignedDoc, SapnsClass
 
 import os
 import logging
+import mimetypes
 import simplejson as sj #@UnresolvedImport
 from neptuno.dataset import DataSet
 from neptuno.postgres.search import search
 from neptuno.dict import Dict
 from neptuno.util import get_paramw
-import sqlalchemy as sa
-from sqlalchemy.sql.expression import and_
 
 __all__ = ['DocsController']
 
@@ -272,7 +271,29 @@ class DocsController(BaseController):
     @expose()
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def download(self, id_doc):
-        pass
+        
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        if not doc:
+            pass
+        
+        content = ''
+        f = file(os.path.join(doc.repo.abs_path(), doc.filename), 'rb')
+        try:
+            content = f.read()
+        
+        finally:
+            f.close()
+            
+        file_name = '%s.%s' % (doc.title_as_filename(), doc.docformat.extension)
+            
+        mt = doc.docformat.mime_type
+        if not mt:
+            mt = mimetypes.guess_type(file_name)[0]
+            
+        response.headerlist.append(('Content-Type', mt))
+        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))            
+        
+        return content
         
     @expose('json')
     @require(authorize.has_any_permission('manage', 'docs'))

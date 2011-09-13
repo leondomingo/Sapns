@@ -5,6 +5,7 @@
 import os
 import shutil
 import datetime as dt
+import re
 
 from pylons.i18n import ugettext as _
 
@@ -105,6 +106,8 @@ class SapnsUserRole(DeclarativeBase):
 
 # inherited class from "User"
 class SapnsUser(User):
+    
+    authored_docs = relation('SapnsDoc', backref='author')
     
     def get_dashboard(self):
         return dbs.query(SapnsShortcut).\
@@ -570,7 +573,9 @@ class SapnsClass(DeclarativeBase):
                              ForeignKey('sp_classes.id', 
                                         onupdate='CASCADE', ondelete='CASCADE'))
     
-    # attributes (SapnsAttribute)
+    # attributes
+    # related_attributes
+    actions = relation('SapnsPermission', backref='class_')
     
     CACHE_ID_ATTR = 'class_get_attributes'
     
@@ -1019,15 +1024,6 @@ class SapnsAttribute(DeclarativeBase):
     name = Column(Unicode(60), nullable=False)
     title = Column(Unicode(100), nullable=False)
     
-    class_id = Column('id_class', Integer, 
-                      ForeignKey('sp_classes.id', 
-                                 onupdate='CASCADE', ondelete='CASCADE'), 
-                      nullable=False)
-    
-    related_class_id = Column('id_related_class', Integer, 
-                              ForeignKey('sp_classes.id',
-                                         onupdate='CASCADE', ondelete='SET NULL'))
-    
     TYPE_INTEGER = 'int'
     TYPE_BOOLEAN = 'bool'
     TYPE_FLOAT = 'float'
@@ -1044,7 +1040,17 @@ class SapnsAttribute(DeclarativeBase):
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
     visible = Column(Boolean, DefaultClause('true'), default=True)
-    #is_collection = Column(Boolean, DefaultClause('false'), default=False)
+    
+    class_id = Column('id_class', Integer, 
+                      ForeignKey('sp_classes.id', 
+                                 onupdate='CASCADE', ondelete='CASCADE'), 
+                      nullable=False)
+    # class_
+    
+    related_class_id = Column('id_related_class', Integer, 
+                              ForeignKey('sp_classes.id',
+                                         onupdate='CASCADE', ondelete='SET NULL'))
+    # related_class
     
     attr_priv = relation('SapnsAttrPrivilege', backref='attribute')
     
@@ -1375,11 +1381,6 @@ SapnsPermission.shortcuts = \
         relation(SapnsShortcut, backref='action',
                  primaryjoin= SapnsPermission.permission_id == SapnsShortcut.permission_id)
 
-    
-SapnsClass.actions = \
-    relation(SapnsPermission, backref='class_',
-             primaryjoin=SapnsClass.class_id == SapnsPermission.class_id)
-    
 class SapnsRolePermission(DeclarativeBase):
 
     __tablename__ = 'sp_role_permission'
@@ -1584,6 +1585,8 @@ class SapnsRepo(DeclarativeBase):
     name = Column(Unicode(50), nullable=False)
     path = Column(Unicode(255))
     
+    docs = relation('SapnsDoc', backref='repo')
+    
     def abs_path(self):
         REPO_BASE_PATH = config.get('app.repo_base')
         return os.path.join(REPO_BASE_PATH, self.path)
@@ -1601,38 +1604,40 @@ class SapnsDoc(DeclarativeBase):
     doc_id = Column('id', Integer, primary_key=True, autoincrement=True)
     title = Column(Unicode(200), nullable=False)
     filename = Column(Unicode(200))
+    
     repo_id = Column('id_repo', Integer, 
                      ForeignKey('sp_repos.id',
                                 onupdate='CASCADE', ondelete='SET NULL'))
+    # repo
     
     author_id = Column('id_author', Integer,
                        ForeignKey('sp_users.id',
                                   onupdate='CASCADE', ondelete='SET NULL'))
+    # authors
     
     doctype_id = Column('id_doctype', Integer, 
                         ForeignKey('sp_doctypes.id',
                                    onupdate='CASCADE', ondelete='SET NULL'))
+    # doctype
     
     docformat_id = Column('id_docformat', Integer,
                           ForeignKey('sp_docformats.id',
                                      onupdate='CASCADE', ondelete='RESTRICT'))
+    # docformat
+    
+    assigned_docs = relation('SapnsAssignedDoc', backref='doc')
     
     def __unicode__(self):
         return u'%s' % self.title
     
     def __repr__(self):
         return unicode(self).encode('utf-8')
+    
+    def title_as_filename(self):
+        t = (self.title or _('NO_TITLE'))
+        pat = re.compile(r'[^a-z0-9_\-.]', re.I)
+        return re.sub(pat, '_', t).encode('utf-8')
 
-SapnsRepo.docs = \
-    relation(SapnsDoc,
-             backref='repo', 
-             primaryjoin=SapnsRepo.repo_id == SapnsDoc.repo_id)
-    
-SapnsUser.authored_docs = \
-    relation(SapnsDoc,
-             backref='author',
-             primaryjoin=SapnsUser.user_id == SapnsDoc.author_id)
-    
 class SapnsDocType(DeclarativeBase):
     
     __tablename__ = 'sp_doctypes'
@@ -1641,9 +1646,7 @@ class SapnsDocType(DeclarativeBase):
     name = Column(Unicode(80), nullable=False)
     description = Column(Text)
     
-    docs = relation(SapnsDoc, 
-                    backref='doctype', 
-                    primaryjoin=doctype_id == SapnsDoc.doctype_id)
+    docs = relation('SapnsDoc', backref='doctype')
     
     def __unicode__(self):
         return u'%s' % self.description
@@ -1661,8 +1664,7 @@ class SapnsDocFormat(DeclarativeBase):
     mime_type = Column(Unicode(30), nullable=False)
     description = Column(Text)
     
-    docs = relation(SapnsDoc, backref='docformat',
-                    primaryjoin=docformat_id == SapnsDoc.docformat_id)
+    docs = relation('SapnsDoc', backref='docformat')
     
 class SapnsAssignedDoc(DeclarativeBase):
     
@@ -1677,12 +1679,9 @@ class SapnsAssignedDoc(DeclarativeBase):
     doc_id = Column('id_doc', Integer, 
                     ForeignKey('sp_docs.id',
                                onupdate='CASCADE', ondelete='CASCADE'))
+    # doc
     
     object_id = Column(Integer)
-    
-SapnsDoc.assigned_docs = \
-    relation(SapnsAssignedDoc, backref='doc',
-             primaryjoin=SapnsDoc.doc_id == SapnsAssignedDoc.doc_id)
     
 class SapnsUpdates(DeclarativeBase):
     

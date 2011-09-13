@@ -1,6 +1,6 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
-{% import 'sapns/docs/list.html' as doc %}
+{#{% import 'sapns/docs/list.html' as doc %}#}
 {% import 'sapns/dashboard/grid.html' as grid_html %}
 
 {% block head %}
@@ -122,19 +122,11 @@
     {{ grid_html.show(page, _, q, grid, show_ids, link=link, came_from=came_from) }}#}
     <div id="docs"></div>
 
-    <!-- <div id="docs_list">{{ doc.doclist(tg, _, doclist) }}</div> -->
-
-    {#<div id="doclist_actions">
-        <button id="btn_add_doc" class="doc_action">{{_('Add')}}</button>
-        <button id="btn_edit_doc" class="doc_action">{{_('Edit')}}</button>
-        <button id="btn_del_doc" class="doc_action">{{_('Delete')}}</button>
-    </div>#}
-    
     <div id="docs_dialog" style="display: none;"></div>
 
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
-        {#{% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}#}
+        {#{% include 'sapns/components/sapns.grid/sapns.grid.js' %}#}
+        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
             
             // the object assigned to these documents 
@@ -447,8 +439,12 @@
                     {title: "{{_('Download')}}",
                      type: {
                          id: "download",
-                         f: function() {
-                             alert('downloading...');
+                         f: function(id_doc) {
+                             var form = '<form method="get" action="{{tg.url("/dashboard/docs/download")}}">' +
+                                 '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
+                                 '</form>';
+                             $(form).appendTo('body').submit().remove();
+                             //alert('downloading...'); 
                          }
                      }
                     },
