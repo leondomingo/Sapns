@@ -521,6 +521,7 @@ class DashboardController(BaseController):
         default_values_ro = {}
         default_values = {}
         for field_name, value in params.iteritems():
+            
             # default read-only values (_xxxx)
             m = re.search(r'^_([a-z]\w+)$', field_name, re.I | re.U)
             if m:
@@ -534,7 +535,7 @@ class DashboardController(BaseController):
                 if m:
                     logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
                     default_values[m.group(1)] = params[field_name]
-                
+                    
         ref = None
         row = None
         if id:

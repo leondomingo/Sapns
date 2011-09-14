@@ -66,7 +66,7 @@ catch(e) {
         set(this, 'parent_id', '');
         set(this, 'cols', []);
         set(this, 'data', {});
-        set(this, 'height', 470);
+        set(this, 'height', 500); //470);
         set(this, 'url_base', '');
         
         set(this, 'default_', {});
@@ -354,23 +354,28 @@ catch(e) {
         var self = this;
         
         $('#grid-dialog_' + self.name).
-        html("<p style='text-align: center'>{{_('You must select a row before click on this action')}}</p>"). 
+        html("<p style='text-align: center; font-style: italic;'>{{_('You must select a row before click on this action')}}</p>"). 
         dialog({
+            title: self.caption,
             resizable: false,
-            height: 100,
+            height: 155,
             width: 450,
             modal: true,
-            draggable: false
+            draggable: false,
+            buttons: {
+                "{{_('Close')}}": function() {
+                    $('#grid-dialog_' + self.name).dialog('close');
+                }
+            }
         });
+        
+        $('.ui-icon-closethick').hide();
     }
     
     SapnsGrid.prototype._loadActions = function(actions) {
         
-        //console.log('_loadActions: ' + actions.length);
-        
         var self = this;
         var g_actions = '';
-        //var act_f = []
         
         if (actions.length > 0) {
             g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
@@ -479,16 +484,25 @@ catch(e) {
                 var came_from = '';
                 if (target != '_blank') {
                     var came_from = self.url_base + '?q=' + window.encodeURI(self.q) + 
-                        '&rp=' + self.rp + '&pag_n=' + self.pag_n;
+                        '&rp=' + self.rp + '&pag_n=' + self.pag_n +
+                        '&ch_attr=' + self.ch_attr + '&parent_id=' + self.parent_id;
                 }
                 
-                return '<form type="post" action="' + action + '" target="' + target + '">' +
-                    '<input type="hidden" name="came_from" value="' + came_from + '">' +
-                    '</form>';
+                var f = 
+                    '<form type="post" action="' + action + '" target="' + target + '">' +
+                        '<input type="hidden" name="came_from" value="' + came_from + '">';
+                
+                if (self.ch_attr) {
+                    f += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
+                }
+                    
+                f += '</form>';
+                
+                return f;
             }
             
             // child attribute 
-            var ch_attr = self.ch_attr; //$('#' + self.name + ' .sp-search-form input[name=ch_attr]').val();
+            var ch_attr = self.ch_attr;
             
             // if CTRL is pressed open in a new tab 
             var target = '';

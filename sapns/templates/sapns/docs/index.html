@@ -104,27 +104,19 @@
             width: 410px;
         }
     </style>
-    
-    <script type="text/javascript">
-        {% include 'sapns/components/sapns.selector.min.js' %}
-        {% include 'sapns/components/sapns.uploader.min.js' %}
-    </script>
-    
-    <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
 {% endblock %}
 
 {% block middle %}
 
-    {{super()}}
+    {{ super() }}
 
-    {#{{ grid_html.js_select_row(_) }}
-    {{ grid_html.js_functions(_) }}
-    {{ grid_html.show(page, _, q, grid, show_ids, link=link, came_from=came_from) }}#}
     <div id="docs"></div>
-
     <div id="docs_dialog" style="display: none;"></div>
-
+    
+    <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
     <script type="text/javascript">
+        {% include 'sapns/components/sapns.selector.min.js' %}
+        {% include 'sapns/components/sapns.uploader.min.js' %}
         {#{% include 'sapns/components/sapns.grid/sapns.grid.js' %}#}
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
