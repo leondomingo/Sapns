@@ -375,7 +375,7 @@ def create_data_exploration():
             else:
                 logger.info('Shortcut for "%s" already exists' % cls.title)
 
-def topdf(html_content, filename='filename', **kw):
+def topdf(html_content, **kw):
     
     import subprocess as sp
     import tempfile
