@@ -96,9 +96,9 @@
 	
 	// click_search
 	SapnsSelector.prototype.click_search = function(q) {
-		
+	    
 		var sapnsSelector = this;
-		var dialog_name = "#dialog-" + this.name;
+		var dialog_name = "#dialog_" + this.name;
 		
 		if (q == undefined) {
 	        q = $(dialog_name + ' .sp-search-text').val();
@@ -126,24 +126,16 @@
 		// search
 		$.ajax({
 	        url: this.search_url,
-	        type: 'post',
+	        //type: 'post',
 	        dataType: 'html',
 	        data: params,
 	        success: function(res) {
 	            $(dialog_name).html(res);
-	            
-	            $(dialog_name + ' .sp-search-button').click(function() {
-	                sapnsSelector.click_search();
-	            });
-	            
-	            $(dialog_name + ' .sp-search-text').keypress(function(event) {
-	                sapnsSelector.search_kp(event);
-	            }).val(q).focus();
 	        },
 	        error: function(f, status, error) {
 	            alert('error!');
 	            sapnsSelector.click_search();
-	            // {# $(dialog_name).dialog('close'); #} 
+	            // $(dialog_name).dialog('close'); 
 	        }
 	    });
 	}
@@ -168,10 +160,11 @@
         	var sapnsSelector = new SapnsSelector(arg1);
         	
 			// dialog
-			this.append('<div id="dialog-' + sapnsSelector.name + '" style="display: none;"></div>'); 
+			this.append('<div id="dialog_' + sapnsSelector.name + '" style="display: none;"></div>'); 
 
 			// select text
-			var select_text = '<input id="st_' + sapnsSelector.name + '"' + 
+			var select_text = 
+			    '<input id="st_' + sapnsSelector.name + '"' + 
 				' class="sp-select-text"' + 
 				' type="text" readonly' + 
 				' value=""';
@@ -202,7 +195,8 @@
 	        });
 			
 			// select_button
-			var select_button = '<button id="sb_' + sapnsSelector.name + '"' +
+			var select_button = 
+			    '<button id="sb_' + sapnsSelector.name + '"' +
 				' class="sp-button sp-select-button" ' +
 				' title=\'Set a value for "' + sapnsSelector.title + '"\'' +
 				' style="font-weight: bold;"';
@@ -226,7 +220,7 @@
 			
 			this.find('#sb_' + sapnsSelector.name).click(function() {
 
-				$('#dialog-' + sapnsSelector.name).dialog({
+				$('#dialog_' + sapnsSelector.name).dialog({
 	                title: dialog_title,
 	                width: sapnsSelector.dialog.width,
 	                height: sapnsSelector.dialog.height,
@@ -234,21 +228,17 @@
 	                modal: true,
 	                buttons: {
 	                    "{{_('Ok')}}": function() {
-	                        // {# get the id of the selected row #} 
-	                        var id_selected = '';
-	                        $('#dialog-' + sapnsSelector.name + ' .sp-grid .sp-grid-rowid').each(function() {
-	                            if ($(this).attr('checked') == true) {
-	                                id_selected = $(this).attr('id_row');
-	                            }
-	                        });
+	                        // get the id of the selected row
+	                        
+	                        var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
 	                        
 	                        sapnsSelector.setValue(id_selected);
 	                        sapnsSelector.setTitle();
 	                        
-	                        $('#dialog-' + sapnsSelector.name).dialog('close');
+	                        $('#dialog_' + sapnsSelector.name).dialog('close');
 	                    },
 	                    "{{_('Cancel')}}": function() {
-	                        $('#dialog-' + sapnsSelector.name).dialog('close');
+	                        $('#dialog_' + sapnsSelector.name).dialog('close');
 	                    }
 	                }
 	            });
@@ -261,7 +251,8 @@
 			// remove button
 			var remove_button = '';
 			if (!sapnsSelector.read_only) {
-				remove_button += '<button id="rb_' + sapnsSelector.name + '"' +
+				remove_button += 
+				    '<button id="rb_' + sapnsSelector.name + '"' +
 					' class="sp-button sp-empty-button"' +
 					' title=\'Remove value of "' + sapnsSelector.title + '"\'' +
 					' style="font-weight: bold; color: red;">X</button>';

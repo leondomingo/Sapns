@@ -19,17 +19,59 @@
 
 {% block middle %}
     {{ super() }}
-    {{ grid_html.js_select_row(_) }}
-    {{ grid_html.js_functions(_) }}
-    {{ grid_html.show(page, _, q, grid, show_ids, link=link, 
-        came_from=came_from, can_edit=True, 
-        rel_classes=rel_classes, ch_attr=ch_attr, parent_id=parent_id) }}
+        
+    <div id="grid"></div>
+    {% if grid.rel_classes %}
+    <div id="rel-classes" style="clear: left; padding-left: 20px;">
+        <div class="sp-grid-relatedinfo-title">{{_('Related info')}}</div>
+        <select id="rel-classes-sel" style="font-size: 11px;">
+        {% for rc in grid.rel_classes %}
+        <option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>
+        {% endfor %}
+        </select>
+        <button id="rel-classes-show" class="sp-button">{{_('Show')}}</button>
+    </div>
+{% endif %}
         
     <script type="text/javascript">
+        {#{% include 'sapns/components/sapns.grid/sapns.grid.js' %}#}
+        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
-        	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title)); 
+        	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title));
+        	
+        	$('#grid').sapnsGrid({
+        	    cls: "{{grid.cls}}",
+        	    caption: "{{grid.caption}}",
+        	    q: "{{grid.q}}", 
+        	    rp: "{{grid.rp}}", 
+        	    pag_n: "{{grid.pag_n}}",
+        	    ch_attr: "{{grid.ch_attr or ''}}",
+        	    parent_id: "{{grid.parent_id or ''}}",
+        	    actions: {},
+        	    url_base: "/dashboard/list/{{grid.cls}}",
+        	});
+        	
+        	$('#grid .sp-search-txt').focus();
+        	
+        	$('#rel-classes-show').click(function() {
+        	    var ids = $('#grid').sapnsGrid('getSelectedIds');
+        	    if (ids.length > 0) {
+        	        var opt = $('#rel-classes-sel option:selected');
+        	        var cls = opt.attr('cls');
+        	        var ch_attr = opt.attr('ch_attr');
+        	        var action = "/dashboard/list/" + cls;
+        	        
+        	        var form = 
+        	            '<form id="rel-classes-form" method="post" action="' + action + '" target="_blank">' +
+        	                '<input type="hidden" name="ch_attr" value="' + ch_attr + '">' +
+        	                '<input type="hidden" name="parent_id" value="' + ids[0] + '">';
+        	            '</form>';
+        	            
+        	        $(form).appendTo('body').submit().remove();
+        	    }
+        	});
         });
     </script>
 {% endblock %}

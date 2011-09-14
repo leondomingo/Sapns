@@ -2,29 +2,28 @@
 """Documents controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect, request, require
+from tg import expose, config, request, require, response
 
 # third party imports
 from pylons import cache
 from pylons.i18n import ugettext as _
 from pylons.i18n import lazy_ugettext as l_
-from repoze.what import authorize, predicates
+from repoze.what import authorize, predicates as p
 
 # project specific imports
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser , SapnsDoc, SapnsRepo,\
-    SapnsAssignedDoc, SapnsClass, SapnsDocType, SapnsDocFormat
+    SapnsAssignedDoc, SapnsClass
 
 import os
 import logging
-import simplejson as sj
+import mimetypes
+import simplejson as sj #@UnresolvedImport
 from neptuno.dataset import DataSet
 from neptuno.postgres.search import search
 from neptuno.dict import Dict
 from neptuno.util import get_paramw
-import sqlalchemy as sa
-from sqlalchemy.sql.expression import and_
 
 __all__ = ['DocsController']
 
@@ -35,48 +34,77 @@ class DocsController(BaseController):
     allow_only = authorize.not_anonymous()
     
     @expose('sapns/docs/index.html')
-    def index(self, cls, id, **kw):
-
+    def default(self, cls, id, **kw):
+        
+        # TODO: comprobar permisos
+        
         class_ = SapnsClass.by_name(cls)
         id_object = int(id)
         
-        came_from = kw.get('came_from')
+        title = SapnsClass.object_title(cls, id_object)
         
-        meta = sa.MetaData(bind=dbs.bind)
-        tbl_doc = sa.Table('sp_docs', meta, autoload=True)
-        tbl_doct = sa.Table('sp_doctypes', meta, autoload=True)
-        tbl_docf = sa.Table('sp_docformats', meta, autoload=True)
-        tbl_adoc = sa.Table('sp_assigned_docs', meta, autoload=True)
-        tbl_repo = sa.Table('sp_repos', meta, autoload=True)
-        tbl_usr = sa.Table('sp_users', meta, autoload=True)
+        return dict(page='',
+                    came_from=kw.get('came_from'), 
+                    obj=dict(id_class=class_.class_id, 
+                             id=id_object,
+                             title=title),
+                    grid=dict(caption=_('Documents of [%s]') % title,
+                              cls=cls,
+                              id_object=id_object,
+                              ))
         
-        qry = tbl_doc.\
-            join(tbl_adoc, tbl_adoc.c.id == tbl_doc.c.id).\
-            outerjoin(tbl_doct, tbl_doct.c.id == tbl_doc.c.id_doctype).\
-            join(tbl_docf, tbl_docf.c.id == tbl_doc.c.id_docformat).\
-            join(tbl_usr, tbl_usr.c.id == tbl_doc.c.id_author).\
-            join(tbl_repo, tbl_repo.c.id == tbl_doc.c.id_repo)
+    @expose('json')
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    def search(self, cls, id, **kw):
+        
+        class_ = SapnsClass.by_name(cls)
+        id_object = int(id)
+        
+        # picking up parameters
+        q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
+        rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
+        pos = (pag_n-1) * rp
+        
+        filters = [('id_class', class_.class_id), ('id_object', id_object)]
+        view_name = '%ssp_docs' % config.get('views_prefix', '_view_') 
+        ds = search(dbs, view_name, q=q.encode('utf-8'), rp=rp, offset=pos,
+                    filters=filters)
+        
+        cols = []
+        for col in ds.labels:
+            w = 125
+            if col == 'id':
+                w = 60
+                
+            cols.append(dict(title=col, width=w, align='center'))
             
-        sel = sa.select([tbl_doc.c.id,
-                         tbl_doc.c.title.label('title'),
-                         tbl_docf.c.name.label('format'),
-                         tbl_doct.c.name.label('type'),
-                         tbl_usr.c.display_name.label('author'),
-                         tbl_repo.c.name.label('repo'),
-                         ], from_obj=qry,
-                        whereclause=and_(tbl_adoc.c.id_class == class_.class_id,
-                                         tbl_adoc.c.object_id == id_object,
-                                         ))
-
-        doclist = search(dbs, sel)
+        # total number of pages
+        total_pag = 1
+        if rp > 0:
+            total_pag = ds.count/rp
+            
+            if ds.count % rp != 0:
+                total_pag += 1
+            
+            if total_pag == 0:
+                total_pag = 1
         
-        return dict(page='object-docs', 
-                    obj=dict(id_class=class_.class_id, id=id_object,
-                             title=SapnsClass.object_title(cls, id_object)),
-                    doclist=doclist, came_from=came_from)
+        # rows in this page
+        totalp = ds.count - pos
+        if rp and totalp > rp:
+            totalp = rp
+            
+        # rows in this page
+        this_page = ds.count - pos
+        if rp and this_page > rp:
+            this_page = rp
+            
+        return dict(status=True, cols=cols, data=ds.to_data(), 
+                    this_page=this_page, total_count=ds.count, total_pag=total_pag)
     
     @expose('sapns/docs/index.html')
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def all(self, **kw):
         came_from = kw.get('came_from')
         
@@ -239,6 +267,33 @@ class DocsController(BaseController):
         except Exception, e:
             logger.error(e)
             return sj.dumps(dict(status=False, message=str(e).decode('utf-8')))
+        
+    @expose()
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    def download(self, id_doc):
+        
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        if not doc:
+            pass
+        
+        content = ''
+        f = file(os.path.join(doc.repo.abs_path(), doc.filename), 'rb')
+        try:
+            content = f.read()
+        
+        finally:
+            f.close()
+            
+        file_name = '%s.%s' % (doc.title_as_filename(), doc.docformat.extension)
+            
+        mt = doc.docformat.mime_type
+        if not mt:
+            mt = mimetypes.guess_type(file_name)[0]
+            
+        response.headerlist.append(('Content-Type', mt))
+        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))            
+        
+        return content
         
     @expose('json')
     @require(authorize.has_any_permission('manage', 'docs'))

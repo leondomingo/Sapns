@@ -14,13 +14,13 @@
 
 {% macro jquery(tg=None) %}
 <!-- JQuery -->
-{# <script type="text/javascript" src="/js/jquery.min.js"></script> #}
+{#<script type="text/javascript" src="/js/jquery.min.js"></script>#}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>
 {% endmacro %}
 
 {% macro jquery_ui(tg=None) %}
 <!-- JQuery UI -->
-{# <script type="text/javascript" src="/js/jquery-ui.min.js"></script> #}
+{#<script type="text/javascript" src="/js/jquery-ui.min.js"></script>#}
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>
 
 {# 
@@ -69,4 +69,12 @@
 {% macro qtip2() %}
 <link rel="stylesheet" type="text/css" href="/js/qtip2/jquery.qtip.min.css">
 <script type="text/javascript" src="/js/qtip2/jquery.qtip.min.js"></script>
+{% endmacro %}
+
+{% macro console_log() %}
+<script type="text/javascript">
+    if (!console.log) {
+        var console = {log: function()};
+    }
+</script>
 {% endmacro %}

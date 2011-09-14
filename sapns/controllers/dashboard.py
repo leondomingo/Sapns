@@ -20,9 +20,8 @@ from sapns.controllers.privileges import PrivilegesController
 from sapns.controllers.docs import DocsController
 
 from neptuno.postgres.search import search
-from neptuno.util import strtobool, strtodate, strtotime, datetostr
+from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 
-from tg.controllers.util import urlencode
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission
 
@@ -33,7 +32,6 @@ import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
-from sqlalchemy.sql.expression import and_
 
 __all__ = ['DashboardController']
 
@@ -84,17 +82,14 @@ class DashboardController(BaseController):
 
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
-    def list(self, cls, q='', **params):
+    def list(self, cls, **params):
         
-        logger = logging.getLogger(__name__ + '/list')
-        #logger.info('params=%s' % params)
+        #logger = logging.getLogger(__name__ + '/list')
+        
+        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
+        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
 
-        # picking up parameters
-        rp = params.get('rp', 10)
-        pag_n = params.get('pag_n', 1)
-        caption = params.get('caption')
-        show_ids = params.get('show_ids', 'false')
-        
         came_from = params.get('came_from', '')
         if came_from:
             came_from = url(came_from)
@@ -109,8 +104,8 @@ class DashboardController(BaseController):
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
             
-        logger.info('Parent class: %s' % cls_.name)
-        logger.info('Child class: %s' % ch_cls_.name)
+        #logger.info('Parent class: %s' % cls_.name)
+        #logger.info('Child class: %s' % ch_cls_.name)
              
         if not user.has_privilege(cls_.name) or \
         not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
@@ -118,37 +113,73 @@ class DashboardController(BaseController):
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
         
-        rp = int(rp)
-        pag_n = int(pag_n)
-        show_ids = strtobool(show_ids)
-        pos = (pag_n-1) * rp
-
-        view = user.get_view_name(ch_cls_.name)
-            
-        date_fmt = config.get('formats.date', default='%m/%d/%Y')
-        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
-        
-        logger.info('search...%s / q=%s' % (view, q))
-        
         # related classes
         rel_classes = cls_.related_classes()
         
         # collection
-        col = None
+        caption = ch_cls_.title
         if ch_attr and parent_id:
-            col = (cls, ch_attr, parent_id,)
             
             p_cls = cls_.attr_by_name(ch_attr).related_class
             p_title = SapnsClass.object_title(p_cls.name, parent_id)
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
-        elif caption is None:
-            caption = ch_cls_.title
+        return dict(page=_('list of %s') % cls_.title.lower(), came_from=came_from, 
+                    grid=dict(cls=cls_.name,
+                              caption=caption,
+                              q=q, rp=rp, pag_n=pag_n,
+                              # collection
+                              ch_attr=ch_attr, parent_id=parent_id,
+                              # related classes
+                              rel_classes=rel_classes))
+        
+    @expose('json')
+    @require(p.not_anonymous())
+    def grid(self, cls, **params):
+        
+        #logger = logging.getLogger('DashboardController.grid')
+
+        # picking up parameters
+        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
+        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
+        pos = (pag_n-1) * rp
+        
+        # collections
+        ch_attr = params.get('ch_attr')
+        parent_id = params.get('parent_id')
+        
+        # does this user have permission on this table?
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        
+        cls_ = SapnsClass.by_name(cls)
+        ch_cls_ = SapnsClass.by_name(cls, parent=False)        
             
+        #logger.info('Parent class: %s' % cls_.name)
+        #logger.info('Child class: %s' % ch_cls_.name)
+             
+        if not user.has_privilege(cls_.name) or \
+        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
+        
+        # get view name
+        view = user.get_view_name(ch_cls_.name)
+            
+        date_fmt = config.get('formats.date', default='%m/%d/%Y')
+        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
+        
+        #logger.info('search...%s / q=%s' % (view, q))
+        
+        # collection
+        col = None
+        if ch_attr and parent_id:
+            col = (cls, ch_attr, parent_id,)
+
         # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    show_ids=show_ids, strtodatef=strtodate_, collection=col) 
+                    strtodatef=strtodate_, collection=col) 
         
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -159,8 +190,6 @@ class DashboardController(BaseController):
         
         ds.float_fmt = app_cfg.format_float
         
-        data = ds.to_data()
-        
         cols = []
         for col in ds.labels:
             w = 125
@@ -169,16 +198,6 @@ class DashboardController(BaseController):
                 
             cols.append(dict(title=col, width=w, align='center'))
         
-        # actions for this class
-        actions = cls_.sorted_actions(user.user_id)
-        actions = [act for act in actions \
-                   if act['type'] in [SapnsPermission.TYPE_NEW,
-                                      SapnsPermission.TYPE_EDIT,
-                                      SapnsPermission.TYPE_DELETE,
-                                      SapnsPermission.TYPE_DOCS,
-                                      SapnsPermission.TYPE_PROCESS,
-                                     ]]
-
         # total number of pages
         total_pag = 1
         if rp > 0:
@@ -191,37 +210,64 @@ class DashboardController(BaseController):
                 total_pag = 1
         
         # rows in this page
-        totalp = ds.count - pos
-        if rp and totalp > rp:
-            totalp = rp
+        this_page = ds.count - pos
+        if rp and this_page > rp:
+            this_page = rp
             
-        link_data = dict(q=q, rp=rp, pag_n=pag_n, caption=caption, show_ids=show_ids)
+        return dict(status=True, cols=cols, data=ds.to_data(), 
+                    this_page=this_page, total_count=ds.count, total_pag=total_pag)
+            
+#        return dict(ch_attr=ch_attr, parent_id=parent_id,
+#                    grid=dict(caption=caption, name=cls, cls=cls_.name,
+#                              search_url=url('/dashboard/grid/'), 
+#                              cols=cols, data=data, 
+#                              pag_n=pag_n, rp=rp, pos=pos,
+#                              this_page=this_page, total=ds.count, total_pag=total_pag))
+
+    @expose('json')
+    @require(p.not_anonymous())
+    def grid_actions(self, cls, **kw):
         
-        if ch_attr and parent_id:
-            link_data['ch_attr'] = ch_attr
-            link_data['parent_id'] = parent_id
-            
-        return dict(page='list',
-                    q=q, show_ids=show_ids, came_from=came_from,
-                    # collection
-                    ch_attr=ch_attr, parent_id=parent_id,
-                    # related classes
-                    rel_classes=rel_classes,
-                    link=('/dashboard/list/%s/?' % cls) + urlencode(link_data),
-                    grid=dict(caption=caption, name=cls, cls=cls_.name,
-                              search_url=url('/dashboard/list/'), 
-                              cols=cols, data=data, 
-                              actions=actions, pag_n=pag_n, rp=rp, pos=pos,
-                              totalp=totalp, total=ds.count, total_pag=total_pag))
+        # does this user have permission on this table?
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        
+        cls_ = SapnsClass.by_name(cls)
+        #ch_cls_ = SapnsClass.by_name(cls, parent=False)        
+             
+        if not user.has_privilege(cls_.name) or \
+        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
+        
+        # actions for this class
+        actions = cls_.sorted_actions(user.user_id)
+        actions = [act for act in actions \
+                   if act['type'] in [SapnsPermission.TYPE_NEW,
+                                      SapnsPermission.TYPE_EDIT,
+                                      SapnsPermission.TYPE_DELETE,
+                                      SapnsPermission.TYPE_DOCS,
+                                      SapnsPermission.TYPE_PROCESS,
+                                     ]]
+        
+        return dict(status=True, actions=actions)
     
     @expose('sapns/dashboard/search.html')
     @require(p.not_anonymous())
     def search(self, **params):
+        
+        import random
+        random.seed()
+        
         logger = logging.getLogger(__name__ + '/search')
         logger.info(params)
         
-        params['caption'] = ''
-        return self.list(**params)
+        #params['caption'] = ''
+        g = self.list(**params)
+        
+        logger.info(g)
+        g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
+        
+        return g
     
     def export(self, cls, **kw):
         """
@@ -295,16 +341,16 @@ class DashboardController(BaseController):
         
         except Exception, e:
             logger.error(e)
-            return dict(status=False, message=str(e))        
+            return dict(status=False, message=str(e).decode('utf-8'))        
     
     @expose()
     @require(p.not_anonymous())
-    def save(self, cls, id='', **params):
+    def save(self, cls, **params):
         """
         IN
           cls          <unicode>
-          id           <int>
           params
+            id         <int>
             came_from  <unicode>
             fld_*      ???        Fields to be saved
         """
@@ -313,6 +359,7 @@ class DashboardController(BaseController):
         logger.info(params)
 
         cls = SapnsClass.by_name(cls)
+        id_ = get_paramw(params, 'id', int, opcional=True)
         came_from = params.get('came_from') #, '/dashboard/list?cls=%s' % cls.name)
         quiet = strtobool(params.get('quiet', 'false'))
         
@@ -328,8 +375,8 @@ class DashboardController(BaseController):
         # init "update" dictionary
         update = {}
         
-        if id:
-            update['id'] = int(id)
+        if id_:
+            update['id'] = int(id_)
             
         READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
                            SapnsAttrPrivilege.ACCESS_DENIED]
@@ -413,7 +460,6 @@ class DashboardController(BaseController):
 
         if not quiet:
             # come back
-            logger.info('came_from = %s' % came_from)
             if came_from:
                 redirect(url(came_from))
                 
@@ -435,14 +481,18 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
-    def edit(self, cls, id='', came_from='/dashboard', **params):
+    def edit(self, cls, id='', **params):
         
         logger = logging.getLogger(__name__ + '/edit')
+        
+        came_from = get_paramw(params, 'came_from', unicode, opcional=True,
+                               por_defecto='/dashboard')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         class_ = SapnsClass.by_name(cls)
         
         if id:
+            id = int(id)
             perm = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT))
         
         else:
@@ -471,6 +521,7 @@ class DashboardController(BaseController):
         default_values_ro = {}
         default_values = {}
         for field_name, value in params.iteritems():
+            
             # default read-only values (_xxxx)
             m = re.search(r'^_([a-z]\w+)$', field_name, re.I | re.U)
             if m:
@@ -484,7 +535,7 @@ class DashboardController(BaseController):
                 if m:
                     logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
                     default_values[m.group(1)] = params[field_name]
-                
+                    
         ref = None
         row = None
         if id:
@@ -560,7 +611,9 @@ class DashboardController(BaseController):
     @expose('sapns/dashboard/delete.html')
     @expose('json')
     @require(p.not_anonymous())
-    def delete(self, cls, id, came_from='/dashboard'):
+    def delete(self, cls, id_, **kw):
+        
+        #came_from = get_paramw(kw, 'came_from', opcional=True, por_defecto='/dashboard')
         
         logger = logging.getLogger(__name__ + '/delete')
         rel_tables = []
@@ -578,7 +631,7 @@ class DashboardController(BaseController):
             meta = MetaData(dbs.bind)
             tbl = Table(cls_.name, meta, autoload=True)
             
-            this_record = dbs.execute(tbl.select(tbl.c.id == id)).fetchone()
+            this_record = dbs.execute(tbl.select(tbl.c.id == id_)).fetchone()
             if not this_record:
                 return dict(status=False, message=_('Record does not exist'))
 
@@ -591,7 +644,7 @@ class DashboardController(BaseController):
                 rtbl = Table(rcls['name'], meta, autoload=True)
                 attr_name = rcls['attr_name']
                 
-                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id))
+                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id_))
                 robj = dbs.execute(sel).fetchone()
                 
                 if robj != None:
@@ -602,7 +655,7 @@ class DashboardController(BaseController):
                     logger.info('---No related objects have been found')
                     
             # delete record
-            tbl.delete(tbl.c.id == id).execute()
+            tbl.delete(tbl.c.id == id_).execute()
             dbs.flush()
             
             # success!
@@ -613,8 +666,8 @@ class DashboardController(BaseController):
             return dict(status=False, message=str(e), rel_tables=rel_tables)
         
     @expose('sapns/order/insert.html')
-    @require(p.has_permission('manage'))
-    def ins_order(self, cls='', came_from='/dashboard'):
+    @require(p.in_group(u'managers'))
+    def ins_order(self, cls, came_from='/dashboard'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
@@ -630,6 +683,7 @@ class DashboardController(BaseController):
                     title=class_.title, came_from=url(came_from))
 
     @expose()
+    @require(p.in_group(u'managers'))
     def ins_order_save(self, attributes='', title='', came_from=''):
         
         # save insertion order
@@ -668,7 +722,7 @@ class DashboardController(BaseController):
                                      came_from='')))
     
     @expose('sapns/order/reference.html')
-    @require(p.has_permission('manage'))
+    @require(p.in_group(u'managers'))
     def ref_order(self, cls, came_from=''):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -685,6 +739,7 @@ class DashboardController(BaseController):
                     came_from=came_from)
     
     @expose()
+    @require(p.in_group(u'managers'))
     def ref_order_save(self, attributes='', came_from=''):
         
         # save reference order
@@ -713,3 +768,47 @@ class DashboardController(BaseController):
     @require(p.in_group('managers'))
     def test_selector(self):
         return {}
+    
+    @expose('sapns/components/sapns.grid/grid_test.html')
+    @require(p.in_group('managers'))
+    def test_grid(self):
+        return {}
+    
+    @expose('json')
+    @require(p.in_group('managers'))
+    def test_search(self, **kw):
+        import jinja2
+        import random
+        random.seed()
+        
+        ds = search(dbs, '_view_%s' % kw.get('cls'), q=kw.get('q'), 
+                    rp=int(kw.get('rp', 10)))
+        
+        def r():
+            return random.randint(1, 1000) / 1.23
+        
+        cols = []
+        for col in ds.labels:
+            cols.append(dict(title=col))
+        
+        return dict(status=True,
+                    cols_=[dict(title='id', width=30),
+                          dict(title='ABC', align='right', width=100),
+                          dict(title='DEF', width=300),
+                          dict(title='GHI', align='left'),
+                          dict(title='cuATro'),
+                          dict(title='five'),
+                          dict(title='SIX', width=200, align='right'),
+                         ],
+                    cols=cols,
+                    data=ds.to_data(),
+                    data_=[[kw.get('p1'), r(), r(), r()],
+                          [kw.get('p2')],
+                          [3, kw.get('q'), 211, 311, 411, 511, 611],
+                          [kw.get('rp'), 11, None, kw.get('pos')],
+                          [100, u'León', jinja2.escape(u'<!-- -->')],
+                          [200, u'€łđŋ', jinja2.escape(u'<a></a>')],
+                          [300, jinja2.escape(u'<a href="#">Google</a>')],
+                         ])
+    
+    

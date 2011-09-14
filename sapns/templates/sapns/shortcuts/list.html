@@ -29,7 +29,7 @@
         <!-- List -->
         {% if sc.action_type == 'list' %}
         <div class="sp-shortcut-title">
-            <a href="{{tg.url('/dashboard/list', params=dict(cls=sc.cls, came_from=_came_from))}}"
+            <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
                 target="" >{{sc.title|escape}}</a>
         </div>
         
