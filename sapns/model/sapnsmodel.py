@@ -658,6 +658,7 @@ class SapnsClass(DeclarativeBase):
     
     #attributes
     privileges = relation('SapnsPrivilege', backref='class_')
+    permissions = relation('SapnsPermission', backref='class_')
     
     CACHE_ID_ATTR = 'class_get_attributes'
     
@@ -1434,6 +1435,7 @@ class SapnsPermission(Permission):
     class_id = Column('id_class', Integer, 
                       ForeignKey('sp_classes.id', 
                                  onupdate='CASCADE', ondelete='CASCADE'))
+    # class_
     
     TYPE_NEW =     u'new'
     TYPE_EDIT =    u'edit'
