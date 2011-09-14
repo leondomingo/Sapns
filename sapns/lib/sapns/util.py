@@ -13,6 +13,7 @@ from sqlalchemy.sql.expression import and_
 from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
     BOOLEAN, BLOB
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
+from pylons.templating import render_jinja2
 
 ROLE_MANAGERS = u'managers'
 
@@ -373,3 +374,46 @@ def create_data_exploration():
             
             else:
                 logger.info('Shortcut for "%s" already exists' % cls.title)
+
+def topdf(html_content, filename='filename', **kw):
+    
+    import subprocess as sp
+    import tempfile
+    import os
+    
+    topdf_path = config.get('htmltopdf.path')
+    
+    fd_html, html_path = tempfile.mkstemp(suffix='.html', prefix='sapns_')
+    os.close(fd_html)
+    try:
+        # save HTML content
+        f_input = open(html_path, 'wb')
+        try:
+            f_input.write(html_content)
+        
+        finally:
+            f_input.close()
+        
+        pdf_content = ''
+        fd_pdf, pdf_path = tempfile.mkstemp(suffix='.pdf', prefix='sapns_')
+        os.close(fd_pdf)
+        try:
+            sp.check_call([topdf_path, '-q', html_path, pdf_path])
+            
+            # get PDF content
+            f_output = open(pdf_path, 'rb')
+            try:
+                pdf_content = f_output.read()
+            
+            finally:
+                f_output.close()
+            
+        finally:
+            if os.access(pdf_path, os.F_OK):
+                os.remove(pdf_path)
+        
+    finally:
+        if os.access(html_path, os.F_OK):
+            os.remove(html_path)
+    
+    return pdf_content
