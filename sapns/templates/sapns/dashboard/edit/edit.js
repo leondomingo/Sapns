@@ -220,7 +220,7 @@ $(document).ready(function() {
         var attr_title = s.attr('attr_title');
         var attr_rc = s.attr('attr_rc');
         var attr_rc_title = s.attr('attr_rc_title');
-        var read_only = s.parent().attr('read_only');
+        var read_only = s.parent().parent().attr('read_only');
         
         s.sapnsSelector({
             name: attr_name,
