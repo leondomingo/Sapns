@@ -1,7 +1,9 @@
 {% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
 
 {% block head %}
     <title>A {{code}} Error has Occurred </title>
+    {{ util.jquery() }}
 {% endblock %}
 
 {% block middle %}

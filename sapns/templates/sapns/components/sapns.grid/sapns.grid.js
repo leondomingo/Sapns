@@ -407,12 +407,15 @@ catch(e) {
         // export
         if (self.exportable) {
             g_actions += 
-                '<div id="grid-export" style="background-color: none; height: 25px; margin-left: 0px;">' +
+                '<div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;">' +
                 '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
                     '<option value="">({{_("Export")}})</option>' +
                     '<option value="csv">CSV</option>' +
                     '<option value="excel">Excel</option>' +
                 '</select></div>';
+        }
+        else {
+            g_actions += '<div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;"></div>';
         }
 
         return g_actions;
@@ -555,6 +558,36 @@ catch(e) {
                 _func();
             }
         });
+        
+        // export button 
+        $('#grid-export_' + self.name).live('change', function() {
+            var fmt = $('#grid-export_' + self.name + ' option:selected').val();
+            if (fmt == '') {
+                // nothing selected 
+                return;
+            }
+            
+            if (fmt == 'csv') {
+                var url = '/dashboard/tocsv';
+            }
+            else if (fmt == 'excel') {
+                var url = '/dashboard/toxls';
+            }
+            // TODO other formats...
+            
+            var form_html =
+                '<form action="' + url + '" method="get" >' +
+                    '<input type="hidden" name="cls" value="' + self.cls + '">' +
+                    '<input type="hidden" name="q" value="' + self.q + '">' +
+                    '<input type="hidden" name="ch_attr" value="' + self.ch_attr + '">' +
+                    '<input type="hidden" name="parent_id" value="' + self.parent_id + '">' +
+                '</form>';
+                
+            $(form_html).appendTo('body').submit().remove();
+            
+            // reset the select 
+            $(this).find('option:first').attr('selected', true);
+        });        
     }
     
     // std_new
