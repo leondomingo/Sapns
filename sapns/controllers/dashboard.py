@@ -489,14 +489,16 @@ class DashboardController(BaseController):
                                por_defecto='/dashboard')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        
         class_ = SapnsClass.by_name(cls)
+        ch_class_ = SapnsClass.by_name(cls, parent=False)
         
         if id:
             id = int(id)
-            perm = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_EDIT))
+            perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT))
         
         else:
-            perm = user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_NEW))
+            perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_NEW))
         
         if not user.has_privilege(class_.name) or not perm:
             redirect(url('/message',
@@ -603,8 +605,8 @@ class DashboardController(BaseController):
 #                    attributes[-1]['vals'] = None
                     attribute['vals'] = None
                     
-        return dict(cls=cls, title=class_.title, id=id, 
-                    related_classes=class_.related_classes(), 
+        return dict(cls=cls, title=ch_class_.title, id=id, 
+                    related_classes=class_.related_classes(),
                     attributes=attributes, reference=ref,
                     actions=actions, came_from=url(came_from))
     
