@@ -524,6 +524,7 @@ catch(e) {
                     a += '/';
                 }
 
+                // with selection
                 if ($(this).attr('require_id') == 'true') {
                     
                     var selected_ids = self.getSelectedIds();
@@ -533,11 +534,15 @@ catch(e) {
                         if (action_type == 'delete') {
                             self.std_delete(selected_ids, url);
                         }
-                        // other standard actions
-                        else { //(action_type == 'edit') {
-                            //self.std_edit(selected_ids[0], url);
+                        // non-standard actions
+                        else if (action_type == 'process') {
+                            a += selected_ids[0]+'';
+                            $(form(a, target)).appendTo('body').submit().remove();
+                        }
+                        // standard actions
+                        else {
+                            // edit, docs, ...
                             a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
-                            //console.log(a + ' ' + target);
                             $(form(a, target)).appendTo('body').submit().remove();
                         }
                     }
@@ -545,11 +550,15 @@ catch(e) {
                         self.warningSelectedId();
                     }
                 }
+                // without selection
                 else {
-                    // new (std)
+                    // new (standard)
                     if (action_type == 'new') {
-                        //self.std_new(url);
                         a += self.cls;
+                        $(form(a, target)).appendTo('body').submit().remove();
+                    }
+                    // non-standard actions
+                    else if (action_type == 'process') {
                         $(form(a, target)).appendTo('body').submit().remove();
                     }
                 }
