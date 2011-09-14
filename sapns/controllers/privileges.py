@@ -170,60 +170,66 @@ class PrivilegesController(BaseController):
     @expose('sapns/privileges/actions.html')
     def actions(self, id_class, **kw):
         
-        id_class = int(id_class)
-        #id_user = get_paramw(kw, 'id_user', int, opcional=True)
-        id_role = get_paramw(kw, 'id_role', int, opcional=True)
-        if id_role:
-            who = dbs.query(SapnsRole).get(id_role)
+        logger = logging.getLogger('PrivilegesController.actions')
+        try:
+            id_class = int(id_class)
+            #id_user = get_paramw(kw, 'id_user', int, opcional=True)
+            id_role = get_paramw(kw, 'id_role', int, opcional=True)
+            if id_role:
+                who = dbs.query(SapnsRole).get(id_role)
+                
+    #        else:
+    #            who = dbs.query(SapnsUser).get(id_user)
             
-#        else:
-#            who = dbs.query(SapnsUser).get(id_user)
-        
-        # class
-        cls = dbs.query(SapnsClass).get(id_class)
-        
-        actions = []
-        for action in cls.actions:
+            # class
+            cls = dbs.query(SapnsClass).get(id_class)
             
-#            action_p = who.act_privilege(action.action_id)
-#            if not action_p:
-#                action_p = Dict(id_action=action.action_id,
-#                                name=_(action.name),
-#                                granted=False, #None,
-#                                )
+            actions = []
+            for action in cls.permissions:
                 
-#                if not id_user:
-#                    action_p.granted = False
+    #            action_p = who.act_privilege(action.action_id)
+    #            if not action_p:
+    #                action_p = Dict(id_action=action.action_id,
+    #                                name=_(action.name),
+    #                                granted=False, #None,
+    #                                )
+                    
+    #                if not id_user:
+    #                    action_p.granted = False
+                
+                if action.type == SapnsPermission.TYPE_NEW:
+                    pos = 1
+                    
+                elif action.type == SapnsPermission.TYPE_EDIT:
+                    pos = 2
+                    
+                elif action.type == SapnsPermission.TYPE_DELETE:
+                    pos = 3
+                    
+                elif action.type == SapnsPermission.TYPE_DOCS:
+                    pos = 4
+                    
+                else:
+                    pos = 100
+                    
+                actions.append(Dict(id_action=action.permission_id,
+                                    name=_(action.display_name),
+                                    granted=who.has_permission(action.permission_id),
+                                    pos=pos,
+                                    ))
             
-            if action.type == SapnsPermission.TYPE_NEW:
-                pos = 1
+            def cmp_action(x, y):
+                if x.pos == y.pos:
+                    return cmp(x.name, y.name)
                 
-            elif action.type == SapnsPermission.TYPE_EDIT:
-                pos = 2
-                
-            elif action.type == SapnsPermission.TYPE_DELETE:
-                pos = 3
-                
-            elif action.type == SapnsPermission.TYPE_DOCS:
-                pos = 4
-                
-            else:
-                pos = 100
-                
-            actions.append(Dict(id_action=action.permission_id,
-                                name=_(action.display_name),
-                                granted=who.has_permission(action.permission_id),
-                                pos=pos,
-                                ))
-        
-        def cmp_action(x, y):
-            if x.pos == y.pos:
-                return cmp(x.name, y.name)
+                else:
+                    return cmp(x.pos, y.pos)
             
-            else:
-                return cmp(x.pos, y.pos)
+            return dict(actions=sorted(actions, cmp=cmp_action))
         
-        return dict(actions=sorted(actions, cmp=cmp_action))
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
     
     @expose('json')
     def attrp_update(self, **kw):

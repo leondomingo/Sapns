@@ -1,3 +1,8 @@
+{% if status == False %}
+<div class="action_row">
+    <div class="action_name">ERROR</div>
+</div>
+{% else %}
 {% for act in actions %}
 <div class="action_row" id_action="{{act.id_action}}">
     <div class="action_name">{{act.name}}</div>
@@ -11,3 +16,4 @@
     {#<input type="checkbox" {% if act.granted %} checked {% endif %}>#}
 </div>
 {% endfor %}
+{% endif %}
