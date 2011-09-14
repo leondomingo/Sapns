@@ -463,7 +463,7 @@ catch(e) {
                             if ($(this).attr('require_id') == 'true') {
                                 var selected_ids = self.getSelectedIds();
                                 if (selected_ids.length > 0) {
-                                    $(this).data('_func')(selected_ids[0]);
+                                    $(this).data('_func')(selected_ids[0], selected_ids);
                                 }
                                 else {
                                     self.warningSelectedId();
