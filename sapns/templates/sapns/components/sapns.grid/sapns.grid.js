@@ -479,6 +479,26 @@ catch(e) {
             }
         }
         
+        // if the row is selected, then mark the checkbox
+        $('#'+self.name + ' .sp-grid-cell').live('click', function() {
+            //console.log(self.multiselect);
+            if ($(this).attr('clickable') == 'true') {
+                var row_id = $(this).parent().find('.sp-grid-rowid');
+                $('.sp-grid-rowid').each(function() {
+                    if ($(this) != row_id && !self.multiselect) {
+                        $(this).attr('checked', false);
+                    }
+                });
+                
+                if (row_id.attr('checked') == true) {
+                    row_id.attr('checked', false);
+                }
+                else {
+                    row_id.attr('checked', true);
+                }
+            }
+        });
+        
         // standard actions
         $('.standard_action').live('click', function(event) {
             
@@ -785,25 +805,6 @@ catch(e) {
             var g_table = 
                 '<div class="sp-grid-parent" style="overflow: auto; clear: left; ' + 
                     'height: ' + g.height + 'px; background-color: transparent;"></div>';
-            
-            // if the row is selected, then mark the checkbox
-            $('.sp-grid-cell').live('click', function() {
-                if ($(this).attr('clickable') == 'true') {
-                    var row_id = $(this).parent().find('.sp-grid-rowid');
-                    $('.sp-grid-rowid').each(function() {
-                        if ($(this) != row_id && !g.multiselect) {
-                            $(this).attr('checked', false);
-                        }
-                    });
-                    
-                    if (row_id.attr('checked') == true) {
-                        row_id.attr('checked', false);
-                    }
-                    else {
-                        row_id.attr('checked', true);
-                    }
-                }
-            });
             
             // pager
             var g_pager = '';
