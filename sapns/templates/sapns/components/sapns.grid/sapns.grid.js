@@ -68,6 +68,7 @@ catch(e) {
         set(this, 'data', {});
         set(this, 'height', 500); //470);
         set(this, 'url_base', '');
+        set(this, 'multiselect', false);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -790,7 +791,7 @@ catch(e) {
                 if ($(this).attr('clickable') == 'true') {
                     var row_id = $(this).parent().find('.sp-grid-rowid');
                     $('.sp-grid-rowid').each(function() {
-                        if ($(this) != row_id) {
+                        if ($(this) != row_id && !g.multiselect) {
                             $(this).attr('checked', false);
                         }
                     });
