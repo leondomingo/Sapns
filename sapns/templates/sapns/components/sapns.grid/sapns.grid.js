@@ -97,7 +97,7 @@ catch(e) {
         $('#' + self.name + ' .sp-grid-row').each(function() {
             var rowid = $(this).find('.sp-grid-rowid');
             if (rowid.attr('checked') == true) {
-                selected_ids.push(rowid.attr('id_row'));
+                selected_ids.push(rowid.attr('id_row')*1);
             }
         });
         
