@@ -417,3 +417,24 @@ def topdf(html_content, **kw):
             os.remove(html_path)
     
     return pdf_content
+
+def pagination(rp, pag_n, total):
+        
+    # total number of pages
+    pos = (pag_n-1)*(rp or 0)
+    total_pag = 1
+    if rp > 0:
+        total_pag = total/rp
+        
+        if total % rp != 0:
+            total_pag += 1
+        
+        if total_pag == 0:
+            total_pag = 1
+    
+    # rows in this page
+    this_page = total - pos
+    if rp and this_page > rp:
+        this_page = rp
+        
+    return (this_page, total_pag,)

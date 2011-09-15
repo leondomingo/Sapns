@@ -7,6 +7,7 @@ from tg.i18n import set_lang, get_lang
 from repoze.what import predicates as p
 
 from sapns.lib.base import BaseController
+from sapns.lib.sapns.util import pagination
 from sapns.model import DBSession as dbs
 import sapns.config.app_cfg as app_cfg
 
@@ -197,33 +198,12 @@ class DashboardController(BaseController):
                 w = 60
                 
             cols.append(dict(title=col, width=w, align='center'))
+            
+        this_page, total_pag = pagination(rp, pag_n, ds.count)
         
-        # total number of pages
-        total_pag = 1
-        if rp > 0:
-            total_pag = ds.count/rp
-            
-            if ds.count % rp != 0:
-                total_pag += 1
-            
-            if total_pag == 0:
-                total_pag = 1
-        
-        # rows in this page
-        this_page = ds.count - pos
-        if rp and this_page > rp:
-            this_page = rp
-            
         return dict(status=True, cols=cols, data=ds.to_data(), 
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
             
-#        return dict(ch_attr=ch_attr, parent_id=parent_id,
-#                    grid=dict(caption=caption, name=cls, cls=cls_.name,
-#                              search_url=url('/dashboard/grid/'), 
-#                              cols=cols, data=data, 
-#                              pag_n=pag_n, rp=rp, pos=pos,
-#                              this_page=this_page, total=ds.count, total_pag=total_pag))
-
     @expose('json')
     @require(p.not_anonymous())
     def grid_actions(self, cls, **kw):
