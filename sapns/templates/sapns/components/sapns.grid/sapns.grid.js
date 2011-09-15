@@ -225,7 +225,7 @@ catch(e) {
             q = self.q;
         }
         
-        if (self.q != q) {
+        if (self.q != q || force) {
             self.pag_n = 1;
         }
         
