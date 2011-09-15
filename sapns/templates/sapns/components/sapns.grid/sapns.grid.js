@@ -480,12 +480,12 @@ catch(e) {
         }
         
         // if the row is selected, then mark the checkbox
-        $('#'+self.name + ' .sp-grid-cell').live('click', function() {
+        $('#'+self.name + ' .sp-grid-cell').live('click', function(event) {
             //console.log(self.multiselect);
             if ($(this).attr('clickable') == 'true') {
                 var row_id = $(this).parent().find('.sp-grid-rowid');
-                $('.sp-grid-rowid').each(function() {
-                    if ($(this) != row_id && !self.multiselect) {
+                $('#'+self.name + ' .sp-grid-rowid').each(function() {
+                    if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
                         $(this).attr('checked', false);
                     }
                 });
@@ -500,7 +500,7 @@ catch(e) {
         });
         
         // standard actions
-        $('.standard_action').live('click', function(event) {
+        $('#'+self.name + ' .standard_action').live('click', function(event) {
             
             //console.log('standard action');
             
@@ -557,14 +557,33 @@ catch(e) {
                         }
                         // non-standard actions
                         else if (action_type == 'process') {
-                            a += selected_ids[0]+'';
-                            $(form(a, target)).appendTo('body').submit().remove();
+                            if (selected_ids.length == 1) {
+                                a += selected_ids[0];
+                                $(form(a, target)).appendTo('body').submit().remove();
+                            }
+                            else {
+                                // multiselect
+                                var a0 = a;
+                                for(var i=0, l=selected_ids.length; i<l; i++) {
+                                    $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
+                                }
+                            }
                         }
                         // standard actions
                         else {
                             // edit, docs, ...
-                            a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
-                            $(form(a, target)).appendTo('body').submit().remove();
+                            if (selected_ids.length == 1) {
+                                a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
+                                $(form(a, target)).appendTo('body').submit().remove();
+                            }
+                            else {
+                                // multiselect
+                                a += sprintf('%s/', self.cls);
+                                var a0 = a;
+                                for(var i=0, l=selected_ids.length; i<l; i++) {
+                                    $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
+                                } 
+                            }
                         }
                     }
                     else {
