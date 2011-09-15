@@ -336,7 +336,16 @@ class DashboardController(BaseController):
     def title(self, cls, id):
         logger = logging.getLogger(__name__ + '/title')
         try:
-            title = SapnsClass.object_title(cls, id)
+            ot = SapnsClass.ObjectTitle(cls)
+            try:
+                title = ot.title(int(id))
+                
+            except:
+                ids = sj.loads(id)
+                title = []
+                for id in ids:
+                    title.append(ot.title(id))
+            
             return dict(status=True, title=title)
         
         except Exception, e:
