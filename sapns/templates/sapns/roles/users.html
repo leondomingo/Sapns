@@ -1,0 +1,112 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    <style type="text/css">
+        #main {
+            position: relative;
+            /*border: 1px solid red;*/
+            height: 600px;
+        }
+        
+        #roles {
+            padding: 10px;
+            position: absolute;
+            left: 0px;
+            top: 20px;
+            width: 450px;
+        }
+        
+        #permissions {
+            padding: 10px;
+            position: absolute;
+            left: 460px;
+            top: 20px;
+        }
+        
+        #role_name {
+            font-size: 20px;
+            font-weight: bold;
+            color: gray;
+            padding-left: 10px;
+        }
+        
+        #title {
+            font-size: 15px;
+            margin-bottom: 5px;
+            border: 1px solid gray;
+            padding: 10px;
+            height: 40px;
+        }
+        
+        .user_name {
+            float: left;
+            font-weight: bold;
+            width: 150px;
+            padding-left: 40px;
+        }
+        
+        #users_list {
+            height: 500px;
+            overflow: auto;
+        }
+        
+    </style>
+{% endblock %}
+
+{% block middle %}
+    <div id="main">
+    <div id="role_name">{{role.name}}</div>
+    <div id="roles">
+    <div id="title">{{_('Check (or uncheck) the USERS you want this role to have in')}}</div>
+    <div id="users_list">
+    {% for u in users %}
+    <div>
+        <div class="user_name">{{u.name}}</div>
+        <input class="user_cb" type="checkbox" id_user="{{u.id}}" {% if u.selected %} checked {% endif %}>
+    </div>
+    {% endfor %}
+    </div>
+    </div>
+    
+    <div id="permissions">
+    <div id="title">{{_('Check (or uncheck) the PERMISSIONS you want this role to have')}}</div>
+    <div id="users_list">
+    {% for p in permissions %}
+    <div>
+        <div class="user_name">{{p.name}}</div>
+        <input class="user_cb" type="checkbox" id_user="{{p.id}}" {% if p.selected %} checked {% endif %}>
+    </div>
+    {% endfor %}
+    </div>
+    </div>
+    
+    </div>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.user_cb').click(function() {
+                var cb = this;
+                var id_user = $(this).attr('id_user');
+                var selected = $(this).attr('checked');
+                
+                $.ajax({
+                    url: "{{tg.url('/dashboard/users/update_role')}}",
+                    data: {
+                        id_user: id_user,
+                        id_role: {{role.id}},
+                        selected: selected
+                    },
+                    success: function(data) {
+                        if (!data.status) {
+                            $(cb).attr('checked', !selected);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}
