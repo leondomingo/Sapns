@@ -15,6 +15,7 @@ import sapns.config.app_cfg as app_cfg
 from sapns.controllers.views import ViewsController
 from sapns.controllers.util import UtilController
 from sapns.controllers.users import UsersController
+from sapns.controllers.roles import RolesController
 from sapns.controllers.shortcuts import ShortcutsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController
@@ -42,6 +43,7 @@ class DashboardController(BaseController):
     views = ViewsController()
     util = UtilController()
     users = UsersController()
+    roles = RolesController()
     sc = ShortcutsController()
     messages = MessagesController()
     privileges = PrivilegesController()

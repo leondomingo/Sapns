@@ -1,5 +1,77 @@
 {% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    <style type="text/css">
+        #roles {
+            padding: 10px;
+        }
+        
+        #user_name {
+            font-size: 20px;
+            font-weight: bold;
+            color: gray;
+            padding-left: 10px;
+        }
+        
+        #title {
+            font-size: 15px;
+            margin-bottom: 5px;
+            border: 1px solid gray;
+            padding-left: 20px;
+        }
+        
+        .role_name {
+            float: left;
+            font-weight: bold;
+            width: 200px;
+            padding-left: 40px;
+        }
+        
+        #roles_list {
+            height: 500px;
+            overflow: auto;
+        }
+    </style>
+{% endblock %}
 
 {% block middle %}
-    <h1>Very soon on your screen</h1>
+    <div id="user_name">{{user.name}}</div>
+    <div id="roles">
+    <div id="title">{{_('Check (or uncheck) the ROLES you want this user to be in')}}</div>
+    <div id="roles_list">
+    {% for r in roles %}
+    <div>
+        <div class="role_name">{{r.name}}</div>
+        <input class="role_cb" type="checkbox" id_role="{{r.id}}" {% if r.selected %} checked {% endif %}>
+    </div>
+    {% endfor %}
+    </div>
+    </div>
+    
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('.role_cb').click(function() {
+                var cb = this;
+                var id_role = $(this).attr('id_role');
+                var selected = $(this).attr('checked');
+                $.ajax({
+                    url: "{{tg.url('/dashboard/users/update_role')}}",
+                    data: {
+                        id_user: {{user.id}},
+                        id_role: id_role,
+                        selected: selected
+                    },
+                    success: function(data) {
+                        if (!data.status) {
+                            $(cb).attr('checked', !selected);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}
