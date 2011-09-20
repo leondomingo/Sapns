@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-09-19 19:55+0200\n"
+"POT-Creation-Date: 2011-09-20 19:42+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,14 +17,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: sapns/controllers/dashboard.py:116
-#: sapns/controllers/dashboard.py:168
-#: sapns/controllers/dashboard.py:222
-#: sapns/controllers/dashboard.py:363
-#: sapns/controllers/dashboard.py:496
-#: sapns/controllers/dashboard.py:621
-#: sapns/controllers/dashboard.py:670
-#: sapns/controllers/dashboard.py:726
+#: sapns/controllers/dashboard.py:116 sapns/controllers/dashboard.py:168
+#: sapns/controllers/dashboard.py:222 sapns/controllers/dashboard.py:363
+#: sapns/controllers/dashboard.py:496 sapns/controllers/dashboard.py:621
+#: sapns/controllers/dashboard.py:670 sapns/controllers/dashboard.py:726
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
@@ -60,8 +56,7 @@ msgstr "El registro se ha guardado correctamente"
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/dashboard.py:539
-#: sapns/controllers/dashboard.py:629
+#: sapns/controllers/dashboard.py:539 sapns/controllers/dashboard.py:629
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
@@ -80,8 +75,7 @@ msgstr "El orden de referencia para \"%s\" se ha actualizado correctamente"
 msgid "Documents of [%s]"
 msgstr "Documentos de [%s]"
 
-#: sapns/controllers/docs.py:257
-#: sapns/controllers/docs.py:309
+#: sapns/controllers/docs.py:257 sapns/controllers/docs.py:309
 #, python-format
 msgid "Repo [%d] was not found"
 msgstr "No se encontró el repositorio [%d]"
@@ -95,19 +89,16 @@ msgstr "Gestión de privilegios para \"%s\""
 msgid "Role privileges copy"
 msgstr "Copia de privilegios de rol"
 
-#: sapns/controllers/root.py:66
-#: sapns/controllers/myapp/root.py:66
+#: sapns/controllers/root.py:66 sapns/controllers/myapp/root.py:66
 msgid "Wrong credentials"
 msgstr "Credenciales incorrectas"
 
-#: sapns/controllers/root.py:80
-#: sapns/controllers/myapp/root.py:80
+#: sapns/controllers/root.py:80 sapns/controllers/myapp/root.py:80
 #, python-format
 msgid "Welcome back, %s!"
 msgstr "¡Bienvenido, %s!"
 
-#: sapns/controllers/root.py:89
-#: sapns/controllers/myapp/root.py:89
+#: sapns/controllers/root.py:89 sapns/controllers/myapp/root.py:89
 msgid "We hope to see you soon!"
 msgstr "¡Esperamos verte pronto!"
 
@@ -144,8 +135,7 @@ msgstr "Clase: %s"
 msgid "New"
 msgstr "Nuevo"
 
-#: sapns/lib/sapns/util.py:192
-#: sapns/templates/sapns/docs/index.html:426
+#: sapns/lib/sapns/util.py:192 sapns/templates/sapns/docs/index.html:426
 msgid "Edit"
 msgstr "Editar"
 
@@ -160,8 +150,7 @@ msgstr "Editar"
 msgid "Delete"
 msgstr "Borrar"
 
-#: sapns/lib/sapns/util.py:194
-#: sapns/lib/sapns/util.py:339
+#: sapns/lib/sapns/util.py:194 sapns/lib/sapns/util.py:339
 msgid "List"
 msgstr "Lista"
 
@@ -169,8 +158,7 @@ msgstr "Lista"
 msgid "Docs"
 msgstr "Documentos"
 
-#: sapns/lib/sapns/util.py:263
-#: sapns/templates/sapns/dashboard/index.html:17
+#: sapns/lib/sapns/util.py:263 sapns/templates/sapns/dashboard/index.html:17
 msgid "Dashboard"
 msgstr "Escritorio"
 
@@ -199,19 +187,16 @@ msgstr "Saltando [%s]"
 msgid "NO_TITLE"
 msgstr "SIN_TITULO"
 
-#: sapns/templates/myapp/base.html:30
-#: sapns/templates/sapns/base.html:26
+#: sapns/templates/myapp/base.html:30 sapns/templates/sapns/base.html:26
 msgid "You are in"
 msgstr "Estás en"
 
-#: sapns/templates/myapp/base.html:34
-#: sapns/templates/sapns/base.html:30
+#: sapns/templates/myapp/base.html:34 sapns/templates/sapns/base.html:30
 #: sapns/templates/sapns/dashboard/edit/edit.html:96
 msgid "return"
 msgstr "volver"
 
-#: sapns/templates/myapp/header.html:5
-#: sapns/templates/sapns/header.html:14
+#: sapns/templates/myapp/header.html:5 sapns/templates/sapns/header.html:14
 msgid "logout"
 msgstr "salir"
 
@@ -231,7 +216,13 @@ msgstr "Selecciona tu idioma"
 msgid "This window will be closed in"
 msgstr "Este ventana se cerrará en"
 
-#: sapns/templates/sapns/components/sapns.selector.js:230
+#: sapns/templates/sapns/components/sapns.selector.js:234
+#: sapns/templates/sapns/components/sapns.selector.min.js:1
+#, python-format
+msgid "Set a value for [%s]"
+msgstr "Poner valor a [%s]"
+
+#: sapns/templates/sapns/components/sapns.selector.js:267
 #: sapns/templates/sapns/components/sapns.selector.min.js:1
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:709
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:1
@@ -245,7 +236,7 @@ msgstr "Este ventana se cerrará en"
 msgid "Ok"
 msgstr "Aceptar"
 
-#: sapns/templates/sapns/components/sapns.selector.js:240
+#: sapns/templates/sapns/components/sapns.selector.js:277
 #: sapns/templates/sapns/components/sapns.selector.min.js:1
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:767
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:1
@@ -259,6 +250,12 @@ msgstr "Aceptar"
 #: sapns/templates/sapns/shortcuts/list.html:305
 msgid "Cancel"
 msgstr "Cancelar"
+
+#: sapns/templates/sapns/components/sapns.selector.js:298
+#: sapns/templates/sapns/components/sapns.selector.min.js:1
+#, python-format
+msgid "Remove value of [%s]"
+msgstr "Quitar valor de [%s]"
 
 #: sapns/templates/sapns/components/sapns.uploader.js:67
 #: sapns/templates/sapns/components/sapns.uploader.min.js:2
