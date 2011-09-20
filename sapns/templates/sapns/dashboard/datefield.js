@@ -30,7 +30,12 @@ $("{{selector}}").each(function() {
        });
 	}
 	else {
-		var date_value = new Date($(this).val()).format(date_fmt1);
+	    var d = $(this).val();
+	    var date_value = '';
+	    if (d) {
+	        date_value = new Date(d).format(date_fmt1);
+	    }
+	    
 		$(this).css('width', '85px').val(date_value);
 	}
 });
