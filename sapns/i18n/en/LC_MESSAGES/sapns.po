@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-09-19 19:55+0200\n"
+"POT-Creation-Date: 2011-09-20 19:42+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -231,7 +231,13 @@ msgstr "Select your language"
 msgid "This window will be closed in"
 msgstr "This window will be closed in"
 
-#: sapns/templates/sapns/components/sapns.selector.js:230
+#: sapns/templates/sapns/components/sapns.selector.js:234
+#: sapns/templates/sapns/components/sapns.selector.min.js:1
+#, python-format
+msgid "Set a value for [%s]"
+msgstr "Set a value for [%s]"
+
+#: sapns/templates/sapns/components/sapns.selector.js:267
 #: sapns/templates/sapns/components/sapns.selector.min.js:1
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:709
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:1
@@ -245,7 +251,7 @@ msgstr "This window will be closed in"
 msgid "Ok"
 msgstr "Ok"
 
-#: sapns/templates/sapns/components/sapns.selector.js:240
+#: sapns/templates/sapns/components/sapns.selector.js:277
 #: sapns/templates/sapns/components/sapns.selector.min.js:1
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:767
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:1
@@ -259,6 +265,12 @@ msgstr "Ok"
 #: sapns/templates/sapns/shortcuts/list.html:305
 msgid "Cancel"
 msgstr "Cancel"
+
+#: sapns/templates/sapns/components/sapns.selector.js:298
+#: sapns/templates/sapns/components/sapns.selector.min.js:1
+#, python-format
+msgid "Remove value of [%s]"
+msgstr "Remove value of [%s]"
 
 #: sapns/templates/sapns/components/sapns.uploader.js:67
 #: sapns/templates/sapns/components/sapns.uploader.min.js:2
