@@ -5,35 +5,55 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
+    
+{% endblock %}
+
+{% block middle %}
+
+    <label>Alumno</label>
+    <div id="alumno"></div>
+    
+    <label>Profesor</label>
+    <div id="profesor"></div>
+
+    <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>    
     <script type="text/javascript">
         {% include 'sapns/components/sapns.selector.js' %}
         
         $(document).ready(function() {
-            $('#selector-alumno').sapnsSelector({
+            $('#alumno').sapnsSelector({
                 //name: 'classes',
-                value: 1,
+                value: null, //1,
                 title: 'Class',
                 rc: 'sp_classes',
                 rc_title: function() {
                     // this = sapnsSelector 
-                    return 'Esto es una prueba con "' + this.name + '"';
+                    return 'Esto es una prueba con "' + this.name + '" ' + new Date().toString();
                     //return new Date().toString();
                 },
                 dialog: {results: 3, height: 380},
                 //search_url: "",
                 //search_params: {fecha: obtener_fecha, id_grupo: 100}
-                // ,read_only: true 
+                read_only: true, 
             });
             
-            $('#selector-profesor').sapnsSelector({
+            $('#profesor').sapnsSelector({
                 //name: 'profesor',
-                value: 40,
+                value: null, //40,
                 title: 'Attribute',
                 rc: 'sp_attributes',
                 rc_title: 'Attributes',
+                onChange: function(v) {
+                    if (!v) {
+                        $('#alumno').sapnsSelector('setValue', null);
+                    }
+                    
+                    $('#alumno').sapnsSelector('setReadonly', !v);
+                },
                 search_params: {
                     //cls: 'sp_classes'
-                    q: 'perm'
+                    q: 'perm',
+                    rp: 5
                 }
                 /*
                 search_params: function() {
@@ -45,13 +65,4 @@
             });
         });
     </script>
-{% endblock %}
-
-{% block middle %}
-
-    <label>Alumno</label>
-    <div id="selector-alumno"></div>
-    
-    <label>Profesor</label>
-    <div id="selector-profesor"></div>
 {% endblock %}

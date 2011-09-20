@@ -1,5 +1,20 @@
 /* Sapns selector */
 
+function load_script(src) {
+    //console.log('Loading from: ' + src);
+    var fileref = document.createElement('script');
+    fileref.setAttribute("type", "text/javascript");
+    fileref.setAttribute("src", src);
+    document.getElementsByTagName("head")[0].appendChild(fileref)
+}
+
+try {
+    sprintf;
+}
+catch (e) {
+    load_script("{{tg.url('/js/sprintf.min.js')}}");
+}
+
 (function($) {
 
 	// SapnsSelector (constructor)
@@ -42,13 +57,18 @@
 	
 	// setValue
 	SapnsSelector.prototype.setValue = function(value, no_callback) {
-	    var change = this.value != value;
-        var old_value = this.value;
-
-		this.value = value;
-		if (change && this.onChange && !no_callback) {
-		    this.onChange(value, old_value);
-		}
+	    
+	    var self = this;
+	    
+	    if (!self.read_only) {
+    	    var change = self.value != value;
+            var old_value = self.value;
+    
+    		self.value = value;
+    		if (change && self.onChange && !no_callback) {
+    		    self.onChange(value, old_value);
+    		}
+	    }
 	}
 	
 	// getValue
@@ -59,28 +79,28 @@
 	// setTitle
 	SapnsSelector.prototype.setTitle = function() {
 		
-		var sapnsSelector = this;
-		var id = "#st_" + this.name
-		var value = this.value;
+		var self = this;
+		var id = "#st_" + self.name
+		var value = self.value;
 		
-		if (value && this.rc) {
+		if (value && self.rc) {
 			$.ajax({
-				url: sapnsSelector.title_url,
+				url: self.title_url,
 				data: {
-					cls: this.rc,
-					id: this.value
+					cls: self.rc,
+					id: self.value
 				},
 				success: function(data) {
 					if (data.status) {
 						$(id).val(data.title).parent().attr('value', value);
-						sapnsSelector.title = data.title;
+						self.title = data.title;
 					}
 				}
 			});
 		}
 		else {
 			$(id).val('').parent().attr('value', '');
-			sapnsSelector.title = '';
+			self.title = '';
 		}
 	}
 	
@@ -94,11 +114,11 @@
 		return this.rc;
 	}
 	
-	// click_search
-	SapnsSelector.prototype.click_search = function(q) {
+	// search
+	SapnsSelector.prototype.search = function(q) {
 	    
-		var sapnsSelector = this;
-		var dialog_name = "#dialog_" + this.name;
+		var self = this;
+		var dialog_name = "#dialog_" + self.name;
 		
 		if (q == undefined) {
 	        q = $(dialog_name + ' .sp-search-text').val();
@@ -106,19 +126,17 @@
 		
 		// search params
 		var params = {
-		        cls: this.rc,
+		        cls: self.rc,
 		        q: q,
-		        rp: this.dialog.results
+		        rp: self.dialog.results
 		};
 		
-		if (this.search_params != null) {
-		    if (typeof(this.search_params) == 'object') {
-		        for (k in this.search_params) {
-		            params[k] = this.search_params[k];
-		        }
+		if (self.search_params != null) {
+		    if (typeof(self.search_params) == 'object') {
+		        params = $.extend(true, params, self.search_params);
 		    }
-		    else if (typeof(this.search_params) == 'function') {
-		        params.search_params = this.search_params;
+		    else if (typeof(self.search_params) == 'function') {
+		        params.search_params = self.search_params;
 		        params.search_params();
 		    }
 		}
@@ -134,7 +152,7 @@
 	        },
 	        error: function(f, status, error) {
 	            alert('error!');
-	            sapnsSelector.click_search();
+	            sapnsSelector.search();
 	            // $(dialog_name).dialog('close'); 
 	        }
 	    });
@@ -143,7 +161,7 @@
 	// search_kp
 	SapnsSelector.prototype.search_kp = function(event) {
 	    if (event.which == 13) {
-	        this.click_search();
+	        this.search();
 	    }
 	}
 
@@ -151,6 +169,21 @@
 	SapnsSelector.prototype.remove = function() {
 		this.setValue('');
 		this.setTitle();
+	}
+	
+	// setEnabled
+	SapnsSelector.prototype.setReadonly = function(value) {
+	    
+	    var self = this;
+	    
+	    if (value === undefined) {
+	        value = true;
+	    }
+	    
+	    $('#st_' + self.name).attr('disabled', value);
+	    $('#sb_' + self.name).attr('disabled', value);
+	    $('#rb_' + self.name).attr('disabled', value);
+	    self.read_only = value;
 	}
 
 	$.fn.sapnsSelector = function(arg1, arg2, arg3) {
@@ -179,26 +212,30 @@
 			
 			// double-click to edit the selected object (if there's any)
 			this.find('#st_' + sapnsSelector.name).dblclick(function() {
-	        	var cls = sapnsSelector.getClass();
-	        	var id = sapnsSelector.getValue();
-	        	if (id != '') {
-	        		var url_edit = sapnsSelector.edit_url;
-	        		var form_edit =
-	        			'<form action="' + url_edit + '" method="post" target="_blank">' +
-	        			    '<input type="hidden" name="cls" value="' + cls + '">' +   
-	        			    '<input type="hidden" name="id" value="' + id + '">' +
-	        			    '<input type="hidden" name="came_from" value="">' +
-	        			'</form>';
-	        			
-	        		$(form_edit).appendTo('body').submit().remove();
-	        	}
+			    
+			    if (!sapnsSelector.isReadonly) {
+    	        	var cls = sapnsSelector.getClass();
+    	        	var id = sapnsSelector.getValue();
+    	        	if (id != '') {
+    	        		var url_edit = sapnsSelector.edit_url;
+    	        		var form_edit =
+    	        			'<form action="' + url_edit + '" method="post" target="_blank">' +
+    	        			    '<input type="hidden" name="cls" value="' + cls + '">' +   
+    	        			    '<input type="hidden" name="id" value="' + id + '">' +
+    	        			    '<input type="hidden" name="came_from" value="">' +
+    	        			'</form>';
+    	        			
+    	        		$(form_edit).appendTo('body').submit().remove();
+    	        	}
+			    }
 	        });
 			
 			// select_button
+			var title = sprintf('{{_("Set a value for [%s]")}}', sapnsSelector.title);
 			var select_button = 
 			    '<button id="sb_' + sapnsSelector.name + '"' +
 				' class="sp-button sp-select-button" ' +
-				' title=\'Set a value for "' + sapnsSelector.title + '"\'' +
+				' title="' + title + '" ' +
 				' style="font-weight: bold;"';
 			
 			if (sapnsSelector.read_only) {
@@ -209,59 +246,66 @@
 			
 			this.append(select_button);
 			
-			// dialog title
-			var dialog_title = '';
-			if (typeof(sapnsSelector.rc_title) == 'string') {
-			    dialog_title = sapnsSelector.rc_title;
-			}
-			else if (typeof(sapnsSelector.rc_title) == 'function'){
-			    dialog_title = sapnsSelector.rc_title();
-			}
-			
 			this.find('#sb_' + sapnsSelector.name).click(function() {
-
-				$('#dialog_' + sapnsSelector.name).dialog({
-	                title: dialog_title,
-	                width: sapnsSelector.dialog.width,
-	                height: sapnsSelector.dialog.height,
-	                resizable: false,
-	                modal: true,
-	                buttons: {
-	                    "{{_('Ok')}}": function() {
-	                        // get the id of the selected row
-	                        
-	                        var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
-	                        
-	                        sapnsSelector.setValue(id_selected);
-	                        sapnsSelector.setTitle();
-	                        
-	                        $('#dialog_' + sapnsSelector.name).dialog('close');
-	                    },
-	                    "{{_('Cancel')}}": function() {
-	                        $('#dialog_' + sapnsSelector.name).dialog('close');
-	                    }
-	                }
-	            });
-	            
-	            sapnsSelector.click_search('');
+			    
+			    if (!sapnsSelector.isReadonly) {
+			        
+    			    // dialog title
+    	            var dialog_title = sapnsSelector.rc_title;
+    	            if (typeof(sapnsSelector.rc_title) == 'function'){
+    	                dialog_title = sapnsSelector.rc_title();
+    	            }
+    			    
+    	            // show search dialog
+    				$('#dialog_' + sapnsSelector.name).dialog({
+    	                title: dialog_title,
+    	                width: sapnsSelector.dialog.width,
+    	                height: sapnsSelector.dialog.height,
+    	                resizable: false,
+    	                modal: true,
+    	                buttons: {
+    	                    "{{_('Ok')}}": function() {
+    	                        // get the id of the selected row
+    	                        
+    	                        var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
+    	                        
+    	                        sapnsSelector.setValue(id_selected);
+    	                        sapnsSelector.setTitle();
+    	                        
+    	                        $('#dialog_' + sapnsSelector.name).dialog('close');
+    	                    },
+    	                    "{{_('Cancel')}}": function() {
+    	                        $('#dialog_' + sapnsSelector.name).dialog('close');
+    	                    }
+    	                }
+    	            });
+    	            
+    	            sapnsSelector.search('');
+			    }
 	        });
 			
 			sapnsSelector.setTitle();
 			
 			// remove button
-			var remove_button = '';
-			if (!sapnsSelector.read_only) {
-				remove_button += 
-				    '<button id="rb_' + sapnsSelector.name + '"' +
-					' class="sp-button sp-empty-button"' +
-					' title=\'Remove value of "' + sapnsSelector.title + '"\'' +
-					' style="font-weight: bold; color: red;">X</button>';
+			var remove_button =
+			    '<button id="rb_' + sapnsSelector.name + '"' +
+				' class="sp-button sp-empty-button"';
+				
+			if (sapnsSelector.read_only) {
+			    remove_button += ' disabled ';
 			}
-		
+			
+			var title = sprintf("{{_('Remove value of [%s]')}}", sapnsSelector.title);
+			remove_button += 
+			    ' title="' + title + '" ' +
+			    ' style="font-weight: bold; color: red;">x</button>';
+
 			this.append(remove_button);
 			
 			this.find('#rb_' + sapnsSelector.name).click(function() {
-				sapnsSelector.remove();
+			    if (!sapnsSelector.isReadonly) {
+			        sapnsSelector.remove();
+			    }
 			});
 			
 			//this.sapnsSelector = sapnsSelector;
@@ -289,6 +333,12 @@
 			// getClass()
 			else if (arg1 == "getClass") {
 				return sapnsSelector.rc;
+			}
+			else if (arg1 == "setReadonly") {
+			    sapnsSelector.setReadonly(arg2);
+			}
+			else if (arg1 == "isReadonly") {
+			    return sapnsSelector.read_only;
 			}
 			// TODO: other sapnsSelector methods
 		}
