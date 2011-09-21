@@ -153,6 +153,9 @@ class DashboardController(BaseController):
         ch_attr = params.get('ch_attr')
         parent_id = params.get('parent_id')
         
+        # filters
+        filters = get_paramw(params, 'filters', sj.loads, opcional=True)
+        
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         
@@ -182,8 +185,8 @@ class DashboardController(BaseController):
 
         # get dataset
         ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    strtodatef=strtodate_, collection=col) 
-        
+                    strtodatef=strtodate_, collection=col, filters=filters)
+                 
         # Reading global settings
         ds.date_fmt = date_fmt
         ds.time_fmt = config.get('formats.time', default='%H:%M')
@@ -237,19 +240,26 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def search(self, **params):
         
-        import random
-        random.seed()
-        
-        logger = logging.getLogger(__name__ + '/search')
-        logger.info(params)
-        
-        #params['caption'] = ''
-        g = self.list(**params)
-        
-        logger.info(g)
-        g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
-        
-        return g
+        logger = logging.getLogger('DashboardController.search')
+        try:
+            import random
+            random.seed()
+            
+            logger.info(params)
+            
+            #params['caption'] = ''
+            g = self.list(**params)
+            
+            logger.info(g)
+            g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
+            g['grid']['q'] = get_paramw(params, 'q', unicode, opcional=True)
+            g['grid']['filters'] = params.get('filters')
+            
+            return g
+    
+        except Exception, e:
+            logger.error(e)
+            raise
     
     def export(self, cls, **kw):
         """

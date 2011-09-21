@@ -10,7 +10,7 @@
 {#{{ u.qtip2() }}#}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
 <script type="text/javascript">
-    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
 </script>
 
 </head>
@@ -29,6 +29,11 @@
                 rp: 10,
                 //height: 700,
                 //with_search: false,
+                search_params: {
+                    data: {
+                        filters: JSON.stringify([['id', 7183]])
+                    }
+                },
                 search_params_: {
                     url: "{{tg.url('/dashboard/test_search/')}}",
                     data: { cls: 'alumnos' }

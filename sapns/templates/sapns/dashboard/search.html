@@ -8,9 +8,16 @@
 </div>
 
 <script type="text/javascript">
-    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
     $(document).ready(function() {
+        
         $('#{{grid.name}}').sapnsGrid({
+            q: "{{grid.q or ''}}",
+            search_params: {
+                data: {
+                    filters: '{{grid.filters or ""}}',
+                }
+            },
             cls: "{{grid.cls}}",
             caption: "",
             actions: [],
