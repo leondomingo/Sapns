@@ -187,6 +187,12 @@ def update_metadata():
                 managers.permissions_.append(action)
                 dbs.flush()
                 
+            elif action.type == SapnsPermission.TYPE_LIST:
+                for s in action.shortcuts:
+                    s.title = action.class_.title
+                    dbs.add(s)
+                    dbs.flush()
+                
         # create standard actions
         create_action(unicode(l_('New')), SapnsPermission.TYPE_NEW)
         create_action(unicode(l_('Edit')), SapnsPermission.TYPE_EDIT)
@@ -374,6 +380,19 @@ def create_data_exploration():
             
             else:
                 logger.info('Shortcut for "%s" already exists' % cls.title)
+                
+        # TODO: sort (alphabetically) shortcuts inside "data exploration"
+        logger.info('Sorting shortcuts inside "data exploration"')
+        i = 0
+        for sc in dbs.query(SapnsShortcut).\
+                filter(SapnsShortcut.parent_id == sc_project.shortcut_id).\
+                order_by(SapnsShortcut.title):
+            
+            sc.order = i
+            dbs.add(sc)
+            dbs.flush()
+            
+            i += 1
 
 def topdf(html_content, **kw):
     

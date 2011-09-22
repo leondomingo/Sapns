@@ -520,6 +520,7 @@ class SapnsShortcut(DeclarativeBase):
     permission_id = Column('id_permission', Integer,
                            ForeignKey('sp_permission.id',
                                       onupdate='CASCADE', ondelete='SET NULL')) #, nullable=False)
+    # permission
     
     def __str__(self):
         return unicode(self).encode('utf-8')
@@ -1437,6 +1438,8 @@ class SapnsPermission(Permission):
                                  onupdate='CASCADE', ondelete='CASCADE'))
     # class_
     
+    shortcuts = relation(SapnsShortcut, backref='permission')
+    
     TYPE_NEW =     u'new'
     TYPE_EDIT =    u'edit'
     TYPE_DELETE =  u'delete'
@@ -1463,10 +1466,6 @@ class SapnsPermission(Permission):
     
 #    def has_privilege(self, id_user):
 #        return SapnsRolePermission.has_privilege(id_user, self.action_id)
-
-SapnsPermission.shortcuts = \
-        relation(SapnsShortcut, backref='action',
-                 primaryjoin= SapnsPermission.permission_id == SapnsShortcut.permission_id)
 
 class SapnsRolePermission(DeclarativeBase):
 
