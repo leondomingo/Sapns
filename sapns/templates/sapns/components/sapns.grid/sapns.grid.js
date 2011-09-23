@@ -791,7 +791,8 @@ catch(e) {
                 
                 g_content += 
                     '<div><div style="float: left;">' +
-                        '<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
+                        //'<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
+                        '<input class="sp-search-txt" name="q" type="text" value="">' +
                         '<button class="sp-button sp-search-btn">{{_("Search...")}}</button></div>';                     
                         
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
@@ -903,6 +904,7 @@ catch(e) {
             this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
             
             g.loadActions();
+            $('#'+g.name + ' .sp-search-txt').val(g.q);
             g.search(g.q)
         }
         else if (typeof(arg1) == "string") {
