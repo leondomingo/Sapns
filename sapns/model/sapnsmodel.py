@@ -1431,6 +1431,7 @@ class SapnsPermission(Permission):
     display_name = Column(Unicode(50), nullable=False)
     url = Column(Unicode(200))
     type = Column(Unicode(20))
+    requires_id = Column(Boolean, default=True)
     
     # TODO: puede ser nulo? (nullable=False)
     class_id = Column('id_class', Integer, 
