@@ -131,7 +131,7 @@ class DashboardController(BaseController):
         return dict(page=_('list of %s') % cls_.title.lower(), came_from=came_from, 
                     grid=dict(cls=cls_.name,
                               caption=caption,
-                              q=q, rp=rp, pag_n=pag_n,
+                              q=q.replace('"', '\\\"'), rp=rp, pag_n=pag_n,
                               # collection
                               ch_attr=ch_attr, parent_id=parent_id,
                               # related classes

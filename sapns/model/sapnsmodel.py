@@ -871,7 +871,7 @@ class SapnsClass(DeclarativeBase):
                     if url and url[-1] != '/':
                         url += '/'
                         
-                    require_id = True
+                    require_id = ac.requires_id # True
                     pos = 100
                         
                     if ac.type == SapnsPermission.TYPE_NEW:
@@ -885,18 +885,21 @@ class SapnsClass(DeclarativeBase):
                         if not ac.url:
                             url = SapnsPermission.URL_EDIT
                             
+                        require_id = True
                         pos = 2
                     
                     elif ac.type == SapnsPermission.TYPE_DELETE:
                         if not ac.url:
                             url = SapnsPermission.URL_DELETE
                             
+                        require_id = True
                         pos = 3
                         
                     elif ac.type == SapnsPermission.TYPE_DOCS:
                         if not ac.url:
                             url = SapnsPermission.URL_DOCS
                             
+                        require_id = True
                         pos = 4
                         
                     actions.append(Dict(title=_(ac.display_name), type=ac.type, 
