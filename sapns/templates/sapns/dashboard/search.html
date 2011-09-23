@@ -18,11 +18,13 @@
                     filters: '{{grid.filters or ""}}',
                 }
             },
+            rp: 25,
             cls: "{{grid.cls}}",
             caption: "",
             actions: [],
             with_pager: false,
-            exportable: false
+            exportable: false,
+            height: 420,
         });
         
         $('#{{grid.name}} .sp-search-txt').focus();

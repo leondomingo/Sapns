@@ -400,7 +400,9 @@ clear:both;
 .sp-grid-cell {
 	/*background-color: white;*/
 	font-family: Arial;
-	height: 40px;
+	font-size: 11px;
+	height: 22px; /*40px;*/
+	max-height: 22px;
 	cursor: pointer;
 }
 
