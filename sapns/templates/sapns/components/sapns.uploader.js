@@ -199,9 +199,9 @@
             
             $('#btn_delete_file_' + sufix).click(function() {
                 // hides filename but does not remove the file from disk (depends on "removeOnDelete" option)
-                sapnsUploader.deleteFile();
+                sapnsUploader.deleteFile(sapnsUploader.removeOnDelete);
                 if (sapnsUploader.onDelete) {
-                    sapnsUploader.onDelete(sapnsUploader.removeOnDelete);
+                    sapnsUploader.onDelete();
                 }
                 
                 sapnsUploader.setUploaded(false);
