@@ -29,6 +29,8 @@
         set(this, 'repo', '');
         set(this, 'show_button', true);
         set(this, 'onUpload', null);
+        set(this, 'onDelete', null);
+        set(this, 'removeOnDelete', false);
         
         set(this, 'qtip', {});
         set(this.qtip, 'style', 'ui-tooltip-red ui-tooltip-rounded', this.qtip);
@@ -196,8 +198,13 @@
             }
             
             $('#btn_delete_file_' + sufix).click(function() {
-                // hides filename but does not remove the file from disk
+                // hides filename but does not remove the file from disk (depends on "removeOnDelete" option)
                 sapnsUploader.deleteFile();
+                if (sapnsUploader.onDelete) {
+                    sapnsUploader.onDelete(sapnsUploader.removeOnDelete);
+                }
+                
+                sapnsUploader.setUploaded(false);
             });
             
             // event handlers 
@@ -216,7 +223,7 @@
                         sapnsUploader.file_name = result.file_name;
                         
                         if (sapnsUploader.onUpload) {
-                            sapnsUploader.onUpload();
+                            sapnsUploader.onUpload(result.uploaded_file, result.file_name);
                         }
                         
                         sapnsUploader.setUploaded(true);
@@ -252,12 +259,15 @@
             else if (arg1 == "setRepo") {
                 sapnsUploader.setRepo(arg2);
             }
+            // getRepo
             else if (arg1 == "getRepo") {
                 return sapnsUploader.getRepo();
             }
+            // deleteFile
             else if (arg1 == "deleteFile") {
                 sapnsUploader.deleteFile(arg2);
             }
+            // isUploaded
             else if (arg1 == "isUploaded") {
                 return sapnsUploader.isUploaded();
             }
