@@ -471,7 +471,14 @@ catch(e) {
                                 }
                             }
                             else {
-                                $(this).data('_func')();
+                                console.log('xxx');
+                                var selected_ids = self.getSelectedIds();
+                                if (selected_ids.length > 0) {
+                                    $(this).data('_func')(selected_ids[0], selected_ids);
+                                }
+                                else {
+                                    $(this).data('_func')();
+                                }
                             }
                         });
                     }
@@ -544,11 +551,11 @@ catch(e) {
                 if (a[a.length-1] != '/') {
                     a += '/';
                 }
+                
+                var selected_ids = self.getSelectedIds();
 
                 // with selection
                 if ($(this).attr('require_id') == 'true') {
-                    
-                    var selected_ids = self.getSelectedIds();
                                         
                     if (selected_ids.length > 0) {
                         // delete (std)
@@ -590,7 +597,7 @@ catch(e) {
                         self.warningSelectedId();
                     }
                 }
-                // without selection
+                // selection is not required
                 else {
                     // new (standard)
                     if (action_type == 'new') {
@@ -599,7 +606,22 @@ catch(e) {
                     }
                     // non-standard actions
                     else if (action_type == 'process') {
-                        $(form(a, target)).appendTo('body').submit().remove();
+                        if (selected_ids.length == 1) {
+                            a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
+                            $(form(a, target)).appendTo('body').submit().remove();
+                        }
+                        else if (selected_ids.length > 1) {
+                            // multiselect
+                            a += sprintf('%s/', self.cls);
+                            var a0 = a;
+                            for(var i=0, l=selected_ids.length; i<l; i++) {
+                                $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
+                            } 
+                        }
+                        else {
+                            // no selection at all
+                            $(form(a, target)).appendTo('body').submit().remove();
+                        }
                     }
                 }
             }
@@ -940,7 +962,7 @@ catch(e) {
             /*else if (arg1 == "delete") {
                 self.std_delete();
             }*/
-            // TODO: other sapnsSelector methods
+            // TODO: other sapnsGrid methods
         }
         
         return this;
