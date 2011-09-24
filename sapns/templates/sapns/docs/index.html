@@ -326,7 +326,6 @@
                             file_name: file_name,
                             uploaded_file: uploaded_file,
                             onUpload: function() {
-                                //console.log(JSON.stringify(this));
                                 if ($('#doc_title').val() == '') {
                                     $('#doc_title').val(this.getUploadedfile());
                                 }
