@@ -24,6 +24,7 @@
         set(this, 'name', 'upl_' + Math.floor(Math.random()*999999));
         set(this, 'file_name', '');
         set(this, 'uploaded_file', '');
+        this.file_size = 0;
         this.uploaded = false;
         set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
         set(this, 'repo', '');
@@ -45,6 +46,10 @@
     // setFilename
     SapnsUploader.prototype.setFilename = function(value) {
         this.file_name = value;
+    }
+    
+    SapnsUploader.prototype.getFilesize = function() {
+        return this.file_size;
     }
     
     // getUploadedfile
@@ -81,6 +86,10 @@
     
     // setUploaded
     SapnsUploader.prototype.setUploaded = function(value) {
+        if (!value) {
+            this.file_size = 0;
+        }
+        
         this.uploaded = value;
     }
     
@@ -127,6 +136,7 @@
                 $('#upload_file_form_' + sufix).show();
                 self.setFilename('');
                 self.setUploadedfile('');
+                self.setUploaded(false);
             }
             
             if (remove_from_disk) {
@@ -221,6 +231,7 @@
                         
                         sapnsUploader.uploaded_file = result.uploaded_file;
                         sapnsUploader.file_name = result.file_name;
+                        sapnsUploader.file_size = result.file_size;
                         
                         if (sapnsUploader.onUpload) {
                             sapnsUploader.onUpload(result.uploaded_file, result.file_name);
@@ -270,6 +281,10 @@
             // isUploaded
             else if (arg1 == "isUploaded") {
                 return sapnsUploader.isUploaded();
+            }
+            // getFilesize
+            else if (arg1 == "getFilesize") {
+                return sapnsUploader.getFilesize();
             }
             // TODO: other sapnsUploader methods
         }

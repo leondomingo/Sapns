@@ -262,7 +262,9 @@ class DocsController(BaseController):
             
             return sj.dumps(dict(status=True, 
                                  uploaded_file=f.filename,
-                                 file_name=file_name))
+                                 file_name=file_name,
+                                 file_size=f.file.tell(),
+                                 ))
         
         except Exception, e:
             logger.error(e)
