@@ -24,11 +24,14 @@
         set(this, 'name', 'upl_' + Math.floor(Math.random()*999999));
         set(this, 'file_name', '');
         set(this, 'uploaded_file', '');
+        this.file_size = 0;
         this.uploaded = false;
         set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
         set(this, 'repo', '');
         set(this, 'show_button', true);
         set(this, 'onUpload', null);
+        set(this, 'onDelete', null);
+        set(this, 'removeOnDelete', false);
         
         set(this, 'qtip', {});
         set(this.qtip, 'style', 'ui-tooltip-red ui-tooltip-rounded', this.qtip);
@@ -43,6 +46,10 @@
     // setFilename
     SapnsUploader.prototype.setFilename = function(value) {
         this.file_name = value;
+    }
+    
+    SapnsUploader.prototype.getFilesize = function() {
+        return this.file_size;
     }
     
     // getUploadedfile
@@ -79,6 +86,10 @@
     
     // setUploaded
     SapnsUploader.prototype.setUploaded = function(value) {
+        if (!value) {
+            this.file_size = 0;
+        }
+        
         this.uploaded = value;
     }
     
@@ -125,6 +136,7 @@
                 $('#upload_file_form_' + sufix).show();
                 self.setFilename('');
                 self.setUploadedfile('');
+                self.setUploaded(false);
             }
             
             if (remove_from_disk) {
@@ -196,8 +208,13 @@
             }
             
             $('#btn_delete_file_' + sufix).click(function() {
-                // hides filename but does not remove the file from disk
-                sapnsUploader.deleteFile();
+                // hides filename but does not remove the file from disk (depends on "removeOnDelete" option)
+                sapnsUploader.deleteFile(sapnsUploader.removeOnDelete);
+                if (sapnsUploader.onDelete) {
+                    sapnsUploader.onDelete();
+                }
+                
+                sapnsUploader.setUploaded(false);
             });
             
             // event handlers 
@@ -214,9 +231,10 @@
                         
                         sapnsUploader.uploaded_file = result.uploaded_file;
                         sapnsUploader.file_name = result.file_name;
+                        sapnsUploader.file_size = result.file_size;
                         
                         if (sapnsUploader.onUpload) {
-                            sapnsUploader.onUpload();
+                            sapnsUploader.onUpload(result.uploaded_file, result.file_name);
                         }
                         
                         sapnsUploader.setUploaded(true);
@@ -252,14 +270,21 @@
             else if (arg1 == "setRepo") {
                 sapnsUploader.setRepo(arg2);
             }
+            // getRepo
             else if (arg1 == "getRepo") {
                 return sapnsUploader.getRepo();
             }
+            // deleteFile
             else if (arg1 == "deleteFile") {
                 sapnsUploader.deleteFile(arg2);
             }
+            // isUploaded
             else if (arg1 == "isUploaded") {
                 return sapnsUploader.isUploaded();
+            }
+            // getFilesize
+            else if (arg1 == "getFilesize") {
+                return sapnsUploader.getFilesize();
             }
             // TODO: other sapnsUploader methods
         }
