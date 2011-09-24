@@ -813,5 +813,3 @@ class DashboardController(BaseController):
                           [200, u'€łđŋ', jinja2.escape(u'<a></a>')],
                           [300, jinja2.escape(u'<a href="#">Google</a>')],
                          ])
-    
-    
