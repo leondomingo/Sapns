@@ -601,22 +601,21 @@ catch(e) {
                 else {
                     // new (standard)
                     if (action_type == 'new') {
-                        a += self.cls;
+                        a += selected_ids[0];
                         $(form(a, target)).appendTo('body').submit().remove();
                     }
                     // non-standard actions
                     else if (action_type == 'process') {
                         if (selected_ids.length == 1) {
-                            a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
+                            a += sprintf('%s/', selected_ids[0]+'');
                             $(form(a, target)).appendTo('body').submit().remove();
                         }
                         else if (selected_ids.length > 1) {
                             // multiselect
-                            a += sprintf('%s/', self.cls);
                             var a0 = a;
                             for(var i=0, l=selected_ids.length; i<l; i++) {
                                 $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                            } 
+                            }
                         }
                         else {
                             // no selection at all
