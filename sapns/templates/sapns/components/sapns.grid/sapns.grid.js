@@ -509,8 +509,6 @@ catch(e) {
         // standard actions
         $('#'+self.name + ' .standard_action').live('click', function(event) {
             
-            //console.log('standard action');
-            
             function form(action, target) {
                 var came_from = '';
                 if (target != '_blank') {
@@ -553,7 +551,7 @@ catch(e) {
                 }
                 
                 var selected_ids = self.getSelectedIds();
-
+                
                 // with selection
                 if ($(this).attr('require_id') == 'true') {
                                         
@@ -601,7 +599,7 @@ catch(e) {
                 else {
                     // new (standard)
                     if (action_type == 'new') {
-                        a += selected_ids[0];
+                        a += sprintf('%s/', self.cls);
                         $(form(a, target)).appendTo('body').submit().remove();
                     }
                     // non-standard actions

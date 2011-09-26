@@ -41,7 +41,7 @@ class Update(object):
             u = Dict(**u)
             if not SapnsUpdates.by_code(u.code):
 
-                logger.info('[%s] %s (%s)' % (u.code, u.desc or '', u.type.upper()))
+                logger.info(u'[%s] %s (%s)' % (u.code, u.desc or '', u.type.upper()))
                 
                 try:
                     # SQL
@@ -80,4 +80,4 @@ class Update(object):
                     logger.error(e)
                     
             else:
-                logger.warning(_('Skipping [%s]' % u.code))
+                logger.warning(_(u'Skipping [%s]') % u.code)
