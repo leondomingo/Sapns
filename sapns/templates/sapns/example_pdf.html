@@ -1,0 +1,117 @@
+{% extends 'sapns/base.html' %}
+
+{% block head %}
+    {{ super() }}
+
+   <link rel="stylesheet" type="text/css" media="screen,print" 
+        href="{{url2(tg.url('/css/example_pdf.css'))}}">
+    
+{% endblock %}
+
+{% block header %}
+	<div id="imgLogo">
+		<img src="{{url2(tg.url('/images/example_pdf.png'))}}"></img>
+	</div>	
+{% endblock %}
+
+{% block middle %}
+<div id="pagina">	
+	<div class="titulo"><span class="naranja">F</span>actura</div>
+	
+	<div id="datosFactura">
+		<table cellpadding=0 cellspacing=0>
+			<tr>
+				<td class="naranjan">Factura Nº</td>
+				<td width="120px">NUMERO</td>
+			</tr>
+			<tr>
+				<td class="naranjan">Fecha:</td>
+				<td>dd/mm/yyyy</td>
+			</tr>
+		</table>			
+	</div>   
+	
+	<p class="naranja"><strong>World Languages Consultancy, S.L. UNIPERSONAL</strong><br>
+	C/ APODACA 6 4º A<br>
+	28004 MADRID<br>
+	CIF: B85226488</p>
+	
+	<div id="datoscliente">
+		<table cellpadding=0 cellspacing=0>
+			<tr>
+				<td class="naranjan">CLIENTE</td>
+				<td width="260px">CLIENTE_NOMBRE</td>
+			</tr>
+			<tr>
+				<td class="naranjan">DIRECCION</td>
+				<td>CLIENTE_DIRECCION</td>
+			</tr>
+			<tr>
+				<td class="naranjan">CIUDAD</td>
+				<td>CLIENTE_CIUDAD</td>
+			</tr>
+			<tr>
+				<td class="naranjan">CIF</td>
+				<td>CLIENTE_CIF</td>
+			</tr>
+		</table>				
+	</div>	      
+
+	<div class="clear"></div>	
+	
+	<div class="cabecera">
+		<div style="width:430px;" class="naranjan">CONCEPTO FACTURADO</div>
+		<div style="width:430px;">CONCEPTO</div>		
+	</div>
+	
+	<div class="clear"></div><br>
+	
+	<div class="cabecera">
+		<div style="width:210px;" class="naranjan">Grupo</div>
+		<div style="width:208px;" class="naranjan">Centro de coste</div>
+		<div style="width:210px;" class="naranjan">Alumno</div>
+		<div style="width:208px;" class="naranjan">Horas</div>		
+	</div>
+	
+	{% for c in cargos %}
+	
+		{% for a in c.alumnos %}
+		
+		<div class="cabecera">
+			<div style="width:210px;">DESCRIPCION</div>
+			<div style="width:208px;">0</div>
+			<div style="width:210px;">NOMBRE APELLIDO1 APELLIDO2</div>
+			<div style="width:208px;">HORAS</div>
+		</div>
+	
+		{% endfor %}
+	
+	{% endfor %}
+	
+	<div class="clear"></div><br>		
+	
+	<div class="cabecera">
+		<div style="width:430px;" class="naranjan">Número total de horas</div>
+		<div style="width:430px;">TOTAL_HORAS</div>		
+	</div>
+	<div class="cabecera">
+		<div style="width:430px;" class="naranjan">Precio hora</div>
+		<div style="width:430px;">concepto</div>		
+	</div>
+	<div class="cabecera">
+		<div style="width:430px;" class="naranjan">Importe</div>
+		<div style="width:430px;">1,234.00 €</div>		
+	</div>
+		
+	<div class="clear"></div><br>	
+	
+	<div class="transferir">Transferir a la siguiente cuenta bancaria<br>2054 0320 16 9149846804</div>
+	<div class="clear"></div>
+</div>	
+{% endblock %}
+
+{% block footer %}
+<div class="footer">
+	<div>www.kleinsoncollins.com<br>tel.:605.98.28.30<br>91.531.87.31<br>Apodaca, 6<br>28004</div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+  
+    .clear{clear:both;}
+    .sp_middle{border:none !important;}
+	
+	#pagina{ padding-left:50px; padding-right:20px; padding-bottom:20px;}
+	#imgLogo{ float:left; padding:10px; margin-left:50px;}
+	.titulo{ margin:0 auto; font-size:24px; font-weight:bold; text-align:center; clear:both;}
+	.transferir{ margin:0 auto; font-size:12px; font-weight:bold; text-align:center; clear:both;}
+		
+	#datosFactura{ clear:both; float:left; padding:20px 0 20px 0; width:100%;}
+		#datosFactura table{ text-align:center; width:300px; border: 1px solid #000000;}
+			#datosFactura table td{border:1px solid #000000;}
+			
+	#datoscliente{ clear:both; float:left; padding:20px 0 20px 0; width:100%;}				
+		#datoscliente table{ text-align:center; width:450px; border: 1px solid #000000;}
+			#datoscliente table td{border:1px solid #000000;}			
+	
+	.naranja{color:#e36c0a;}
+	.naranjan{color:#e36c0a;font-weight:bold;}
+	
+	.footer{height:40px; font-size:10px;}
+		.footer div {padding: 15px 0 15px 0; text-align: center;}
+		
+		
+	.cabecera{width:900px;}
+		.cabecera div {float:left; text-align:center; font-size:16px; font-weight:bold; padding:5px; border:1px solid #000000;}
