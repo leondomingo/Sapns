@@ -3,6 +3,7 @@
 
 from sapns.config.app_cfg import base_config
 from sapns.config.environment import load_environment
+from sapns.lib.sapns.htmltopdf import HtmlToPdfMiddleware
 
 
 __all__ = ['make_app']
@@ -35,5 +36,6 @@ def make_app(global_conf, full_stack=True, **app_conf):
     app = make_base_app(global_conf, full_stack=True, **app_conf)
     
     # Wrap your base TurboGears 2 application with custom middleware here
+    app = HtmlToPdfMiddleware(app, app_conf)
     
     return app

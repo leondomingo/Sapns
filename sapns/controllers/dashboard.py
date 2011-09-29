@@ -34,6 +34,7 @@ import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
+from sapns.lib.sapns.htmltopdf import url2
 
 __all__ = ['DashboardController']
 
@@ -775,7 +776,13 @@ class DashboardController(BaseController):
     @expose('sapns/components/sapns.grid/grid_test.html')
     @require(p.in_group('managers'))
     def test_grid(self):
-        return {}
+        return dict()
+    
+    @expose('sapns/example_pdf.html')
+    @require(p.in_group('managers'))
+    def test_pdf(self):
+        request.environ['to_pdf'] = 'example_1.pdf'
+        return dict(url2=url2)
     
     @expose('json')
     @require(p.in_group('managers'))

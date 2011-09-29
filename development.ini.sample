@@ -63,6 +63,7 @@ app.company_url = http://www.sapns.org
 #app.root_folder = 
 app.home = /dashboard
 app.repo_base = %(here)s/sapns/public/repo
+app.url = http://localhost:8081/
 
 htmltopdf.path =
 
