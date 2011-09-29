@@ -2,7 +2,6 @@
 
 from webob import Request
 from sapns.lib.sapns.util import topdf
-import logging
 
 class HtmlToPdfMiddleware(object):
 
@@ -10,10 +9,8 @@ class HtmlToPdfMiddleware(object):
         self.application = application
         
     def __call__(self, environ, start_response):
-        logger = logging.getLogger('HtmlToPdfMiddleware.__call__')
         request = Request(environ)
         response = request.get_response(self.application)
-        logger.info(environ['HTTP_HOST'])
         if environ.has_key('to_pdf'):
             response.content_type = 'application/pdf'
             response.headerlist.append(("content-disposition",
