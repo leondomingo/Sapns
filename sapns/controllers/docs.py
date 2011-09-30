@@ -286,13 +286,13 @@ class DocsController(BaseController):
         finally:
             f.close()
             
-        file_name = '%s.%s' % (doc.title_as_filename(), doc.docformat.extension)
+        file_name = ('%s.%s' % (doc.title_as_filename(), doc.docformat.extension)).encode('utf-8')
             
         mt = doc.docformat.mime_type
         if not mt:
             mt = mimetypes.guess_type(file_name)[0]
             
-        response.headerlist.append(('Content-Type', mt))
+        response.headerlist.append(('Content-Type', mt.encode('utf-8')))
         response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))            
         
         return content
