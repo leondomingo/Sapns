@@ -5,6 +5,7 @@ num_field_keydown: function (fld, e, is_int) {
     var one_dot = current_text.search(/\./) != -1;
     if ((k < 48 || k > 57) && // numbers
         (k < 96 || k > 105) && // numbers
+        //(current_text.length > 0 || k != 109) &&
         (k != 190 || one_dot || is_int) && // dot (.)
         (k != 110 || one_dot || is_int) && // dot (.)
         k != 46 && // delete
@@ -15,7 +16,7 @@ num_field_keydown: function (fld, e, is_int) {
       ) {
         e.preventDefault();
     }
-    //console.log(e.which);
+    console.log(e.which);
 },
 time_field_keydown: function (e) {
     var k = e.which;
