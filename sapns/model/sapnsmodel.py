@@ -830,11 +830,15 @@ class SapnsClass(DeclarativeBase):
     
     @staticmethod
     def object_title(class_name, id_object):
+        
+        logger = logging.getLogger('object_title')
+        
         _title = SapnsClass.ObjectTitle(class_name).title(id_object)
         
-        if not _title:
+        if id_object and not _title:
             cls = SapnsClass.by_name(class_name)
             _title = '[%s: %s]' % (cls.title, id_object)
+            logger.info(u'no_title: %s' % _title)
             
         return _title
     

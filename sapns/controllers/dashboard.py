@@ -327,19 +327,21 @@ class DashboardController(BaseController):
     @expose('json')
     @require(p.not_anonymous())
     def title(self, cls, id):
-        logger = logging.getLogger(__name__ + '/title')
+        logger = logging.getLogger('DashboardController.title')
         try:
-            ot = SapnsClass.ObjectTitle(cls)
             try:
-                title = ot.title(int(id))
+                _title = SapnsClass.object_title(cls, int(id))
                 
-            except:
+            except Exception, e:
+                logger.error(e)
+                
                 ids = sj.loads(id)
-                title = []
-                for id in ids:
-                    title.append(ot.title(id))
+                _title = []
+                ot = SapnsClass.ObjectTitle(cls)
+                for id_ in ids:
+                    _title.append(ot.title(id_))
             
-            return dict(status=True, title=title)
+            return dict(status=True, title=_title)
         
         except Exception, e:
             logger.error(e)
