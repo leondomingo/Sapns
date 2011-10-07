@@ -232,17 +232,15 @@ $(document).ready(function() {
         });
     }
     
-    $('.sp_float_field').keydown(function(e) {
-        fields.num_field_keydown($(this), e);
+    $('.sp_float_field').change(function() {
+        fields.num_field_change($(this), false);
     });
     
-    $('.sp_integer_field').keydown(function(e) {
-        fields.num_field_keydown($(this), e, true);
+    $('.sp_integer_field').change(function() {
+        fields.num_field_change($(this), true);
     });
     
-    $('.sp-time-field').keydown(function(e) {
-        fields.time_field_keydown(e);
-    }).change(function() {
+    $('.sp-time-field').change(function() {
         fields.time_field_change($(this));
     });
     
