@@ -2,7 +2,10 @@
 # -*- coding: utf-8 -*-
 
 import logging
-from sapns.model import DBSession as dbs
+from tg import config
+#from sapns.model import DBSession as dbs
+from sapns.exc.conexion import Conexion
+dbs = Conexion(config.get('sqlalchemy.url')).session
 
 def test1(*args, **kwargs):
     logger = logging.getLogger('test1')
