@@ -412,12 +412,16 @@ def topdf(html_content, **kw):
         
         finally:
             f_input.close()
+            
+        orientation = kw.get('orientation')
+        if not orientation:
+            orientation = 'Portrait'
         
         pdf_content = ''
         fd_pdf, pdf_path = tempfile.mkstemp(suffix='.pdf', prefix='sapns_')
         os.close(fd_pdf)
         try:
-            sp.check_call([topdf_path, '-q', html_path, pdf_path])
+            sp.check_call([topdf_path, '-q', '-O', orientation, html_path, pdf_path])
             
             # get PDF content
             f_output = open(pdf_path, 'rb')

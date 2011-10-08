@@ -12,10 +12,11 @@ class HtmlToPdfMiddleware(object):
         request = Request(environ)
         response = request.get_response(self.application)
         if environ.has_key('to_pdf'):
+            orientation = environ.get('pdf_orientation')
             response.content_type = 'application/pdf'
             response.headerlist.append(("content-disposition",
                                         "attachment; filename=%s" % request.environ['to_pdf']))
-            response.body = topdf(response.body)
+            response.body = topdf(response.body, orientation=orientation)
         
         return response(environ, start_response)
     
