@@ -6,7 +6,6 @@ import logging
 import datetime as dt
 import encodings
 _open = encodings.codecs.open
-from pylons.i18n import ugettext as _
 from tg import config
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUpdates
@@ -19,7 +18,7 @@ current_path = os.path.dirname(os.path.abspath(__file__))
 class Update(object):
     
     def __init__(self):
-        logger.info(_('Loading settings...'))
+        logger.info('Loading settings...')
         
         # postgresql://postgres:mypassword@localhost:5432/mydb
         m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', unicode(dbs.bind))
@@ -32,10 +31,10 @@ class Update(object):
             self.pg_path = config.get('pg_path', '/usr/bin/')
             
         else:
-            raise Exception(_('It was not possible to get connection data'))
+            raise Exception('It was not possible to get connection data')
         
     def __call__(self):
-
+        
         for u in TODO:
             
             u = Dict(**u)
@@ -62,8 +61,8 @@ class Update(object):
                     # python
                     elif u.type.lower() == 'py':
                         #logger.info(_('Executing Python script...'))
-                        module = __import__('sapns.lib.sapns.update.%s' % u.module, 
-                                            None, None, ['update'])
+                        module_name = 'sapns.lib.sapns.update.%s' % u.module
+                        module = __import__(module_name, fromlist=['update'])
                         module.update()
                         
                     # save "update"
@@ -80,4 +79,4 @@ class Update(object):
                     logger.error(e)
                     
             else:
-                logger.warning(_(u'Skipping [%s]') % u.code)
+                logger.warning(u'Skipping [%s]' % u.code)
