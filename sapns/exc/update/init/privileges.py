@@ -24,4 +24,4 @@ class Privileges(BaseUpdate):
         managers = SapnsRole.by_name(u'managers')
         managers.permissions_.append(ap_r)
 
-update = Privileges()
+update = Privileges

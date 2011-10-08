@@ -24,4 +24,4 @@ class CopyPrivileges(BaseUpdate):
         managers = SapnsRole.by_name(u'managers')
         managers.permissions_.append(ap_r)
 
-update = CopyPrivileges()
+update = CopyPrivileges

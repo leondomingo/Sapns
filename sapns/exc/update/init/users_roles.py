@@ -37,4 +37,4 @@ class UsersRoles(BaseUpdate):
         managers.permissions_.append(p1)
         managers.permissions_.append(p2)
 
-update = UsersRoles()
+update = UsersRoles
