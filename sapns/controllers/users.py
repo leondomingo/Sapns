@@ -34,7 +34,13 @@ class UsersController(BaseController):
     @require(predicates.not_anonymous())
     def edit(self, id, **params):
         
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         id_user = int(id)
+        
+        is_manager = u'managers' in request.identity['groups']
+        
+        if user.user_id != id_user and not is_manager:
+            redirect(url('/error'))
         
         came_from = params.get('came_from')
         if came_from:
