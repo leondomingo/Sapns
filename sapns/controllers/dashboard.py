@@ -29,7 +29,7 @@ from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
 
 import logging
 import re
-import simplejson as sj #@UnresolvedImport
+import simplejson as sj
 import cStringIO
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
@@ -104,6 +104,7 @@ class DashboardController(BaseController):
         
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        permissions = request.identity['permissions']
         
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
@@ -112,7 +113,7 @@ class DashboardController(BaseController):
         #logger.info('Child class: %s' % ch_cls_.name)
              
         if not user.has_privilege(cls_.name) or \
-        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
+        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -159,6 +160,7 @@ class DashboardController(BaseController):
         
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        permissions = request.identity['permissions']
         
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
@@ -167,7 +169,7 @@ class DashboardController(BaseController):
         #logger.info('Child class: %s' % ch_cls_.name)
              
         if not user.has_privilege(cls_.name) or \
-        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
+        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
             return dict(status=False, 
                         message=_('Sorry, you do not have privilege on this class'))
         
@@ -218,13 +220,7 @@ class DashboardController(BaseController):
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         
         cls_ = SapnsClass.by_name(cls)
-        #ch_cls_ = SapnsClass.by_name(cls, parent=False)        
              
-        if not user.has_privilege(cls_.name) or \
-        not user.has_permission('%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST)):
-            return dict(status=False, 
-                        message=_('Sorry, you do not have privilege on this class'))
-        
         # actions for this class
         actions = cls_.sorted_actions(user.user_id)
         actions = [act for act in actions \
@@ -276,8 +272,16 @@ class DashboardController(BaseController):
         # q
         q = kw.get('q', '')
         
-        # user
+        cls_ = SapnsClass.by_name(cls)
+        
+        # user/permissions
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        permissions = request.identity['permissions']
+        
+        if not user.has_privilege(cls_.name) or \
+        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
         
         # collections
         ch_attr = kw.get('ch_attr')
@@ -303,6 +307,18 @@ class DashboardController(BaseController):
     @expose(content_type='text/csv')
     @require(p.not_anonymous())
     def tocsv(self, cls, **kw):
+        
+        cls_ = SapnsClass.by_name(cls)
+        
+        # user/permissions
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        permissions = request.identity['permissions']
+        
+        if not user.has_privilege(cls_.name) or \
+        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
+        
         ds = self.export(cls, **kw)
         
         response.headerlist.append(('Content-Disposition',
@@ -313,6 +329,18 @@ class DashboardController(BaseController):
     @expose(content_type='application/excel')
     @require(p.not_anonymous())
     def toxls(self, cls, **kw):
+        
+        cls_ = SapnsClass.by_name(cls)
+        
+        # user
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        permissions = request.identity['permissions']
+        
+        if not user.has_privilege(cls_.name) or \
+        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
+            return dict(status=False, 
+                        message=_('Sorry, you do not have privilege on this class'))
+        
         ds = self.export(cls, **kw)
 
         response.headerlist.append(('Content-Disposition',
@@ -369,9 +397,11 @@ class DashboardController(BaseController):
         
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        permissions = request.identity['permissions']
         
         if not user.has_privilege(cls.name) or \
-        not user.has_permission('%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT)):
+        not '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT) in permissions:
+        #not user.has_permission('%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT)):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -493,16 +523,19 @@ class DashboardController(BaseController):
                                por_defecto='/dashboard')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        permissions = request.identity['permissions']
         
         class_ = SapnsClass.by_name(cls)
         ch_class_ = SapnsClass.by_name(cls, parent=False)
         
         if id:
             id = int(id)
-            perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT))
+            #perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT))
+            perm = '%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT) in permissions
         
         else:
-            perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_NEW))
+            #perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_NEW))
+            perm = '%s#%s' % (class_.name, SapnsPermission.TYPE_NEW) in permissions
         
         if not user.has_privilege(class_.name) or not perm:
             redirect(url('/message',
@@ -625,11 +658,13 @@ class DashboardController(BaseController):
         rel_tables = []
         try:
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            permissions = request.identity['permissions']
             cls_ = SapnsClass.by_name(cls)
             
             # check privilege on this class
             if not user.has_privilege(cls_.name) or \
-            not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_DELETE)):
+            not '%s#%s' % (cls, SapnsPermission.TYPE_DELETE) in permissions:
+            #not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_DELETE)):
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
             
