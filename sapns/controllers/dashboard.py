@@ -663,8 +663,7 @@ class DashboardController(BaseController):
             
             # check privilege on this class
             if not user.has_privilege(cls_.name) or \
-            not '%s#%s' % (cls, SapnsPermission.TYPE_DELETE) in permissions:
-            #not user.has_permission('%s#%s' % (cls, SapnsPermission.TYPE_DELETE)):
+            not '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions:
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
             
