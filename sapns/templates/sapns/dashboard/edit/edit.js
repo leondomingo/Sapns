@@ -16,13 +16,17 @@ $(document).ready(function() {
         var params = '';
         var required_attrs = [];
         
-        // {# text #} 
+        // text 
         $('.sp-text-field').each(function() {
             var name = $(this).parent().parent().attr('name');
             var required = $(this).parent().parent().attr('required');
             var value = $(this).val();
+            var ok = $(this).attr('_ok');
+            if (ok === undefined) {
+                ok = true;
+            }
                     
-            if (required == 'true' && value == '') {
+            if (required == 'true' && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -35,8 +39,9 @@ $(document).ready(function() {
             var name = $(this).parent().parent().attr('name');
             var required = $(this).parent().parent().attr('required');
             var value = $(this).val();
+            var ok = $(this).attr('_ok');
                     
-            if (required == 'true' && value == '') {
+            if (required == 'true' && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -49,8 +54,9 @@ $(document).ready(function() {
             var name = $(this).parent().parent().attr('name');
             var required = $(this).parent().parent().attr('required');
             var value = $(this).val();
+            var ok = $(this).attr('_ok');
                     
-            if (required == 'true' && value == '') {
+            if (required == 'true' && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -58,7 +64,7 @@ $(document).ready(function() {
                 '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
         });
         
-        // {# url #} 
+        // url
         $('.url_field_text').each(function() {
             var parent = $(this).parent().parent().parent();
             var name = parent.attr('name');
@@ -73,7 +79,7 @@ $(document).ready(function() {
                 '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
         });
         
-        // {# checkbox #} 
+        // checkbox 
         $('.sp-checkbox-field').each(function() {
             var name = $(this).parent().parent().attr('name');
             params += 
@@ -81,7 +87,7 @@ $(document).ready(function() {
                     'value="' + $(this).attr('checked') + '">\n';
         });
 
-        // {# date #} 
+        // date 
         $('.sp-date-field').each(function() {
             
             var date_value = $(this).datepicker('getDate');
@@ -109,7 +115,7 @@ $(document).ready(function() {
                     'value="' + date_value + '">\n';
         });
         
-        // {# time #} 
+        // time
         $('.sp-time-field').each(function() {
             var name = $(this).parent().parent().attr('name');
             var required = $(this).parent().parent().attr('required');
@@ -124,7 +130,7 @@ $(document).ready(function() {
                     'value="' + value + '">\n';
         });
         
-        // {# select fields #} 
+        // select fields
         $('.sp-select-field').each(function() {
             
             var name = $(this).parent().parent().attr('name');
@@ -184,7 +190,7 @@ $(document).ready(function() {
     // with specific date format and options #} 
     {{ df.date_field(tg, _, '.sp-date-field') }}
     
-    // {# show related class #} 
+    // show related class
     $('#rel-classes-show').click(function() {
         
         var option = $('#rel-classes-sel option:selected');
@@ -232,25 +238,15 @@ $(document).ready(function() {
         });
     }
     
-    /*$('.sp_float_field').change(function() {
-        fields.num_field_change($(this), false);
-    });
-    
-    $('.sp_integer_field').change(function() {
-        fields.num_field_change($(this), true);
-    });*/
-    
     function check_regex(field) {
         var regex = field.attr('regex');
-        if (regex) {
-            regex = new RegExp(regex, 'g');
-            var text = field.val();
+        var text = field.val();
+        if (regex && text) {
+            regex = new RegExp(regex.trim());
             if (regex.test(text)) {
-                console.log('yes');
                 field.css('color', '').attr('_ok', 1);
             }
             else {
-                console.log('no');
                 field.css('color', 'red').attr('_ok', '');
             }
         }
@@ -261,6 +257,10 @@ $(document).ready(function() {
     });
     
     $('.sp_float_field').change(function() {
+        check_regex($(this));
+    });
+    
+    $('.sp-text-field').change(function() {
         check_regex($(this));
     });
     
