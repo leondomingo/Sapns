@@ -2,7 +2,7 @@
 """Dashboard Controller"""
 
 from tg import response, expose, require, url, request, redirect, config
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
+from pylons.i18n import ugettext as _
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates as p
 
@@ -37,6 +37,9 @@ from sqlalchemy.schema import MetaData
 from sapns.lib.sapns.htmltopdf import url2
 
 __all__ = ['DashboardController']
+
+class ECondition(Exception):
+    pass
 
 class DashboardController(BaseController):
     """DashboardController manage raw-data editing"""
@@ -375,7 +378,7 @@ class DashboardController(BaseController):
             logger.error(e)
             return dict(status=False, message=str(e).decode('utf-8'))        
     
-    @expose()
+    @expose('json')
     @require(p.not_anonymous())
     def save(self, cls, **params):
         """
@@ -388,119 +391,132 @@ class DashboardController(BaseController):
         """
         
         logger = logging.getLogger(__name__ + '/save')
-        logger.info(params)
-
-        cls = SapnsClass.by_name(cls)
-        id_ = get_paramw(params, 'id', int, opcional=True)
-        came_from = params.get('came_from') #, '/dashboard/list?cls=%s' % cls.name)
-        quiet = strtobool(params.get('quiet', 'false'))
-        
-        # does this user have permission on this table?
-        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        permissions = request.identity['permissions']
-        
-        if not user.has_privilege(cls.name) or \
-        not '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT) in permissions:
-        #not user.has_permission('%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT)):
-            redirect(url('/message', 
-                         params=dict(message=_('Sorry, you do not have privilege on this class'),
-                                     came_from=came_from)))
-
-        # init "update" dictionary
-        update = {}
-        
-        if id_:
-            update['id'] = int(id_)
+        try:
+            logger.info(params)
+    
+            ch_cls = SapnsClass.by_name(cls, parent=False)
+            cls = SapnsClass.by_name(cls)
+            id_ = get_paramw(params, 'id', int, opcional=True)
             
-        READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
-                           SapnsAttrPrivilege.ACCESS_DENIED]
-        
-        for field_name, field_value in params.iteritems():
-            m_field = re.search(r'^fld_(.+)', field_name)
-            if m_field:
-                field_name_ = m_field.group(1) 
-                attr = cls.attr_by_name(field_name_)
+            # does this user have permission on this table?
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            permissions = request.identity['permissions']
+            
+            if not user.has_privilege(cls.name) or \
+            not '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT) in permissions:
+                return dict(status=False)
+    
+            # init "update" dictionary
+            update = {}
+            
+            if id_:
+                update['id'] = int(id_)
                 
-                logger.info(field_name_)
-                
-                # skipping "read-only" and "denied" attributes
-                acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
-                if acc in READONLY_DENIED:
-                    continue
-                
-                # null values
-                if field_value == 'null':
-                    field_value = None
+            READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
+                               SapnsAttrPrivilege.ACCESS_DENIED]
+            
+            for field_name, field_value in params.iteritems():
+                m_field = re.search(r'^fld_(.+)', field_name)
+                if m_field:
+                    field_name_ = m_field.group(1) 
+                    attr = cls.attr_by_name(field_name_)
                     
-                else:
-                    # integer
-                    if attr.type == SapnsAttribute.TYPE_INTEGER:
-                        if field_value == '':
-                            field_value = None
-                        else:
-                            field_value = int(field_value)
+                    logger.info(field_name_)
                     
-                    # numeric
-                    elif attr.type == SapnsAttribute.TYPE_FLOAT:
-                        if field_value == '':
-                            field_value = None
-                        else:
-                            field_value = float(field_value)
+                    # skipping "read-only" and "denied" attributes
+                    acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
+                    if acc in READONLY_DENIED:
+                        continue
                     
-                    # boolean
-                    elif attr.type == SapnsAttribute.TYPE_BOOLEAN:
-                        field_value = strtobool(field_value)
+                    # null values
+                    if field_value == 'null':
+                        field_value = None
                         
-                    # date
-                    elif attr.type == SapnsAttribute.TYPE_DATE:
-                        if field_value == '':
-                            field_value = None
-                        else:
-                            field_value = strtodate(field_value, fmt='%Y-%m-%d')
-                    
-                    # time
-                    elif attr.type == SapnsAttribute.TYPE_TIME:
-                        if field_value == '':
-                            field_value = None
-                        else:
-                            field_value = strtotime(field_value)
-                            
-                    elif attr.type == SapnsAttribute.TYPE_DATETIME:
-                        if field_value == '':
-                            field_value = None
-                        else:
-                            field_value = strtotime(field_value)
-                    
-                    # string types        
                     else:
-                        field_value = field_value.strip()
-                
-                update[field_name_] = field_value
-                
-        logger.info(update)
-                
-        meta = MetaData(bind=dbs.bind)
-        tbl = Table(cls.name, meta, autoload=True)
-        
-        if update.get('id'):
-            logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
-            tbl.update(whereclause=tbl.c.id == update['id'], values=update).execute()
-            
-        else:
-            logger.info('Inserting new object in "%s"' % cls.name)
-            tbl.insert(values=update).execute()
-            
-        dbs.flush()
+                        # integer
+                        if attr.type == SapnsAttribute.TYPE_INTEGER:
+                            if field_value == '':
+                                field_value = None
+                            else:
+                                field_value = int(field_value)
+                        
+                        # numeric
+                        elif attr.type == SapnsAttribute.TYPE_FLOAT:
+                            if field_value == '':
+                                field_value = None
+                            else:
+                                field_value = float(field_value)
+                        
+                        # boolean
+                        elif attr.type == SapnsAttribute.TYPE_BOOLEAN:
+                            field_value = strtobool(field_value)
+                            
+                        # date
+                        elif attr.type == SapnsAttribute.TYPE_DATE:
+                            if field_value == '':
+                                field_value = None
+                            else:
+                                field_value = strtodate(field_value, fmt='%Y-%m-%d')
+                        
+                        # time
+                        elif attr.type == SapnsAttribute.TYPE_TIME:
+                            if field_value == '':
+                                field_value = None
+                            else:
+                                field_value = strtotime(field_value)
+                                
+                        elif attr.type == SapnsAttribute.TYPE_DATETIME:
+                            if field_value == '':
+                                field_value = None
+                            else:
+                                field_value = strtotime(field_value)
+                        
+                        # string types        
+                        else:
+                            field_value = field_value.strip()
+                    
+                    update[field_name_] = field_value
+                    logger.info('%s=%s' % (field_name, field_value))
 
-        if not quiet:
-            # come back
-            if came_from:
-                redirect(url(came_from))
+            def _exec_post_conditions(moment, app_name, update):
+                if app_name:
+                    m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                    c = m.Conditions()
+                    method_name = '%s_save' % ch_cls.name
+                    if hasattr(c, method_name):
+                        f = getattr(c, method_name)
+                        f(moment, update)
+                        
+            _exec_post_conditions('before', 'sapns', update)
+            _exec_post_conditions('before', config.get('app.root_folder'), update)
+                    
+            meta = MetaData(bind=dbs.bind)
+            tbl = Table(cls.name, meta, autoload=True)
+            
+            if update.get('id'):
+                logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
+                tbl.update(whereclause=tbl.c.id == update['id'], values=update).execute()
                 
             else:
-                redirect(url('/message', 
-                             params=dict(message=_('The record has been successfully saved'),
-                                         came_from='')))
+                logger.info('Inserting new object in "%s"' % cls.name)
+                ins = tbl.insert(values=update).returning(tbl.c.id).execute()
+
+            dbs.flush()
+            if not update.get('id'):
+                update['id'] = ins.fetchone().id
+            
+            _exec_post_conditions('after', 'sapns', update)
+            _exec_post_conditions('after', config.get('app.root_folder'), update)
+            
+            return dict(status=True)
+        
+        except ECondition, e:
+            logger.error(e)
+            return dict(status=False, message=str(e).decode('utf-8'))
+    
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
         
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
@@ -641,6 +657,19 @@ class DashboardController(BaseController):
                     logger.error(e)
 #                    attributes[-1]['vals'] = None
                     attribute['vals'] = None
+        
+        def _exec_pre_conditions(app_name):
+            if app_name:
+                # pre-conditions
+                m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                c = m.Conditions()
+                method_name = '%s_before' % ch_class_.name
+                if hasattr(c, method_name):
+                    f = getattr(c, method_name)
+                    f(id, attributes)
+                
+        _exec_pre_conditions('sapns')
+        _exec_pre_conditions(config.get('app.root_folder'))
                     
         return dict(cls=cls, title=ch_class_.title, id=id, 
                     related_classes=class_.related_classes(),

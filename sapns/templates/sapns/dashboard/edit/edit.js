@@ -4,7 +4,7 @@ $(document).ready(function() {
     $('#sp-back').hide();
     
     $('#back-button').click(function() {
-        window.location = "{{came_from}}";
+        $('#form_back').submit();
     });
     
     $('.sp-edit-field:first').find('input:first').focus();      
@@ -13,7 +13,10 @@ $(document).ready(function() {
         
         $('.ui-tooltip').remove();
         
-        var params = '';
+        var params = {
+                id: "{{id}}",
+        };
+        
         var required_attrs = [];
         
         // text 
@@ -30,8 +33,7 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params += 
-                '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
+            params['fld_'+name] = value;
         });
         
         // integer
@@ -45,8 +47,7 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params += 
-                '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
+            params['fld_'+name] = value;
         });
         
         // float
@@ -60,8 +61,7 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params += 
-                '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
+            params['fld_'+name] = value;
         });
         
         // url
@@ -75,16 +75,14 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params +=
-                '<input type="hidden" name="fld_' + name + '" value="' + value + '">\n';
+            params['fld_'+name] = value;
         });
         
         // checkbox 
         $('.sp-checkbox-field').each(function() {
             var name = $(this).parent().parent().attr('name');
-            params += 
-                '<input type="hidden" name="fld_' + name + '" ' + 
-                    'value="' + $(this).attr('checked') + '">\n';
+            
+            params['fld_'+name] = $(this).attr('checked');
         });
 
         // date 
@@ -110,9 +108,7 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params += 
-                '<input type="hidden" name="fld_' + name + '" ' + 
-                    'value="' + date_value + '">\n';
+            params['fld_'+name] = date_value;
         });
         
         // time
@@ -125,9 +121,7 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params += 
-                '<input type="hidden" name="fld_' + name + '" ' + 
-                    'value="' + value + '">\n';
+            params['fld_'+name] = value;
         });
         
         // select fields
@@ -141,8 +135,7 @@ $(document).ready(function() {
                 required_attrs.push($(this));
             }
             
-            params += 
-                '<input type="hidden" name="fld_' + name + '" value="' + sel_value + '">\n';
+            params['fld_'+name] = sel_value;
         });
         
         if (required_attrs.length > 0) {
@@ -182,7 +175,25 @@ $(document).ready(function() {
             }
         }
         else {
-            $('#edit-form').append(params).submit();
+            // save
+            $.ajax({
+                url: "{{tg.url('/dashboard/save/%s/' % cls)}}",
+                type: "post",
+                data: params,
+                success: function(data) {
+                    if (data.status) {
+                        $('#form_back').submit();
+                    }
+                    else {
+                        if (data.message) {
+                            alert(data.message);
+                        }
+                        else {
+                            alert('Error!');
+                        }
+                    }
+                }
+            });
         }
     });
     

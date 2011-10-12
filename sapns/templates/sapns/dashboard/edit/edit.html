@@ -4,7 +4,6 @@
 
 {% block head %}
     {{ super() }}
-    {#<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}" >#}
     <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}" >
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
@@ -23,10 +22,14 @@
 {% block middle %}
 <div id="edit-dialog" style="display: none;"></div>
 
-<form id="edit-form" method="post" action="{{tg.url('/dashboard/save/%s' % cls)}}">
-    <input type="hidden" name="id" value="{{id}}">
-    <input type="hidden" name="came_from" value="{{came_from}}">
+{% if came_from %}
+<form id="form_back" method="post" action="{{came_from}}"></form>
+{% else %}
+<form id="form_back" method="post" action="{{tg.url('/message')}}">
+    <input type="hidden" name="message" value="{{_('The record has been successfully saved')}}">
+    <input type="hidden" name="came_from" value="">
 </form>
+{% endif %}
 
 <div class="sp-edit-panel">
     <div id="edit-header">
