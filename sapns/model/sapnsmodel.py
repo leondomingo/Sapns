@@ -1097,6 +1097,7 @@ class SapnsClass(DeclarativeBase):
                              type=attr.type,
                              required=attr.required,
                              related_class_id=attr.related_class_id,
+                             field_regex=attr.field_regex,
                             ))
             
             return zip(class_attributes, sorted(class_attr_priv.values(), 
@@ -1131,6 +1132,7 @@ class SapnsAttribute(DeclarativeBase):
     reference_order = Column(Integer)
     insertion_order = Column(Integer)
     visible = Column(Boolean, DefaultClause('true'), default=True)
+    field_regex = Column(Text)
     
     class_id = Column('id_class', Integer, 
                       ForeignKey('sp_classes.id', 

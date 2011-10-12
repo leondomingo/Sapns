@@ -232,12 +232,36 @@ $(document).ready(function() {
         });
     }
     
-    $('.sp_float_field').change(function() {
+    /*$('.sp_float_field').change(function() {
         fields.num_field_change($(this), false);
     });
     
     $('.sp_integer_field').change(function() {
         fields.num_field_change($(this), true);
+    });*/
+    
+    function check_regex(field) {
+        var regex = field.attr('regex');
+        if (regex) {
+            regex = new RegExp(regex, 'g');
+            var text = field.val();
+            if (regex.test(text)) {
+                console.log('yes');
+                field.css('color', '').attr('_ok', 1);
+            }
+            else {
+                console.log('no');
+                field.css('color', 'red').attr('_ok', '');
+            }
+        }
+    }
+    
+    $('.sp_integer_field').change(function() {
+        check_regex($(this));
+    });
+    
+    $('.sp_float_field').change(function() {
+        check_regex($(this));
     });
     
     $('.sp-time-field').change(function() {
