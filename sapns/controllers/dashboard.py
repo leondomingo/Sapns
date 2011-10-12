@@ -616,7 +616,7 @@ class DashboardController(BaseController):
             attribute = dict(name=attr.name, title=attr.title,
                              type=attr.type, value=value, required=attr.required,
                              related_class=None, related_class_title='',
-                             read_only=read_only, vals=None)
+                             read_only=read_only, vals=None, field_regex=attr.field_regex,)
             
             #logger.info('%s = %s' % (attr.name, repr(value)))
             

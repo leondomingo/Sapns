@@ -13,8 +13,7 @@
     <script type="text/javascript">
         {% include 'sapns/components/sapns.selector.min.js' %}
     </script>
-    {#<script type="text/javascript" src="{{tg.url('/js/fields.js')}}"></script>#}
-    <script type="text/javascript" src="{{tg.url('/js/fields.js')}}"></script>
+    <script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
     <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
 {% endblock %}
 
@@ -117,7 +116,10 @@
         
         attr-title="{{attr.title}}">
         
-        <div class="sp-label-field" 
+        <div class="sp-label-field"
+            {% if attr.field_regex %}
+            title="{{attr.field_regex}}"
+            {% endif %} 
             style="margin-left: 10px; 
                 margin-top: 4px;
                 {% if attr.required %} font-weight: bold;  {% endif %}
@@ -127,13 +129,13 @@
         
         <!-- {# Integer #} -->
         {% if attr.type == 'int' and attr.related_class == None %}
-        <input class="sp_integer_field" type="text"
+        <input class="sp_integer_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %}
             value="{{attr.value or ''}}">
             
         <!-- {# Float #} -->
         {% elif attr.type == 'float' %}
-        <input class="sp_float_field" type="text"
+        <input class="sp_float_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %}
             value="{{attr.value or ''}}">
         
@@ -178,7 +180,7 @@
             attr_rc_title="{{attr.related_class_title}}"></div>
         {%- else %}
         <!-- {# Everything else #} -->
-        <input class="sp-text-field" type="text" 
+        <input class="sp-text-field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             value="{{attr.value|escape}}"
             {% if attr.read_only %} disabled {% endif %}>
         {% endif %}
@@ -190,7 +192,6 @@
 </div>
 
 <script type="text/javascript">
-    {#{% include 'sapns/dashboard/edit/edit.js' %}#}
     {% include 'sapns/dashboard/edit/edit.min.js' %}
 </script>
 {% endblock %}
