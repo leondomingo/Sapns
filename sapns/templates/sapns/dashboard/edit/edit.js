@@ -178,13 +178,19 @@ $(document).ready(function() {
             // save
             $.ajax({
                 url: "{{tg.url('/dashboard/save/%s/' % cls)}}",
+                type: "post",
                 data: params,
                 success: function(data) {
                     if (data.status) {
                         $('#form_back').submit();
                     }
                     else {
-                        alert('Error!');
+                        if (data.message) {
+                            alert(data.message);
+                        }
+                        else {
+                            alert('Error!');
+                        }
                     }
                 }
             });

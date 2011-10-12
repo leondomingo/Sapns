@@ -2,7 +2,7 @@
 """Dashboard Controller"""
 
 from tg import response, expose, require, url, request, redirect, config
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
+from pylons.i18n import ugettext as _
 from tg.i18n import set_lang, get_lang
 from repoze.what import predicates as p
 
@@ -37,6 +37,9 @@ from sqlalchemy.schema import MetaData
 from sapns.lib.sapns.htmltopdf import url2
 
 __all__ = ['DashboardController']
+
+class ECondition(Exception):
+    pass
 
 class DashboardController(BaseController):
     """DashboardController manage raw-data editing"""
@@ -391,10 +394,9 @@ class DashboardController(BaseController):
         try:
             logger.info(params)
     
+            ch_cls = SapnsClass.by_name(cls, parent=False)
             cls = SapnsClass.by_name(cls)
             id_ = get_paramw(params, 'id', int, opcional=True)
-            #came_from = params.get('came_from')
-            #quiet = strtobool(params.get('quiet', 'false'))
             
             # does this user have permission on this table?
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -403,9 +405,6 @@ class DashboardController(BaseController):
             if not user.has_privilege(cls.name) or \
             not '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT) in permissions:
                 return dict(status=False)
-#                redirect(url('/message', 
-#                             params=dict(message=_('Sorry, you do not have privilege on this class'),
-#                                         came_from=came_from)))
     
             # init "update" dictionary
             update = {}
@@ -478,6 +477,18 @@ class DashboardController(BaseController):
                     
                     update[field_name_] = field_value
                     logger.info('%s=%s' % (field_name, field_value))
+
+            def _exec_post_conditions(moment, app_name, update):
+                if app_name:
+                    m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                    c = m.Conditions()
+                    method_name = '%s_save' % ch_cls.name
+                    if hasattr(c, method_name):
+                        f = getattr(c, method_name)
+                        f(moment, update)
+                        
+            _exec_post_conditions('before', 'sapns', update)
+            _exec_post_conditions('before', config.get('app.root_folder'), update)
                     
             meta = MetaData(bind=dbs.bind)
             tbl = Table(cls.name, meta, autoload=True)
@@ -488,24 +499,21 @@ class DashboardController(BaseController):
                 
             else:
                 logger.info('Inserting new object in "%s"' % cls.name)
-                tbl.insert(values=update).execute()
-                
-            logger.info(update)
-                
+                ins = tbl.insert(values=update).returning(tbl.c.id).execute()
+
             dbs.flush()
+            if not update.get('id'):
+                update['id'] = ins.fetchone().id
+            
+            _exec_post_conditions('after', 'sapns', update)
+            _exec_post_conditions('after', config.get('app.root_folder'), update)
             
             return dict(status=True)
+        
+        except ECondition, e:
+            logger.error(e)
+            return dict(status=False, message=str(e).decode('utf-8'))
     
-#            if not quiet:
-#                # come back
-#                if came_from:
-#                    redirect(url(came_from))
-#                    
-#                else:
-#                    redirect(url('/message', 
-#                                 params=dict(message=_('The record has been successfully saved'),
-#                                             came_from='')))
-                    
         except Exception, e:
             logger.error(e)
             return dict(status=False)
@@ -649,6 +657,19 @@ class DashboardController(BaseController):
                     logger.error(e)
 #                    attributes[-1]['vals'] = None
                     attribute['vals'] = None
+        
+        def _exec_pre_conditions(app_name):
+            if app_name:
+                # pre-conditions
+                m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                c = m.Conditions()
+                method_name = '%s_before' % ch_class_.name
+                if hasattr(c, method_name):
+                    f = getattr(c, method_name)
+                    f(id, attributes)
+                
+        _exec_pre_conditions('sapns')
+        _exec_pre_conditions(config.get('app.root_folder'))
                     
         return dict(cls=cls, title=ch_class_.title, id=id, 
                     related_classes=class_.related_classes(),
