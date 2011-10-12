@@ -224,9 +224,20 @@ def update_metadata():
                     first_ref = True
                     
                 attr.visible = True
-                    
                 attr.insertion_order = i
-                attr.is_collection = False
+                
+                if attr.type == SapnsAttribute.TYPE_INTEGER and \
+                not attr.name.startswith('id_'):
+                    # signed
+                    attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
+                    
+                elif attr.type == SapnsAttribute.TYPE_FLOAT:
+                    # signed
+                    # col['prec']
+                    # col['scale']
+                    attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
+                        (col['prec']-col['scale'],
+                         col['scale'])
                 
                 dbs.add(attr)
                 dbs.flush()
@@ -237,6 +248,18 @@ def update_metadata():
                 
             else:
                 logger.warning('.....already exists')
+                
+                # fill the "field_regex"
+                if not attr.field_regex:
+                    if attr.type == SapnsAttribute.TYPE_INTEGER and \
+                    not attr.name.startswith('id_'):
+                        # signed
+                        attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
+                        
+                    elif attr.type == SapnsAttribute.TYPE_FLOAT:
+                        # signed
+                        attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
+                            (col['prec'] - col['scale'], col['scale'])
                 
             # foreign key
             if col['fk_table'] != None:

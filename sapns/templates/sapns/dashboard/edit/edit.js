@@ -242,12 +242,18 @@ $(document).ready(function() {
         var regex = field.attr('regex');
         var text = field.val();
         if (regex && text) {
-            regex = new RegExp(regex.trim());
-            if (regex.test(text)) {
-                field.css('color', '').attr('_ok', 1);
+            try {
+                regex = new RegExp(regex.trim());
+                if (regex.test(text)) {
+                    field.css('color', '').attr('_ok', 1);
+                }
+                else {
+                    field.css('color', 'red').attr('_ok', '');
+                }
             }
-            else {
-                field.css('color', 'red').attr('_ok', '');
+            catch(e) {
+                //console.log(e);
+                field.css('color', '').attr('_ok', 1);
             }
         }
     }
