@@ -504,8 +504,11 @@ class DashboardController(BaseController):
                 logger.info('Inserting new object in "%s"' % cls.name)
                 ins = tbl.insert(values=update).returning(tbl.c.id)
                 r = dbs.execute(ins)
-
+                
+            ch_cls.name = ch_cls.name
+            dbs.add(ch_cls)
             dbs.flush()
+            
             if not update.get('id'):
                 update['id'] = r.fetchone().id
                 
