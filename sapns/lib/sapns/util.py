@@ -250,7 +250,7 @@ def update_metadata():
                 logger.warning('.....already exists')
                 
                 # fill the "field_regex"
-                if not attr.field_regex:
+                if attr and not attr.field_regex:
                     if attr.type == SapnsAttribute.TYPE_INTEGER and \
                     not attr.name.startswith('id_'):
                         # signed
