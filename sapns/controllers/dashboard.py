@@ -420,6 +420,9 @@ class DashboardController(BaseController):
                 if m_field:
                     field_name_ = m_field.group(1) 
                     attr = cls.attr_by_name(field_name_)
+                    if not attr:
+                        update[field_name_] = field_value
+                        continue
                     
                     logger.info(field_name_)
                     
@@ -495,16 +498,17 @@ class DashboardController(BaseController):
             
             if update.get('id'):
                 logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
-                tbl.update(whereclause=tbl.c.id == update['id'], values=update).execute()
+                dbs.execute(tbl.update(whereclause=tbl.c.id == update['id'], values=update))
                 
             else:
                 logger.info('Inserting new object in "%s"' % cls.name)
-                ins = tbl.insert(values=update).returning(tbl.c.id).execute()
+                ins = tbl.insert(values=update).returning(tbl.c.id)
+                r = dbs.execute(ins)
 
             dbs.flush()
             if not update.get('id'):
-                update['id'] = ins.fetchone().id
-            
+                update['id'] = r.fetchone().id
+                
             _exec_post_conditions('after', 'sapns', update)
             _exec_post_conditions('after', config.get('app.root_folder'), update)
             
