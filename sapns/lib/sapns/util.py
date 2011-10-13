@@ -238,6 +238,9 @@ def update_metadata():
                     attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
                         (col['prec']-col['scale'],
                          col['scale'])
+                        
+                elif attr.type == SapnsAttribute.TYPE_TIME:
+                    attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
                 
                 dbs.add(attr)
                 dbs.flush()
@@ -260,6 +263,9 @@ def update_metadata():
                         # signed
                         attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
                             (col['prec'] - col['scale'], col['scale'])
+                            
+                    elif attr.type == SapnsAttribute.TYPE_TIME:
+                        attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
                 
             # foreign key
             if col['fk_table'] != None:

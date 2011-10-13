@@ -156,7 +156,7 @@
         
         <!-- {# Time #} -->
         {%- elif attr.type == 'time' %}
-        <input class="sp-time-field" type="text"
+        <input class="sp-time-field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}">            
         

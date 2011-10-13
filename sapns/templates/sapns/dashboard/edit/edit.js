@@ -116,8 +116,9 @@ $(document).ready(function() {
             var name = $(this).parent().parent().attr('name');
             var required = $(this).parent().parent().attr('required');
             var value = $(this).val();
+            var ok = $(this).attr('_ok');
                     
-            if (required == 'true' && value == '') {
+            if (required == 'true' && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -282,7 +283,7 @@ $(document).ready(function() {
     });
     
     $('.sp-time-field').change(function() {
-        fields.time_field_change($(this));
+        check_regex($(this));
     });
     
     $('.url_field_btn').click(function() {
