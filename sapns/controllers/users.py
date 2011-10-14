@@ -2,12 +2,11 @@
 """Users management controller"""
 
 # turbogears imports
-from tg import expose, url, config, redirect, require, request
+from tg import expose, url, redirect, require, request
 
 # third party imports
 from pylons import cache
 from pylons.i18n import ugettext as _
-from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize, predicates
 
 # project specific imports
@@ -16,12 +15,8 @@ from sapns.model import DBSession as dbs
 
 import logging
 import simplejson as sj
-from sapns.model.sapnsmodel import SapnsUser , SapnsRole, SapnsUserRole,\
-    SapnsPermission, SapnsRolePermission
-from neptuno.dataset import DataSet
+from sapns.model.sapnsmodel import SapnsUser , SapnsRole, SapnsUserRole
 from neptuno.util import get_paramw, strtobool
-from neptuno.postgres.search import search
-from urllib import urlencode
 from sqlalchemy.sql.expression import and_
 
 __all__ = ['UsersControllers']
@@ -32,7 +27,7 @@ class UsersController(BaseController):
     
     @expose('sapns/users/edit.html')
     @require(predicates.not_anonymous())
-    def edit(self, id, **params):
+    def edit(self, cls, id, **params):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         id_user = int(id)
@@ -51,7 +46,7 @@ class UsersController(BaseController):
     
     @expose('sapns/users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
-    def new(self, **params):
+    def new(self, cls, **params):
         came_from = params.get('came_from', '/dashboard/users')
         return dict(user={}, came_from=url(came_from))
     
