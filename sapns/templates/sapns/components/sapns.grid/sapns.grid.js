@@ -69,6 +69,7 @@ catch(e) {
         set(this, 'height', 500); //470);
         set(this, 'url_base', '');
         set(this, 'multiselect', false);
+        set(this, 'actions_inline', false);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -129,6 +130,10 @@ catch(e) {
             '<table class="sp-grid">' +
             '<tr><td class="sp-col-title">#</td>';
         
+        if (self.actions_inline) {
+            g_table += '<td class="sp-col-title">*</td>';
+        }
+        
         var cols = self.cols;
         if (typeof(cols) == 'function') {
             cols = cols();
@@ -160,6 +165,16 @@ catch(e) {
             g_table += 
                 '<tr class="sp-grid-row">' +
                 '<td title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></td>';
+            
+            if (self.actions_inline) {
+                var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
+                g_table +=
+                '<td style="font-size: 10px; width: 35px;">' +
+                '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
+                '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
+                '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
+                '</td>';
+            }
             
             for (var j=0, lr=cols.length; j<lr; j++) {
                 var col = cols[j];
@@ -203,10 +218,14 @@ catch(e) {
         }
         }
         else {
+            var n = 1;
+            if (self.actions_inline) {
+                n = 3;
+            }
             g_table += 
                 '<tr class="sp-grid-row" style="width: 100%;">' +
                     '<td class="sp-grid-cell sp-grid-noresults"' + 
-                        ' colspan="' + (cols.length+1) + '">{{_("No results")}}</td>' +
+                        ' colspan="' + (cols.length+n) + '">{{_("No results")}}</td>' +
                 '</tr>';
         }
         
