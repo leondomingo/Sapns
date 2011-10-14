@@ -45,4 +45,6 @@ TODO = [
     # test1
     dict(code=u'sapns: test1_sql', type='sql', filename='init/test1.sql'),
     dict(code=u'sapns: test1_py', type='py', module='init.test1'),
+    # users edit
+    dict(code=u'sapns: users edit', type='py', module='init.users_edit'),
 ]
