@@ -511,7 +511,9 @@ catch(e) {
             function form(action, target) {
                 var came_from = '';
                 if (target != '_blank') {
-                    var came_from = self.url_base + '?q=' + window.encodeURI(self.q) + 
+                    var came_from = self.url_base + '?q=' + encodeURI(self.q).
+                    replace('-', '%2D', 'g').replace('"', '%22', 'g').
+                    replace('+', '%2B', 'g').replace('#', '%23', 'g') + 
                         '&rp=' + self.rp + '&pag_n=' + self.pag_n +
                         '&ch_attr=' + self.ch_attr + '&parent_id=' + self.parent_id;
                 }
