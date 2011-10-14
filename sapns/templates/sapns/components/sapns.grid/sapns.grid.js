@@ -69,6 +69,7 @@ catch(e) {
         set(this, 'height', 500); //470);
         set(this, 'url_base', '');
         set(this, 'multiselect', false);
+        set(this, 'actions_inline', false);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -129,6 +130,10 @@ catch(e) {
             '<table class="sp-grid">' +
             '<tr><td class="sp-col-title">#</td>';
         
+        if (self.actions_inline) {
+            g_table += '<td class="sp-col-title">*</td>';
+        }
+        
         var cols = self.cols;
         if (typeof(cols) == 'function') {
             cols = cols();
@@ -160,6 +165,16 @@ catch(e) {
             g_table += 
                 '<tr class="sp-grid-row">' +
                 '<td title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></td>';
+            
+            if (self.actions_inline) {
+                var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
+                g_table +=
+                '<td style="font-size: 10px; width: 35px;">' +
+                '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
+                '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
+                '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
+                '</td>';
+            }
             
             for (var j=0, lr=cols.length; j<lr; j++) {
                 var col = cols[j];
@@ -203,10 +218,14 @@ catch(e) {
         }
         }
         else {
+            var n = 1;
+            if (self.actions_inline) {
+                n = 3;
+            }
             g_table += 
                 '<tr class="sp-grid-row" style="width: 100%;">' +
                     '<td class="sp-grid-cell sp-grid-noresults"' + 
-                        ' colspan="' + (cols.length+1) + '">{{_("No results")}}</td>' +
+                        ' colspan="' + (cols.length+n) + '">{{_("No results")}}</td>' +
                 '</tr>';
         }
         
@@ -379,7 +398,8 @@ catch(e) {
         var g_actions = '';
         
         if (actions.length > 0) {
-            g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+            //g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+            g_actions = '';
             for (var i=0, l=actions.length; i<l; i++) {
                 
                 var act = actions[i];
@@ -390,10 +410,17 @@ catch(e) {
                 }
                 
                 if (typeof(act.type) === 'string') {
-                    g_actions += '<div style="float: left;">';
-                    g_actions += '<button class="sp-button sp-grid-action standard_action" ' +
+                    var a = '<div style="float: left;">';
+                    a += '<button class="sp-button sp-grid-action standard_action" ' +
                         ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
                         ' require_id="' + req_id + '" >' + act.title + '</button></div>';
+                    
+                    if (act.type === 'new') {
+                        $('#search_box').append(a);
+                    }
+                    else {
+                        g_actions += a;
+                    }
                 }
                 else {
                     g_actions += 
@@ -408,7 +435,7 @@ catch(e) {
         // export
         if (self.exportable) {
             g_actions += 
-                '<div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;">' +
+                '<div id="grid-export_' + self.name + '" style="position: absolute; background-color: none; height: 25px; right: 0px;">' +
                 '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
                     '<option value="">({{_("Export")}})</option>' +
                     '<option value="csv">CSV</option>' +
@@ -810,10 +837,10 @@ catch(e) {
             if (g.with_search) {
                 
                 g_content += 
-                    '<div><div style="float: left;">' +
+                    '<div><div id="search_box" style="float: left;">' +
                         //'<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
-                        '<input class="sp-search-txt" name="q" type="text" value="">' +
-                        '<button class="sp-button sp-search-btn">{{_("Search...")}}</button></div>';                     
+                        '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
+                        '<button class="sp-button sp-search-btn" style="float: left;">{{_("Search...")}}</button></div>';                     
                         
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
                     g.search($('#' + g.name + ' .sp-search-txt').val());
@@ -921,7 +948,8 @@ catch(e) {
                 });
             }
             
-            this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
+            //this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
+            this.append(g_content+'<div class="actions" style="clear: left; position: relative;"></div>'+g_table+g_pager+'</div>');
             
             g.loadActions();
             $('#'+g.name + ' .sp-search-txt').val(g.q);
