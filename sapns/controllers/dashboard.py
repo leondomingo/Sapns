@@ -483,12 +483,16 @@ class DashboardController(BaseController):
 
             def _exec_post_conditions(moment, app_name, update):
                 if app_name:
-                    m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
-                    c = m.Conditions()
-                    method_name = '%s_save' % ch_cls.name
-                    if hasattr(c, method_name):
-                        f = getattr(c, method_name)
-                        f(moment, update)
+                    try:
+                        m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                        c = m.Conditions()
+                        method_name = '%s_save' % ch_cls.name
+                        if hasattr(c, method_name):
+                            f = getattr(c, method_name)
+                            f(moment, update)
+                            
+                    except ImportError:
+                        pass
                         
             _exec_post_conditions('before', 'sapns', update)
             _exec_post_conditions('before', config.get('app.root_folder'), update)
@@ -667,13 +671,17 @@ class DashboardController(BaseController):
         
         def _exec_pre_conditions(app_name):
             if app_name:
-                # pre-conditions
-                m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
-                c = m.Conditions()
-                method_name = '%s_before' % ch_class_.name
-                if hasattr(c, method_name):
-                    f = getattr(c, method_name)
-                    f(id, attributes)
+                try:
+                    # pre-conditions
+                    m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                    c = m.Conditions()
+                    method_name = '%s_before' % ch_class_.name
+                    if hasattr(c, method_name):
+                        f = getattr(c, method_name)
+                        f(id, attributes)
+                    
+                except ImportError:
+                    pass
                 
         _exec_pre_conditions('sapns')
         _exec_pre_conditions(config.get('app.root_folder'))
