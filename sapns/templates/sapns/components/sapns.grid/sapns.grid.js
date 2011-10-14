@@ -379,7 +379,8 @@ catch(e) {
         var g_actions = '';
         
         if (actions.length > 0) {
-            g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+            //g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+            g_actions = '';
             for (var i=0, l=actions.length; i<l; i++) {
                 
                 var act = actions[i];
@@ -390,10 +391,17 @@ catch(e) {
                 }
                 
                 if (typeof(act.type) === 'string') {
-                    g_actions += '<div style="float: left;">';
-                    g_actions += '<button class="sp-button sp-grid-action standard_action" ' +
+                    var a = '<div style="float: left;">';
+                    a += '<button class="sp-button sp-grid-action standard_action" ' +
                         ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
                         ' require_id="' + req_id + '" >' + act.title + '</button></div>';
+                    
+                    if (act.type === 'new') {
+                        $('#search_box').append(a);
+                    }
+                    else {
+                        g_actions += a;
+                    }
                 }
                 else {
                     g_actions += 
@@ -408,7 +416,7 @@ catch(e) {
         // export
         if (self.exportable) {
             g_actions += 
-                '<div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;">' +
+                '<div id="grid-export_' + self.name + '" style="position: absolute; background-color: none; height: 25px; right: 0px;">' +
                 '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
                     '<option value="">({{_("Export")}})</option>' +
                     '<option value="csv">CSV</option>' +
@@ -810,10 +818,10 @@ catch(e) {
             if (g.with_search) {
                 
                 g_content += 
-                    '<div><div style="float: left;">' +
+                    '<div><div id="search_box" style="float: left;">' +
                         //'<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
-                        '<input class="sp-search-txt" name="q" type="text" value="">' +
-                        '<button class="sp-button sp-search-btn">{{_("Search...")}}</button></div>';                     
+                        '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
+                        '<button class="sp-button sp-search-btn" style="float: left;">{{_("Search...")}}</button></div>';                     
                         
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
                     g.search($('#' + g.name + ' .sp-search-txt').val());
@@ -921,7 +929,8 @@ catch(e) {
                 });
             }
             
-            this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
+            //this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
+            this.append(g_content+'<div class="actions" style="clear: left; position: relative;"></div>'+g_table+g_pager+'</div>');
             
             g.loadActions();
             $('#'+g.name + ' .sp-search-txt').val(g.q);
