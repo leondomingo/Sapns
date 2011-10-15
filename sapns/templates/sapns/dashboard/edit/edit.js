@@ -250,40 +250,20 @@ $(document).ready(function() {
         });
     }
     
-    function check_regex(field) {
-        var regex = field.attr('regex');
-        var text = field.val();
-        if (regex && text) {
-            try {
-                regex = new RegExp(regex.trim());
-                if (regex.test(text)) {
-                    field.css('color', '').attr('_ok', 1);
-                }
-                else {
-                    field.css('color', 'red').attr('_ok', '');
-                }
-            }
-            catch(e) {
-                //console.log(e);
-                field.css('color', '').attr('_ok', 1);
-            }
-        }
-    }
-    
     $('.sp_integer_field').change(function() {
-        check_regex($(this));
+        fields.check_regex($(this));
     });
     
     $('.sp_float_field').change(function() {
-        check_regex($(this));
+        fields.check_regex($(this));
     });
     
     $('.sp-text-field').change(function() {
-        check_regex($(this));
+        fields.check_regex($(this));
     });
     
     $('.sp-time-field').change(function() {
-        check_regex($(this));
+        fields.check_regex($(this));
     });
     
     $('.url_field_btn').click(function() {
