@@ -21,6 +21,9 @@ from sqlalchemy.sql.expression import and_
 
 __all__ = ['UsersControllers']
 
+class EUser(Exception):
+    pass
+
 class UsersController(BaseController):
     
     allow_only = authorize.not_anonymous()
@@ -50,48 +53,74 @@ class UsersController(BaseController):
         came_from = params.get('came_from', '/dashboard/users')
         return dict(user={}, came_from=url(came_from))
     
-    @expose()
+    @expose('json')
     @require(predicates.has_any_permission('manage', 'users'))
     def save(self, **params):
         
-        came_from = params.get('came_from')
-        if came_from:
-            came_from = url(came_from)
-            
+        logger = logging.getLogger('UsersController.save')
         try:
+            logger.info(params)
+            
+            id_ = get_paramw(params, 'id', int, opcional=True)
+            display_name = get_paramw(params, 'display_name', unicode)
+            user_name = get_paramw(params, 'user_name', unicode)
+            email_address = get_paramw(params, 'email_address', unicode)
+            password = get_paramw(params, 'password', unicode, opcional=True)
+            copy_from = get_paramw(params, 'copy_from', int, opcional=True)
+            
             new_user = False
-            if params['id']:
-                user = dbs.query(SapnsUser).get(params['id'])
+            if id_:
+                user = dbs.query(SapnsUser).get(id_)
             else:
                 new_user = True
                 user = SapnsUser()
                 
-            user.display_name = params['display_name']
-            user.user_name = params['user_name']
-            user.email_address = params['email_address']
+            user.display_name = display_name
+
+            # user_name            
+            another = dbs.query(SapnsUser).\
+                filter(and_(SapnsUser.user_id != user.user_id,
+                            SapnsUser.user_name == user_name,
+                            )).\
+                first()
+            if another:
+                raise EUser(_('"User name" is already in use'))
+
+            # email_address            
+            another = dbs.query(SapnsUser).\
+                filter(and_(SapnsUser.user_id != user.user_id,
+                            SapnsUser.email_address == email_address,
+                            )).\
+                first()
+                
+            if another:
+                raise EUser(_('"E-mail address" is already in use'))
             
-            if params['password'] != '':
-                user.password = params['password']
+            # user_name
+            user.user_name = user_name
+            
+            # email_address
+            user.email_address = email_address
+            
+            if password:
+                user.password = password
                 
             dbs.add(user)
             dbs.flush()
             
             # copy shortcuts and privileges form another user
             if new_user:
-                user.copy_from(int(params['copy_from']))
+                user.copy_from(copy_from)
+                
+            return dict(status=True)
         
-        except:
-            redirect(url('/message', 
-                         params=dict(message=_('An error occurred while saving the user'),
-                                     came_from=came_from)))
-
-        if came_from:
-            redirect(came_from)
-            
-        else:
-            redirect(url('/message',
-                         params=dict(message='User was updated successfully',
-                                     came_from='')))
+        except EUser, e:
+            logger.error(e)
+            return dict(status=False, message=str(e).decode('utf-8'))
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
 
     @expose('sapns/users/permission.html')
     @require(predicates.has_any_permission('manage', 'users'))
@@ -176,12 +205,12 @@ class UsersController(BaseController):
             return sj.dumps(dict(status=False))
         
     @expose('json')
-    def all(self):
+    def all_(self):
         logger = logging.getLogger('Users.all')
         def _all():
             logger.info('Getting all users...')
             users = []
-            for user in dbs.query(SapnsUser).order_by(SapnsUser.user_name):
+            for user in dbs.query(SapnsUser).order_by(SapnsUser.user_id):
                 users.append(dict(id=user.user_id, display_name=user.display_name, 
                                   user_name=user.user_name))
                 
@@ -189,4 +218,4 @@ class UsersController(BaseController):
                 
         _cache = cache.get_cache('users_all')
                         
-        return dict(users=_cache.get_value(key='all', createfunc=_all, expiretime=3600))
+        return dict(users=_cache.get_value(key='all', createfunc=_all, expiretime=0))

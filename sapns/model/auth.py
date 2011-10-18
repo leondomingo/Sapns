@@ -105,7 +105,7 @@ class User(DeclarativeBase):
 
     user_id = Column('id', Integer, autoincrement=True, primary_key=True)
 
-    user_name = Column(Unicode(16), unique=True, nullable=False)
+    user_name = Column(Unicode(50), unique=True, nullable=False)
 
     email_address = Column(Unicode(255), unique=True, nullable=False,
                            info={'rum': {'field':'Email'}})

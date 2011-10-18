@@ -12,6 +12,7 @@
         
         .sp-label-field {
             font-size: 14px;
+            font-weight: bold;
         }
         
         .edit-user-field {
@@ -22,32 +23,33 @@
 
 {% block middle %}
 <div id="user-dialog"></div>
-<form id="form-edit-user" method="post" action="/dashboard/users/save">
 <input type="hidden" name="id" value="{{user.user_id}}">
 <input type="hidden" name="came_from" value="{{came_from or ''}}">
 <div id="edit-user">
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('Display name')}}</div>
         <input class="sp-text-field" type="text" style="width: 50%;" 
-            name="display_name" value="{{user.display_name}}">
+            id="display_name" value="{{user.display_name}}">
     </div>
     
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('User name')}}</div>
-        <input class="sp-text-field" type="text" style="width: 50%;" 
-            name="user_name" value="{{user.user_name}}">
+        <input class="sp-text-field" type="text" style="width: 50%;"
+            regex="^[\w\-\.@]{4,50}$" _ok="1" 
+            id="user_name" value="{{user.user_name}}">
     </div>
 
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('E-mail address')}}</div>
         <input class="sp-text-field" type="text" style="width: 50%;" 
-            name="email_address" value="{{user.email_address}}">
+            id="email_address" value="{{user.email_address}}"
+            regex="^[\w\-\.]+@[\w\-\.]+$" _ok="1">
     </div>
     
     <div class="edit-user-field">
         <div class="sp-label-field">{{_('Password')}}</div>
         <input id="password" class="sp-text-field" type="password"
-            name="password" value="">
+            regex="^[\w\-\.@]{4,}$" _ok="1" value="">
     </div>
     
     <div class="edit-user-field">
@@ -59,26 +61,85 @@
     {% if not user.user_id %}
     <div>
         <div class="sp-label-field">{{_('Copy from')}}</div>
-        <select name="copy_from"></select>
+        <select id="copy_from"></select>
     </div>
     {% endif %}
     
     <div>
-        <input id="save_user_btn" type="button" value="{{_('Save')}}"/>
+        <button id="save_user_btn">{{_('Save')}}</button>
     </div>
 </div>
-</form>
+<form id="form_exit" method="get" action="{{came_from}}"></form>
 
+<script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
 <script type="text/javascript">
     $(document).ready(function() {
         
         $('.sp-text-field:first').focus();
         
+        $('#user_name').change(function() {
+            fields.check_regex($(this));
+        });
+        
+        $('#email_address').change(function() {
+            fields.check_regex($(this));
+        });
+        
+        $('#password').change(function() {
+            fields.check_regex($(this));
+        });
+        
         $('#save_user_btn').click(function() {
-            var pswd = $('#password').val();
-            var pswd2 = $('#password2').val();
             
-            if (pswd != '' && pswd != pswd2) {
+            var _ok;
+            
+            // display_name 
+            var display_name = $('#display_name').val();
+            //var _ok = $('#display_name').attr('_ok');
+            if (!display_name) {
+                alert('{{_("\"Display name\" is required")}}');
+                $('#display_name').focus();
+                return;
+            }
+            
+            // user_name 
+            var user_name = $('#user_name').val();
+            _ok = $('#user_name').attr('_ok');
+            if (!user_name || !_ok) {
+                alert('{{_("\"User name\" is required")}}');
+                $('#user_name').focus();
+                return;
+            }
+            
+            // email_address 
+            var email_address = $('#email_address').val();
+            _ok = $('#email_address').attr('_ok');
+            if (!email_address || !_ok) {
+                alert('{{_("\"E-mail address\" is required")}}');
+                $('#email_address').focus();
+                return;
+            }
+            
+            // password 
+            var password = $('#password').val();
+            _ok = $('#password').attr('_ok');
+            {% if not user.user_id %}
+            if (!password) {
+                alert('{{_("\"Password\" is required")}}');
+                $('#password').focus();
+                return;
+            }
+            {% endif %}
+            
+            if (!_ok) {
+                alert('{{_("\"Password\" is required")}}');
+                $('#password').focus();
+                return;
+            }
+            
+            var password2 = $('#password2').val();
+            
+            if (password != '' && password2 != password2) {
                 $('#user-dialog').
                     html("<p>{{_('Passwords must be equal')}}</p>").
                     dialog({
@@ -90,12 +151,39 @@
                     });
             }
             else {
-                $('#form-edit-user').submit();
+                
+                var copy_from = '';
+                {% if not user.user_id %}
+                copy_from = $('#copy_from option:selected').val(),
+                {% endif %}
+                
+                $.ajax({
+                    url: "{{tg.url('/dashboard/users/save/')}}",
+                    data: {
+                        id: "{{user.user_id}}",
+                        display_name: display_name,
+                        user_name: user_name,
+                        email_address: email_address,
+                        password: password,
+                        copy_from: copy_from,
+                    },
+                    success: function(data) {
+                        if (data.status) {
+                            $('#form_exit').submit();
+                        }
+                        else if (data.message) {
+                            alert(data.message);
+                        }
+                        else {
+                            alert('Error!');
+                        }
+                    }
+                });
             }
         });
         
         $.ajax({
-            url: "{{tg.url('/dashboard/users/all')}}",
+            url: "{{tg.url('/dashboard/users/all_')}}",
             type: "get",
             dataType: "json",
             success: function(res) {
@@ -108,7 +196,7 @@
                            user.display_name + ' [' + user.user_name + ']</option>';
                 }
                 
-                $('select[name=copy_from]').html(options);
+                $('#copy_from').html(options);
             },
             error: function() {
             }
