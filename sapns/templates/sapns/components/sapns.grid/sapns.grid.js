@@ -70,6 +70,7 @@ catch(e) {
         set(this, 'url_base', '');
         set(this, 'multiselect', false);
         set(this, 'actions_inline', false);
+        set(this, 'hide_id', false);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -146,6 +147,10 @@ catch(e) {
                 wd = self.default_.col_width;
             }
             
+            if (self.hide_id && col.title == 'id') {
+                continue;
+            }
+            
             g_table += '<td class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</td>';
         }
 
@@ -191,6 +196,10 @@ catch(e) {
                 var cell = row[j];
                 if (!cell) {
                     cell = self.default_.empty_value;
+                }
+                
+                if (self.hide_id && col.title == 'id') {
+                    continue;
                 }
                 
                 g_table += '<td class="sp-grid-cell" style="text-align: ' + al + '; width: ' + wd + 'px;"';
@@ -949,7 +958,7 @@ catch(e) {
             }
             
             //this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
-            this.append(g_content+'<div class="actions" style="clear: left; position: relative;"></div>'+g_table+g_pager+'</div>');
+            this.append(g_content+'<div class="actions" style="clear: left; position: relative; min-height: 20px;"></div>'+g_table+g_pager+'</div>');
             
             g.loadActions();
             $('#'+g.name + ' .sp-search-txt').val(g.q);
