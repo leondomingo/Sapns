@@ -3,7 +3,7 @@
 }
 
 #rel-classes, #actions {
-	margin-left: 87px; 
+	margin-left: 70px; 
 	width: 555px;
 	/*border: 1px solid gray;*/
 }
@@ -13,7 +13,7 @@
     /*color: gray;*/ 
     margin-top: 3px;
     font-size: 11px; 
-    width: 160px; 
+    width: 170px; 
     text-align: right;
     margin-right: 5px;
 }
@@ -57,7 +57,7 @@
 .sp-save-button {
 	/*background-color: orange;
 	border: 1px solid white;*/
-    margin-left: 553px;
+    margin-left: 545px;
     width: 70px; 
 }
 
