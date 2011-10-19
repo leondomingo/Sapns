@@ -46,10 +46,10 @@ class RootController(BaseController):
             if ep and ep != '/':
                 redirect(url(ep))
             
-        else:
-            home = config.get('app.home')
-            if home and home != '/':
-                redirect(url(home))
+        # there is no "entry_point" defined
+        home = config.get('app.home')
+        if home and home != '/':
+            redirect(url(home))
             
         curr_lang = get_lang()
         return dict(curr_lang=curr_lang)
