@@ -7,12 +7,13 @@ from tg.i18n import set_lang, get_lang
 from repoze.what import predicates
 
 from sapns.lib.base import BaseController
-#from sapns.model import DBSession
-#import sapns.config.app_cfg as app_cfg
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsUser
 
 from sapns.controllers.error import ErrorController
 from sapns.controllers.dashboard import DashboardController
-#from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut
+
+import logging
 
 __all__ = ['RootController']
 
@@ -31,14 +32,24 @@ class RootController(BaseController):
     """
     
     error = ErrorController()
-    
     dashboard = DashboardController()
 
     @expose('sapns/index.html')
     def index(self):
-        home = config.get('app.home')
-        if home and home != '/':
-            redirect(url(home))
+        
+        logger = logging.getLogger('RootController.index')
+        
+        if request.identity:
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            ep = user.entry_point()
+            logger.info('entry-point: %s' % ep)
+            if ep and ep != '/':
+                redirect(url(ep))
+            
+        else:
+            home = config.get('app.home')
+            if home and home != '/':
+                redirect(url(home))
             
         curr_lang = get_lang()
         return dict(curr_lang=curr_lang)

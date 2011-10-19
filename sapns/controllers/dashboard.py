@@ -531,7 +531,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
-    def new(self, cls, came_from='/dashboard', **kw):
+    def new(self, cls, came_from='/', **kw):
         
         if not kw:
             kw = {}
@@ -547,7 +547,7 @@ class DashboardController(BaseController):
         logger = logging.getLogger(__name__ + '/edit')
         
         came_from = get_paramw(params, 'came_from', unicode, opcional=True,
-                               por_defecto='/dashboard')
+                               por_defecto='/')
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         permissions = request.identity['permissions']
@@ -696,7 +696,7 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def delete(self, cls, id_, **kw):
         
-        #came_from = get_paramw(kw, 'came_from', opcional=True, por_defecto='/dashboard')
+        #came_from = get_paramw(kw, 'came_from', opcional=True, por_defecto='/')
         
         logger = logging.getLogger(__name__ + '/delete')
         rel_tables = []
@@ -751,7 +751,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/order/insert.html')
     @require(p.in_group(u'managers'))
-    def ins_order(self, cls, came_from='/dashboard'):
+    def ins_order(self, cls, came_from='/'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
@@ -807,7 +807,7 @@ class DashboardController(BaseController):
     
     @expose('sapns/order/reference.html')
     @require(p.in_group(u'managers'))
-    def ref_order(self, cls, came_from=''):
+    def ref_order(self, cls, came_from='/'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         

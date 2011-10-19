@@ -192,6 +192,9 @@ class SapnsUser(User):
     
     authored_docs = relation('SapnsDoc', backref='author')
     
+    def entry_point(self):
+        return self.groups[0].entry_point
+    
     def get_dashboard(self):
         return dbs.query(SapnsShortcut).\
             filter(and_(SapnsShortcut.user_id == self.user_id,

@@ -72,6 +72,8 @@ class Group(DeclarativeBase):
     display_name = Column('description', Unicode(255))
 
     created = Column(DateTime, default=datetime.now)
+    
+    entry_point = Column(Unicode(100))
 
     #{ Relations
 
