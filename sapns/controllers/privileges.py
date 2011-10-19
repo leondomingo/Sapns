@@ -83,6 +83,13 @@ class PrivilegesController(BaseController):
                     #return who.has_privilege(cls.name, no_cache=True)
     
             classes = []
+            
+            classes.append(Dict(id=-1,
+                                id_class_p=None,
+                                name='*',
+                                granted=True
+                                ))
+            
             for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
                 classes.append(Dict(id=cls.class_id,
                                     id_class_p=None,
@@ -135,6 +142,9 @@ class PrivilegesController(BaseController):
                 first()
 
         id_class = int(id_class)
+        if id_class == -1:
+            return dict(attributes=[])
+        
         id_user = get_paramw(kw, 'id_user', int, opcional=True)
         id_role = get_paramw(kw, 'id_role', int, opcional=True)
         if id_role:
@@ -183,19 +193,15 @@ class PrivilegesController(BaseController):
             
             # class
             cls = dbs.query(SapnsClass).get(id_class)
+            if cls:
+                permissions = cls.permissions
+                
+            else:
+                permissions = dbs.query(SapnsPermission).\
+                    filter(SapnsPermission.class_id == None)
             
             actions = []
-            for action in cls.permissions:
-                
-    #            action_p = who.act_privilege(action.action_id)
-    #            if not action_p:
-    #                action_p = Dict(id_action=action.action_id,
-    #                                name=_(action.name),
-    #                                granted=False, #None,
-    #                                )
-                    
-    #                if not id_user:
-    #                    action_p.granted = False
+            for action in permissions:
                 
                 if action.type == SapnsPermission.TYPE_NEW:
                     pos = 1

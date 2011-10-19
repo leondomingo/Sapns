@@ -37,7 +37,7 @@
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
         
-        {% if h.authorize.has_any_permission('manage') %}
+        {% if h.authorize.in_group('managers') %}
         <!-- {# insertion order #} -->
         <option value="ins-order">{{_('Insertion order')}}</option>
 

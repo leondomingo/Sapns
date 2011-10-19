@@ -5,7 +5,6 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    {#<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.css">#}
     <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.min.css">
 {% endblock %}
 
@@ -38,7 +37,6 @@
     </div>
 
     <script type="text/javascript">
-        {#{% include 'sapns/privileges/privileges.js' %}#}
         {% include 'sapns/privileges/privileges.min.js' %}
     </script>
 </div>
