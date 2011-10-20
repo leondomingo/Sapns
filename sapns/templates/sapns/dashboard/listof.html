@@ -64,13 +64,13 @@
         	        var ch_attr = opt.attr('ch_attr');
         	        var action = "/dashboard/list/" + cls;
         	        
-        	        var form = 
-        	            '<form id="rel-classes-form" method="post" action="' + action + '" target="_blank">' +
+        	        var form_ = 
+        	            '<form id="rel-classes-form" method="get" action="' + action + '" target="_blank">' +
         	                '<input type="hidden" name="ch_attr" value="' + ch_attr + '">' +
-        	                '<input type="hidden" name="parent_id" value="' + ids[0] + '">';
+        	                '<input type="hidden" name="parent_id" value="' + ids[0] + '">' +
         	            '</form>';
         	            
-        	        $(form).appendTo('body').submit().remove();
+        	        $(form_).appendTo('body').submit().remove();
         	    }
         	});
         });
