@@ -9,7 +9,9 @@ class UsersRoles(BaseUpdate):
         
         dbs = self.dbs
         
-        roles = SapnsClass.by_name(u'sp_roles')
+        roles = dbs.query(SapnsClass).\
+            filter(SapnsClass.name == u'sp_roles').\
+            first()
         
         p1 = SapnsPermission()
         p1.class_id = roles.class_id
@@ -20,7 +22,9 @@ class UsersRoles(BaseUpdate):
         
         dbs.add(p1)
         
-        users = SapnsClass.by_name(u'sp_users')
+        users = dbs.query(SapnsClass).\
+            filter(SapnsClass.name == u'sp_users').\
+            first()
 
         p2 = SapnsPermission()
         p2.class_id = users.class_id
@@ -33,7 +37,9 @@ class UsersRoles(BaseUpdate):
         dbs.flush()
         
         # "managers" role
-        managers = SapnsRole.by_name(u'managers')
+        managers = dbs.query(SapnsRole).\
+            filter(SapnsRole.group_name == u'managers').\
+            first()
         managers.permissions_.append(p1)
         managers.permissions_.append(p2)
 

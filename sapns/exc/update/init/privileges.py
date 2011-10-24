@@ -9,7 +9,9 @@ class Privileges(BaseUpdate):
         
         dbs = self.dbs
         
-        roles = SapnsClass.by_name(u'sp_roles')
+        roles = dbs.query(SapnsClass).\
+            filter(SapnsClass.name == u'sp_roles').\
+            first()
         
         ap_r = SapnsPermission()
         ap_r.class_id = roles.class_id
@@ -19,9 +21,13 @@ class Privileges(BaseUpdate):
         ap_r.url = u'/dashboard/privileges/roles/'
         
         dbs.add(ap_r)
+        dbs.flush()
         
         # "managers" role
-        managers = SapnsRole.by_name(u'managers')
+        managers = dbs.query(SapnsRole).\
+            filter(SapnsRole.group_name == u'managers').\
+            first()
+            
         managers.permissions_.append(ap_r)
 
 update = Privileges
