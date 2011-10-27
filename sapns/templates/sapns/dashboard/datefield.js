@@ -26,17 +26,23 @@ $("{{selector}}").each(function() {
 		    monthNames: ["{{_('January')}}", "{{_('February')}}", "{{_('March')}}",
 		                 "{{_('April')}}", "{{_('May')}}", "{{_('June')}}",
                          "{{_('July')}}", "{{_('August')}}", "{{_('September')}}", 
-                         "{{_('October')}}", "{{_('November')}}", "{{_('December')}}"]
+                         "{{_('October')}}", "{{_('November')}}", "{{_('December')}}"],
+            monthNamesShort: ["{{_('Jan')}}", "{{_('Feb')}}", "{{_('Mar')}}",
+                              "{{_('Apr')}}", "{{_('May')}}", "{{_('Jun')}}",
+                              "{{_('Jul')}}", "{{_('Aug')}}", "{{_('Sep')}}",
+                              "{{_('Oct')}}", "{{_('Nov')}}", "{{_('Dec')}}"],
        });
 	}
 	else {
+	    /*
 	    var d = $(this).val();
 	    var date_value = '';
 	    if (d) {
 	        date_value = new Date(d).format(date_fmt1);
 	    }
+	    */
 	    
-		$(this).css('width', '85px').val(date_value);
+		$(this).css('width', '85px'); //.val(date_value);
 	}
 });
 
