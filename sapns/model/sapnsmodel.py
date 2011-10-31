@@ -909,8 +909,13 @@ class SapnsClass(DeclarativeBase):
                         require_id = True
                         pos = 4
                         
-                    actions.append(Dict(title=_(ac.display_name), type=ac.type, 
-                                        url=url, require_id=require_id, pos=pos))
+                    p_name = re.search(r'^\w+#(\w+)', ac.permission_name, re.I)
+                    if p_name:
+                        p_name = p_name.group(1)
+                        
+                    actions.append(Dict(name=p_name or '', title=_(ac.display_name), 
+                                        type=ac.type, url=url, require_id=require_id, 
+                                        pos=pos))
                 
             def cmp_act(x, y):
                 if x.pos == y.pos:

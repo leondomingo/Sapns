@@ -252,10 +252,10 @@ catch (e) {
 			        
     			    // dialog title
     	            var dialog_title = sapnsSelector.rc_title;
-    	            if (typeof(sapnsSelector.rc_title) == 'function'){
+    	            if (typeof(sapnsSelector.rc_title) == 'function') {
     	                dialog_title = sapnsSelector.rc_title();
     	            }
-    			    
+    	            
     	            // show search dialog
     				$('#dialog_' + sapnsSelector.name).dialog({
     	                title: dialog_title,

@@ -1,6 +1,5 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
-{% import 'sapns/dashboard/grid.html' as grid_html %}
 
 {% block head %}
     {{ super() }}
@@ -52,6 +51,7 @@
         	    url_base: "/dashboard/list/{{grid.cls}}",
         	    height: 400,
         	    actions_inline: false, // temporal hasta que funcionen las acciones "inline"
+        	    dblclick: 'edit',
         	});
         	
         	$('#grid .sp-search-txt').focus();

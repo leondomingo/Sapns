@@ -71,6 +71,8 @@ catch(e) {
         set(this, 'multiselect', false);
         set(this, 'actions_inline', false);
         set(this, 'hide_id', false);
+        set(this, 'dblclick', null);
+        set(this, 'select_first', false);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -239,6 +241,9 @@ catch(e) {
         }
         
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
+        if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
+            $('#'+self.name + ' .sp-grid-row input[type=checkbox]:first').attr('checked', true);
+        }
     }
     
     // search
@@ -421,6 +426,7 @@ catch(e) {
                 if (typeof(act.type) === 'string') {
                     var a = '<div style="float: left;">';
                     a += '<button class="sp-button sp-grid-action standard_action" ' +
+                        ' id="' + self.name + '_' + act.name + '"' +
                         ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
                         ' require_id="' + req_id + '" >' + act.title + '</button></div>';
                     
@@ -540,6 +546,34 @@ catch(e) {
                 }
             }
         });
+        
+        if (self.dblclick) {
+            $('#'+self.name + ' .sp-grid-cell').live('dblclick', function(event) {
+                //console.log(self.multiselect);
+                if ($(this).attr('clickable') == 'true') {
+                    var row_id = $(this).parent().find('.sp-grid-rowid');
+                    $('#'+self.name + ' .sp-grid-rowid').each(function() {
+                        if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
+                            $(this).attr('checked', false);
+                        }
+                    });
+                    
+                    if (row_id.attr('checked') == true) {
+                        row_id.attr('checked', false);
+                    }
+                    else {
+                        row_id.attr('checked', true);
+                    }
+                    
+                    if (typeof(self.dblclick) == 'function') {
+                        self.dblclick(row_id.attr('id_row')*1);
+                    }
+                    else {
+                        $('#'+self.name + '_' + self.dblclick).click();
+                    }
+                }
+            });
+        }
         
         // standard actions
         $('#'+self.name + ' .standard_action').live('click', function(event) {
