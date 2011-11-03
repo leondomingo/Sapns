@@ -1,7 +1,10 @@
 # -*- coding: utf-8 -*-
 
+from jinja2 import Environment, FileSystemLoader
+from neptuno.dict import Dict
+from sapns.exc.conexion import Conexion
 from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute, \
-    SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole,\
+    SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole, \
     SapnsPrivilege
 from sqlalchemy import MetaData
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
@@ -10,11 +13,10 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
     BOOLEAN, BLOB
 from tg import config
 import logging
-from sapns.exc.conexion import Conexion
+import os
 
 ROLE_MANAGERS = u'managers'
-
-logger = logging.getLogger('InitSapns')
+current_path = os.path.dirname(os.path.abspath(__file__))
 
 class InitSapns(object):
     
@@ -22,9 +24,14 @@ class InitSapns(object):
         self.dbs = Conexion(config.get('sqlalchemy.url')).session
         
     def __call__(self):
-        logger.info('Starting [InitSapns]')
+        logger = logging.getLogger('InitSapns')
+        
+        logger.info('update_metadata')
         self.update_metadata()
+        
+        logger.info('create_data_exploration')
         self.create_data_exploration()
+        
         self.dbs.commit()
 
     def extract_model(self, all_=False):
@@ -75,11 +82,12 @@ class InitSapns(object):
                     fk_tables.append(fk.column.table)
                     fk_cols.append(fk.parent.name)
                     
+                log_attributes = Dict(created=False, updated=False)
                 for c in tbl.columns:
-                    col = dict(name=c.name, type=repr(c.type), fk='-', 
+                    col = Dict(name=c.name, type=repr(c.type), fk='-',
                                length=None, prec=None, scale=None,
                                pk=False)
-    
+                    
                     # is primary key?                    
                     col['pk'] = c.name in tbl.primary_key.columns.keys()
                     
@@ -146,6 +154,8 @@ class InitSapns(object):
         
         dbs = self.dbs
         
+        env = Environment(loader=FileSystemLoader(current_path))
+        
         managers = dbs.query(SapnsRole).\
             filter(SapnsRole.group_name == u'managers').\
             first()
@@ -180,7 +190,16 @@ class InitSapns(object):
                 
                 dbs.add(priv)
                 dbs.flush()
-    
+                
+                _alter = 'ALTER TABLE %s ADD _created TIMESTAMP, ADD _updated TIMESTAMP;' % tbl['name']
+                try:
+                    dbs.execute(_alter)
+                    dbs.flush()
+                    
+                except Exception, e:
+                    dbs.rollback()
+                    logger.error(e)
+                        
             else:
                 logger.warning('.....already exists')
                 
@@ -220,6 +239,8 @@ class InitSapns(object):
             create_action(u'List', SapnsPermission.TYPE_LIST)
             create_action(u'Docs', SapnsPermission.TYPE_DOCS)
                 
+            log_attributes = Dict(created=False, updated=False)
+            log_cols = []
             first_ref = False
             for i, col in enumerate(tbl['columns']):
                 
@@ -230,6 +251,20 @@ class InitSapns(object):
                                 SapnsAttribute.class_id == klass.class_id, 
                                 )).\
                     first()
+                    
+                # log attributes
+                if col['name'] in ['_created', '_updated']:
+                    
+                    if col['name'] == '_created':
+                        log_attributes.created = True
+                        
+                    if col['name'] == '_updated':
+                        log_attributes.updated = True
+                    
+                    continue
+                
+                elif col['name'] != 'id':
+                    log_cols.append(col['name'])
                         
                 if not attr and col['name'] != 'id':
                     logger.warning('.....creating')
@@ -295,6 +330,60 @@ class InitSapns(object):
                 # foreign key
                 if col['fk_table'] != None:
                     pending_attr[attr.attribute_id] = col['fk_table'].name
+                    
+            if not tbl['name'].startswith('sp_'):
+                        
+                _log_attributes = []
+                # _created
+                if not log_attributes.created:
+                    _log_attributes.append('ADD _created TIMESTAMP')
+                
+                # _updated
+                if not log_attributes.updated:
+                    _log_attributes.append('ADD _updated TIMESTAMP')
+                    
+                if _log_attributes:
+                    _alter = 'ALTER TABLE %s %s;' % (tbl['name'], ', '.join(_log_attributes))
+                    logger.info(_alter)
+                    
+                    try:
+                        dbs.execute(_alter)
+                        dbs.flush()
+                        
+                    except Exception, e:
+                        dbs.rollback()
+                        logger.error(e)
+                        
+                # log trigger function
+                tmpl = env.get_template('trigger_function_log.txt')
+                try:
+                    logf = tmpl.render(tbl_name=tbl['name'], cols=log_cols)
+                    #logger.info(logf)
+                    dbs.execute(logf)
+                    dbs.flush()
+                    
+                except Exception, e:
+                    dbs.rollback()
+                    logger.error(e)
+                            
+                # log triggers
+                log_trigger = 'SELECT COUNT(*) FROM pg_trigger WHERE tgname = \'zzzflog_%s\'' % tbl['name']
+                lt = dbs.execute(log_trigger).fetchone()
+                if lt[0] == 0:
+                    _trigger = '''create trigger zzzflog_%s
+                                  after insert or update or delete
+                                  on %s
+                                  for each row
+                                  execute procedure flog_%s();''' % ((tbl['name'],)*3)
+                                  
+                    #logger.info(_trigger)
+                    try:
+                        dbs.execute(_trigger)
+                        dbs.flush()
+                        
+                    except Exception, e:
+                        dbs.rollback()
+                        logger.error(e)
             
         # update related classes
         for attr_id, fk_table in pending_attr.iteritems():
@@ -370,7 +459,7 @@ class InitSapns(object):
         
         logger = logging.getLogger('lib.sapns.util.create_data_exploration')
         
-        tables = self.extract_model(all_=True) #['tables']
+        tables = self.extract_model(all_=True)
     
         for us in dbs.query(SapnsUser).\
             join((SapnsUserRole,
