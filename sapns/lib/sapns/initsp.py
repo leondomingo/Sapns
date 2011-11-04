@@ -82,7 +82,6 @@ class InitSapns(object):
                     fk_tables.append(fk.column.table)
                     fk_cols.append(fk.parent.name)
                     
-                log_attributes = Dict(created=False, updated=False)
                 for c in tbl.columns:
                     col = Dict(name=c.name, type=repr(c.type), fk='-',
                                length=None, prec=None, scale=None,
@@ -266,54 +265,22 @@ class InitSapns(object):
                 elif col['name'] != 'id':
                     log_cols.append(col['name'])
                         
-                if not attr and col['name'] != 'id':
-                    logger.warning('.....creating')
-                    
-                    attr = SapnsAttribute()
-                    attr.name = col['name']
-                    attr.title = col['name'].replace('_', ' ').title()
-                    attr.class_id = klass.class_id
-                    attr.type = col['type_name']
-                    if attr.type == SapnsAttribute.TYPE_STRING and not first_ref:
-                        attr.reference_order = 0
-                        first_ref = True
+                if col['name'] not in ['id', '_created', '_updated']:
+                    if not attr: 
+                        logger.warning('.....creating')
                         
-                    attr.visible = True
-                    attr.insertion_order = i
-                    
-                    if attr.type == SapnsAttribute.TYPE_INTEGER and \
-                    not attr.name.startswith('id_'):
-                        # signed
-                        attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
-                        
-                    elif attr.type == SapnsAttribute.TYPE_FLOAT:
-                        # signed
-                        # col['prec']
-                        # col['scale']
-                        attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
-                            (col['prec']-col['scale'],
-                             col['scale'])
+                        attr = SapnsAttribute()
+                        attr.name = col['name']
+                        attr.title = col['name'].replace('_', ' ').title()
+                        attr.class_id = klass.class_id
+                        attr.type = col['type_name']
+                        if attr.type == SapnsAttribute.TYPE_STRING and not first_ref:
+                            attr.reference_order = 0
+                            first_ref = True
                             
-                    elif attr.type == SapnsAttribute.TYPE_TIME:
-                        attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
-                    
-                    dbs.add(attr)
-                    dbs.flush()
-                    
-                    # grant access (r/w) to managers
-                    priv = SapnsAttrPrivilege()
-                    priv.role_id = managers.group_id
-                    priv.attribute_id = attr.attribute_id
-                    priv.access = SapnsAttrPrivilege.ACCESS_READWRITE
-                    
-                    dbs.add(priv)
-                    dbs.flush()
-                    
-                else:
-                    logger.warning('.....already exists')
-                    
-                    # fill the "field_regex"
-                    if attr and not attr.field_regex:
+                        attr.visible = True
+                        attr.insertion_order = i
+                        
                         if attr.type == SapnsAttribute.TYPE_INTEGER and \
                         not attr.name.startswith('id_'):
                             # signed
@@ -321,11 +288,44 @@ class InitSapns(object):
                             
                         elif attr.type == SapnsAttribute.TYPE_FLOAT:
                             # signed
+                            # col['prec']
+                            # col['scale']
                             attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
-                                (col['prec'] - col['scale'], col['scale'])
+                                (col['prec']-col['scale'],
+                                 col['scale'])
                                 
                         elif attr.type == SapnsAttribute.TYPE_TIME:
                             attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
+                        
+                        dbs.add(attr)
+                        dbs.flush()
+                        
+                        # grant access (r/w) to managers
+                        priv = SapnsAttrPrivilege()
+                        priv.role_id = managers.group_id
+                        priv.attribute_id = attr.attribute_id
+                        priv.access = SapnsAttrPrivilege.ACCESS_READWRITE
+                        
+                        dbs.add(priv)
+                        dbs.flush()
+                        
+                    else:
+                        logger.warning('.....already exists')
+                        
+                        # fill the "field_regex"
+                        if attr and not attr.field_regex:
+                            if attr.type == SapnsAttribute.TYPE_INTEGER and \
+                            not attr.name.startswith('id_'):
+                                # signed
+                                attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
+                                
+                            elif attr.type == SapnsAttribute.TYPE_FLOAT:
+                                # signed
+                                attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
+                                    (col['prec'] - col['scale'], col['scale'])
+                                    
+                            elif attr.type == SapnsAttribute.TYPE_TIME:
+                                attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
                     
                 # foreign key
                 if col['fk_table'] != None:
@@ -384,7 +384,7 @@ class InitSapns(object):
                     except Exception, e:
                         dbs.rollback()
                         logger.error(e)
-            
+                        
         # update related classes
         for attr_id, fk_table in pending_attr.iteritems():
             attr = dbs.query(SapnsAttribute).get(attr_id)
