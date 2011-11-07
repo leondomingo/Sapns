@@ -4,16 +4,11 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}" >
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}">
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
     {{ util.qtip2() }}
-    <script type="text/javascript">
-        {% include 'sapns/components/sapns.selector.min.js' %}
-    </script>
-    <script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
-    <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
 {% endblock %}
 
 {% block header %}
@@ -34,23 +29,20 @@
 <div class="sp-edit-panel">
     <div id="edit-header">
     
-    <div style="position: absolute; width: 350px; height: 145px; top: 5px; z-index: -1;
-        background-color: transparent;">
+    <div id="app_title">
         <div style="">
             <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
             <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
         </div>
     </div>
     
-    <div style="position: absolute; left: 360px; top: 5px; padding-right: 10px; 
-        width: 617px; background-color: transparent;">
+    <div id="right_desc">
     
     <!-- {# Title of the object #} -->
     <div style="font-size: 25px; text-align: right;">{{title}}</div>
 
     {%- if reference %}
-    <div style="margin-left: 0; font-size: 15px; color: black; 
-        background-color: none; text-align: right;">[{{reference}}]</div>
+    <div id="reference">[{{reference}}]</div>
     {% endif %}
     
     <div style="height: 10px;"></div>
@@ -127,7 +119,6 @@
                 margin-top: 4px;
                 {% if attr.required %} font-weight: bold;  {% endif %}
                 margin-bottom: 2px;">{{attr.title|escape}}</div>
-
         <div>
         
         <!-- {# Integer #} -->
@@ -194,7 +185,10 @@
     </div>
 </div>
 
+<script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
+<script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
 <script type="text/javascript">
+    {% include 'sapns/components/sapns.selector.min.js' %}
     {% include 'sapns/dashboard/edit/edit.min.js' %}
 </script>
 {% endblock %}

@@ -1,23 +1,17 @@
 # -*- coding: utf-8 -*-
 """Users management controller"""
 
-# turbogears imports
-from tg import expose, url, redirect, require, request
-
-# third party imports
+from neptuno.util import get_paramw, strtobool
 from pylons import cache
 from pylons.i18n import ugettext as _
 from repoze.what import authorize, predicates
-
-# project specific imports
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-
+from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
+from sqlalchemy.sql.expression import and_
+from tg import expose, url, redirect, require, request
 import logging
 import simplejson as sj
-from sapns.model.sapnsmodel import SapnsUser , SapnsRole, SapnsUserRole
-from neptuno.util import get_paramw, strtobool
-from sqlalchemy.sql.expression import and_
 
 __all__ = ['UsersControllers']
 
@@ -30,22 +24,18 @@ class UsersController(BaseController):
     
     @expose('sapns/users/edit.html')
     @require(predicates.not_anonymous())
-    def edit(self, cls, id, **params):
+    def edit(self, cls, id_, **params):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        id_user = int(id)
+        id_user = int(id_)
         
         is_manager = u'managers' in request.identity['groups']
         
         if user.user_id != id_user and not is_manager:
             redirect(url('/error'))
         
-        came_from = params.get('came_from')
-        if came_from:
-            came_from = url(came_from)
-        
         user = dbs.query(SapnsUser).get(id_user)
-        return dict(user=user, came_from=came_from)
+        return dict(user=user, came_from=params.get('came_from'))
     
     @expose('sapns/users/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
@@ -59,7 +49,7 @@ class UsersController(BaseController):
         
         logger = logging.getLogger('UsersController.save')
         try:
-            logger.info(params)
+            #logger.info(params)
             
             id_ = get_paramw(params, 'id', int, opcional=True)
             display_name = get_paramw(params, 'display_name', unicode)
@@ -206,9 +196,9 @@ class UsersController(BaseController):
         
     @expose('json')
     def all_(self):
-        logger = logging.getLogger('Users.all')
+        #logger = logging.getLogger('Users.all')
         def _all():
-            logger.info('Getting all users...')
+            #logger.info('Getting all users...')
             users = []
             for user in dbs.query(SapnsUser).order_by(SapnsUser.user_id):
                 users.append(dict(id=user.user_id, display_name=user.display_name, 

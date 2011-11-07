@@ -392,7 +392,7 @@ class DashboardController(BaseController):
         
         logger = logging.getLogger(__name__ + '/save')
         try:
-            logger.info(params)
+            #logger.info(params)
     
             ch_cls = SapnsClass.by_name(cls, parent=False)
             cls = SapnsClass.by_name(cls)
@@ -424,7 +424,7 @@ class DashboardController(BaseController):
                         update[field_name_] = field_value
                         continue
                     
-                    logger.info(field_name_)
+                    #logger.info(field_name_)
                     
                     # skipping "read-only" and "denied" attributes
                     acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
@@ -479,7 +479,7 @@ class DashboardController(BaseController):
                             field_value = field_value.strip()
                     
                     update[field_name_] = field_value
-                    logger.info('%s=%s' % (field_name, field_value))
+                    #logger.info('%s=%s' % (field_name, field_value))
 
             def _exec_post_conditions(moment, app_name, update):
                 if app_name:
@@ -591,7 +591,7 @@ class DashboardController(BaseController):
             # default read-only values (_xxxx)
             m = re.search(r'^_([a-z]\w+)$', field_name, re.I | re.U)
             if m:
-                logger.info('Default value (read-only): %s = %s' % (m.group(1), params[field_name]))
+                #logger.info('Default value (read-only): %s = %s' % (m.group(1), params[field_name]))
                 default_values_ro[m.group(1)] = params[field_name]
                 
             else:
@@ -599,7 +599,7 @@ class DashboardController(BaseController):
                 # depends on privilege of this attribute
                 m = re.search(r'^__([a-z]\w+)$', field_name, re.I | re.U)
                 if m:
-                    logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
+                    #logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
                     default_values[m.group(1)] = params[field_name]
                     
         ref = None
@@ -619,7 +619,7 @@ class DashboardController(BaseController):
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
             
-            logger.info('%s [%s]' % (attr.name, attr_priv.access))
+            #logger.info('%s [%s]' % (attr.name, attr_priv.access))
             
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY

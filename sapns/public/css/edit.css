@@ -135,3 +135,31 @@
 .sp-search-text:focus {
 	border: 1px solid orange;
 }
+
+#app_title {
+	position: absolute; 
+	width: 350px; 
+	height: 145px; 
+	top: 5px; 
+	z-index: -1;
+    background-color: transparent;
+}
+
+#right_desc {
+	position: absolute; 
+    left: 360px; 
+    top: 12px; 
+    padding-right: 10px; 
+    width: 617px; 
+    background-color: transparent;
+}
+
+#reference {
+	margin-left: 0; 
+	font-size: 15px; 
+	color: black; 
+    background-color: none; 
+    text-align: right; 
+    height: 22px;
+    overflow: hidden;
+}

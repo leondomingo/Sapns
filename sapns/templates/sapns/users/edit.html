@@ -69,7 +69,10 @@
         <button id="save_user_btn">{{_('Save')}}</button>
     </div>
 </div>
-<form id="form_exit" method="get" action="{{came_from}}"></form>
+<form id="form_exit" method="post" 
+    action="{% if came_from %}{{came_from}}
+            {%else%}{{tg.url('/message', dict(message=_('Update was completed successfully'), came_from=''))}}{%endif%}">
+</form>
 
 <script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
 <script type="text/javascript">
