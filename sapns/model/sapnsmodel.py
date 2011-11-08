@@ -15,7 +15,7 @@ from pylons import cache
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text,\
-    DateTime
+    DateTime, BigInteger
 from sqlalchemy.orm import relation
 from sqlalchemy.exc import NoSuchTableError
 
@@ -659,6 +659,8 @@ class SapnsClass(DeclarativeBase):
     parent_class_id = Column('id_parent_class', Integer, 
                              ForeignKey('sp_classes.id', 
                                         onupdate='CASCADE', ondelete='CASCADE'))
+    
+    is_logged = Column(Boolean, default=False)
     
     #attributes
     privileges = relation('SapnsPrivilege', backref='class_')
@@ -1800,3 +1802,52 @@ class SapnsUpdates(DeclarativeBase):
     def by_code(code):
         return dbs.query(SapnsUpdates).\
             filter(SapnsUpdates.code == code).first()
+            
+class SapnsLog(DeclarativeBase):
+    
+    __tablename__ = 'sp_logs'
+    
+    log_id = Column('id', BigInteger, primary_key=True)
+    table_name = Column(Unicode(100))
+    row_id = Column(BigInteger)
+    when_ = Column(DateTime, default=dt.datetime.now())
+    who = Column(Integer, 
+                 ForeignKey('sp_users.id',
+                            onupdate='CASCADE', ondelete='SET NULL'))
+    what = Column(Unicode(100))
+    description = Column(Text)
+    auto = Column(Boolean, default=False)
+    
+    @staticmethod
+    def register(**kw):
+        """
+        IN
+          table_name   <unicode>
+          row_id       <int>
+          when_        <datetime>
+          who          <int>
+          what         <unicode>
+          description  <unicode>
+        """
+        
+        #logger = logging.getLogger('SapnsLog.register')
+        #logger.info(kw)
+        
+        log = SapnsLog()
+        
+        create_log = True
+        if kw.get('table_name'):
+            cls = dbs.query(SapnsClass).\
+                filter(and_(SapnsClass.name == kw['table_name'],
+                            SapnsClass.is_logged,
+                            )).\
+                first()
+
+            create_log = cls != None
+                
+        if create_log:
+            for k, v in kw.iteritems():
+                setattr(log, k, v)
+                
+            dbs.add(log)
+            dbs.flush()

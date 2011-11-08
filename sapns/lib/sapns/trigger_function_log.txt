@@ -1,0 +1,93 @@
+CREATE OR REPLACE FUNCTION flog_{{tbl_name}}() RETURNS TRIGGER AS
+$$
+DECLARE
+  changes text;
+  is_logged boolean;
+BEGIN
+  select coalesce(is_logged, False)
+  from sp_classes
+  where id = {{class_id}} {#name = '{{tbl_name}}'#}  
+  into is_logged;
+  
+  if is_logged then
+    if tg_op = 'INSERT' then
+      UPDATE {{tbl_name}}
+      SET _created = CURRENT_TIMESTAMP, _updated = CURRENT_TIMESTAMP
+      WHERE id = NEW.id;
+    
+      INSERT INTO sp_logs (
+        table_name,
+        row_id,
+        who,
+        what,
+        auto
+      )
+      VALUES (
+        '{{tbl_name}}',
+        NEW.id,
+        null,
+        'insert',
+        True
+      );
+    
+    elsif tg_op = 'UPDATE' then
+    
+      changes = '';
+      {% for c in cols %}
+      -- {{tbl_name}}.{{c}}
+      if (OLD.{{c}} is null and NEW.{{c}} is not null) or
+         (OLD.{{c}} is not null and NEW.{{c}} is null) or
+         (OLD.{{c}} != NEW.{{c}}) then
+           if changes != '' then
+             changes = changes || chr(10) || '{{c}},';
+           else
+             changes = '{{c}},';
+           end if;
+      end if;
+      {% endfor %}
+    
+      if changes != '' then
+        UPDATE {{tbl_name}}
+        SET _updated = CURRENT_TIMESTAMP
+        WHERE id = NEW.id;
+    
+        INSERT INTO sp_logs (
+          table_name,
+          row_id,
+          who,
+          what,
+          description,
+          auto
+        )
+        VALUES (
+          '{{tbl_name}}',
+          NEW.id,
+          null,
+          'update',
+          changes,
+          True
+        );
+      end if;
+    else
+      -- DELETE
+      INSERT INTO sp_logs (
+        table_name,
+        row_id,
+        who,
+        what,
+        auto
+      )
+      VALUES (
+        '{{tbl_name}}',
+        OLD.id,
+        null,
+        'delete',
+        true
+      );
+    end if;
+  end if;
+  
+  return NULL;
+END;
+$$
+LANGUAGE 'plpgsql';

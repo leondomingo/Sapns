@@ -1,19 +1,16 @@
 # -*- coding: utf-8 -*-
 
-from tg import config
 from pylons.i18n import lazy_ugettext as l_
-
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute,\
+from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute, \
     SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole
-    
-import logging
 from sqlalchemy import MetaData
-from sqlalchemy.sql.expression import and_
-from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR,\
-    BOOLEAN, BLOB
 from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
-from pylons.templating import render_jinja2
+from sqlalchemy.sql.expression import and_
+from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
+    BOOLEAN, BLOB
+from tg import config
+import logging
 
 ROLE_MANAGERS = u'managers'
 

@@ -25,26 +25,16 @@ class UtilController(BaseController):
     
     allow_only = authorize.has_any_permission('manage', 'utilities')
     
-    @expose('sapns/message.html')
+    @expose('sapns/util/init.html')
     def init(self):
-        set_lang('en')
-        logger = logging.getLogger('UtilController.init')
-        logger.info('update_metadata')
-        libutil.update_metadata()
-        libutil.create_data_exploration()
+        return {}
         
-        return dict(message=_('Initialization was completed successfully'),
-                    came_from=url('/'))
-        
-    @expose('sapns/message.html')
+    @expose('sapns/util/update.html')
     def update(self):
-        Update().__call__()
-        
-        return dict(message=_('Update was completed successfully'),
-                    came_from=url('/'))
+        return {}
         
     @expose('sapns/util/index.html')
-    def index(self, came_from='/'):
+    def index_(self, came_from='/'):
         return dict(page='util', came_from=came_from)
 
     @expose('sapns/message.html')

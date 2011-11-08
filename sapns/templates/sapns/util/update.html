@@ -1,0 +1,12 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block middle %}
+    {{ super() }}
+    <div style="padding: 20px;">
+    <h1 style="">This process is now deprecated</h1>
+    <h3>Please, use:</h3>
+    <span style="font-family: courier; font-weight: bold; color: gray;">
+        $ python sapns/exc/update.py [development.ini|production.ini]</span>
+    </div>
+{% endblock %}

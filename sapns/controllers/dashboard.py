@@ -1,41 +1,36 @@
 # -*- coding: utf-8 -*-
 """Dashboard Controller"""
 
-from tg import response, expose, require, url, request, redirect, config
-from pylons.i18n import ugettext as _
-from tg.i18n import set_lang, get_lang
-from repoze.what import predicates as p
-
-from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import pagination
-from sapns.model import DBSession as dbs
-import sapns.config.app_cfg as app_cfg
-
-# controllers
-from sapns.controllers.views import ViewsController
-from sapns.controllers.util import UtilController
-from sapns.controllers.users import UsersController
-from sapns.controllers.roles import RolesController
-from sapns.controllers.shortcuts import ShortcutsController
-from sapns.controllers.messages import MessagesController
-from sapns.controllers.privileges import PrivilegesController
-from sapns.controllers.docs import DocsController
-
 from neptuno.postgres.search import search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
-
-from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
-    SapnsAttribute, SapnsAttrPrivilege, SapnsPermission
-
-import logging
-import re
-import simplejson as sj
-import cStringIO
+from pylons.i18n import ugettext as _
+from repoze.what import predicates as p
+from sapns.controllers.docs import DocsController
+from sapns.controllers.messages import MessagesController
+from sapns.controllers.privileges import PrivilegesController
+from sapns.controllers.roles import RolesController
+from sapns.controllers.shortcuts import ShortcutsController
+from sapns.controllers.users import UsersController
+from sapns.controllers.util import UtilController
+from sapns.controllers.views import ViewsController
+from sapns.lib.base import BaseController
+from sapns.lib.sapns.htmltopdf import url2
+from sapns.lib.sapns.util import pagination
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
+    SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
-from sapns.lib.sapns.htmltopdf import url2
+from tg import response, expose, require, url, request, redirect, config
+from tg.i18n import set_lang, get_lang
+import cStringIO
+import logging
+import re
+import sapns.config.app_cfg as app_cfg
+import simplejson as sj
 
+# controllers
 __all__ = ['DashboardController']
 
 class ECondition(Exception):
@@ -500,6 +495,7 @@ class DashboardController(BaseController):
             meta = MetaData(bind=dbs.bind)
             tbl = Table(cls.name, meta, autoload=True)
             
+            is_insert = False
             if update.get('id'):
                 logger.info('Updating object [%d] of "%s"' % (update['id'], cls.name))
                 dbs.execute(tbl.update(whereclause=tbl.c.id == update['id'], values=update))
@@ -508,16 +504,31 @@ class DashboardController(BaseController):
                 logger.info('Inserting new object in "%s"' % cls.name)
                 ins = tbl.insert(values=update).returning(tbl.c.id)
                 r = dbs.execute(ins)
+                is_insert = True
                 
             ch_cls.name = ch_cls.name
             dbs.add(ch_cls)
             dbs.flush()
-            
+
             if not update.get('id'):
                 update['id'] = r.fetchone().id
                 
             _exec_post_conditions('after', 'sapns', update)
             _exec_post_conditions('after', config.get('app.root_folder'), update)
+
+            # TODO: log
+            _desc = _('updating an existing record')
+            _what = _('update')
+            if is_insert:
+                _desc = _('creating a new record')
+                _what = _('create')
+                
+            SapnsLog.register(table_name=ch_cls.name,
+                              row_id=update['id'],
+                              who=user.user_id,
+                              what=_what,
+                              description=_desc,
+                              )
             
             return dict(status=True)
         
@@ -555,6 +566,20 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         ch_class_ = SapnsClass.by_name(cls, parent=False)
         
+        # log
+        _what = _('edit record')
+        if not id:
+            _what = _('new record')
+            _id = None
+        else:
+            _id = int(id)
+            
+        SapnsLog.register(table_name=ch_class_.name,
+                          row_id=_id,
+                          who=user.user_id,
+                          what=_what,
+                          )
+
         if id:
             id = int(id)
             #perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT))
@@ -742,6 +767,13 @@ class DashboardController(BaseController):
             tbl.delete(tbl.c.id == id_).execute()
             dbs.flush()
             
+            # log
+            SapnsLog.register(table_name=cls_.name,
+                              row_id=id_,
+                              who=user.user_id,
+                              what=_('delete'),
+                              )
+
             # success!
             return dict(status=True)
             
