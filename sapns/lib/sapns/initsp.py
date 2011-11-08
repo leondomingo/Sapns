@@ -190,15 +190,6 @@ class InitSapns(object):
                 dbs.add(priv)
                 dbs.flush()
                 
-                _alter = 'ALTER TABLE %s ADD _created TIMESTAMP, ADD _updated TIMESTAMP;' % tbl['name']
-                try:
-                    dbs.execute(_alter)
-                    dbs.flush()
-                    
-                except Exception, e:
-                    dbs.rollback()
-                    logger.error(e)
-                        
             else:
                 logger.warning('.....already exists')
                 
@@ -351,19 +342,21 @@ class InitSapns(object):
                         dbs.flush()
                         
                     except Exception, e:
-                        dbs.rollback()
+                        #dbs.rollback()
                         logger.error(e)
                         
                 # log trigger function
                 tmpl = env.get_template('trigger_function_log.txt')
                 try:
-                    logf = tmpl.render(tbl_name=tbl['name'], cols=log_cols)
+                    logf = tmpl.render(tbl_name=tbl['name'], cols=log_cols,
+                                       class_id=klass.class_id,
+                                       )
                     #logger.info(logf)
                     dbs.execute(logf)
                     dbs.flush()
                     
                 except Exception, e:
-                    dbs.rollback()
+                    #dbs.rollback()
                     logger.error(e)
                             
                 # log triggers
@@ -382,7 +375,7 @@ class InitSapns(object):
                         dbs.flush()
                         
                     except Exception, e:
-                        dbs.rollback()
+                        #dbs.rollback()
                         logger.error(e)
                         
         # update related classes
@@ -399,8 +392,6 @@ class InitSapns(object):
         logger = logging.getLogger('lib.sapns.util.create_dashboards')
         
         dbs = self.dbs
-        
-        #us = dbs.query(SapnsUser).get(id_user)
             
         logger.info('Creating dashboard for "%s"' % us.display_name)
         
@@ -479,7 +470,7 @@ class InitSapns(object):
                 cls = dbs.query(SapnsClass).\
                     filter(SapnsClass.name == tbl['name']).\
                     first()
-                
+                    
                 # look for this table "list" action
                 act_table = dbs.query(SapnsPermission).\
                     filter(and_(SapnsPermission.type == SapnsPermission.TYPE_LIST,
@@ -528,7 +519,7 @@ class InitSapns(object):
                 else:
                     logger.info(u'Shortcut for "%s" already exists' % cls.title)
                     
-            # TODO: sort (alphabetically) shortcuts inside "data exploration"
+            # sort (alphabetically) shortcuts inside "data exploration"
             logger.info('Sorting shortcuts inside "data exploration"')
             i = 0
             for sc in dbs.query(SapnsShortcut).\

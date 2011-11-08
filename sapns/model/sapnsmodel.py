@@ -660,6 +660,8 @@ class SapnsClass(DeclarativeBase):
                              ForeignKey('sp_classes.id', 
                                         onupdate='CASCADE', ondelete='CASCADE'))
     
+    is_logged = Column(Boolean, default=False)
+    
     #attributes
     privileges = relation('SapnsPrivilege', backref='class_')
     permissions = relation('SapnsPermission', backref='class_')
@@ -1814,23 +1816,38 @@ class SapnsLog(DeclarativeBase):
                             onupdate='CASCADE', ondelete='SET NULL'))
     what = Column(Unicode(100))
     description = Column(Text)
+    auto = Column(Boolean, default=False)
     
     @staticmethod
     def register(**kw):
         """
         IN
-          table_name  <unicode>
-          row_id      <int>
-          when_       <datetime>
-          who         <int>
-          what        <unicode>
-          description <unicode>
+          table_name   <unicode>
+          row_id       <int>
+          when_        <datetime>
+          who          <int>
+          what         <unicode>
+          description  <unicode>
         """
+        
+        #logger = logging.getLogger('SapnsLog.register')
+        #logger.info(kw)
         
         log = SapnsLog()
         
-        for k, v in kw.iteritems:
-            setattr(log, k, v)
-            
-        dbs.add(log)
-        dbs.flush()
+        create_log = True
+        if kw.get('table_name'):
+            cls = dbs.query(SapnsClass).\
+                filter(and_(SapnsClass.name == kw['table_name'],
+                            SapnsClass.is_logged,
+                            )).\
+                first()
+
+            create_log = cls != None
+                
+        if create_log:
+            for k, v in kw.iteritems():
+                setattr(log, k, v)
+                
+            dbs.add(log)
+            dbs.flush()
