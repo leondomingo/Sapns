@@ -492,42 +492,44 @@ class InitSapns(object):
                     dbs.flush()
                     
                 # project
-                sc_parent = sc_project.shortcut_id
+                sc_parent = sc_project
                 if cls.name.startswith('sp_'):
                     # sapns
-                    sc_parent = sc_sapns.shortcut_id
+                    sc_parent = sc_sapns
                     
-                sc_table = dbs.query(SapnsShortcut).\
-                    filter(and_(SapnsShortcut.parent_id == sc_parent,
-                                SapnsShortcut.permission_id == act_table.permission_id,
-                                SapnsShortcut.user_id == us.user_id,
-                                )).\
-                    first()
-                        
-                # does this user have this class shortcut?
-                if not sc_table:
-                    sc_table = SapnsShortcut()
-                    sc_table.title = tbl['name']
-                    sc_table.parent_id = sc_parent
-                    sc_table.user_id = us.user_id
-                    sc_table.permission_id = act_table.permission_id
-                    sc_table.order = i
-        
-                    dbs.add(sc_table)
-                    dbs.flush()
-                
-                else:
-                    logger.info(u'Shortcut for "%s" already exists' % cls.title)
+                if sc_parent:
+                    sc_table = dbs.query(SapnsShortcut).\
+                        filter(and_(SapnsShortcut.parent_id == sc_parent.shortcut_id,
+                                    SapnsShortcut.permission_id == act_table.permission_id,
+                                    SapnsShortcut.user_id == us.user_id,
+                                    )).\
+                        first()
+                            
+                    # does this user have this class shortcut?
+                    if not sc_table:
+                        sc_table = SapnsShortcut()
+                        sc_table.title = tbl['name']
+                        sc_table.parent_id = sc_parent.shortcut_id
+                        sc_table.user_id = us.user_id
+                        sc_table.permission_id = act_table.permission_id
+                        sc_table.order = i
+            
+                        dbs.add(sc_table)
+                        dbs.flush()
+                    
+                    else:
+                        logger.info(u'Shortcut for "%s" already exists' % cls.title)
                     
             # sort (alphabetically) shortcuts inside "data exploration"
-            logger.info('Sorting shortcuts inside "data exploration"')
-            i = 0
-            for sc in dbs.query(SapnsShortcut).\
-                    filter(SapnsShortcut.parent_id == sc_project.shortcut_id).\
-                    order_by(SapnsShortcut.title):
-                
-                sc.order = i
-                dbs.add(sc)
-                dbs.flush()
-                
-                i += 1
+            if sc_project:
+                logger.info('Sorting shortcuts inside "data exploration"')
+                i = 0
+                for sc in dbs.query(SapnsShortcut).\
+                        filter(SapnsShortcut.parent_id == sc_project.shortcut_id).\
+                        order_by(SapnsShortcut.title):
+                    
+                    sc.order = i
+                    dbs.add(sc)
+                    dbs.flush()
+                    
+                    i += 1

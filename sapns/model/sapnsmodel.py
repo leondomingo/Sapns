@@ -2,30 +2,26 @@
 
 """Sapns basic data model"""
 
-import os
-import shutil
-import datetime as dt
-import re
-
-from pylons.i18n import ugettext as _
-
-from tg import config
-from pylons import cache
-
-from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, DefaultClause
-from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam
-from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text,\
-    DateTime, BigInteger
-from sqlalchemy.orm import relation
-from sqlalchemy.exc import NoSuchTableError
-
-from sapns.model import DeclarativeBase, DBSession as dbs
-from sapns.model.auth import User, user_group_table, Group, Permission,\
-    group_permission_table
-
-import logging
-from neptuno.util import datetostr
 from neptuno.dict import Dict
+from neptuno.util import datetostr
+from pylons import cache
+from pylons.i18n import ugettext as _
+from sapns.model import DeclarativeBase, DBSession as dbs
+from sapns.model.auth import User, user_group_table, Group, Permission, \
+    group_permission_table
+from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, \
+    DefaultClause
+from sqlalchemy.exc import NoSuchTableError
+from sqlalchemy.orm import relation
+from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
+from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
+    DateTime, BigInteger
+from tg import config
+import datetime as dt
+import logging
+import os
+import re
+import shutil
 
 __all__ = ['SapnsAssignedDoc', 'SapnsAttrPrivilege', 'SapnsAttribute', 'SapnsClass',
            'SapnsDoc', 'SapnsDocFormat', 'SapnsDocType', 'SapnsMessage', 
@@ -203,8 +199,8 @@ class SapnsUser(User):
     
     def get_dataexploration(self):
         return dbs.query(SapnsShortcut).\
-            filter(and_(SapnsShortcut.parent_id == self.get_dashboard().shortcut_id,
-                        SapnsShortcut.order == 0,
+            filter(and_(SapnsShortcut.user_id == self.user_id,
+                        func.upper(SapnsShortcut.title) == func.upper(u'Data exploration'),
                         )).\
             first()
     
@@ -530,7 +526,7 @@ class SapnsShortcut(DeclarativeBase):
 
     def __unicode__(self):
         return u'<Shortcut: "%s" user=%s, action=%s>' % \
-            (self.title, self.user, self.action or '')
+            (self.title, self.user, self.permission or '')
     
     def by_order(self, order, comp=0):
         """Return a 'child' shortcut (of this) with the indicated 'order'"""
@@ -1479,7 +1475,7 @@ class SapnsPermission(Permission):
     CACHE_ID = 'user_actions'
     
     def __unicode__(self):
-        return u'<SapnsAction: "%s" type=%s>' % (self.name, self.type)
+        return u'<SapnsAction: "%s" type=%s>' % (self.permission_name, self.type)
     
     def __str__(self):
         return unicode(self).encode('utf-8')
