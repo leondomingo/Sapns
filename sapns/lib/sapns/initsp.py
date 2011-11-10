@@ -461,8 +461,11 @@ class InitSapns(object):
             self.create_dashboards(us)
             
             data_ex = us.get_dataexploration()
-            sc_sapns = data_ex.by_order(0)
-            sc_project = data_ex.by_order(1)
+            sc_sapns = None
+            sc_project = None
+            if data_ex:
+                sc_sapns = data_ex.by_order(0)
+                sc_project = data_ex.by_order(1)
             
             # data exploration/project       
             for i, tbl in enumerate(tables):
