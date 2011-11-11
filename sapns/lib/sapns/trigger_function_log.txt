@@ -2,14 +2,14 @@ CREATE OR REPLACE FUNCTION flog_{{tbl_name}}() RETURNS TRIGGER AS
 $$
 DECLARE
   changes text;
-  is_logged boolean;
+  _logged boolean;
 BEGIN
   select coalesce(is_logged, False)
   from sp_classes
   where id = {{class_id}} {#name = '{{tbl_name}}'#}  
-  into is_logged;
+  into _logged;
   
-  if is_logged then
+  if _logged then
     if tg_op = 'INSERT' then
       UPDATE {{tbl_name}}
       SET _created = CURRENT_TIMESTAMP, _updated = CURRENT_TIMESTAMP
