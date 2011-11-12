@@ -273,4 +273,20 @@ $(document).ready(function() {
                 appendTo('body').submit().remove();
         }
     });
+    
+    $('.created').click(function() {
+        // TODO: Show last log events on this record
+        $('#edit-dialog').dialog({
+            title: "Logs",
+            width: 900,
+            height: 600,
+            resizable: false,
+            modal: true,
+            buttons: {
+                "{{_('Close')}}": function() {
+                    $('#edit-dialog').dialog('close');
+                }
+            }
+        });
+    });
 });

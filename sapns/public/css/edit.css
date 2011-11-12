@@ -54,6 +54,10 @@
 	cursor: pointer;
 }
 
+#back-button:hover, #save-button:hover, #action-go:hover, #rel-classes-show:hover {
+	color: white;
+}
+
 .sp-save-button {
 	/*background-color: orange;
 	border: 1px solid white;*/
@@ -162,4 +166,24 @@
     text-align: right; 
     height: 22px;
     overflow: hidden;
+}
+
+#created_updated {
+    height: 9px; 
+    padding-left: 400px; 
+    font-size: 9px; 
+    cursor: pointer;
+}
+
+.created {
+	width: 100px;
+	border: 1px solid lightgray;
+	float: left; 
+	margin-right: 5px;
+	text-align: center;
+}
+
+.created:hover {
+	background-color: lightgray;
+	color: white;
 }

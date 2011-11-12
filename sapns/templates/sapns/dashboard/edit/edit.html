@@ -4,7 +4,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}">
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
@@ -36,27 +36,6 @@
         </div>
     </div>
     
-    {% if id %}
-    <div style="margin-left: 0px; font-size: 11px; height: 32px;
-        position: absolute; top: 79px;">
-    <div style="padding-left: 5px; float: left;">
-        <div style="margin-bottom: 5px;">{{_('Created')}}</div>
-        <div style="border: 1px solid gray;
-            background-color: lightgray; cursor: text;
-            padding-left: 2px;
-            width: 175px;">{{_created or '&nbsp;'}}</div>
-    </div>
-    
-    <div style="padding-left: 10px; float: left;">
-        <div style="margin-bottom: 5px;">{{_('Updated')}}</div>
-        <div style="border: 1px solid gray;
-            background-color: lightgray; cursor: text;
-            padding-left: 2px;
-            width: 175px;">{{_updated or '&nbsp;'}}</div>
-    </div>
-    </div>
-    {% endif %}
-    
     <div id="right_desc">
     
     <!-- {# Title of the object #} -->
@@ -66,7 +45,15 @@
     <div id="reference">[{{reference}}]</div>
     {% endif %}
     
-    <div style="height: 10px;"></div>
+    <!-- _created / _updated -->
+    {% if id %}
+    <div id="created_updated">
+        <div title="{{_('Created')}}" class="created">{{_created or '&nbsp;'}}</div>
+        <div title="{{_('Updated')}}" class="created">{{_updated or '&nbsp;'}}</div>
+    </div>
+    {% endif %}
+    
+    <div style="height: 5px;"></div>
     
     <!-- related classes -->
     {% if id and related_classes|length > 0 %}
@@ -116,8 +103,6 @@
     </div>
     
     <div style="height: 175px;">&nbsp;</div>
-    
-    {#<div style="clear: left; height: 1px;">&nbsp;</div>#}
     
     {%- for attr in attributes %}
     <div class="sp-edit-field" name="{{attr.name}}"
@@ -213,7 +198,7 @@
 <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
 <script type="text/javascript">
     {% include 'sapns/components/sapns.selector.min.js' %}
-    {% include 'sapns/dashboard/edit/edit.min.js' %}
+    {% include 'sapns/dashboard/edit/edit.js' %}
 </script>
 {% endblock %}
 

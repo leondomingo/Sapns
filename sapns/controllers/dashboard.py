@@ -608,6 +608,7 @@ class DashboardController(BaseController):
                                      came_from=came_from)))
             
         date_fmt = config.get('formats.date', default='%m/%d/%Y')
+        datetime_fmt = config.get('formats.datetime', default='%Y/%m/%d %H:%M:%S')
         
         default_values_ro = {}
         default_values = {}
@@ -627,6 +628,9 @@ class DashboardController(BaseController):
                     #logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
                     default_values[m.group(1)] = params[field_name]
                     
+        _created = None
+        _updated = None
+                    
         ref = None
         row = None
         if id:
@@ -640,8 +644,8 @@ class DashboardController(BaseController):
             # reference
             ref = SapnsClass.object_title(class_.name, id)
             
-            _created = row['_created']
-            _updated = row['_updated']
+            _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
+            _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
             
         # get attributes
         attributes = []
