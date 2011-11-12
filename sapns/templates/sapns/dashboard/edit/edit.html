@@ -36,6 +36,27 @@
         </div>
     </div>
     
+    {% if id %}
+    <div style="margin-left: 0px; font-size: 11px; height: 32px;
+        position: absolute; top: 79px;">
+    <div style="padding-left: 5px; float: left;">
+        <div style="margin-bottom: 5px;">{{_('Created')}}</div>
+        <div style="border: 1px solid gray;
+            background-color: lightgray; cursor: text;
+            padding-left: 2px;
+            width: 175px;">{{_created or '&nbsp;'}}</div>
+    </div>
+    
+    <div style="padding-left: 10px; float: left;">
+        <div style="margin-bottom: 5px;">{{_('Updated')}}</div>
+        <div style="border: 1px solid gray;
+            background-color: lightgray; cursor: text;
+            padding-left: 2px;
+            width: 175px;">{{_updated or '&nbsp;'}}</div>
+    </div>
+    </div>
+    {% endif %}
+    
     <div id="right_desc">
     
     <!-- {# Title of the object #} -->
@@ -75,7 +96,6 @@
         </select>
         <button id="action-go" class="sp-button" style="width: 63px;">{{_('Go')}}</button>
         <form id="action-form" method="post" action="" target="_blank">
-            <!--<input type="hidden" name="id" value="{{id}}">-->
             <input type="hidden" name="came_from" value="">
         </form>
     </div>
@@ -84,6 +104,7 @@
     <div class="sp-save-button">
         <button id="save-button" class="sp-button">{{_('Save')}}</button>
     </div>
+    
     </div>
     
     {% if came_from %}
@@ -91,9 +112,12 @@
         <button id="back-button" class="sp-button">{{_('return')}}</button>
     </div>
     {% endif %}
+    
     </div>
     
     <div style="height: 175px;">&nbsp;</div>
+    
+    {#<div style="clear: left; height: 1px;">&nbsp;</div>#}
     
     {%- for attr in attributes %}
     <div class="sp-edit-field" name="{{attr.name}}"

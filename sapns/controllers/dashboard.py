@@ -640,6 +640,9 @@ class DashboardController(BaseController):
             # reference
             ref = SapnsClass.object_title(class_.name, id)
             
+            _created = row['_created']
+            _updated = row['_updated']
+            
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
@@ -676,8 +679,6 @@ class DashboardController(BaseController):
             
             if attr.related_class_id:
                 # vals
-                #attributes[-1]['vals'] = []
-                #attribute['vals'] = []
                 try:
                     rel_class = dbs.query(SapnsClass).get(attr.related_class_id)
                     
@@ -686,12 +687,8 @@ class DashboardController(BaseController):
                     attribute['related_class_title'] = rel_class.title
                     attribute['related_title'] = SapnsClass.object_title(rel_class.name, value)
                     
-                    #logger.info(rel_class.name)
-                    #attributes[-1]['vals'] = SapnsClass.class_titles(rel_class.name)
-                
                 except Exception, e:
                     logger.error(e)
-#                    attributes[-1]['vals'] = None
                     attribute['vals'] = None
         
         def _exec_pre_conditions(app_name):
@@ -714,6 +711,7 @@ class DashboardController(BaseController):
         return dict(cls=cls, title=ch_class_.title, id=id, 
                     related_classes=class_.related_classes(),
                     attributes=attributes, reference=ref,
+                    _created=_created, _updated=_updated,
                     actions=actions, came_from=url(came_from))
     
     @expose('sapns/dashboard/delete.html')
