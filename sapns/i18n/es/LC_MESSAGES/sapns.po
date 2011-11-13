@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-11-08 13:12+0100\n"
+"POT-Creation-Date: 2011-11-13 13:35+0100\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,80 +17,88 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: sapns/controllers/dashboard.py:116 sapns/controllers/dashboard.py:172
-#: sapns/controllers/dashboard.py:282 sapns/controllers/dashboard.py:318
-#: sapns/controllers/dashboard.py:340 sapns/controllers/dashboard.py:594
-#: sapns/controllers/dashboard.py:737 sapns/controllers/dashboard.py:793
-#: sapns/controllers/dashboard.py:849
+#: sapns/controllers/dashboard.py:118
+#: sapns/controllers/dashboard.py:174
+#: sapns/controllers/dashboard.py:284
+#: sapns/controllers/dashboard.py:320
+#: sapns/controllers/dashboard.py:342
+#: sapns/controllers/dashboard.py:596
+#: sapns/controllers/dashboard.py:741
+#: sapns/controllers/dashboard.py:797
+#: sapns/controllers/dashboard.py:853
+#: sapns/controllers/logs.py:53
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
-#: sapns/controllers/dashboard.py:129
+#: sapns/controllers/dashboard.py:131
 #, python-format
 msgid "%s of [%s]"
 msgstr "%s de [%s]"
 
-#: sapns/controllers/dashboard.py:131
+#: sapns/controllers/dashboard.py:133
 #, python-format
 msgid "list of %s"
 msgstr "lista de %s"
 
-#: sapns/controllers/dashboard.py:195
+#: sapns/controllers/dashboard.py:197
+#: sapns/controllers/logs.py:84
 #: sapns/templates/sapns/privileges/actions.html:13
 #: sapns/templates/sapns/privileges/classes.html:8
 #: sapns/templates/sapns/privileges/index.html:32
 msgid "Yes"
 msgstr "Sí"
 
-#: sapns/controllers/dashboard.py:196
+#: sapns/controllers/dashboard.py:198
+#: sapns/controllers/logs.py:85
 #: sapns/templates/sapns/privileges/actions.html:14
 #: sapns/templates/sapns/privileges/classes.html:9
 #: sapns/templates/sapns/privileges/index.html:33
 msgid "No"
 msgstr "No"
 
-#: sapns/controllers/dashboard.py:520
+#: sapns/controllers/dashboard.py:522
 msgid "updating an existing record"
 msgstr "actualizando un registro existente"
 
-#: sapns/controllers/dashboard.py:521
+#: sapns/controllers/dashboard.py:523
 msgid "update"
 msgstr "actualizar"
 
-#: sapns/controllers/dashboard.py:523
+#: sapns/controllers/dashboard.py:525
 msgid "creating a new record"
 msgstr "creando un nuevo registro"
 
-#: sapns/controllers/dashboard.py:524
+#: sapns/controllers/dashboard.py:526
 msgid "create"
 msgstr "crear"
 
-#: sapns/controllers/dashboard.py:570
+#: sapns/controllers/dashboard.py:572
 msgid "edit record"
 msgstr "editar registro"
 
-#: sapns/controllers/dashboard.py:572
+#: sapns/controllers/dashboard.py:574
 msgid "new record"
 msgstr "nuevo registro"
 
-#: sapns/controllers/dashboard.py:607
+#: sapns/controllers/dashboard.py:609
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/dashboard.py:637 sapns/controllers/dashboard.py:745
+#: sapns/controllers/dashboard.py:643
+#: sapns/controllers/dashboard.py:749
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
-#: sapns/controllers/dashboard.py:774
+#: sapns/controllers/dashboard.py:778
 msgid "delete"
 msgstr "borrar"
 
-#: sapns/controllers/dashboard.py:837
+#: sapns/controllers/dashboard.py:841
 #, python-format
 msgid "Insertion order for \"%s\" has been successfully updated"
 msgstr "El orden de inserción para \"%s\" se ha actualizado correctamente"
 
-#: sapns/controllers/dashboard.py:880
+#: sapns/controllers/dashboard.py:884
 #, python-format
 msgid "Reference order for \"%s\" has been successfully updated"
 msgstr "El orden de referencia para \"%s\" se ha actualizado correctamente"
@@ -100,7 +108,8 @@ msgstr "El orden de referencia para \"%s\" se ha actualizado correctamente"
 msgid "Documents of [%s]"
 msgstr "Documentos de [%s]"
 
-#: sapns/controllers/docs.py:257 sapns/controllers/docs.py:311
+#: sapns/controllers/docs.py:257
+#: sapns/controllers/docs.py:311
 #, python-format
 msgid "Repo [%d] was not found"
 msgstr "No se encontró el repositorio [%d]"
@@ -160,7 +169,8 @@ msgstr "Clase: %s"
 msgid "New"
 msgstr "Nuevo"
 
-#: sapns/lib/sapns/util.py:195 sapns/templates/sapns/docs/index.html:425
+#: sapns/lib/sapns/util.py:195
+#: sapns/templates/sapns/docs/index.html:425
 msgid "Edit"
 msgstr "Editar"
 
@@ -175,7 +185,8 @@ msgstr "Editar"
 msgid "Delete"
 msgstr "Borrar"
 
-#: sapns/lib/sapns/util.py:197 sapns/lib/sapns/util.py:371
+#: sapns/lib/sapns/util.py:197
+#: sapns/lib/sapns/util.py:371
 msgid "List"
 msgstr "Lista"
 
@@ -183,7 +194,8 @@ msgstr "Lista"
 msgid "Docs"
 msgstr "Documentos"
 
-#: sapns/lib/sapns/util.py:295 sapns/templates/sapns/dashboard/index.html:17
+#: sapns/lib/sapns/util.py:295
+#: sapns/templates/sapns/dashboard/index.html:17
 msgid "Dashboard"
 msgstr "Escritorio"
 
@@ -195,20 +207,23 @@ msgstr "Exploración de datos"
 msgid "Project"
 msgstr "Proyecto"
 
-#: sapns/model/sapnsmodel.py:1743
+#: sapns/model/sapnsmodel.py:1739
 msgid "NO_TITLE"
 msgstr "SIN_TITULO"
 
-#: sapns/templates/myapp/base.html:30 sapns/templates/sapns/base.html:26
+#: sapns/templates/myapp/base.html:30
+#: sapns/templates/sapns/base.html:26
 msgid "You are in"
 msgstr "Estás en"
 
-#: sapns/templates/myapp/base.html:34 sapns/templates/sapns/base.html:30
-#: sapns/templates/sapns/dashboard/edit/edit.html:91
+#: sapns/templates/myapp/base.html:34
+#: sapns/templates/sapns/base.html:30
+#: sapns/templates/sapns/dashboard/edit/edit.html:99
 msgid "return"
 msgstr "volver"
 
-#: sapns/templates/myapp/header.html:5 sapns/templates/sapns/header.html:14
+#: sapns/templates/myapp/header.html:5
+#: sapns/templates/sapns/header.html:14
 msgid "logout"
 msgstr "salir"
 
@@ -294,9 +309,7 @@ msgstr "No hay resultados"
 #: sapns/templates/sapns/dashboard/grid.html:492
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
-msgstr ""
-"Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta "
-"%(pos1)d"
+msgstr "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta %(pos1)d"
 
 #: sapns/templates/sapns/components/sapns.grid/grid.html:70
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:950
@@ -351,6 +364,8 @@ msgstr "Tienes que seleccionar una fila antes de utilizar esta acción"
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:110
 #: sapns/templates/sapns/dashboard/grid.html:126
 #: sapns/templates/sapns/dashboard/grid.html:136
+#: sapns/templates/sapns/dashboard/edit/edit.js:292
+#: sapns/templates/sapns/dashboard/edit/edit.min.js:46
 #: sapns/templates/sapns/views/views-min.js:1
 #: sapns/templates/sapns/views/views.js:456
 msgid "Close"
@@ -358,7 +373,7 @@ msgstr "Cerrar"
 
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:415
 #: sapns/templates/sapns/dashboard/grid.html:558
-#: sapns/templates/sapns/dashboard/edit/edit.html:69
+#: sapns/templates/sapns/dashboard/edit/edit.html:77
 #: sapns/templates/sapns/privileges/index.html:31
 msgid "Actions"
 msgstr "Acciones"
@@ -386,12 +401,8 @@ msgstr "Ups, algo fue mal..."
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:819
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:105
 #: sapns/templates/sapns/dashboard/grid.html:106
-msgid ""
-"For your information this object is related with other objects in the "
-"following classes:"
-msgstr ""
-"Para tu información este objeto está relacionado con otros objetos en las"
-" siguientes clases:"
+msgid "For your information this object is related with other objects in the following classes:"
+msgstr "Para tu información este objeto está relacionado con otros objetos en las siguientes clases:"
 
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:886
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:115
@@ -595,13 +606,13 @@ msgstr "Crear un favorito para esta búsqueda"
 
 #: sapns/templates/sapns/dashboard/grid.html:599
 #: sapns/templates/sapns/dashboard/listof.html:25
-#: sapns/templates/sapns/dashboard/edit/edit.html:53
+#: sapns/templates/sapns/dashboard/edit/edit.html:61
 msgid "Related info"
 msgstr "Información relacionada"
 
 #: sapns/templates/sapns/dashboard/grid.html:605
 #: sapns/templates/sapns/dashboard/listof.html:31
-#: sapns/templates/sapns/dashboard/edit/edit.html:59
+#: sapns/templates/sapns/dashboard/edit/edit.html:67
 msgid "Show"
 msgstr "Mostrar"
 
@@ -613,24 +624,32 @@ msgstr "subir"
 msgid "The record has been successfully saved"
 msgstr "El registro se ha guardado correctamente"
 
-#: sapns/templates/sapns/dashboard/edit/edit.html:71
+#: sapns/templates/sapns/dashboard/edit/edit.html:51
+msgid "Created"
+msgstr "Creado"
+
+#: sapns/templates/sapns/dashboard/edit/edit.html:52
+msgid "Updated"
+msgstr "Actualizado"
+
+#: sapns/templates/sapns/dashboard/edit/edit.html:79
 #: sapns/templates/sapns/privileges/attributes.html:6
 #: sapns/templates/sapns/privileges/classes.html:6
 msgid "none"
 msgstr "ninguno"
 
-#: sapns/templates/sapns/dashboard/edit/edit.html:76
+#: sapns/templates/sapns/dashboard/edit/edit.html:84
 msgid "Go"
 msgstr "Ir"
 
-#: sapns/templates/sapns/dashboard/edit/edit.html:85
+#: sapns/templates/sapns/dashboard/edit/edit.html:92
 #: sapns/templates/sapns/order/insert.html:65
 #: sapns/templates/sapns/order/reference.html:128
 #: sapns/templates/sapns/users/edit.html:69
 msgid "Save"
 msgstr "Guardar"
 
-#: sapns/templates/sapns/dashboard/edit/edit.html:166
+#: sapns/templates/sapns/dashboard/edit/edit.html:175
 msgid "Go to link"
 msgstr "Ir a enlace"
 

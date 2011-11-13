@@ -4,7 +4,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.min.css')}}">
+    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}">
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
@@ -45,7 +45,15 @@
     <div id="reference">[{{reference}}]</div>
     {% endif %}
     
-    <div style="height: 10px;"></div>
+    <!-- _created / _updated -->
+    {% if id %}
+    <div id="created_updated">
+        <div title="{{_('Created')}}" class="created">{{_created or '&nbsp;'}}</div>
+        <div title="{{_('Updated')}}" class="created">{{_updated or '&nbsp;'}}</div>
+    </div>
+    {% endif %}
+    
+    <div style="height: 5px;"></div>
     
     <!-- related classes -->
     {% if id and related_classes|length > 0 %}
@@ -75,7 +83,6 @@
         </select>
         <button id="action-go" class="sp-button" style="width: 63px;">{{_('Go')}}</button>
         <form id="action-form" method="post" action="" target="_blank">
-            <!--<input type="hidden" name="id" value="{{id}}">-->
             <input type="hidden" name="came_from" value="">
         </form>
     </div>
@@ -84,6 +91,7 @@
     <div class="sp-save-button">
         <button id="save-button" class="sp-button">{{_('Save')}}</button>
     </div>
+    
     </div>
     
     {% if came_from %}
@@ -91,6 +99,7 @@
         <button id="back-button" class="sp-button">{{_('return')}}</button>
     </div>
     {% endif %}
+    
     </div>
     
     <div style="height: 175px;">&nbsp;</div>

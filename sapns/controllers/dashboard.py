@@ -6,6 +6,7 @@ from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 from pylons.i18n import ugettext as _
 from repoze.what import predicates as p
 from sapns.controllers.docs import DocsController
+from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController
 from sapns.controllers.roles import RolesController
@@ -47,6 +48,7 @@ class DashboardController(BaseController):
     messages = MessagesController()
     privileges = PrivilegesController()
     docs = DocsController()
+    logs = LogsController()
 
     @expose('sapns/dashboard/index.html')
     @require(p.not_anonymous())
@@ -615,6 +617,7 @@ class DashboardController(BaseController):
                                      came_from=came_from)))
             
         date_fmt = config.get('formats.date', default='%m/%d/%Y')
+        datetime_fmt = config.get('formats.datetime', default='%Y/%m/%d %H:%M:%S')
         
         default_values_ro = {}
         default_values = {}
@@ -634,6 +637,9 @@ class DashboardController(BaseController):
                     #logger.info('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
                     default_values[m.group(1)] = params[field_name]
                     
+        _created = None
+        _updated = None
+                    
         ref = None
         row = None
         if id:
@@ -646,6 +652,9 @@ class DashboardController(BaseController):
                 
             # reference
             ref = SapnsClass.object_title(class_.name, id)
+            
+            _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
+            _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
             
         # get attributes
         attributes = []
@@ -683,8 +692,6 @@ class DashboardController(BaseController):
             
             if attr.related_class_id:
                 # vals
-                #attributes[-1]['vals'] = []
-                #attribute['vals'] = []
                 try:
                     rel_class = dbs.query(SapnsClass).get(attr.related_class_id)
                     
@@ -693,12 +700,8 @@ class DashboardController(BaseController):
                     attribute['related_class_title'] = rel_class.title
                     attribute['related_title'] = SapnsClass.object_title(rel_class.name, value)
                     
-                    #logger.info(rel_class.name)
-                    #attributes[-1]['vals'] = SapnsClass.class_titles(rel_class.name)
-                
                 except Exception, e:
                     logger.error(e)
-#                    attributes[-1]['vals'] = None
                     attribute['vals'] = None
         
         def _exec_pre_conditions(app_name):
@@ -721,6 +724,7 @@ class DashboardController(BaseController):
         return dict(cls=cls, title=ch_class_.title, id=id, 
                     related_classes=class_.related_classes(),
                     attributes=attributes, reference=ref,
+                    _created=_created, _updated=_updated,
                     actions=actions, came_from=url(came_from))
     
     @expose('sapns/dashboard/delete.html')

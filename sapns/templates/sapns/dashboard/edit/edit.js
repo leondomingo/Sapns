@@ -273,4 +273,28 @@ $(document).ready(function() {
                 appendTo('body').submit().remove();
         }
     });
+    
+    $('.created').click(function() {
+        $.ajax({
+            url: "{{tg.url('/dashboard/logs/search/')}}",
+            data: {
+                table_name: "{{cls}}",
+                row_id: "{{id}}"
+            },
+            success: function(content) {
+                $('#edit-dialog').html(content).dialog({
+                    title: "Logs",
+                    width: 900,
+                    height: 600,
+                    resizable: false,
+                    modal: true,
+                    buttons: {
+                        "{{_('Close')}}": function() {
+                            $('#edit-dialog').dialog('close');
+                        }
+                    }
+                });
+            }
+        });
+    });
 });
