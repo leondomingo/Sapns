@@ -275,17 +275,25 @@ $(document).ready(function() {
     });
     
     $('.created').click(function() {
-        // TODO: Show last log events on this record
-        $('#edit-dialog').dialog({
-            title: "Logs",
-            width: 900,
-            height: 600,
-            resizable: false,
-            modal: true,
-            buttons: {
-                "{{_('Close')}}": function() {
-                    $('#edit-dialog').dialog('close');
-                }
+        $.ajax({
+            url: "{{tg.url('/dashboard/logs/search/')}}",
+            data: {
+                table_name: "{{cls}}",
+                row_id: "{{id}}"
+            },
+            success: function(content) {
+                $('#edit-dialog').html(content).dialog({
+                    title: "Logs",
+                    width: 900,
+                    height: 600,
+                    resizable: false,
+                    modal: true,
+                    buttons: {
+                        "{{_('Close')}}": function() {
+                            $('#edit-dialog').dialog('close');
+                        }
+                    }
+                });
             }
         });
     });
