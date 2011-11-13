@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Dashboard Controller"""
 
-from neptuno.postgres.search import search
+from neptuno.postgres.search import Search 
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 from pylons.i18n import ugettext as _
 from repoze.what import predicates as p
@@ -185,8 +185,14 @@ class DashboardController(BaseController):
             col = (cls, ch_attr, parent_id,)
 
         # get dataset
-        ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-                    strtodatef=strtodate_, collection=col, filters=filters)
+        _search = Search(dbs, view, strtodatef=strtodate_)
+        _search.apply_qry(q.encode('utf-8'))
+        _search.apply_filters(filters)
+        
+        ds = _search(rp=rp, offset=pos, collection=col)
+        
+#        ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
+#                    strtodatef=strtodate_, collection=col, filters=filters)
                  
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -297,8 +303,9 @@ class DashboardController(BaseController):
         strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
         
         # get dataset
-        ds = search(dbs, view, q=q.encode('utf-8'), rp=0, collection=col,
-                    strtodatef=strtodate_)
+        s = Search(dbs, view, strtodatef=strtodate_)
+        s.apply_qry(q.encode('utf-8'))
+        ds = s(rp=0, collection=col)
         
         return ds 
     
@@ -903,8 +910,9 @@ class DashboardController(BaseController):
         import random
         random.seed()
         
-        ds = search(dbs, '_view_%s' % kw.get('cls'), q=kw.get('q'), 
-                    rp=int(kw.get('rp', 10)))
+        s = Search(dbs, '_view_%s' % kw.get('cls'))
+        s.apply_qry(kw.get('q').encode('utf-8'))
+        ds = s(rp=int(kw.get('rp', 10)))
         
         def r():
             return random.randint(1, 1000) / 1.23
