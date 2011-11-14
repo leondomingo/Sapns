@@ -653,8 +653,9 @@ class DashboardController(BaseController):
             # reference
             ref = SapnsClass.object_title(class_.name, id)
             
-            _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
-            _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
+            if class_.name != u'sp_logs':
+                _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
+                _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
             
         # get attributes
         attributes = []

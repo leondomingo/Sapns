@@ -28,10 +28,10 @@ class InitSapns(object):
         
         logger.info('update_metadata')
         self.update_metadata()
+        self.dbs.commit()
         
         logger.info('create_data_exploration')
         self.create_data_exploration()
-        
         self.dbs.commit()
 
     def extract_model(self, all_=False):
@@ -161,7 +161,6 @@ class InitSapns(object):
                 
         tables = self.extract_model(all_=True)
         tables_id = {}
-        pending_attr = {}
         for tbl in tables:
             
             logger.info('Table: %s' % tbl['name'])
@@ -193,7 +192,15 @@ class InitSapns(object):
             else:
                 logger.warning('.....already exists')
                 
-            tables_id[tbl['name']] = klass.class_id
+            tables_id[tbl['name']] = klass #.class_id
+            
+        tmpl = env.get_template('trigger_function_log.txt')
+        
+        pending_attr = {}
+        for tbl in tables:
+            
+            #tables_id[tbl['name']] = klass.class_id
+            klass = tables_id[tbl['name']]
                 
             # create an action
             def create_action(name, type_):
@@ -322,9 +329,10 @@ class InitSapns(object):
                 if col['fk_table'] != None:
                     pending_attr[attr.attribute_id] = col['fk_table'].name
                     
-            if not tbl['name'].startswith('sp_'):
-                        
+            if tbl['name'] != u'sp_logs':
+                
                 _log_attributes = []
+                
                 # _created
                 if not log_attributes.created:
                     _log_attributes.append('ADD _created TIMESTAMP')
@@ -346,7 +354,6 @@ class InitSapns(object):
                         logger.error(e)
                         
                 # log trigger function
-                tmpl = env.get_template('trigger_function_log.txt')
                 try:
                     logf = tmpl.render(tbl_name=tbl['name'], cols=log_cols,
                                        class_id=klass.class_id,
@@ -377,15 +384,14 @@ class InitSapns(object):
                     except Exception, e:
                         #dbs.rollback()
                         logger.error(e)
-                        
-        # update related classes
-        for attr_id, fk_table in pending_attr.iteritems():
-            attr = dbs.query(SapnsAttribute).get(attr_id)
-            attr.related_class_id = tables_id[fk_table]
+                    
+            # update related classes
+            for attr_id, fk_table in pending_attr.iteritems():
+                attr = dbs.query(SapnsAttribute).get(attr_id)
+                attr.related_class_id = tables_id[fk_table].class_id
             
-            dbs.add(attr)
-            dbs.flush()
-        
+                dbs.add(attr)
+                dbs.flush()
         
     def create_dashboards(self, us):
         
