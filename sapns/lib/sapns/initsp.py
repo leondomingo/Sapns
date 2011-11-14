@@ -329,7 +329,9 @@ class InitSapns(object):
                 if col['fk_table'] != None:
                     pending_attr[attr.attribute_id] = col['fk_table'].name
                     
-            if tbl['name'] != u'sp_logs':
+            if tbl['name'] not in [u'sp_logs', 
+                                   u'sp_role_permission', 
+                                   u'sp_user_role']:
                 
                 _log_attributes = []
                 

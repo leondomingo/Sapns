@@ -46,7 +46,7 @@
     {% endif %}
     
     <!-- _created / _updated -->
-    {% if id %}
+    {% if id and h.authorize.in_group('managers') %}
     <div id="created_updated">
         <div title="{{_('Created')}}" class="created">{{_created or '&nbsp;'}}</div>
         <div title="{{_('Updated')}}" class="created">{{_updated or '&nbsp;'}}</div>
