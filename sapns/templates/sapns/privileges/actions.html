@@ -5,7 +5,7 @@
 {% else %}
 {% for act in actions %}
 <div class="action_row" id_action="{{act.id_action}}">
-    <div class="action_name">{{act.name}}</div>
+    <div class="action_name">{{act.display_name}} (<span>{{act.name}}</span>)</div>
     <select class="action_granted">
         {#{% if show_none %}
         <option value="" {% if act.granted == None %} selected {% endif %}>({{_('none')}})</option>

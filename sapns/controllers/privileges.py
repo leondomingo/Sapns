@@ -168,7 +168,8 @@ class PrivilegesController(BaseController):
             
             attributes.append(Dict(id=attr_p.attr_privilege_id,
                                    access=attr_p.access,
-                                   name=attr.title,
+                                   name=attr.name,
+                                   title=attr.title,
                                    id_attr=attr.attribute_id,
                                    ins_order=attr.insertion_order,
                                    ))
@@ -219,7 +220,8 @@ class PrivilegesController(BaseController):
                     pos = 100
                     
                 actions.append(Dict(id_action=action.permission_id,
-                                    name=_(action.display_name),
+                                    display_name=_(action.display_name),
+                                    name=action.permission_name,
                                     granted=who.has_permission(action.permission_id),
                                     pos=pos,
                                     ))

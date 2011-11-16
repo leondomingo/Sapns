@@ -159,6 +159,12 @@
     float: left;
 }
 
+.attr_name span {
+	font-size: 10px;
+	font-style: italic;
+	color: white;
+}
+
 #actions_pane {
     position: relative;
     height: 210px;
@@ -192,4 +198,10 @@
 .action_name {
     width: 554px;
     float: left;
+}
+
+.action_name span {
+	font-size: 10px;
+	font-style: italic;
+	color: white;
 }

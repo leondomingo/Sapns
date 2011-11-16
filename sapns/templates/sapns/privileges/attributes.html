@@ -1,6 +1,6 @@
 {% for attr in attributes %}
 <div class="attr_row" id_attr="{{attr.id_attr}}">
-    <div class="attr_name">{{attr.name}}</div>
+    <div class="attr_name">{{attr.title}} (<span>{{attr.name}}</span>)</div>
     <select class="attr_granted">
         {% if show_none %}
         <option value="">({{_('none')}})</option>

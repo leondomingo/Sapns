@@ -240,7 +240,7 @@
         	
         	// {# load list of users #} 
             $.ajax({
-                url: "{{tg.url('/dashboard/users/all')}}",
+                url: "{{tg.url('/dashboard/users/all_')}}",
                 type: 'get',
                 dataType: 'json',
                 success: function(res) {
@@ -274,7 +274,7 @@
                 buttons: {
                     "{{_('Ok')}}": function() {
                     	
-                    	var user_id = $('#users-to-share-with').find('option:selected').val();
+                    	var user_id = $('#users-to-share-with').val();
                     	
                         $.ajax({
                             url: "{{tg.url('/dashboard/sc/share')}}",
@@ -292,12 +292,12 @@
                                     alert('Error!');
                                 }
                                 
-                                $('#users-to-share-with').find('option:first').attr('selected', true);
+                                $('#users-to-share-with option:first').attr('selected', true);
                                 $('#share-dialog').dialog('close');
                             },
                             error: function() {
                                 alert('Error!');
-                                $('#users-to-share-with').find('option:first').attr('selected', true);
+                                $('#users-to-share-with option:first').attr('selected', true);
                                 $('#share-dialog').dialog('close');
                             }
                         });
