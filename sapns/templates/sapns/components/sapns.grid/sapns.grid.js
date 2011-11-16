@@ -755,9 +755,8 @@ catch(e) {
         
         var self = this;
         var cls = self.cls;
-        var id = ids[0];
         
-        //console.log('std_delete ' + id + ' ' + url);
+        var id = JSON.stringify(ids);
         
         var delete_html = 
             "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
@@ -777,11 +776,19 @@ catch(e) {
             dataType: "json",
             data: {
                 cls: cls,
-                id: id,         
+                id: id
             },
             success: function(res) {
                 if (res.status) {
-                    $('#grid-dialog_' + self.name + ' #object-title').html(res.title);
+                    var title;
+                    if (typeof(res.title) == 'string') {
+                        title = res.title;
+                    }
+                    else {
+                        title = res.title.join(' | ');
+                    }
+                    
+                    $('#grid-dialog_' + self.name + ' #object-title').html(title);
                 }
             },
             error: function() {
@@ -803,7 +810,7 @@ catch(e) {
                         dataType: "json",
                         data: {
                             cls: cls,
-                            id_: id,
+                            id_: id
                         },
                         success: function(res) {
                             if (res.status) {
@@ -851,7 +858,7 @@ catch(e) {
                                     }
                                 }
                             });
-                        },
+                        }
                     });
                 },
                 "{{_('Cancel')}}": function() {

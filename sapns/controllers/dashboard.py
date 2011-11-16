@@ -364,6 +364,7 @@ class DashboardController(BaseController):
     def title(self, cls, id):
         logger = logging.getLogger('DashboardController.title')
         try:
+            logger.info(id)
             try:
                 _title = SapnsClass.object_title(cls, int(id))
                 
