@@ -735,7 +735,7 @@ class DashboardController(BaseController):
         
         #came_from = get_paramw(kw, 'came_from', opcional=True, por_defecto='/')
         
-        logger = logging.getLogger(__name__ + '/delete')
+        logger = logging.getLogger('DashboardController.delete')
         rel_tables = []
         try:
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -752,9 +752,23 @@ class DashboardController(BaseController):
             meta = MetaData(dbs.bind)
             tbl = Table(cls_.name, meta, autoload=True)
             
-            this_record = dbs.execute(tbl.select(tbl.c.id == id_)).fetchone()
-            if not this_record:
-                return dict(status=False, message=_('Record does not exist'))
+            try:
+                id_ = int(id_)
+                
+            except:
+                id_ = sj.loads(id_)
+                
+            if isinstance(id_, int):
+                # int
+                this_record = dbs.execute(tbl.select(tbl.c.id == id_)).fetchone()
+                if not this_record:
+                    return dict(status=False, message=_('Record does not exist'))
+                
+            else:
+                # array of ints
+                these_records = dbs.execute(tbl.select(tbl.c.id.in_(id_))).fetchall()
+                if len(these_records) != len(id_):
+                    return dict(status=False, message=_('Some records do not exist'))
 
             # look for objects in other classes that are related with this
             
@@ -765,7 +779,15 @@ class DashboardController(BaseController):
                 rtbl = Table(rcls['name'], meta, autoload=True)
                 attr_name = rcls['attr_name']
                 
-                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(id_))
+                if isinstance(id_, int):
+                    # int
+                    i = id_
+                    
+                else:
+                    # array of ints
+                    i = id_[0]
+                
+                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(i))
                 robj = dbs.execute(sel).fetchone()
                 
                 if robj != None:
@@ -776,15 +798,30 @@ class DashboardController(BaseController):
                     logger.info('---No related objects have been found')
                     
             # delete record
-            tbl.delete(tbl.c.id == id_).execute()
-            dbs.flush()
+            if isinstance(id_, int):
+                # int
+                tbl.delete(tbl.c.id == id_).execute()
+                
+                # log
+                SapnsLog.register(table_name=cls_.name,
+                                  row_id=id_,
+                                  who=user.user_id,
+                                  what=_('delete'),
+                                  )
             
-            # log
-            SapnsLog.register(table_name=cls_.name,
-                              row_id=id_,
-                              who=user.user_id,
-                              what=_('delete'),
-                              )
+            else:
+                # array of int's
+                tbl.delete(tbl.c.id.in_(id_)).execute()
+                
+                for i in id_:
+                    # log
+                    SapnsLog.register(table_name=cls_.name,
+                                      row_id=i,
+                                      who=user.user_id,
+                                      what=_('delete'),
+                                      )
+
+            dbs.flush()
 
             # success!
             return dict(status=True)
