@@ -47,4 +47,6 @@ TODO = [
     dict(code=u'sapns: test1_py', type='py', module='init.test1'),
     # users edit
     dict(code=u'sapns: users edit', type='py', module='init.users_edit'),
+    # logs view
+    dict(code=u'sapns: logs view', type='sql', filename='init/logs_view.sql'),
 ]
