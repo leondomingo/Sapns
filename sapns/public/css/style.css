@@ -298,7 +298,8 @@ clear:both;
 
 .sp_logout {
 	position: absolute;
-	left: 690px;
+	/*left: 690px;*/
+	right: 10px;
 	top: 20px;
     /*margin-left: 67%; 
     width: 300px;*/
@@ -333,7 +334,8 @@ clear:both;
 
 #language_selector {
 	position: absolute;
-	left: 875px;
+	/*left: 875px;*/
+	right: 10px;
 	top: 70px;
 }
 
@@ -401,9 +403,13 @@ clear:both;
 	/*background-color: white;*/
 	font-family: Arial;
 	font-size: 11px;
-	height: 22px; /*40px;*/
-	max-height: 22px;
+	height: 22px;
+	overflow: hidden;
 	cursor: pointer;
+	padding: 2px;
+	/*padding-left: 2px;
+	padding-right: 2px;
+	padding-bottom: 2px;*/
 }
 
 .sp-grid-noresults {

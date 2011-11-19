@@ -29,7 +29,7 @@
                 rp: 10,
                 //height: 700,
                 //with_search: false,
-                search_params: {
+                search_params_: {
                     data: {
                         filters: JSON.stringify([['id', 7183]])
                     }
@@ -54,11 +54,11 @@
                        {title: 'CUATRO'}
                        ],
                 actions_: {},
-                actions_a: [{title: 'act1', url: '/act1', type: 'process'},
+                actions: [{title: 'act1', url: '/act1', type: 'process'},
                           {title: 'act2', url: '/act2', type: 'process'},
                           {title: 'act3', url: '/act3', type: 'process'}
                           ],
-                actions: function() {
+                actions__: function() {
                     //console.log(this.cls);
                     return [{title: 'New', url: '/act1', type: 'new', required_id: false},
                             {title: 'Edit', url: '/act2', type: 'edit'},

@@ -204,7 +204,12 @@ catch(e) {
                     continue;
                 }
                 
-                g_table += '<td class="sp-grid-cell" style="text-align: ' + al + '; width: ' + wd + 'px;"';
+                var width = '';
+                if (wd > 0) {
+                    width = ' width: ' + wd + 'px;';
+                }
+                
+                g_table += '<td><div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
                 
                 if (cell) {
                     g_table += 'title="' + cell + '"';
@@ -215,14 +220,15 @@ catch(e) {
                 
                 g_table += 'clickable="true">';
                 
-                if (cell.length > 30) {
+                /*if (cell.length > 30) {
                     g_table += (cell+'').substr(0, 30) + '...';
                 }
                 else {
                     g_table += cell;
-                }
+                }*/
+                g_table += cell;
                 
-                g_table += '</td>';
+                g_table += '</div></td>';
             }
             
             g_table += '</tr>';
@@ -457,9 +463,10 @@ catch(e) {
                     '<option value="excel">Excel</option>' +
                 '</select></div>';
         }
+        /*
         else {
-            g_actions += '<div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;"></div>';
-        }
+            g_actions += <div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;"></div>';
+        }*/
 
         return g_actions;
     }
@@ -493,6 +500,10 @@ catch(e) {
             }
             else {
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                
+                if (self.actions.length == 0 && !self.exportable) {
+                    $('#' + self.name + ' .actions').css('min-height', '0px');
+                }
                 
                 // assign functions to actions
                 for (var i=0, l=self.actions.length; i<l; i++) {
@@ -529,9 +540,9 @@ catch(e) {
         
         // if the row is selected, then mark the checkbox
         $('#'+self.name + ' .sp-grid-cell').live('click', function(event) {
-            //console.log(self.multiselect);
+            //console.log('click');
             if ($(this).attr('clickable') == 'true') {
-                var row_id = $(this).parent().find('.sp-grid-rowid');
+                var row_id = $(this).parent().parent().find('.sp-grid-rowid');
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
                     if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
                         $(this).attr('checked', false);
@@ -547,9 +558,10 @@ catch(e) {
             }
         });
         
+        /*
         if (self.dblclick) {
             $('#'+self.name + ' .sp-grid-cell').live('dblclick', function(event) {
-                //console.log(self.multiselect);
+                //console.log('dbl-click');
                 if ($(this).attr('clickable') == 'true') {
                     var row_id = $(this).parent().find('.sp-grid-rowid');
                     $('#'+self.name + ' .sp-grid-rowid').each(function() {
@@ -574,6 +586,7 @@ catch(e) {
                 }
             });
         }
+        */
         
         // standard actions
         $('#'+self.name + ' .standard_action').live('click', function(event) {
@@ -998,7 +1011,6 @@ catch(e) {
                 });
             }
             
-            //this.append(g_content+g_table+g_pager+'<div class="actions"></div></div>');
             this.append(g_content+'<div class="actions" style="clear: left; position: relative; min-height: 20px;"></div>'+g_table+g_pager+'</div>');
             
             g.loadActions();
