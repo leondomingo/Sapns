@@ -52,6 +52,16 @@ class DashboardController(BaseController):
     privileges = PrivilegesController()
     docs = DocsController()
     logs = LogsController()
+    
+    @expose('sapns/sidebar.html')
+    def sidebar(self, came_from=''):
+        # connected user
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        
+        # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
+        shortcuts = user.get_shortcuts(id_parent=None)
+        
+        return dict(shortcuts=shortcuts, came_from=came_from)    
 
     @expose('sapns/dashboard/index.html')
     @require(p.not_anonymous())
@@ -62,7 +72,7 @@ class DashboardController(BaseController):
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
-        shortcuts = user.get_shortcuts(id_parent=sc_parent)
+        #shortcuts = user.get_shortcuts(id_parent=sc_parent)
         
         params = {}
         if sc_parent:
@@ -79,7 +89,7 @@ class DashboardController(BaseController):
         messages = user.messages()
         unread = user.unread_messages()
         
-        return dict(page='dashboard', curr_lang=curr_lang, shortcuts=shortcuts,
+        return dict(page='dashboard', curr_lang=curr_lang, shortcuts=[],
                     messages=messages, unread=unread,
                     sc_type=sc_type, sc_parent=sc_parent, _came_from=came_from)
         
@@ -211,7 +221,7 @@ class DashboardController(BaseController):
         
         cols = []
         for col in ds.labels:
-            w = 850 / len(ds.labels)
+            w = 765 / len(ds.labels)
             if col == 'id':
                 w = 60
                 

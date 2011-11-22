@@ -6,7 +6,7 @@
 <title>{{tg.config.get('app.name', 'Sapns')}} - 
     {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
 {% endblock %}
-<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.min.css')}}">
+<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
 {% if tg.config.get('app.root_folder') %}
   {% set root_folder = tg.config.get('app.root_folder') %}
   <link rel="stylesheet" type="text/css" media="screen" 
@@ -20,16 +20,17 @@
     </div>
     {% endblock %}
     
-    <div class="sp_middle">
-    {% if page %}
+    {#{% if page %}
     <div id="you-are-in"><a style="font-size: 15px;" href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
-    {% endif %}
-    
-    {% if came_from %}
-    <div id="sp-back" style="margin-left: 5px; font-size: 9px;"><a href="{{came_from}}">{{_('return')}}</a></div>
-    {% endif %}
-    {% block middle %}
-    {% endblock middle %}
+    {% endif %}#}
+
+    <div class="sp_middle">
+        <div class="sp_sidebar"></div>
+        
+        <div class="sp_center">
+        {% block middle %}
+        {% endblock middle %}
+        </div>
     </div>
     
     {% block footer %}
@@ -37,6 +38,23 @@
         {% include 'sapns/footer.html' %}
     </div>
     {% endblock %}
+    
+    <script type="text/javascript">
+    $(function() {
+        // Load sidebar 
+        $.ajax({
+            url: "{{tg.url('/dashboard/sidebar/')}}",
+            data: {
+                came_from: "{{came_from or ''}}",
+            },
+            cache: true,
+            dataType: 'html',
+            success: function(content) {
+                $('.sp_sidebar').html(content);
+            }
+        });
+    });
+    </script>
     
 </body>
 </html>

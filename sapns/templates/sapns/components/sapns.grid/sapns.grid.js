@@ -122,6 +122,16 @@ catch(e) {
         return selected_ids;
     }
     
+    SapnsGrid.prototype.getAction = function(action_name) {
+        var self = this;
+        for (var i=0, l=self.actions.length; i<l; i++) {
+            var act = self.actions[i];
+            if (act.name == action_name) {
+                return act;
+            }
+        }
+    }
+    
     // getRow
     SapnsGrid.prototype.getRow = function(id) {
         var self = this;
@@ -139,6 +149,8 @@ catch(e) {
     
     // loadData
     SapnsGrid.prototype.loadData = function() {
+        
+        //console.log('loadData');
         
         var self = this;
         
@@ -190,10 +202,23 @@ catch(e) {
                 var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
                 g_table +=
                 '<td style="font-size: 10px; width: 35px;">' +
-                '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
-                '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
-                '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
-                '</td>';
+                '<div style="width: 100px;">' +
+                    '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' +
+                        'src="{{tg.url("/images/sapns/icons/edit.png")}}">' + 
+                    '<img class="inline_action delete_inline" title="{{_("Delete")}}" ' + 
+                        'src="{{tg.url("/images/sapns/icons/delete.png")}}">' +
+                    '<img class="inline_action docs_inline" title="{{_("Docs")}}" ' + 
+                        'src="{{tg.url("/images/sapns/icons/docs.png")}}">' +
+                    '<select class="nonstd_actions">';
+                
+                for (var i=0, l=self.actions.length; i<l; i++) {
+                    var act = self.actions[i];
+                    if (act.type == 'process' && act.require_id) {
+                        g_table += '<option name="act.name">' + act.title + '</option>';
+                    }
+                }
+                
+                g_table += '</select></div></td>';
             }
             
             for (var j=0, lr=cols.length; j<lr; j++) {
@@ -231,17 +256,7 @@ catch(e) {
                     g_table += 'title="({{_("empty")}})"';
                 }
                 
-                g_table += 'clickable="true">';
-                
-                /*if (cell.length > 30) {
-                    g_table += (cell+'').substr(0, 30) + '...';
-                }
-                else {
-                    g_table += cell;
-                }*/
-                g_table += cell;
-                
-                g_table += '</div></td>';
+                g_table += 'clickable="true">' + cell + '</div></td>';
             }
             
             g_table += '</tr>';
@@ -427,6 +442,8 @@ catch(e) {
     
     SapnsGrid.prototype._loadActions = function(actions) {
         
+        //console.log('_loadActions');
+        
         var self = this;
         var g_actions = '';
         
@@ -443,6 +460,7 @@ catch(e) {
                 }
                 
                 if (typeof(act.type) === 'string') {
+                    
                     var a = '<div style="float: left;">';
                     a += '<button class="sp-button sp-grid-action standard_action" ' +
                         ' id="' + self.name + '_' + act.name + '"' +
@@ -450,10 +468,15 @@ catch(e) {
                         ' require_id="' + req_id + '" >' + act.title + '</button></div>';
                     
                     if (act.type === 'new') {
-                        $('#search_box').append(a);
+                        var new_btn = '<img class="inline_action new_inline" src="{{tg.url("/images/sapns/icons/new.png")}}">';
+                        $('#search_box').append(new_btn);
+                    }
+                    else if (self.actions_inline && (act.type == 'edit' || 
+                            act.type == 'delete' || act.type == 'docs')) {
+                        continue;
                     }
                     else {
-                        g_actions += a;
+                        //g_actions += a;
                     }
                 }
                 else {
@@ -495,6 +518,8 @@ catch(e) {
     }
     
     SapnsGrid.prototype.loadActions = function() {
+        
+        //console.log('loadActions');
         
         var self = this;
         var g_actions = '';
@@ -610,6 +635,65 @@ catch(e) {
             });
         }
         */
+        
+        function form(action, target) {
+            var came_from = '';
+            if (target != '_blank') {
+                var came_from = self.url_base + '?q=' + encodeURI(self.q).
+                replace('-', '%2D', 'g').replace('"', '%22', 'g').
+                replace('+', '%2B', 'g').replace('#', '%23', 'g') + 
+                    '&rp=' + self.rp + '&pag_n=' + self.pag_n +
+                    '&ch_attr=' + self.ch_attr + '&parent_id=' + self.parent_id;
+            }
+            
+            var f = 
+                '<form type="post" action="' + action + '" target="' + target + '">' +
+                    '<input type="hidden" name="came_from" value="' + came_from + '">';
+            
+            if (self.ch_attr) {
+                f += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
+            }
+                
+            f += '</form>';
+            
+            return f;
+        };
+        
+        function edit_docs(item, action_name) {
+            var act = self.getAction(action_name);
+            var id = item.parent().parent().parent().find('.sp-grid-rowid').attr('id_row');
+            
+            var a = act.url;
+            if (a[a.length-1] != '/') {
+                a += '/';
+            }
+            
+            a += sprintf('%s/%s', self.cls, id);
+            $(form(a, '')).appendTo('body').submit().remove();
+        };
+        
+        // new
+        $('#'+self.name + ' .new_inline').live('click', function(event) {
+            var a = sprintf('%s/', self.cls);
+            $(form(a, '')).appendTo('body').submit().remove();
+        });
+        
+        // edit
+        $('#'+self.name + ' .edit_inline').live('click', function(event) {
+            edit_docs($(this), 'edit');
+        });
+        
+        // delete
+        $('#'+self.name + ' .delete_inline').live('click', function(event) {
+            var id = $(this).parent().parent().parent().find('.sp-grid-rowid').attr('id_row');
+            var act = self.getAction('delete');
+            self.std_delete([id], act.url);
+        });
+        
+        // docs
+        $('#'+self.name + ' .docs_inline').live('click', function(event) {
+            edit_docs($(this), 'docs');
+        });
         
         // standard actions
         $('#'+self.name + ' .standard_action').live('click', function(event) {
@@ -947,7 +1031,8 @@ catch(e) {
                     '<div><div id="search_box" style="float: left;">' +
                         //'<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
                         '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
-                        '<button class="sp-button sp-search-btn" style="float: left;">{{_("Search...")}}</button></div>';                     
+                        //'<button class="sp-button sp-search-btn" style="float: left;">{{_("Search...")}}</button></div>';                     
+                        '<img class="inline_action sp-search-btn" src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
                         
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
                     g.search($('#' + g.name + ' .sp-search-txt').val());
@@ -1058,6 +1143,7 @@ catch(e) {
             this.append(g_content+'<div class="actions" style="clear: left; position: relative; min-height: 20px;"></div>'+g_table+g_pager+'</div>');
             
             g.loadActions();
+            
             $('#'+g.name + ' .sp-search-txt').val(g.q);
             g.search(g.q)
         }

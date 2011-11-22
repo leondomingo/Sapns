@@ -1,0 +1,34 @@
+{% if came_from %}
+<div><a href="{{came_from}}">{{_('return')}}</a></div>
+{% endif %}
+
+<div class="item_sb">
+    <img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home">
+    <div class="text_sb"><a href="/">Home</a></div>
+</div>
+
+{% for sc in shortcuts %}
+{% if sc.action_type %}
+{% if sc.action_type == 'list' %}
+<div class="item_sb">
+    <img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">
+    <div class="text_sb" title="{{sc.title}}">
+        <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">{{sc.title}}</a>
+    </div>
+</div>
+{% elif sc.action_type == 'process' %}
+<div class="item_sb">
+    <img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">
+    <div class="text_sb" title="{{sc.title}}">
+        <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">{{sc.title}}</a>
+    </div>
+</div>
+{% elif sc.action_type == 'object' %}
+<div class="item_sb">
+    <img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">
+    <div class="text_sb" title="{{sc.title}}"><a href="{{tg.url(sc.url)}}">{{sc.title}}</a></div>
+</div>
+{% endif %}
+{% endif %}
+
+{% endfor %}

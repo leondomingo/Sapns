@@ -11,8 +11,8 @@
     {{ util.qtip2() }}
 {% endblock %}
 
-{% block header %}
-{% endblock %}
+{#{% block header %}
+{% endblock %}#}
 
 {% block middle %}
 <div id="edit-dialog" style="display: none;"></div>
@@ -29,17 +29,10 @@
 <div class="sp-edit-panel">
     <div id="edit-header">
     
-    <div id="app_title">
-        <div style="">
-            <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
-            <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
-        </div>
-    </div>
-    
     <div id="right_desc">
     
     <!-- {# Title of the object #} -->
-    <div style="font-size: 25px; text-align: right;">{{title}}</div>
+    <div id="class_title">{{title}}</div>
 
     {%- if reference %}
     <div id="reference">[{{reference}}]</div>
@@ -87,22 +80,25 @@
         </form>
     </div>
     {% endif %}
+    </div>
     
-    <div class="sp-save-button">
-        <button id="save-button" class="sp-button">{{_('Save')}}</button>
+    <div id="edit_buttons">
+        <div style="float: left;">
+            <button id="save-button" class="sp-button">{{_('Save')}}</button>
+        </div>
+        
+        {% if came_from %}
+        <div id="edit-back" style="float: left;">
+            <button id="back-button" class="sp-button">{{_('return')}}</button>
+        </div>
+        {% endif %}
     </div>
     
     </div>
     
-    {% if came_from %}
-    <div id="edit-back">
-        <button id="back-button" class="sp-button">{{_('return')}}</button>
-    </div>
-    {% endif %}
+    {#<div style="height: 175px;">&nbsp;</div>#}
     
-    </div>
-    
-    <div style="height: 175px;">&nbsp;</div>
+    <div id="edit_fields">
     
     {%- for attr in attributes %}
     <div class="sp-edit-field" name="{{attr.name}}"
@@ -190,6 +186,7 @@
         </div>
     </div>
     {% endfor %}
+    </div>
     <div style="height: 40px;">
     </div>
 </div>
@@ -200,7 +197,4 @@
     {% include 'sapns/components/sapns.selector.min.js' %}
     {% include 'sapns/dashboard/edit/edit.min.js' %}
 </script>
-{% endblock %}
-
-{% block footer %}
 {% endblock %}
