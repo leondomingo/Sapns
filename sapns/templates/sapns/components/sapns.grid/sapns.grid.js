@@ -85,6 +85,19 @@ catch(e) {
         }
         
         set(this, 'exportable', true);
+         
+        var formats = [{
+            id: 'csv',
+            title: 'CSV',
+            url: '/dashboard/tocsv'
+        },
+        {
+            id: 'excel',
+            title: 'Excel',
+            url: '/dashboard/toxls'
+        }];
+        set(this, 'exportable_formats', formats);
+        
         
         set(this, 'with_pager', true);
         set(this, 'pag_n', 1);
@@ -455,18 +468,28 @@ catch(e) {
         
         // export
         if (self.exportable) {
-            g_actions += 
-                '<div id="grid-export_' + self.name + '" style="position: absolute; background-color: none; height: 25px; right: 0px;">' +
-                '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
-                    '<option value="">({{_("Export")}})</option>' +
-                    '<option value="csv">CSV</option>' +
-                    '<option value="excel">Excel</option>' +
-                '</select></div>';
+            
+            var formats = self.exportable_formats;
+            
+            if (typeof(self.exportable) == 'object') {
+                formats = self.exportable.formats; 
+            }
+            
+            var l = formats.length;
+            if (l > 0) {
+                var options = '';
+                for (var i=0; i<l; i++) {
+                    options += '<option value="' + formats[i].id + '">' + formats[i].title + '</option>';
+                }
+                
+                g_actions += 
+                    '<div id="grid-export_' + self.name + '" style="position: absolute; background-color: none; height: 25px; right: 0px;">' +
+                    '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
+                        '<option value="">({{_("Export")}})</option>' +
+                        options +
+                    '</select></div>';
+            }
         }
-        /*
-        else {
-            g_actions += <div id="grid-export_' + self.name + '" style="background-color: none; height: 25px; margin-left: 0px;"></div>';
-        }*/
 
         return g_actions;
     }
@@ -714,28 +737,49 @@ catch(e) {
         // export button 
         $('#grid-export_' + self.name).live('change', function() {
             var fmt = $('#grid-export_' + self.name + ' option:selected').val();
+            
             if (fmt == '') {
                 // nothing selected 
                 return;
             }
             
-            if (fmt == 'csv') {
-                var url = '/dashboard/tocsv';
-            }
-            else if (fmt == 'excel') {
-                var url = '/dashboard/toxls';
-            }
-            // TODO other formats...
+            var formats = self.exportable_formats;             
             
-            var form_html =
+            var extra_params = '';
+            if (typeof(self.exportable) == 'object') {
+                
+                formats = self.exportable.formats;
+                
+                if (self.exportable.data) {
+                    for (k in self.exportable.data) {
+                        var v = self.exportable.data[k];
+                        if (typeof(v) == 'function') {
+                            v = v();
+                        }
+                        
+                        extra_params += '<input type="hidden" name="' + k + '" value="' + v + '">';
+                    }
+                }
+            }
+            
+            var url = '';
+            for (var i=0, l=formats.length; i<l; i++) {
+                if (formats[i].id == fmt) {
+                    url = formats[i].url;
+                    break;
+                }
+            }
+            
+            var form_export =
                 '<form action="' + url + '" method="get" >' +
                     '<input type="hidden" name="cls" value="' + self.cls + '">' +
                     '<input type="hidden" name="q" value="' + self.q + '">' +
                     '<input type="hidden" name="ch_attr" value="' + self.ch_attr + '">' +
                     '<input type="hidden" name="parent_id" value="' + self.parent_id + '">' +
+                    extra_params +
                 '</form>';
-                
-            $(form_html).appendTo('body').submit().remove();
+            
+            $(form_export).appendTo('body').submit().remove();
             
             // reset the select 
             $(this).find('option:first').attr('selected', true);

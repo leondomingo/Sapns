@@ -252,12 +252,9 @@ class DashboardController(BaseController):
             import random
             random.seed()
             
-            logger.info(params)
-            
             #params['caption'] = ''
             g = self.list(**params)
             
-            logger.info(g)
             g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
             g['grid']['q'] = get_paramw(params, 'q', unicode, opcional=True)
             g['grid']['filters'] = params.get('filters')
