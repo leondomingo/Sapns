@@ -34,6 +34,9 @@ import simplejson as sj
 # controllers
 __all__ = ['DashboardController']
 
+date_fmt = config.get('formats.date', default='%m/%d/%Y')
+_strtodate = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
+
 class ECondition(Exception):
     pass
 
@@ -139,11 +142,9 @@ class DashboardController(BaseController):
                               # related classes
                               rel_classes=rel_classes))
         
-    @expose('json')
-    @require(p.not_anonymous())
-    def grid(self, cls, **params):
+    def grid_data(self, cls, **params):
         
-        #logger = logging.getLogger('DashboardController.grid')
+        #logger = logging.getLogger('DashboardController.grid_data')
 
         # picking up parameters
         q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
@@ -157,16 +158,16 @@ class DashboardController(BaseController):
         
         # filters
         filters = get_paramw(params, 'filters', sj.loads, opcional=True)
-        
-        # does this user have permission on this table?
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-        
+
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
             
         #logger.info('Parent class: %s' % cls_.name)
         #logger.info('Child class: %s' % ch_cls_.name)
+        
+        # does this user have permission on this table?
+        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+        permissions = request.identity['permissions']
              
         if not user.has_privilege(cls_.name) or \
         not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
@@ -176,9 +177,6 @@ class DashboardController(BaseController):
         # get view name
         view = user.get_view_name(ch_cls_.name)
             
-        date_fmt = config.get('formats.date', default='%m/%d/%Y')
-        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
-        
         #logger.info('search...%s / q=%s' % (view, q))
         
         # collection
@@ -187,15 +185,21 @@ class DashboardController(BaseController):
             col = (cls, ch_attr, parent_id,)
 
         # get dataset
-        _search = Search(dbs, view, strtodatef=strtodate_)
+        _search = Search(dbs, view, strtodatef=_strtodate)
         _search.apply_qry(q.encode('utf-8'))
         _search.apply_filters(filters)
         
-        ds = _search(rp=rp, offset=pos, collection=col)
+        return _search(rp=rp, offset=pos, collection=col)
+    
+    @expose('json')
+    @require(p.not_anonymous())
+    def grid(self, cls, **params):
         
-#        ds = search(dbs, view, q=q.encode('utf-8'), rp=rp, offset=pos, 
-#                    strtodatef=strtodate_, collection=col, filters=filters)
-                 
+        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
+        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
+        
+        ds = self.grid_data(cls, **params)        
+        
         # Reading global settings
         ds.date_fmt = date_fmt
         ds.time_fmt = config.get('formats.time', default='%H:%M')
@@ -248,12 +252,9 @@ class DashboardController(BaseController):
             import random
             random.seed()
             
-            logger.info(params)
-            
             #params['caption'] = ''
             g = self.list(**params)
             
-            logger.info(g)
             g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
             g['grid']['q'] = get_paramw(params, 'q', unicode, opcional=True)
             g['grid']['filters'] = params.get('filters')
@@ -264,69 +265,13 @@ class DashboardController(BaseController):
             logger.error(e)
             raise
     
-    def export(self, cls, **kw):
-        """
-        IN
-          cls          <unicode>
-          kw
-            q          <unicode>
-            ch_attr    <unicode>
-            parent_id  <int>
-        """
-        
-        # parameters
-        # q
-        q = kw.get('q', '')
-        
-        cls_ = SapnsClass.by_name(cls)
-        
-        # user/permissions
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-        
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
-            return dict(status=False, 
-                        message=_('Sorry, you do not have privilege on this class'))
-        
-        # collections
-        ch_attr = kw.get('ch_attr')
-        parent_id = kw.get('parent_id')
-        
-        # collection
-        col = None
-        if ch_attr and parent_id:
-            col = (cls, ch_attr, parent_id,)
-            
-        view = user.get_view_name(cls)
-        
-        date_fmt = config.get('formats.date', default='%m/%d/%Y')
-        
-        strtodate_ = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
-        
-        # get dataset
-        s = Search(dbs, view, strtodatef=strtodate_)
-        s.apply_qry(q.encode('utf-8'))
-        ds = s(rp=0, collection=col)
-        
-        return ds 
-    
     @expose(content_type='text/csv')
     @require(p.not_anonymous())
     def tocsv(self, cls, **kw):
         
-        cls_ = SapnsClass.by_name(cls)
-        
-        # user/permissions
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-        
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
-            return dict(status=False, 
-                        message=_('Sorry, you do not have privilege on this class'))
-        
-        ds = self.export(cls, **kw)
+        # all records
+        kw['rp'] = 0
+        ds = self.grid_data(cls, **kw)
         
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.csv' % cls.encode('utf-8')))
@@ -337,18 +282,9 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def toxls(self, cls, **kw):
         
-        cls_ = SapnsClass.by_name(cls)
-        
-        # user
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-        
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
-            return dict(status=False, 
-                        message=_('Sorry, you do not have privilege on this class'))
-        
-        ds = self.export(cls, **kw)
+        # all records
+        kw['rp'] = 0
+        ds = self.grid_data(cls, **kw)
 
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.xls' % cls.encode('utf-8')))
