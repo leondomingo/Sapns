@@ -23,7 +23,8 @@
     <div class="subactions">
     <ul>
     {% for subaction in sc.actions %}
-    <li><a class="subaction" href="{{subaction.url}}">{{subaction.title}}</a></li>
+    <li><a class="subaction" href="{{subaction.url}}"
+        {% if subaction.desc %}title="{{subaction.desc}}"{% endif %}>{{subaction.title}}</a></li>
     {% endfor %}
     </ul>
     </div>

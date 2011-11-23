@@ -484,7 +484,8 @@ try {
                         ' require_id="' + req_id + '" >' + act.title + '</button></div>';
 
                     if (act.type === 'new') {
-                        var new_btn = '<img class="inline_action new_inline" src="{{tg.url("/images/sapns/icons/new.png")}}">';
+                        var new_btn = '<img class="inline_action new_inline" ' 
+                            + 'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
                         $('#search_box').append(new_btn);
                     } 
                     else if (self.actions_inline && (act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
@@ -1027,7 +1028,8 @@ try {
                         // '<button class="sp-button sp-search-btn"
                         // style="float:
                         // left;">{{_("Search...")}}</button></div>';
-                        '<img class="inline_action sp-search-btn" src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
+                        '<img class="inline_action sp-search-btn" '
+                            + 'src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
 
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
                     g.search($('#' + g.name + ' .sp-search-txt').val());

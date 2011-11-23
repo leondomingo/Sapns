@@ -246,6 +246,7 @@ class SapnsUser(User):
                             
                             actions.append(dict(title=cls_action.display_name,
                                                 url=cls_action.url,
+                                                desc=cls_action.description,
                                                 ))
                                 
                 shortcuts.append(dict(url=url, 
