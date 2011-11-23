@@ -679,7 +679,16 @@ try {
                     a += '/';
                 }
                 
-                a += sprintf('%s/%s', self.cls, id);
+                if (act.type == 'process') {
+                    a += id;
+                }
+                else if (act.type == 'new') {
+                    a += sprintf('%s/', self.cls);
+                }
+                else {
+                    a += sprintf('%s/%s', self.cls, id);
+                }
+                console.log(form(a, ''))
                 $(form(a, '')).appendTo('body').submit().remove();
             }
             else {
@@ -689,8 +698,7 @@ try {
 
         // new
         $('#' + self.name + ' .new_inline').live('click', function(event) {
-            var a = sprintf('%s/', self.cls);
-            $(form(a, '')).appendTo('body').submit().remove();
+            run_action($(this), 'new');
         });
 
         // edit
@@ -1133,7 +1141,6 @@ try {
             }
 
             this.append(g_content
-                    //+ '<div class="actions" style="clear: left; position: relative; min-height: 20px;"></div>'
                     + g_table + g_pager + '</div>');
 
             g.loadActions();
