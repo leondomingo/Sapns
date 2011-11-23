@@ -13,7 +13,8 @@ from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, \
     DefaultClause
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import relation
-from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
+from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func,\
+    not_
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
     DateTime, BigInteger
 from tg import config
@@ -229,12 +230,23 @@ class SapnsUser(User):
                 url = ''
                 type_ = ''
                 class_ = ''
+                actions = []
                 if ac:
                     url = ac.url
                     type_ = ac.type
                     
                     if cl:
-                        class_ = cl.name 
+                        class_ = cl.name
+                        
+                        for cls_action in dbs.query(SapnsPermission).\
+                                filter(and_(SapnsPermission.class_id == cl.class_id,
+                                            not_(SapnsPermission.requires_id),
+                                            SapnsPermission.type == SapnsPermission.TYPE_PROCESS
+                                            )):
+                            
+                            actions.append(dict(title=cls_action.display_name,
+                                                url=cls_action.url,
+                                                ))
                                 
                 shortcuts.append(dict(url=url, 
                                       order=sc.order,
@@ -242,7 +254,9 @@ class SapnsUser(User):
                                       action_type=type_,
                                       cls=class_,
                                       parent=sc.parent_id, 
-                                      id=sc.shortcut_id))
+                                      id=sc.shortcut_id,
+                                      actions=actions))
+                
             
             return shortcuts
 

@@ -14,7 +14,20 @@
     <img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">
     <div class="text_sb" title="{{sc.title}}">
         <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">{{sc.title}}</a>
+        {#{% if sc.actions %}
+        <div style="float: right;">+</div>
+        {% endif %}#}
     </div>
+    
+    {% if sc.actions %}
+    <div class="subactions">
+    <ul>
+    {% for subaction in sc.actions %}
+    <li><a class="subaction" href="{{subaction.url}}">{{subaction.title}}</a></li>
+    {% endfor %}
+    </ul>
+    </div>
+    {% endif %}
 </div>
 {% elif sc.action_type == 'process' %}
 <div class="item_sb">

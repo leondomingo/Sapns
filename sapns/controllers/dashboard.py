@@ -60,7 +60,7 @@ class DashboardController(BaseController):
         
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=None)
-        
+
         return dict(shortcuts=shortcuts, came_from=came_from)    
 
     @expose('sapns/dashboard/index.html')

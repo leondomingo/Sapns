@@ -20,7 +20,7 @@
         $(document).ready(function() {
             
             $('#g').sapnsGrid({
-                cls: 'grupos',
+                cls: 'alumnos',
                 //caption: 'Grid test', 
                 caption: function() {
                     return 'Grid test (func)';
@@ -29,6 +29,7 @@
                 rp: 10,
                 //height: 700,
                 //with_search: false,
+                actions_inline: true,
                 search_params_: {
                     data: {
                         filters: JSON.stringify([['id', 7183]])
@@ -54,22 +55,23 @@
                        {title: 'CUATRO'}
                        ],
                 actions_: {},
-                actions: [{title: 'act1', url: '/act1', type: 'process'},
+                actions__: [{title: 'act1', url: '/act1', type: 'process', require_id: true},
                           {title: 'act2', url: '/act2', type: 'process'},
                           {title: 'act3', url: '/act3', type: 'process'}
                           ],
-                actions__: function() {
+                actions: function() {
                     //console.log(this.cls);
                     return [{title: 'New', url: '/act1', type: 'new', required_id: false},
                             {title: 'Edit', url: '/act2', type: 'edit'},
                             {title: 'Delete', url: '/act3', type: 'delete'},
-                            {title: 'act4_f',
+                            {title: 'ACT4_F',
                              type: {
                                  id:'act4_f', 
                                  f: function(id) {
-                                     alert('act4_f: hooola! ' + id);
+                                     alert('act4_f: id=' + id);
                                  }
-                             }
+                             },
+                             require_id: true
                             },
                             {title: 'act5_f',
                              type: {
