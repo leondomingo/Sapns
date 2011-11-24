@@ -1093,7 +1093,7 @@ class SapnsClass(DeclarativeBase):
                         # related class
                         rc = dbs.query(SapnsClass).get(attr.related_class_id)
                         
-                        if not user.has_privilege(rc.name) and \
+                        if not user.has_privilege(rc.name) or \
                         not user.has_permission(u'%s#%s' % (rc.name, SapnsPermission.TYPE_LIST)):
                             class_attr_priv[attr.attribute_id].access = SapnsAttrPrivilege.ACCESS_READONLY
                 
