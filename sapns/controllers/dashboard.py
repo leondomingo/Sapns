@@ -553,7 +553,6 @@ class DashboardController(BaseController):
                          params=dict(message=_('This class does not exist'),
                                      came_from=came_from)))
             
-        date_fmt = config.get('formats.date', default='%m/%d/%Y')
         datetime_fmt = config.get('formats.datetime', default='%Y/%m/%d %H:%M:%S')
         
         default_values_ro = {}

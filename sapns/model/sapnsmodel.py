@@ -1038,9 +1038,10 @@ class SapnsClass(DeclarativeBase):
     # get attributes
     def get_attributes(self, id_user):
         
-        logger = logging.getLogger('get_attributes')
+        #logger = logging.getLogger('SapnsClass.get_attributes')
 
         def _get_attributes():
+            
             _cmp = SapnsAttrPrivilege.cmp_access
             
             class_attr_priv = {}
@@ -1048,6 +1049,7 @@ class SapnsClass(DeclarativeBase):
             last_attr = None
             
             # role based
+            # attr privileges
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
                     join((SapnsRole,
                           SapnsRole.group_id == SapnsAttrPrivilege.role_id)).\
@@ -1074,28 +1076,27 @@ class SapnsClass(DeclarativeBase):
                 else:
                     class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access, pos=i)
 
-#            # user based
-#            for attr_priv in dbs.query(SapnsAttrPrivilege).\
-#                    join((SapnsAttribute,
-#                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
-#                               SapnsAttribute.class_id == self.class_id,
-#                               SapnsAttrPrivilege.user_id == id_user
-#                               ))):
-#                
-#                if class_attr_priv.has_key(attr_priv.attribute_id):
-#                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
-#                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-#    
-#                else:
-#                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-    
+            user = dbs.query(SapnsUser).get(id_user)
+
+            # class attributes (insertion order, field_regex, ...)
             class_attributes = []
             for attr in dbs.query(SapnsAttribute).\
                     filter(SapnsAttribute.class_id == self.class_id).\
                     order_by(SapnsAttribute.insertion_order):
-                
+
+                # what about the privileges on the related class?
                 if class_attr_priv.has_key(attr.attribute_id): 
-                # and class_attr_priv[attr.attribute_id].access != SapnsAttrPrivilege.ACCESS_DENIED:
+                
+                    if attr.related_class_id and \
+                    class_attr_priv[attr.attribute_id].access == SapnsAttrPrivilege.ACCESS_READWRITE:
+                    
+                        # related class
+                        rc = dbs.query(SapnsClass).get(attr.related_class_id)
+                        
+                        if not user.has_privilege(rc.name) and \
+                        not user.has_permission(u'%s#%s' % (rc.name, SapnsPermission.TYPE_LIST)):
+                            class_attr_priv[attr.attribute_id].access = SapnsAttrPrivilege.ACCESS_READONLY
+                
                     class_attributes.append(
                         Dict(id=attr.attribute_id,
                              name=attr.name,
@@ -1106,9 +1107,10 @@ class SapnsClass(DeclarativeBase):
                              field_regex=attr.field_regex,
                             ))
             
+            # merge list of attributes and privileges on those attributes in one list
             return zip(class_attributes, sorted(class_attr_priv.values(), 
                                                 cmp=lambda x, y: cmp(x.pos, y.pos)))
-        
+            
         _cache = cache.get_cache(SapnsClass.CACHE_ID_ATTR)
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
                                 createfunc=_get_attributes, expiretime=3600)
@@ -1196,7 +1198,7 @@ class SapnsPrivilege(DeclarativeBase):
     @staticmethod
     def has_privilege(id_user, cls):
         
-        logger = logging.getLogger('SapnsPrivilege.has_privilege')
+        #logger = logging.getLogger('SapnsPrivilege.has_privilege')
 
         if isinstance(cls, (str, unicode)):
             id_class = SapnsClass.by_name(cls).class_id
@@ -1206,23 +1208,21 @@ class SapnsPrivilege(DeclarativeBase):
         
         def _has_privilege():
             
-            logger.info('> class=%s' % cls)
+            #logger.info('> class=%s' % cls)
             
-            # user
-            priv = SapnsPrivilege.get_privilege(id_class, id_user=id_user)
-            
-            if not priv:
-                # role
-                priv = dbs.query(SapnsPrivilege).\
-                    join((SapnsRole,
-                          SapnsRole.group_id == SapnsPrivilege.role_id)).\
-                    join((SapnsUserRole,
-                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
-                               SapnsUserRole.user_id == id_user))).\
-                    filter(SapnsPrivilege.class_id == id_class).\
-                    first()
-                    
-            return priv.granted
+            # role based
+            priv = dbs.query(SapnsPrivilege).\
+                join((SapnsRole,
+                      SapnsRole.group_id == SapnsPrivilege.role_id)).\
+                join((SapnsUserRole,
+                      and_(SapnsUserRole.role_id == SapnsRole.group_id,
+                           SapnsUserRole.user_id == id_user))).\
+                filter(and_(SapnsPrivilege.class_id == id_class,
+                            SapnsPrivilege.granted,
+                            )).\
+                first()
+               
+            return priv != None
         
         _cache = cache.get_cache(SapnsPrivilege.CACHE_ID)
         return _cache.get_value(key='%d_%d' % (id_user, id_class),
@@ -1313,9 +1313,9 @@ class SapnsAttrPrivilege(DeclarativeBase):
     
     access = Column(Unicode(15)) # denied, read-only, read/write
     
-    ACCESS_DENIED = 'denied'
-    ACCESS_READONLY = 'read-only'
-    ACCESS_READWRITE = 'read/write'
+    ACCESS_DENIED = u'denied'
+    ACCESS_READONLY = u'read-only'
+    ACCESS_READWRITE = u'read/write'
     
     CACHE_ID = 'attrpriv_get_access'
     
