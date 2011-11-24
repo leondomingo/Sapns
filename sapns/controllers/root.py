@@ -60,8 +60,11 @@ class RootController(BaseController):
         
     @expose('sapns/message.html')
     @require(predicates.not_anonymous())
-    def message(self, message='Error!', came_from='/'):
-        return dict(message=message, came_from=url(came_from))
+    def message(self, message='Error!', came_from='/', **kw):
+        return dict(message=message, came_from=url(came_from),
+                    no_header=kw.get('no_header', False),
+                    no_footer=kw.get('no_footer', False),
+                    )
 
     @expose('sapns/environ.html')
     @require(predicates.has_permission('manage'))
