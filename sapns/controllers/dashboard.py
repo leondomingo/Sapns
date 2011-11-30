@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Dashboard Controller"""
 
-from neptuno.postgres.search import Search 
+from neptuno.postgres.search import Search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 from pylons.i18n import ugettext as _
 from repoze.what import predicates as p
@@ -26,6 +26,7 @@ from sqlalchemy.schema import MetaData
 from tg import response, expose, require, url, request, redirect, config
 from tg.i18n import set_lang, get_lang
 import cStringIO
+import datetime as dt
 import logging
 import re
 import sapns.config.app_cfg as app_cfg
@@ -36,6 +37,8 @@ __all__ = ['DashboardController']
 
 date_fmt = config.get('formats.date', default='%m/%d/%Y')
 _strtodate = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
+
+datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
 
 class ECondition(Exception):
     pass
@@ -356,6 +359,35 @@ class DashboardController(BaseController):
             READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
                                SapnsAttrPrivilege.ACCESS_DENIED]
             
+            def _strtodatetime(s, fmt):
+                
+                # build regex
+                regex = r'^\s*%s\s*$' % (fmt.replace('%d', r'(?P<day>([0-2]?[1-9]|3[0-1]))').\
+                                         replace('%m', r'(?P<month>(0?[1-9]|1[0-2]))').\
+                                         replace('%Y', r'(?P<year>\d{4})').\
+                                         replace('%H', r'(?P<hour>([0-1]?[0-9]|2[0-3]))').\
+                                         replace('%M', r'(?P<minute>[0-5][0-9])').\
+                                         replace('%S', r'(?P<second>[0-5][0-9])').\
+                                         replace(' ', r'\s'))
+                
+                m1 = re.search(regex, s)
+                if m1:
+                    try:
+                        day = int(m1.groupdict().get('day') or 1)
+                        month = int(m1.groupdict().get('month') or 1)
+                        year = int(m1.groupdict().get('year') or 1900)
+                        hour = int(m1.groupdict().get('hour') or 0)
+                        min_ = int(m1.groupdict().get('minute') or 0)
+                        sec = int(m1.groupdict().get('second') or 0)
+                        
+                        return dt.datetime(year, month, day, hour, min_, sec)
+                    
+                    except Exception, e:
+                        logger.error(e)
+                        raise
+                else:
+                    raise Exception('Invalid type')
+            
             for field_name, field_value in params.iteritems():
                 m_field = re.search(r'^fld_(.+)', field_name)
                 if m_field:
@@ -409,11 +441,12 @@ class DashboardController(BaseController):
                             else:
                                 field_value = strtotime(field_value)
                                 
+                        # datetime
                         elif attr.type == SapnsAttribute.TYPE_DATETIME:
                             if field_value == '':
                                 field_value = None
                             else:
-                                field_value = strtotime(field_value)
+                                field_value = _strtodatetime(field_value, datetime_fmt)
                         
                         # string types        
                         else:
@@ -553,8 +586,6 @@ class DashboardController(BaseController):
                          params=dict(message=_('This class does not exist'),
                                      came_from=came_from)))
             
-        datetime_fmt = config.get('formats.datetime', default='%Y/%m/%d %H:%M:%S')
-        
         default_values_ro = {}
         default_values = {}
         for field_name, value in params.iteritems():
@@ -613,6 +644,10 @@ class DashboardController(BaseController):
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
                         value = datetostr(row[attr.name], fmt=date_fmt)
+                        
+                    # datetime
+                    elif attr.type == SapnsAttribute.TYPE_DATETIME:
+                        value = row[attr.name].strftime(datetime_fmt) if row[attr.name] else ''
                     
                     # rest of types
                     else:
