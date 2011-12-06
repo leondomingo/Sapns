@@ -163,11 +163,11 @@ try {
         }
 
         var cols = self.cols;
-        if (typeof (cols) == 'function') {
+        if (typeof(cols) == 'function') {
             cols = cols();
         }
 
-        for ( var i = 0, l = cols.length; i < l; i++) {
+        for (var i=0, l=cols.length; i < l; i++) {
             var col = cols[i];
             var wd = col.width;
             if (!wd) {
@@ -178,7 +178,7 @@ try {
                 continue;
             }
 
-            g_table += '<td class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</td>';
+            g_table += sprintf('<td class="sp-col-title" style="width: %(wd)dpx;">%(title)s</td>', {wd: wd, title:col.title});
         }
 
         g_table += '</tr>';
@@ -187,7 +187,7 @@ try {
         if (typeof (data) == 'function') {
             data = data();
         }
-
+        
         var ld = data.length;
         if (ld > 0) {
             for(var i=0; i < ld; i++) {
@@ -200,9 +200,12 @@ try {
                     '</td>';
 
                 if (self.actions_inline) {
+                    
+                    var actions_wd = 'width: 100px;';
+                    
                     var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
-                    g_table += '<td style="font-size: 10px; width: 35px;">' + 
-                        '<div style="width: 100px;">' + 
+                    var _actions = '<td style="font-size: 10px;">' + 
+                        '<div style="%(actions_wd)s">' +
                         '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' + 
                             'src="{{tg.url("/images/sapns/icons/edit.png")}}">' + 
                         '<img class="inline_action delete_inline" title="{{_("Delete")}}" ' + 
@@ -217,10 +220,10 @@ try {
                             var act = self.actions[a];
                             if ((act.type === 'process' || typeof (act.type) == 'object') && act.require_id) {
                                 if (typeof(act.type) == 'object') {
-                                    nonstd += '<option value="' + act.type.id + '">' + act.title + '</option>';
+                                    nonstd += sprintf('<option value="%(id)s">%(title)s</option>', {id: act.type.id, title: act.title});
                                 } 
                                 else {
-                                    nonstd += '<option value="' + act.name + '">' + act.title + '</option>';
+                                    nonstd += sprintf('<option value="%(name)s">%(title)s</option>', {name: act.name, title: act.title});
                                 }
                             }
                         }
@@ -230,13 +233,12 @@ try {
                         nonstd = '<select class="nonstd_actions"><option value=""></option>' 
                             + nonstd 
                             + '</select>';
-                        
-                        g_table += nonstd;
                     }
                     else {
-                        g_table += '<div class="nonstd_actions" style="background-color: red;">X</div>';
+                        actions_wd = 'width: 75px;';
                     }
                     
+                    g_table += sprintf(_actions, {actions_wd: actions_wd}) + nonstd;
                     g_table += '</div></td>';
                 }
 
@@ -263,10 +265,10 @@ try {
 
                     var width = '';
                     if (wd > 0) {
-                        width = ' width: ' + wd + 'px;';
+                        width = sprintf(' width: %(wd)d px;', {wd: wd});
                     }
                     
-                    g_table += '<td><div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
+                    g_table += sprintf('<td><div class="sp-grid-cell" style="text-align: %(al)s; %(wd)s"', {al: al, wd: width});
 
                     if (cell) {
                         g_table += 'title="' + cell + '"';
@@ -284,10 +286,10 @@ try {
             if (self.actions_inline) {
                 n = 3;
             }
-            g_table += '<tr class="sp-grid-row" style="width: 100%;">' + 
+            
+            g_table += '<tr class="sp-grid-row" style="width: 100%; height: ' + (self.height-50) + 'px;">' + 
                 '<td class="sp-grid-cell sp-grid-noresults"' + 
-                ' colspan="' + (cols.length + n) + 
-                '">{{_("No results")}}</td>' + '</tr>';
+                ' colspan="' + (cols.length + n) + '">{{_("No results")}}</td></tr>';
         }
 
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
@@ -315,111 +317,110 @@ try {
         self.q = q;
 
         var loading = '<div style="padding: 10px; font-size: 15px; ' + 
-            'font-weight: bold; color: gray;">{{_("Loading")}}...</div>';
+            sprintf('font-weight: bold; color: gray; height: %(hg)dpx;">{{_("Loading")}}...</div>', {hg: self.height-50});
         
         $('#' + self.name).find('.sp-grid-parent').html(loading);
 
-        var ajx = $.extend(true,
-                {
-                    url: "{{tg.url('/dashboard/grid/')}}",
-                    data: {
-                        cls: self.cls,
-                        q: self.q,
-                        rp: self.rp,
-                        pag_n: self.pag_n,
-                        ch_attr: self.ch_attr,
-                        parent_id: self.parent_id
-                    },
-                    success: function(response) {
-                        if (response.status) {
-                            
-                            // this page
-                            if (response.this_page) {
-                                self.this_page = response.this_page;
-                            }
-                            
-                            // total_count
-                            if (response.total_count) {
-                                self.total_count = response.total_count;
-                            }
-                            
-                            
-                            // total_pag
-                            if (response.total_pag) {
-                                self.total_pag = response.total_pag;
-                            }
-                            
-                            // cols
-                            if (response.cols) {
-                                self.cols = response.cols;
-                            }
-                            
-                            // actions
-                            if (response.actions) {
-                                self.actions = response.actions;
-                            }
-                            
-                            // update pager
-                            var pos = (self.pag_n - 1) * self.rp * 1;
-                            
-                            var params = {
-                                    curr_page: self.pag_n * 1,
-                                    total_page: self.total_pag * 1,
-                                    pos0: pos + 1,
-                                    pos1: pos + self.this_page
-                            };
-                            
-                            var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
-                            
-                            $('#' + self.name + ' .first-page').attr('title', "{{_('page 1')}}");
-                            
-                            // page-back
-                            if (params.curr_page > 1) {
-                                var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page - 1});
-                                $('#' + self.name + ' .page-back').attr('title', prev_page).attr('disabled', false);
-                            } 
-                            else {
-                                $('#' + self.name + ' .page-back').attr('disabled', true);
-                            }
-                            
-                            // page-forth
-                            if (params.curr_page < params.total_page) {
-                                var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page + 1});
-                                $('#' + self.name + ' .page-forth').attr('title', next_page).attr('disabled', false);
-                            } 
-                            else {
-                                $('#' + self.name + ' .page-forth').attr('disabled', true);
-                            }
-                            
-                            
-                            // last-page
-                            var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
-                            
-                            $('#' + self.name + ' .last-page').attr('title', last_page);
-                            
-                            $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
-                            $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
-
-                            try {
-                                $('.sp-grid-cell').qtip({
-                                    content: {
-                                        text: true
-                                    },
-                                    position: {
-                                        my: "left top",
-                                        at: "bottom center"
-                                    },
-                                    style: "ui-tooltip-dark ui-tooltip-rounded"
-                                });
-                            } catch (e) {
-                                // console.log(e);
-                                // qtip2 is not loaded
-                            }
-                            
-                            self.data = response.data;
-                            self.loadData();
-                        }
+        var ajx = $.extend(true, {
+            url: "{{tg.url('/dashboard/grid/')}}",
+            data: {
+                cls: self.cls,
+                q: self.q,
+                rp: self.rp,
+                pag_n: self.pag_n,
+                ch_attr: self.ch_attr,
+                parent_id: self.parent_id
+            },
+            success: function(response) {
+                if (response.status) {
+                    
+                    // this page
+                    if (response.this_page) {
+                        self.this_page = response.this_page;
                     }
+                            
+                    // total_count
+                    if (response.total_count) {
+                        self.total_count = response.total_count;
+                    }
+                    
+                    
+                    // total_pag
+                    if (response.total_pag) {
+                        self.total_pag = response.total_pag;
+                    }
+                    
+                    // cols
+                    if (response.cols) {
+                        self.cols = response.cols;
+                    }
+                    
+                    // actions
+                    if (response.actions) {
+                        self.actions = response.actions;
+                    }
+                    
+                    // update pager
+                    var pos = (self.pag_n - 1) * self.rp * 1;
+                            
+                    var params = {
+                            curr_page: self.pag_n * 1,
+                            total_page: self.total_pag * 1,
+                            pos0: pos + 1,
+                            pos1: pos + self.this_page
+                    };
+                            
+                    var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
+                    
+                    $('#' + self.name + ' .first-page').attr('title', "{{_('page 1')}}");
+                    
+                    // page-back
+                    if (params.curr_page > 1) {
+                        var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page - 1});
+                        $('#' + self.name + ' .page-back').attr('title', prev_page).attr('disabled', false);
+                    } 
+                    else {
+                        $('#' + self.name + ' .page-back').attr('disabled', true);
+                    }
+                    
+                    // page-forth
+                    if (params.curr_page < params.total_page) {
+                        var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page + 1});
+                        $('#' + self.name + ' .page-forth').attr('title', next_page).attr('disabled', false);
+                    } 
+                    else {
+                        $('#' + self.name + ' .page-forth').attr('disabled', true);
+                    }
+                    
+                    
+                    // last-page
+                    var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
+                            
+                    $('#' + self.name + ' .last-page').attr('title', last_page);
+                    
+                    $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
+                    $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
+
+                    try {
+                        $('.sp-grid-cell').qtip({
+                            content: {
+                                text: true
+                            },
+                            position: {
+                                my: "left top",
+                                at: "bottom center"
+                            },
+                            style: "ui-tooltip-dark ui-tooltip-rounded"
+                        });
+                    } catch (e) {
+                        // console.log(e);
+                        // qtip2 is not loaded
+                    }
+                    
+                    self.data = response.data;
+                    self.loadData();
+                } // if
+            } // sucess 
         }, self.search_params);
 
         var curr_ajx_data = JSON.stringify(ajx.data);
@@ -463,10 +464,9 @@ try {
         var g_actions = '';
 
         if (actions.length > 0) {
-            // g_actions += '<div
-            // class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+
             g_actions = '';
-            for ( var i = 0, l = actions.length; i < l; i++) {
+            for (var i=0, l=actions.length; i < l; i++) {
 
                 var act = actions[i];
 
@@ -490,17 +490,8 @@ try {
                     } 
                     else if (self.actions_inline && (act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
                         continue;
-                    } else {
-                        // g_actions += a;
-                    }
+                    } 
                 } 
-                else {
-                    /*
-                     * g_actions += '<div style="float: left;">' + '<button
-                     * id="' + act.type.id + '" class="sp-button sp-grid-action" ' + '
-                     * require_id="' + req_id + '" >' + act.title + '</button>' + '</div>';
-                     */
-                }
             }
         }
 
@@ -563,45 +554,41 @@ try {
 
                 $.ajax(ajx);
             } else {
-                $('#' + self.name + ' .actions').html(
-                        self._loadActions(self.actions));
-
-                if (self.actions.length == 0 && !self.exportable) {
-                    $('#' + self.name + ' .actions').css('min-height', '0px');
-                }
-
-                // assign functions to actions
-                for ( var i = 0, l = self.actions.length; i < l; i++) {
-
-                    var act = self.actions[i];
-
-                    if (typeof (act.type) == 'object') {
-                        $('#' + act.type.id).data('_func', act.type.f);
-
-                        $('#' + act.type.id).live('click', function() {
-                            if ($(this).attr('require_id') == 'true') {
-                                var selected_ids = self.getSelectedIds();
-                                if (selected_ids.length > 0) {
-                                    $(this).data('_func')(
-                                            selected_ids[0],
-                                            selected_ids);
-                                } 
-                                else {
-                                    self.warningSelectedId();
-                                }
-                            } else {
-                                var selected_ids = self.getSelectedIds();
-                                
-                                if (selected_ids.length > 0) {
-                                    $(this).data('_func')(selected_ids[0], selected_ids);
-                                } 
-                                else {
-                                    $(this).data('_func')();
-                                }
-                            }
-                        });
+                $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                
+                // actions
+                for (var a=0, la=self.actions.length; a<la; a++) {
+                    var act = self.actions[a];
+                    if (typeof(act.type) == 'object' && !act.require_id) {
+                        $('#'+self.name + ' .actions').show();
+                        $('#'+self.name + ' .actions').append(
+                                sprintf('<button id="%(id)s" class="below_actions" style="font-size: 11px; min-width: 80px;">%(title)s</button>',
+                                        {id: act.type.id, title: act.title}));
                     }
                 }
+                
+                $('.below_actions').live('click', function() {
+                    var act = self.getAction($(this).attr('id'));
+                    
+                    if (act.require_id) {
+                        var selected_ids = self.getSelectedIds();
+                        if (selected_ids.length > 0) {
+                            act.type.f(selected_ids[0], selected_ids);
+                        } 
+                        else {
+                            self.warningSelectedId();
+                        }
+                    } else {
+                        var selected_ids = self.getSelectedIds();
+                        
+                        if (selected_ids.length > 0) {
+                            act.type.f(selected_ids[0], selected_ids);
+                        } 
+                        else {
+                            act.type.f();
+                        }
+                    }
+                });
             }
         }
 
@@ -609,8 +596,7 @@ try {
         $('#' + self.name + ' .sp-grid-cell').live('click', function(event) {
             // console.log('click');
             if ($(this).attr('clickable') == 'true') {
-                var row_id = $(this).parent().parent().find(
-                        '.sp-grid-rowid');
+                var row_id = $(this).parent().parent().find('.sp-grid-rowid');
                 $('#' + self.name + ' .sp-grid-rowid').each(function() {
                     if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
                         $(this).attr('checked', false);
@@ -670,7 +656,7 @@ try {
             return f;
         }
 
-        function run_action(item, action_name) {
+        function run_action(item, action_name, ctrl) {
             var act = self.getAction(action_name);
             var id = item.parent().parent().parent().find('.sp-grid-rowid').attr('id_row');
             
@@ -678,6 +664,12 @@ try {
                 var a = act.url;
                 if (a[a.length - 1] != '/') {
                     a += '/';
+                }
+                
+                var target = '';
+                console.log(ctrl);
+                if (ctrl) {
+                    target = '_blank';
                 }
                 
                 if (act.type == 'process') {
@@ -690,7 +682,7 @@ try {
                     a += sprintf('%s/%s', self.cls, id);
                 }
                 console.log(form(a, ''))
-                $(form(a, '')).appendTo('body').submit().remove();
+                $(form(a, target)).appendTo('body').submit().remove();
             }
             else {
                 act.type.f(id);
@@ -699,23 +691,20 @@ try {
 
         // new
         $('#' + self.name + ' .new_inline').live('click', function(event) {
-            run_action($(this), 'new');
+            run_action($(this), 'new', event.ctrlKey);
         });
 
         // edit
         $('#' + self.name + ' .edit_inline').live('click', function(event) {
-            run_action($(this), 'edit');
+            run_action($(this), 'edit', event.ctrlKey);
         });
 
         // delete
-        $('#' + self.name + ' .delete_inline').live(
-                'click',
-                function(event) {
-                    var id = $(this).parent().parent().parent().find(
-                            '.sp-grid-rowid').attr('id_row');
-                    var act = self.getAction('delete');
-                    self.std_delete([ id ], act.url);
-                });
+        $('#' + self.name + ' .delete_inline').live('click', function(event) {
+            var id = $(this).parent().parent().parent().find('.sp-grid-rowid').attr('id_row');
+            var act = self.getAction('delete');
+            self.std_delete([id], act.url);
+        });
 
         // docs
         $('#' + self.name + ' .docs_inline').live('click', function(event) {
@@ -731,6 +720,7 @@ try {
         });
 
         // standard actions
+        /*
         $('#' + self.name + ' .standard_action').live('click', function(event) {
             
             // child attribute
@@ -827,6 +817,7 @@ try {
                 _func();
             }
         });
+        */
 
         // export button
         $('#grid-export_' + self.name).live('change', function() {
@@ -856,7 +847,7 @@ try {
             }
 
             var url = '';
-            for (var i = 0, l = formats.length; i < l; i++) {
+            for (var i=0, l=formats.length; i < l; i++) {
                 if (formats[i].id == fmt) {
                     url = formats[i].url;
                     break;
@@ -941,7 +932,8 @@ try {
                             if (res.status) {
                                 self.search(self.q, true);
                                 $('#grid-dialog_' + self.name).dialog('close');
-                            } else {
+                            } 
+                            else {
                                 $('#grid-dialog_' + self.name).dialog('close');
 
                                 var message = "<p style='color: gray;'>" + res.message + "</p>";
@@ -964,13 +956,12 @@ try {
                                     message += "</ul>";
                                 }
 
-                                // {# load message #}
+                                // load message
                                 $('#grid-dialog_'+ self.name).html(error_html)
                                     .find('#delete-error-message')
                                     .html(message);
 
-                                // {# show error dialog
-                                // #}
+                                // show error dialog
                                 $('#grid-dialog_'+ self.name).dialog({
                                     width: 700,
                                     height: 250,
@@ -1003,33 +994,26 @@ try {
 
     $.fn.sapnsGrid = function(arg1, arg2, arg3) {
 
-        if (typeof (arg1) == "object") {
-
+        if (typeof(arg1) == "object") {
+            
             var g = new SapnsGrid(arg1);
             this.data('sapnsGrid', g);
 
-            this.append('<div id="grid-dialog_' + g.name
-                    + '" style="display: none;"></div>');
+            this.append(sprintf('<div id="grid-dialog_%(name)s" style="display: none;"></div>', {name: g.name}));
 
             var g_content = '';
-            g_content += '<div class="sp-grid-container" id="' + g.name + 
-                '" cls="' + g.cls + '">';
+            g_content += sprintf('<div class="sp-grid-container" id="%(name)s" cls="%(cls)s">', {name: g.name, cls: g.cls});
 
             if (g.caption) {
-                g_content += '<div class="sp-grid-caption">' + g.caption + '</div>';
+                g_content += sprintf('<div class="sp-grid-caption">%(caption)s</div>', {caption: g.caption});
             }
 
             if (g.with_search) {
 
                 g_content += '<div><div id="search_box" style="float: left;">' +
-                        // '<input class="sp-search-txt" name="q" type="text"
-                        // value="' + g.q + '">' +
                         '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
-                        // '<button class="sp-button sp-search-btn"
-                        // style="float:
-                        // left;">{{_("Search...")}}</button></div>';
-                        '<img class="inline_action sp-search-btn" '
-                            + 'src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
+                        '<img class="inline_action sp-search-btn" ' + 
+                            'src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
 
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
                     g.search($('#' + g.name + ' .sp-search-txt').val());
@@ -1059,10 +1043,8 @@ try {
                 g_content += '</div>';
             }
 
-            var g_table = '<div class="sp-grid-parent" style="overflow: auto; clear: left; '
-                    + 'height: '
-                    + g.height
-                    + 'px; background-color: transparent;"></div>';
+            var g_table = sprintf('<div class="sp-grid-parent" style="overflow: auto; clear: left;' +
+                    ' height: %(hg)dpx; background-color: transparent;"></div>', {hg: g.height});
 
             // pager
             var g_pager = '';
@@ -1141,9 +1123,10 @@ try {
                     g.search(g.q);
                 });
             }
+            
+            var g_actions = '<div class="actions" style="padding: 2px; height: 25px; display: none;"></div>';
 
-            this.append(g_content
-                    + g_table + g_pager + '</div>');
+            this.append(g_content + g_table + g_actions + g_pager + '</div>');
 
             g.loadActions();
 
