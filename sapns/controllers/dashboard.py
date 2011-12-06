@@ -54,14 +54,15 @@ class DashboardController(BaseController):
     logs = LogsController()
     
     @expose('sapns/sidebar.html')
-    def sidebar(self, came_from=''):
+    def sidebar(self, **kw):
+        
         # connected user
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=None)
 
-        return dict(shortcuts=shortcuts, came_from=came_from)    
+        return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''))    
 
     @expose('sapns/dashboard/index.html')
     @require(p.not_anonymous())

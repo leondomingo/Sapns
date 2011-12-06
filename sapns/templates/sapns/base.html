@@ -39,23 +39,19 @@
     </div>
     {% endblock %}
     
-    {#<script type="text/javascript" src="{{tg.url('/js/tree.jquery.js')}}"></script>#}
     <script type="text/javascript">
-    $(function() {
-        // Load sidebar 
+        // Load sidebar (don't wait for document load) 
         $.ajax({
             url: "{{tg.url('/dashboard/sidebar/')}}",
             data: {
                 came_from: "{{came_from or ''}}",
             },
-            cache: true,
+            cache: false, // true 
             dataType: 'html',
             success: function(content) {
                 $('.sp_sidebar').html(content);
             }
         });
-    });
     </script>
-    
 </body>
 </html>
