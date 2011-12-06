@@ -631,20 +631,6 @@ clear:both;
     min-height: 600px;
 }
 
-/*
-.sp_sidebar {
-	position: absolute;
-	width: 180px;
-	height: 580px;
-	overflow: auto;
-	box-shadow: 0 0 11px #888888 inset;
-	left: 0px;
-	top: 0px;
-	padding: 10px;
-	font-size: 16px;
-}
-*/
-
 .sp_sidebar {
     position: absolute;
     width: 165px;
@@ -658,17 +644,6 @@ clear:both;
     /*background: url(http://localhost/fondo_header_atenea.jpg);*/
     border: 1px solid darkGray;
 }
-
-/*
-.sp_center {
-	position: absolute;
-	width: 1000px;
-	height: 100%;
-	left: 200px;
-	top: 0px;
-	box-shadow: 0 0 11px #888888 inset;
-}
-*/
 
 .sp_center {
     position: absolute;
