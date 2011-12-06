@@ -2,28 +2,21 @@
 """Documents controller"""
 
 # turbogears imports
-from tg import expose, config, request, require, response
-
-# third party imports
-from pylons import cache
+from neptuno.dataset import DataSet
+from neptuno.dict import Dict
+from neptuno.postgres.search import search
+from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
-from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize, predicates as p
-
-# project specific imports
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsUser , SapnsDoc, SapnsRepo,\
-    SapnsAssignedDoc, SapnsClass
-
-import os
+from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsAssignedDoc, \
+    SapnsClass
+from tg import expose, config, request, require, response
 import logging
 import mimetypes
+import os
 import simplejson as sj #@UnresolvedImport
-from neptuno.dataset import DataSet
-from neptuno.postgres.search import search
-from neptuno.dict import Dict
-from neptuno.util import get_paramw
 
 __all__ = ['DocsController']
 

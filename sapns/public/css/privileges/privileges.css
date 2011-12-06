@@ -37,21 +37,21 @@
 
 #main_pane {
     position: relative;
-    height: 541px;
+    height: 570px;
     padding: 10px;
-    /*border: 1px solid lightgray;*/
-    /*background-color: white;*/
+    /*border: 1px solid #000;*/
+    /*background-color: orange;*/
 }
 
 #classes_sidebar {
     position: absolute;
     left: 0px;
     top: 0px;
-    height: 539px;
+    height: 565px;
     width: 315px;
-    /*border: 1px solid lightgray;*/
     padding: 10px;
     font-size: 14px;
+    /*border: 1px solid lightgray;*/
     /*font-family: Arial;*/
     /*background-color: lightgray;*/
 }
@@ -66,7 +66,7 @@
 
 #classes_list {
 	overflow: auto;
-	height: 520px;
+	height: 541px;
 }
 
 .class_row {
@@ -155,7 +155,7 @@
 }
 
 .attr_name {
-    width: 492px;
+    width: 488px;
     float: left;
 }
 
@@ -167,7 +167,7 @@
 
 #actions_pane {
     position: relative;
-    height: 210px;
+    height: 236px;
     overflow: auto;
     background-color: blue;
 }
@@ -181,7 +181,7 @@
 
 #actions_list {
     overflow: auto;
-    height: 180px;
+    height: 206px;
     padding-left: 10px;
     background-color: lightgray;
 }

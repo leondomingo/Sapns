@@ -1,7 +1,5 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
-{#{% import 'sapns/docs/list.html' as doc %}#}
-{% import 'sapns/dashboard/grid.html' as grid_html %}
 
 {% block head %}
     {{ super() }}
@@ -117,9 +115,8 @@
     <script type="text/javascript">
         {% include 'sapns/components/sapns.selector.min.js' %}
         {% include 'sapns/components/sapns.uploader.min.js' %}
-        {#{% include 'sapns/components/sapns.grid/sapns.grid.js' %}#}
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
-        $(document).ready(function() {
+        $(function() {
             
             // the object assigned to these documents 
             var obj = {
@@ -407,47 +404,54 @@
                 cls: "{{grid.cls}}",
                 caption: "{{grid.caption}}",
                 exportable: false,
+                height: 470,
+                actions_inline: true,
                 search_params: {
                     url: "{{tg.url('/dashboard/docs/search/')}}",
-                    data: { 
+                    data: {
                         cls: "{{grid.cls}}", 
                         id: "{{grid.id_object}}"*1 
                     }
                 },
-                actions: [
-                    {title: "{{_('Add')}}",
-                     type: {
-                        id: "add", 
+                actions: [{
+                    title: "{{_('Add')}}",
+                    type: {
+                        id: "add",
                         f: function() { edit_doc(); }
-                     },
-                     require_id: false
                     },
-                    {title: "{{_('Edit')}}",
-                     type: {
-                          id: "edit",
-                          f: edit_doc
-                     }
+                    require_id: false
+                    
+                },
+                {
+                    title: "{{_('Edit')}}",
+                    type: {
+                        id: "edit",
+                        f: edit_doc
                     },
-                    {title: "{{_('Download')}}",
-                     type: {
-                         id: "download",
-                         f: function(id_doc) {
-                             var form = '<form method="get" action="{{tg.url("/dashboard/docs/download")}}">' +
-                                 '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
-                                 '</form>';
-                             $(form).appendTo('body').submit().remove();
-                             //alert('downloading...'); 
-                         }
-                     }
+                    require_id: true
+                },
+                {
+                    title: "{{_('Download')}}",
+                    type: {
+                        id: "download",
+                        f: function(id_doc) {
+                            var form = '<form method="get" action="{{tg.url("/dashboard/docs/download")}}">' +
+                                '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
+                                '</form>';
+                            $(form).appendTo('body').submit().remove();
+                                //alert('downloading...'); 
+                        }
                     },
-                    {title: "{{_('Delete')}}", 
-                     type: {
-                         id: "delete",
-                         f: delete_doc
-                     },
-                     require_id: true
-                    }
-                ]
+                    require_id: true
+                },
+                {
+                    title: "{{_('Delete')}}",
+                    type: {
+                        id: "delete",
+                        f: delete_doc
+                    },
+                    require_id: true
+                }]
             });
         });
     </script>

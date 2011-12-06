@@ -13,8 +13,7 @@ from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, \
     DefaultClause
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import relation
-from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func,\
-    not_
+from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
     DateTime, BigInteger
 from tg import config
@@ -238,17 +237,13 @@ class SapnsUser(User):
                     if cl:
                         class_ = cl.name
                         
-                        for cls_action in dbs.query(SapnsPermission).\
-                                filter(and_(SapnsPermission.class_id == cl.class_id,
-                                            not_(SapnsPermission.requires_id),
-                                            SapnsPermission.type == SapnsPermission.TYPE_PROCESS
-                                            )):
-                            
-                            actions.append(dict(title=cls_action.display_name,
-                                                url=cls_action.url,
-                                                desc=cls_action.description,
-                                                ))
-                                
+                        for act in cl.sorted_actions(self.user_id):
+                            if not act.require_id and act.type == SapnsPermission.TYPE_PROCESS:
+                                actions.append(dict(title=act.title,
+                                                    url=act.url,
+                                                    desc=act.description,
+                                                    ))
+                        
                 shortcuts.append(dict(url=url, 
                                       order=sc.order,
                                       title=_(sc.title),

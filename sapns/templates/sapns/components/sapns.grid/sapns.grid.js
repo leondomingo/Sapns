@@ -62,7 +62,7 @@ try {
         set(this, 'parent_id', '');
         set(this, 'cols', []);
         set(this, 'data', {});
-        set(this, 'height', 500); // 470);
+        set(this, 'height', 500);
         set(this, 'url_base', '');
         set(this, 'multiselect', false);
         set(this, 'actions_inline', false);
@@ -85,12 +85,12 @@ try {
         var formats = [{
             id: 'csv',
             title: 'CSV',
-            url: '/dashboard/tocsv'
+            url: "{{tg.url('/dashboard/tocsv')}}"
         },
         {
             id: 'excel',
             title: 'Excel',
-            url: '/dashboard/toxls'
+            url: "{{tg.url('/dashboard/toxls')}}"
         }];
         
         set(this, 'exportable_formats', formats);
@@ -500,14 +500,14 @@ try {
 
             var formats = self.exportable_formats;
 
-            if (typeof (self.exportable) == 'object') {
+            if (typeof(self.exportable) == 'object') {
                 formats = self.exportable.formats;
             }
 
             var l = formats.length;
             if (l > 0) {
                 var options = '';
-                for ( var i = 0; i < l; i++) {
+                for (var i=0; i < l; i++) {
                     options += '<option value="' + formats[i].id + '">'
                             + formats[i].title + '</option>';
                 }
@@ -838,7 +838,7 @@ try {
                 if (self.exportable.data) {
                     for (k in self.exportable.data) {
                         var v = self.exportable.data[k];
-                        if (typeof (v) == 'function') {
+                        if (typeof(v) == 'function') {
                             v = v();
                         }
                         extra_params += '<input type="hidden" name="' + k + '" value="' + v + '">';
@@ -888,7 +888,7 @@ try {
         // get object's title
         var title = '';
         $.ajax({
-            url: "/dashboard/title",
+            url: "{{tg.url('/dashboard/title')}}",
             type: "get",
             dataType: "json",
             data: {
@@ -1067,7 +1067,7 @@ try {
                     another_value = '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
                 }
 
-                g_pager += '<select class="sp-button sp-grid-rp">'
+                g_pager += '<div style="float: left; clear: right; height: 25px; margin-top: 2px;"><select class="sp-button sp-grid-rp">'
                         + another_value
                         + '<option value="10"'
                         + sel_10
@@ -1084,11 +1084,9 @@ try {
                         + '</select>'
                         + '<button class="sp-button first-page" style="float: left;">|&lt;&lt;</button>'
                         + '<button class="sp-button page-back" style="float: left;">&lt;&lt;</button>'
-                        + '<div>'
-                        + '<input class="sp-grid-current-page" type="text" style="text-align: center;" readonly>'
-                        + '</div>'
+                        + '<input class="sp-grid-current-page" type="text" style="text-align: center; font-size: 11px; margin-top: 3px;" readonly>'
                         + '<button class="sp-button page-forth" style="float: left;">&gt;&gt</button>'
-                        + '<button class="sp-button last-page" style="float: left;">&gt;&gt|</button>';
+                        + '<button class="sp-button last-page" style="float: left;">&gt;&gt|</button></div>';
 
                 g_pager += '</div>';
 
@@ -1132,7 +1130,7 @@ try {
 
             $('#' + g.name + ' .sp-search-txt').val(g.q);
             g.search(g.q)
-        } else if (typeof (arg1) == "string") {
+        } else if (typeof(arg1) == "string") {
 
             var self = this.data('sapnsGrid');
 
@@ -1144,7 +1142,7 @@ try {
             else if (arg1 == "search") {
                 var q = '';
 
-                if (typeof (arg2) == 'boolean') {
+                if (typeof(arg2) == 'boolean') {
                     q = self.q;
                 } else if (arg2) {
                     q = arg2;

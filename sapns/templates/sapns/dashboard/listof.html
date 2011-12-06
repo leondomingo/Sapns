@@ -13,9 +13,6 @@
     <script type="text/javascript" src="/js/sprintf.min.js"></script>
 {% endblock %}
 
-{#{% block header %}
-{% endblock %}#}
-
 {% block middle %}
     {{ super() }}
         
@@ -33,7 +30,7 @@
     {% endif %}
         
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
