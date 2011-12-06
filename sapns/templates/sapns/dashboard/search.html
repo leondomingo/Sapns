@@ -6,8 +6,7 @@
 
 <script type="text/javascript">
     {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
-    $(document).ready(function() {
-        
+    $(function() {
         $('#{{grid.name}}').sapnsGrid({
             q: "{{grid.q or ''}}",
             search_params: {

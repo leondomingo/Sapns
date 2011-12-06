@@ -1,20 +1,21 @@
 <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
 <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
-{#{{request.identity.user.user_name}}#}
+
 {% if request.identity %}
-    <div class="sp_logout">
-        <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
-            <a href="{{tg.url('/dashboard/users/edit/sp_users/%s?came_from=' % request.identity.user.user_id)}}"
-                target="_blank" title="{{_('Click here to edit user data')}}">
-                {{request.identity.user.display_name}}
-            </a>
-        </div>
-        <div class="sp-logout-btn">
-            <a title="{{_('Click here to logout')}}" 
-                href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
-        </div>
+<div class="sp_logout">
+    <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
+        <a href="{{tg.url('/dashboard/users/edit/sp_users/%s?came_from=' % request.identity.user.user_id)}}"
+            target="_blank" title="{{_('Click here to edit user data')}}">
+            {{request.identity.user.display_name}}
+        </a>
     </div>
+    <div class="sp-logout-btn">
+        <a title="{{_('Click here to logout')}}" 
+            href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
+    </div>
+</div>
 {% endif %}
+
 <div id="language_selector">
     <select>
         <option>{{_('Select your language')}}</option>
@@ -24,12 +25,14 @@
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(function() {
         $('#language_selector select').change(function() {
             $.ajax({
                 url: "{{tg.url('/setlang')}}",
                 data: { lang: $('#language_selector option:selected').val() },
-                success: function() {}
+                success: function() {
+                    window.location = document.URL;
+                }
             });
         });
     });

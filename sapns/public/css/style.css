@@ -33,14 +33,12 @@ a {
 
 /* Login form*/
 
-#loginform
-{
+#loginform {
     text-align: center;
     margin-top: 100px;
 }
 
-form.loginfields
-{
+form.loginfields {
     text-align: left;
     width: 270px;
     background: url('../images/loginbg.png') top left no-repeat;
@@ -49,8 +47,7 @@ form.loginfields
     border: 0;
 }
 
-form.loginfields h2
-{
+form.loginfields h2 {
     font-size: 16px;
     float: left;
     padding: 0;
@@ -59,15 +56,13 @@ form.loginfields h2
     background: url('../images/loginheader-left.png') top left no-repeat;
 }
 
-* html form.loginfields h2
-{
+* html form.loginfields h2 {
     margin-left: 3px;
     width: 80px;
     text-align: center;
 }
 
-form.loginfields h2 span
-{
+form.loginfields h2 span {
     background: url('../images/loginheader-right.png') right top no-repeat;
     height: 30px;
     line-height: 30px;
@@ -78,24 +73,21 @@ form.loginfields h2 span
     padding: 0 10px;
 }
 
-*+html form.loginfields h2 span
-{
-    padding: 0 20px;
+*+html form.loginfields h2 span {
+	padding: 0 20px;
 }
 
-form.loginfields label
-{
+form.loginfields label {
     clear: left;
     float: left;
-    margin-top: 5px;
+    margin-top: 10px;
     margin-left: 10px;
     width: 65px;
-    line-height: 31px;
+    line-height: 18px;
     vertical-align: middle;
 }
 
-form.loginfields input.text
-{
+form.loginfields input.text {
     float: left;
     margin-left: 10px;
     margin-top: 5px;
@@ -107,15 +99,13 @@ form.loginfields input.text
     color: #fff;
 }
 
-form.loginfields #loginremember
-{
+form.loginfields #loginremember {
     float:right;
     vertical-align: middle;
     height: 26px;
 }
 
-form.loginfields #labelremember 
-{
+form.loginfields #labelremember {
     float: right;
     width: auto;
     margin:0;
@@ -123,8 +113,7 @@ form.loginfields #labelremember
     vertical-align: middle;
 }
 
-form.loginfields input#submit
-{
+form.loginfields input#submit {
     background: url('../images/loginbottombg.png') bottom left no-repeat;
     width: 270px;
     height: 61px;
@@ -135,8 +124,7 @@ form.loginfields input#submit
     cursor: pointer;
 }
 
-* html form.loginfields input#submit
-{
+* html form.loginfields input#submit {
     clear: both;
     margin-left: -10px;
 }
@@ -162,8 +150,6 @@ form.loginfields input#submit
   margin-left: 1.5em;
   padding-left: 0;
 }
-
-
 
 #sb_top {
   clear: right;
@@ -206,45 +192,54 @@ form.loginfields input#submit
 .foottext p {
 	margin: 0; padding: 0;
 }
+
 .code {
-font-family:monospace;
-font-size:127%;
+    font-family: monospace;
+    font-size: 127%;
 }
 span.code {
-background:#EEEEEE none repeat scroll 0% 0%;
-font-weight:bold;
+    background: #EEEEEE none repeat scroll 0% 0%;
+    font-weight: bold;
 }
+
 #flash, .notice {
-font-size:120%;
-font-weight:bolder;
-margin:0pt auto 0.5em;
-width:680px;
+	font-size:120%;
+    font-weight:bolder;
+    margin:0pt auto 0.5em;
+    width:680px;
 }
+
 #flash div, .notice {
-padding:20px 15px 20px 65px;
+	padding:20px 15px 20px 65px;
 }
+
 #flash .ok {
-background:#d8ecd8 url(../images/ok.png) no-repeat scroll 10px center;
+	background:#d8ecd8 url(../images/ok.png) no-repeat scroll 10px center;
 }
+
 #flash .warning {
-background:#fff483 url(../images/warning.png) no-repeat scroll 10px center;
+	background:#fff483 url(../images/warning.png) no-repeat scroll 10px center;
 }
+
 #flash .error {
-background:#f9c5c1 url(../images/error.png) no-repeat scroll 10px center;
+	background:#f9c5c1 url(../images/error.png) no-repeat scroll 10px center;
 }
-#flash .alert,
-#flash .info {
-background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
+
+#flash .alert, #flash .info {
+	background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
 }
+
 .notice {
-background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
+	background:#EEEEFF url(../images/info.png) no-repeat scroll 10px center;
 }
+
 .fielderror {
-color:red;
-font-weight:bold;
+	color: red;
+	font-weight:bold;
 }
+
 div.clearingdiv {
-clear:both;
+	clear:both;
 }
 
 .sp_header {
@@ -289,11 +284,8 @@ clear:both;
 
 .sp_logout {
 	position: absolute;
-	/*left: 690px;*/
 	right: 10px;
 	top: 20px;
-    /*margin-left: 67%; 
-    width: 300px;*/
     border: 1px solid;
     background-color: #CCCFA5;
     border-radius: 10px;
@@ -325,7 +317,6 @@ clear:both;
 
 #language_selector {
 	position: absolute;
-	/*left: 875px;*/
 	right: 10px;
 	top: 70px;
 }
@@ -338,7 +329,6 @@ clear:both;
     font-size: 11px;
     text-align: center;
     margin: 2px;
-    /*color: #723532;*/
 }
 
 .sp-grid-container {
@@ -401,9 +391,6 @@ clear:both;
 	overflow: hidden;
 	cursor: pointer;
 	padding: 2px;
-	/*padding-left: 2px;
-	padding-right: 2px;
-	padding-bottom: 2px;*/
 }
 
 .sp-grid-noresults {
@@ -421,7 +408,6 @@ clear:both;
 .sp-grid-pager-desc {
 	color: gray;
 	font-family: arial;
-	/*background-color: gray;*/
 	width: 350px;
 	text-align: center;
 	float: left;
@@ -447,9 +433,8 @@ clear:both;
 }
 
 .sp-grid-actions {
-	/*border: 1px solid gray;*/
 	clear: left;
-	background-color: #CCCFA5; /*#B4BD3C;*/
+	background-color: #CCCFA5;
 	height: 25px;
 }
 
@@ -459,10 +444,9 @@ clear:both;
 	float: left;
 	clear: left;
 	margin-top: 5px;
-	color: gray; /*#F9F9F9;*/
+	color: gray;
 	font-weight: bold;
 	font-size: 10px;
-	/*border: 1px dotted white;*/
 }
 
 .sp-grid-action {
@@ -479,7 +463,6 @@ clear:both;
     font-weight: bold;
     text-align: center;
     margin-top: 5px;
-    /*border: 1px dotted white;*/
 }
 
 .sp_field_error {
@@ -509,7 +492,6 @@ clear:both;
 }
 
 .sp_message {
-	/*font-family: Arial;*/
 	font-size: 25px;
 	color: #605B7C;
 	margin-top: 20px;

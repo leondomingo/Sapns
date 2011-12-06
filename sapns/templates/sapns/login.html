@@ -1,23 +1,31 @@
-{% extends 'sapns/base.html' %}
-
+{% extends 'sapns/no_sidebar.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
 
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    <style type="text/css">
+        .sp_center {
+            width: 1198px !important;
+            left: 0px !important;
+        }
+    </style>
+{% endblock %}
+
 {% block middle %}
-
-{{util.jquery()}}
-<script type="text/javascript">
-    $(document).ready(function() {
-    	$('#loginusername').focus();
-    });
-</script>
-
 <div id="loginform">
 <form action="{{tg.url('/login_handler', params=dict(came_from_=came_from_.encode('utf-8'), __logins=login_counter.encode('utf-8')))}}" method="post" accept-charset="UTF-8" class="loginfields">
     <h2><span>Login</span></h2>
-    <label for="loginusername">Username:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
-    <label for="loginpassword">Password:</label><input type="password" id="loginpassword" name="password" class="text"></input>
-    <label id="labelremember" for="loginremember">remember me</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
+    <label for="loginusername">{{_('Username')}}:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
+    <label for="loginpassword">{{_('Password')}}:</label><input type="password" id="loginpassword" name="password" class="text"></input>
+    <label id="labelremember" for="loginremember">{{_('remember me')}}</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
     <input type="submit" id="submit" value="Login" />
 </form>
 </div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#loginusername').focus();
+    });
+</script>
 {% endblock %}

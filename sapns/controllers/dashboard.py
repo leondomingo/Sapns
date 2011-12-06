@@ -851,31 +851,39 @@ class DashboardController(BaseController):
         return dict(page='reference order', reference=class_.reference(all=True), 
                     came_from=came_from)
     
-    @expose()
+    @expose('json')
     @require(p.in_group(u'managers'))
-    def ref_order_save(self, attributes='', came_from=''):
+    def ref_order_save(self, **kw):
         
-        # save reference order
-        attributes = sj.loads(attributes)
+        logger = logging.getLogger('DashboardController.ref_order_save')
+        try:
+            # save reference order
+            attributes = get_paramw(kw, 'attributes', sj.loads)
+            
+            cls_title = None
+            for attr in attributes:
+                attribute = dbs.query(SapnsAttribute).get(attr['id'])
+                
+                if not cls_title:
+                    cls_title = attribute.class_.title
+                
+                attribute.reference_order = attr['order']
+                dbs.add(attribute)
+                dbs.flush()
+                
+            return dict(status=True)
+            
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
         
-        cls_title = None
-        for attr in attributes:
-            attribute = dbs.query(SapnsAttribute).get(attr['id'])
-            
-            if not cls_title:
-                cls_title = attribute.class_.title
-            
-            attribute.reference_order = attr['order']
-            dbs.add(attribute)
-            dbs.flush()
-        
-        if came_from:
-            redirect(url(came_from))
-            
-        else:
-            redirect(url('/message', 
-                         params=dict(message=_('Reference order for "%s" has been successfully updated') % cls_title, 
-                                     came_from='')))
+#        if came_from:
+#            redirect(url(came_from))
+#            
+#        else:
+#            redirect(url('/message', 
+#                         params=dict(message=_('Reference order for "%s" has been successfully updated') % cls_title, 
+#                                     came_from='')))
             
     @expose('sapns/components/sapns.selector.example.html')
     @require(p.in_group('managers'))
