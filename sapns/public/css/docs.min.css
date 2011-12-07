@@ -1,0 +1,7 @@
+#docs_list{padding:10px;border:1px solid red}#doclist_content{border:1px solid orange;overflow:auto;height:400px;width:100%}
+.doc_row{height:24px}.col_label{font-size:12px;font-weight:bold;text-align:center;border:1px solid gray;margin-right:2px;margin-bottom:2px;height:24px;padding-left:3px;padding-right:3px}
+.col_value{text-align:center;border:1px solid gray;margin-right:2px;margin-bottom:2px;height:24px;padding-left:3px;padding-right:3px;overflow:hidden}
+.col_check{width:40px;float:left}.row_check{height:18px}.col_title{width:350px;float:left}
+.col_format{width:120px;float:left}.col_type{width:110px;float:left}.col_author{width:150px;float:left}
+.col_repo{width:120px;float:left}#doclist_actions{padding-left:10px}.doc_action{width:110px}
+.doc_field{width:90%;margin-bottom:5px}.doc_field_required{font-weight:bold}#doc_title{width:410px}
