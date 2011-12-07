@@ -31,6 +31,7 @@
         set(this, 'show_button', true);
         set(this, 'onUpload', null);
         set(this, 'onDelete', null);
+        set(this, 'onError', null);
         set(this, 'removeOnDelete', false);
         
         set(this, 'qtip', {});
@@ -241,7 +242,12 @@
                     }
                     else {
                         // result.status = false
-                        sapnsUploader.showWarning($('#btn_upload_' + sufix), result.message);
+                        if (sapnsUploader.onError) {
+                            sapnsUploader.onError(result.message);
+                        }
+                        else {
+                            sapnsUploader.showWarning($('#btn_upload_' + sufix), result.message);
+                        }
                     }
                 }
             });

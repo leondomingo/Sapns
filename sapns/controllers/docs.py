@@ -239,25 +239,36 @@ class DocsController(BaseController):
             import hashlib as hl
             import random
             
-            logger.info(kw)
-
-            # create hash
-            s256 = hl.sha256()
+            #raise Exception('Esto es una prueba...')
             
-            random.seed()
-            s256.update('%s%6.6d' % (f.filename, random.randint(0, 999999)))
-            
-            file_name = s256.hexdigest()
-            
-            # repo
+            # get repo
             id_repo = get_paramw(kw, 'id_repo', int)
-            
             repo = dbs.query(SapnsRepo).get(id_repo)
             if not repo:
                 raise Exception(_('Repo [%d] was not found') % id_repo)
             
+            repo_path = repo.abs_path()
+            
+            # calculate random name for the new file
+            def _file_path():
+                
+                # create hash
+                s256 = hl.sha256()
+                
+                random.seed()
+                s256.update('%s%6.6d' % (f.filename.encode('utf-8'), random.randint(0, 999999)))
+                
+                file_name = s256.hexdigest()
+                return os.path.join(repo_path, file_name), file_name
+            
+            while True:
+                file_path, file_name = _file_path()
+                # does it exist???
+                if not os.access(file_path, os.F_OK):
+                    break
+            
             f.file.seek(0)
-            with file(os.path.join(repo.abs_path(), file_name), 'wb') as fu:
+            with file(file_path, 'wb') as fu:
                 fu.write(f.file.read())
             
             return sj.dumps(dict(status=True, 

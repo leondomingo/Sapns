@@ -1,109 +1,13 @@
 {% extends 'sapns/base.html' %}
 {% import 'sapns/dashboard/util.html' as util %}
-{#{% import 'sapns/docs/list.html' as doc %}#}
-{% import 'sapns/dashboard/grid.html' as grid_html %}
 
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    
-    <style type="text/css">
-        #docs_list {
-            padding: 10px;
-            border: 1px solid red;
-        }
-        
-        #doclist_content {
-            border: 1px solid orange;
-            overflow: auto;
-            height: 400px; /*540px;*/
-            width: 100%;
-        }
-        
-        .doc_row {
-            height: 24px;
-        }
-        
-        .col_label {
-            font-size: 12px;
-            font-weight: bold;
-            text-align: center;
-            border: 1px solid gray;
-            margin-right: 2px;
-            margin-bottom: 2px;
-            height: 24px;
-            padding-left: 3px;
-            padding-right: 3px;
-        }
-        
-        .col_value {
-            text-align: center;
-            border: 1px solid gray;
-            margin-right: 2px;
-            margin-bottom: 2px;
-            height: 24px;
-            padding-left: 3px;
-            padding-right: 3px;
-            overflow: hidden;
-        }
-        
-        .col_check {
-            width: 40px;
-            float: left;
-        }
-        
-        .row_check {
-            height: 18px;
-        }
-        
-        .col_title {
-            width: 350px;
-            float: left;
-        }
-        
-        .col_format {
-            width: 120px;
-            float: left;
-        }
-        
-        .col_type {
-            width: 110px;
-            float: left;
-        }
-        
-        .col_author {
-            width: 150px;
-            float: left;
-        }
-        
-        .col_repo {
-            width: 120px;
-            float: left;
-        }
-        
-        #doclist_actions {
-            padding-left: 10px;
-        }
-        
-        .doc_action {
-            width: 110px;
-        }
-        
-        .doc_field {
-            width: 90%;
-            margin-bottom: 5px;
-        }
-        
-        .doc_field_required {
-            font-weight: bold;
-        }
-        
-        #doc_title {
-            width: 410px;
-        }
-    </style>
+    <link rel="stylesheet" type="text/css" media="screen" 
+        href="{{tg.url('/css/docs.min.css')}}">
 {% endblock %}
 
 {% block middle %}
@@ -117,7 +21,6 @@
     <script type="text/javascript">
         {% include 'sapns/components/sapns.selector.min.js' %}
         {% include 'sapns/components/sapns.uploader.min.js' %}
-        {#{% include 'sapns/components/sapns.grid/sapns.grid.js' %}#}
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
             
@@ -330,6 +233,9 @@
                                     $('#doc_title').val(this.getUploadedfile());
                                 }
                             }
+                            /*onError: function(msg) {
+                                alert(msg);
+                            }*/
                         });
                         
                         // assign repo (if there's any) 
@@ -385,6 +291,8 @@
                     modal: true,
                     resizable: false,
                     title: "{{_('Delete document')}}",
+                    width: 'auto',
+                    height: 'auto',
                     buttons: {
                         "{{_('Ok')}}": function() {
                             var callback_success = function() {
@@ -414,40 +322,43 @@
                         id: "{{grid.id_object}}"*1 
                     }
                 },
-                actions: [
-                    {title: "{{_('Add')}}",
-                     type: {
+                actions: [{
+                    title: "{{_('Add')}}",
+                    type: {
                         id: "add", 
                         f: function() { edit_doc(); }
                      },
                      require_id: false
+                },
+                {
+                    title: "{{_('Edit')}}",
+                    type: {
+                        id: "edit",
+                        f: edit_doc
                     },
-                    {title: "{{_('Edit')}}",
-                     type: {
-                          id: "edit",
-                          f: edit_doc
-                     }
+                    require_id: true
+                },
+                {
+                    title: "{{_('Download')}}",
+                    type: {
+                        id: "download",
+                        f: function(id_doc) {
+                            var form = '<form method="get" action="{{tg.url("/dashboard/docs/download")}}">' +
+                                '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
+                                '</form>';
+                            $(form).appendTo('body').submit().remove();
+                        }
                     },
-                    {title: "{{_('Download')}}",
-                     type: {
-                         id: "download",
-                         f: function(id_doc) {
-                             var form = '<form method="get" action="{{tg.url("/dashboard/docs/download")}}">' +
-                                 '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
-                                 '</form>';
-                             $(form).appendTo('body').submit().remove();
-                             //alert('downloading...'); 
-                         }
-                     }
+                    require_id: true
+                },
+                {
+                    title: "{{_('Delete')}}",
+                    type: {
+                        id: "delete",
+                        f: delete_doc
                     },
-                    {title: "{{_('Delete')}}", 
-                     type: {
-                         id: "delete",
-                         f: delete_doc
-                     },
-                     require_id: true
-                    }
-                ]
+                    require_id: true
+                }]
             });
         });
     </script>
