@@ -1739,6 +1739,139 @@ class SapnsDoc(DeclarativeBase):
         t = (self.title or _('NO_TITLE'))
         pat = re.compile(r'[^a-z0-9_\-.]', re.I)
         return re.sub(pat, '_', t).encode('utf-8')
+    
+    def register(self, cls, object_id):
+        """
+        IN
+          cls        <int>/<unicode>/<str>
+          object_id  <int>
+        """
+        
+        if isinstance(cls, int):
+            cls = dbs.query(SapnsClass).get(cls)
+            
+        elif isinstance(cls, (str, unicode,)):
+            cls = SapnsClass.by_name(cls, parent=False)
+
+        # assign doc to object/class
+        ad = SapnsAssignedDoc()
+        ad.doc_id = self.doc_id
+        ad.class_id = cls.class_id
+        ad.object_id = object_id
+        
+        dbs.add(ad)
+        dbs.flush()
+    
+    @staticmethod
+    def delete_doc(id_doc):
+        """
+        IN
+          id_doc  <int>
+        """
+        
+        id_doc = int(id_doc)
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        
+        # remove file from disk
+        SapnsDoc.remove_file(doc.repo_id, doc.filename)
+        
+        # remove doc
+        dbs.query(SapnsDoc).filter(SapnsDoc.doc_id == id_doc).delete()
+        dbs.flush()
+    
+    @staticmethod
+    def upload(f, id_repo):
+        """
+        IN
+          f        <file>
+          id_repo  <int>
+          
+        OUT
+          {uploaded_file: <str>,
+           file_name:     <str>,
+           file_size:     <int>}
+        """
+        
+        import hashlib as hl
+        import random
+        
+        # get repo
+        repo = dbs.query(SapnsRepo).get(id_repo)
+        if not repo:
+            raise Exception(_('Repo [%d] was not found') % id_repo)
+        
+        repo_path = repo.abs_path()
+        
+        # calculate random name for the new file
+        def _file_path():
+            
+            # create hash
+            s256 = hl.sha256()
+            
+            random.seed()
+            s256.update('%s%6.6d' % (f.filename.encode('utf-8'), random.randint(0, 999999)))
+            
+            file_name = s256.hexdigest()
+            return os.path.join(repo_path, file_name), file_name
+        
+        while True:
+            file_path, file_name = _file_path()
+            # does it exist???
+            if not os.access(file_path, os.F_OK):
+                break
+        
+        f.file.seek(0)
+        with file(file_path, 'wb') as fu:
+            fu.write(f.file.read())
+            
+        return dict(uploaded_file=f.filename,
+                    file_name=file_name,
+                    file_size=f.file.tell())
+        
+    @staticmethod
+    def download(id_doc):
+        """
+        IN
+          id_doc  <int>
+          
+        OUT
+          (<content>, <mime type>, <file name>,)
+        """
+        
+        import mimetypes
+        
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        if not doc:
+            # TODO: document does not exist
+            pass
+        
+        content = ''
+        f = file(os.path.join(doc.repo.abs_path(), doc.filename), 'rb')
+        try:
+            content = f.read()
+        
+        finally:
+            f.close()
+            
+        file_name = ('%s.%s' % (doc.title_as_filename(), doc.docformat.extension)).encode('utf-8')
+            
+        mt = doc.docformat.mime_type
+        if not mt:
+            mt = mimetypes.guess_type(file_name)[0]
+            
+        return content, mt, file_name
+    
+    @staticmethod
+    def remove_file(id_repo, file_name):
+
+        repo = dbs.query(SapnsRepo).get(id_repo)
+        if not repo:
+            raise Exception(_('Repo [%d] was not found') % id_repo)
+        
+        path_file = os.path.join(repo.abs_path(), file_name) 
+        if os.access(path_file, os.F_OK):
+            os.remove(path_file)
+
 
 class SapnsDocType(DeclarativeBase):
     
