@@ -12,6 +12,8 @@ from sqlalchemy.sql.expression import or_, func
 from tg import expose, flash, require, url, request, redirect, config
 from tg.i18n import set_lang, get_lang
 import logging
+from jinja2.environment import Environment
+from jinja2.loaders import PackageLoader
 
 __all__ = ['RootController']
 
@@ -145,13 +147,33 @@ class RootController(BaseController):
             
             dst = [(u.email_address.encode('utf-8'), u.user_name.encode('utf-8'),)]
                 
-            # get e-mail settings
+            # e-mail settings
             remitente = (config.get('avisos.e_mail'), config.get('avisos.nombre'),)
             
-            # TODO: get e-mail template
-            asunto = _('Remember password')
-            mensaje = _('Your new password is %s') % new_password 
-            mensaje_html = mensaje
+            # get e-mail templates
+            lang = get_lang()[0]
+            root_folder = config.get('app.root_folder')
+            env = Environment(loader=PackageLoader('sapns', 'templates'))
+            
+            try:
+                m = __import__('sapns.lib.%s.forgot_password' % root_folder, fromlist=['ForgotPassword'])
+                fp = m.ForgotPassword(lang)
+                asunto, mensaje, mensaje_html = fp()
+                
+            except ImportError:
+                vars_ = dict(user_name=u.display_name,
+                             new_password=new_password,
+                             app_title=config.get('avisos.nombre').decode('utf-8'),
+                             )
+                
+                asunto = env.get_template('sapns/users/forgot_password/%s/subject.txt' % lang)
+                asunto = asunto.render(**vars_).encode('utf-8')
+                
+                mensaje = env.get_template('sapns/users/forgot_password/%s/message.txt' % lang)
+                mensaje = mensaje.render(**vars_).encode('utf-8')
+                
+                mensaje_html = env.get_template('sapns/users/forgot_password/%s/message.html' % lang)
+                mensaje_html = mensaje_html.render(**vars_).encode('utf-8')
             
             email_login = config.get('avisos.login')
             email_password = config.get('avisos.password')

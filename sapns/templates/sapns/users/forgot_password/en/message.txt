@@ -1,0 +1,2 @@
+Hi {{ user_name }},
+Your new password is {{ new_password }}.
