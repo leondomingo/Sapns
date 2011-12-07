@@ -1,23 +1,61 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.jquery_jstree() }}
+    <style type="text/css">
+        #sc_list {
+            height: 565px;
+            overflow: auto;
+        }
+        
+        #exploration_head {
+            height: 20px;
+            padding-left: 25px;
+            padding-top: 2px;
+            border: 1px solid gray;
+            border-radius: 5px;
+            margin: 4px;
+        }
+    </style>
+{% endblock %}
+
+{% block middle %}
 <!-- {# dialogs (now ain't visible) #} -->
-<div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
+{#<div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
   <p>{{_('Do you want to delete this shortcut?')}}</p>
   <p id="sp-shortcut-title" style="font-weight: bold;"></p>  
-</div>
+</div>#}
 
+{#
 <div id="bookmark-confirmation" style="display: none;" title="{{_('Send to dashboard')}}">
   <p>{{_('Do you want to send this shortcut to the dashboard?')}}</p>
   <p id="sp-shortcut-title" style="font-weight: bold;"></p>
 </div>
+#}
 
+{#
 <div id="share-dialog" style="display: none;" title="{{_('Shortcut sharing')}}">
     <p>{{_('What user do you want to share this shortcut with?')}}</p>
     <p id="sp-shortcut-title" style="font-weight: bold;"></p>
     <select id="users-to-share-with"></select>
 </div>
+#}
 
 <form id="order-form" action="" method="post" target="_blank">
     <input type="hidden" name="came_from" />
 </form>
+
+<div id="exploration_head">
+    {% if sc_parent %}
+    <a href="{{tg.url('/dashboard/data_exploration', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
+    {% else %}
+    <div>&nbsp;</div>
+    {% endif %}
+</div>
 
 <div id="sc_list">
     {% for sc in shortcuts %}
@@ -43,6 +81,7 @@
 
         <!-- {# reference order #} -->
         <option value="ref-order">{{_('Reference order')}}</option>
+        </select>
         {% endif %}
         
         <!-- Process -->
@@ -52,8 +91,10 @@
                 target="">{{sc.title|escape}}</a>
         </div>
         
-        <select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>
+        <div style="clear: right;"></div>
+        
+        {#<select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>#}
 
         <!-- Object -->
         {% elif sc.action_type == 'object' %}
@@ -62,24 +103,31 @@
                 target="">{{sc.title|escape}}</a>
         </div>
         
-        <select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>
+        <div style="clear: right;"></div>
+        
+        {#<select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>#}
         {% else %}
         <div class="sp-shortcut-title">
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
         </div>
         
-        <select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>
+        <div style="clear: right;"></div>
+        
+        {#<select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>#}
         {% endif %}
     {% else %}
         <!-- {# This is a group #} -->
-        <div class="sp-shortcut-title">
-            <a href="{{tg.url('/dashboard', 
+        <div class="sp-shortcut-title" style="clear: left;">
+            <a href="{{tg.url('/dashboard/data_exploration/', 
                 params=dict(sc_parent=sc.id))}}">&lt;{{sc.title}}&gt;</a>
         </div>
-        <select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>
+        
+        <div style="clear: right; height: 25px;">&nbsp;</div>
+        
+        {#<select class="sp-select-shortcut">
+        <option value="">{{_('(Select operation)')}}</option>#}
     {% endif %}
         <!-- {# general actions over shortcuts #} -->
     
@@ -88,16 +136,16 @@
             title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>#}
         
         <!-- {# Delete #} -->
-        <option value="delete" 
-            title="{{_('Remove this shortcut')}}">{{_('Delete')}}</option>
+        {#<option value="delete" 
+            title="{{_('Remove this shortcut')}}">{{_('Delete')}}</option>#}
     
         <!-- {# To dashboard #} -->
-        <option value="to-dashboard"
-            title="{{_('Put this shortcut on the dashboard')}}">{{_('Send to dashboard')}}</option>
+        {#<option value="to-dashboard"
+            title="{{_('Put this shortcut on the dashboard')}}">{{_('Send to dashboard')}}</option>#}
 
         <!-- {# Share #} -->
-        <option value="share"
-            title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>
+        {#<option value="share"
+            title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>#}
             
         <!-- {# Up #} -->
         {#<option value="up"
@@ -107,7 +155,7 @@
         {#<option value="down"
             title="">{{_('Down')}}</option>#}
         
-        </select>
+        {#</select>#}
         
     </div>
     {% endfor %}
@@ -372,3 +420,4 @@
         }
     });
 </script>
+{% endblock %}

@@ -24,7 +24,7 @@ from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from tg import response, expose, require, url, request, redirect, config
-from tg.i18n import set_lang, get_lang
+from tg.i18n import get_lang
 import cStringIO
 import logging
 import re
@@ -61,38 +61,51 @@ class DashboardController(BaseController):
         
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=None)
+        
+#        shortcuts.append(dict(title=u'Data exploration',
+#                              url=u'/dashboard/data_exploration/',
+#                              action_type=SapnsPermission.TYPE_PROCESS))
 
-        return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''))    
-
-    @expose('sapns/dashboard/index.html')
+        return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''))
+    
+    @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
-    def index(self, sc_type='list', sc_parent=None):
-        curr_lang = get_lang()
-
-        # connected user
+    def data_exploration(self, **kw):
+        
+        sc_parent = get_paramw(kw, 'sc_parent', int, opcional=True)
+        
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
-        # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
-        #shortcuts = user.get_shortcuts(id_parent=sc_parent)
+        root = user.get_dashboard().shortcut_id
+        data_e = user.get_dataexploration().shortcut_id
+        
+        id_parent = sc_parent
+        if not sc_parent or sc_parent == root:
+            id_parent = data_e
+        
+        shortcuts = user.get_shortcuts(id_parent=id_parent)
         
         params = {}
         if sc_parent:
             params = dict(sc_parent=sc_parent)
-        came_from = url('/dashboard/', params=params)
+            
+        came_from = url('/dashboard/data_exploration/', params=params)
         
-        if sc_parent:
+        if sc_parent and sc_parent != data_e:
             sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
             
         else:
             sc_parent = None
             
-        # number of messages
-        messages = user.messages()
-        unread = user.unread_messages()
-        
-        return dict(page='dashboard', curr_lang=curr_lang, shortcuts=[],
-                    messages=messages, unread=unread,
-                    sc_type=sc_type, sc_parent=sc_parent, _came_from=came_from)
+        return dict(page=u'Data exploration', shortcuts=shortcuts,
+                    sc_parent=sc_parent, _came_from=came_from)
+
+    @expose('sapns/dashboard/index.html')
+    @require(p.not_anonymous())
+    def index(self, **kw):
+        curr_lang = get_lang()
+        return dict(page='dashboard', came_from=kw.get('came_from'), 
+                    curr_lang=curr_lang, shortcuts=[])
         
     @expose()
     def init(self):
