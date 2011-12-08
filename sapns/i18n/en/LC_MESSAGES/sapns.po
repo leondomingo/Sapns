@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2011-12-07 21:28+0100\n"
+"POT-Creation-Date: 2011-12-08 09:31+0100\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -234,6 +234,22 @@ msgstr "Select your language"
 #: sapns/templates/sapns/login.html:33
 msgid "Enter your username or e-mail"
 msgstr "Enter your username or e-mail"
+
+#: sapns/templates/sapns/login.html:40
+msgid "Username"
+msgstr "Username"
+
+#: sapns/templates/sapns/login.html:41 sapns/templates/sapns/users/edit.html:50
+msgid "Password"
+msgstr "Password"
+
+#: sapns/templates/sapns/login.html:42
+msgid "remember me"
+msgstr "remember me"
+
+#: sapns/templates/sapns/login.html:43
+msgid "Login"
+msgstr "Login"
 
 #: sapns/templates/sapns/login.html:48
 msgid "Forgot my password"
@@ -918,10 +934,6 @@ msgstr "User name"
 #: sapns/templates/sapns/users/edit.html:43
 msgid "E-mail address"
 msgstr "E-mail address"
-
-#: sapns/templates/sapns/users/edit.html:50
-msgid "Password"
-msgstr "Password"
 
 #: sapns/templates/sapns/users/edit.html:56
 msgid "Re-type password"
