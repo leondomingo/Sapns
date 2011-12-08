@@ -567,7 +567,8 @@ catch(e) {
             if ($(this).attr('clickable') == 'true') {
                 var row_id = $(this).parent().parent().find('.sp-grid-rowid');
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
-                    if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
+                    var ctrl = event.ctrlKey || event.metaKey;
+                    if ($(this) != row_id && !self.multiselect && !ctrl) {
                         $(this).attr('checked', false);
                     }
                 });
@@ -640,9 +641,9 @@ catch(e) {
             // child attribute 
             var ch_attr = self.ch_attr;
             
-            // if CTRL is pressed open in a new tab 
+            // if CTRL or CMD (Mac) is pressed open in a new tab 
             var target = '';
-            if (event.ctrlKey) {
+            if (event.ctrlKey || event.metaKey) {
                 target = '_blank';
             }
             
