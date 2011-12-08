@@ -667,7 +667,6 @@ try {
                 }
                 
                 var target = '';
-                console.log(ctrl);
                 if (ctrl) {
                     target = '_blank';
                 }
@@ -681,7 +680,7 @@ try {
                 else {
                     a += sprintf('%s/%s', self.cls, id);
                 }
-                console.log(form(a, ''))
+
                 $(form(a, target)).appendTo('body').submit().remove();
             }
             else {
@@ -691,12 +690,12 @@ try {
 
         // new
         $('#' + self.name + ' .new_inline').live('click', function(event) {
-            run_action($(this), 'new', event.ctrlKey);
+            run_action($(this), 'new', event.ctrlKey || event.metaKey);
         });
 
         // edit
         $('#' + self.name + ' .edit_inline').live('click', function(event) {
-            run_action($(this), 'edit', event.ctrlKey);
+            run_action($(this), 'edit', event.ctrlKey || event.metaKey);
         });
 
         // delete
