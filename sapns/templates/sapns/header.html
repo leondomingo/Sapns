@@ -1,6 +1,5 @@
 <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}</div>
 <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
-{#{{request.identity.user.user_name}}#}
 {% if request.identity %}
     <div class="sp_logout">
         <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
@@ -29,7 +28,9 @@
             $.ajax({
                 url: "{{tg.url('/setlang')}}",
                 data: { lang: $('#language_selector option:selected').val() },
-                success: function() {}
+                success: function() {
+                    window.location = document.URL;
+                }
             });
         });
     });

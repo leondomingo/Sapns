@@ -1,23 +1,105 @@
 {% extends 'sapns/base.html' %}
-
 {% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    <style type="text/css">
+        #forgot_password {
+            text-align: center;
+        }
+        
+        #forgot_password label {
+            font-weight: normal;
+            font-size: 11px;
+            color: #fff;
+            cursor: pointer;
+        }
+        
+        #forgot_password label:hover {
+            color: #000;
+        }
+        
+        #username_or_email {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
 
 {% block middle %}
 
-{{util.jquery()}}
-<script type="text/javascript">
-    $(document).ready(function() {
-    	$('#loginusername').focus();
-    });
-</script>
+<div id="forgot_password_dlg" style="display: none;">
+    <h3>{{_('Enter your username or e-mail')}}</h3>
+    <input id="username_or_email" type="text">
+</div>
 
 <div id="loginform">
 <form action="{{tg.url('/login_handler', params=dict(came_from_=came_from_.encode('utf-8'), __logins=login_counter.encode('utf-8')))}}" method="post" accept-charset="UTF-8" class="loginfields">
     <h2><span>Login</span></h2>
-    <label for="loginusername">Username:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
-    <label for="loginpassword">Password:</label><input type="password" id="loginpassword" name="password" class="text"></input>
-    <label id="labelremember" for="loginremember">remember me</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
-    <input type="submit" id="submit" value="Login" />
+    <label for="loginusername">{{_('Username')}}:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
+    <label for="loginpassword">{{_('Password')}}:</label><input type="password" id="loginpassword" name="password" class="text"></input>
+    <label id="labelremember" for="loginremember">{{_('remember me')}}</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
+    <input type="submit" id="submit" value="{{_('Login')}}">
 </form>
 </div>
+
+<div id="forgot_password">
+    <label>{{_('Forgot my password')}}</label>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function() {
+        $('#loginusername').focus();
+        
+        $('#forgot_password label').click(function(event) {
+            $('#username_or_email').val('').focus();
+            $('#forgot_password_dlg').dialog({
+                title: "{{_('Remember password')}}",
+                modal: true,
+                resizable: false,
+                width: 600,
+                height: 'auto',
+                buttons: {
+                    "{{_('Please, e-mail me a new password')}}": function() {
+                        
+                        $('.ui-button').attr('disabled', true).css('cursor', 'wait');
+                        $('#username_or_email').attr('readonly', true);
+                        
+                        var username_or_email = $('#username_or_email').val();
+                        if (!username_or_email) {
+                            return;
+                        }
+                        
+                        $.ajax({
+                            url: "{{tg.url('/remember_password/')}}",
+                            data: {
+                                username_or_email: username_or_email
+                            },
+                            success: function(res) {
+                                $('.ui-button').attr('disabled', false).css('cursor', 'default');
+                                $('#username_or_email').attr('readonly', false);
+                                if (res.status) {
+                                    alert("{{_('A new password has been sent to you by e-mail')}}");
+                                    $('#forgot_password_dlg').dialog('close');
+                                }
+                                else {
+                                    if (res.message) {
+                                        alert(res.message);
+                                    }
+                                    else {
+                                        alert('Error!');
+                                    }
+                                }
+                            }
+                        });
+                    },
+                    "{{_('Close')}}": function() {
+                        $('#forgot_password_dlg').dialog('close');
+                    }
+                }
+            });
+        });
+    });
+</script>
 {% endblock %}
