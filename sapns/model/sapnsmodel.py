@@ -1070,7 +1070,7 @@ class SapnsClass(DeclarativeBase):
                 last_attr = attr_priv.attribute_id
 
                 if class_attr_priv.has_key(attr_priv.attribute_id):
-                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
+                    if _cmp(class_attr_priv[attr_priv.attribute_id].access, attr_priv.access) == -1:
                         class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access, pos=i)
     
                 else:
