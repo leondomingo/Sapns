@@ -111,11 +111,12 @@ class RootController(BaseController):
             redirect(url(came_from))
             
     @expose('json')
-    def remember_password(self, username_or_email):
+    def remember_password(self, username_or_email, **kw):
         
         from neptuno.enviaremail import enviar_email
         import random
         import hashlib as hl
+        from sapns.lib.sapns.util import extract_lang
         
         logger = logging.getLogger('RootController.remember_passsword')
         try:
@@ -151,7 +152,7 @@ class RootController(BaseController):
             remitente = (config.get('avisos.e_mail'), config.get('avisos.nombre'),)
             
             # get e-mail templates
-            lang = get_lang()[0]
+            lang = extract_lang(get_lang(), r'^[a-z]{2}$')
             root_folder = config.get('app.root_folder')
             env = Environment(loader=PackageLoader('sapns', 'templates'))
             
@@ -187,4 +188,4 @@ class RootController(BaseController):
     
         except Exception, e:
             logger.error(e)
-            return dict(status=False)            
+            return dict(status=False)
