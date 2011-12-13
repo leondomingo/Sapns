@@ -11,6 +11,7 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
     BOOLEAN, BLOB
 from tg import config
 import logging
+import re
 
 ROLE_MANAGERS = u'managers'
 
@@ -492,3 +493,11 @@ def pagination(rp, pag_n, total):
         this_page = rp
         
     return (this_page, total_pag,)
+
+def extract_lang(lang_list, pattern):
+    
+    for item in lang_list:
+        if re.match(pattern, item):
+            return item
+        
+    return None

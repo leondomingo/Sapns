@@ -58,6 +58,7 @@
                 title: "{{_('Remember password')}}",
                 modal: true,
                 resizable: false,
+                draggable: false,
                 width: 600,
                 height: 'auto',
                 buttons: {
@@ -73,6 +74,7 @@
                         
                         $.ajax({
                             url: "{{tg.url('/remember_password/')}}",
+                            cache: false,
                             data: {
                                 username_or_email: username_or_email
                             },
