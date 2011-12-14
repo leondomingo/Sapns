@@ -21,7 +21,7 @@
             
             $('#g').sapnsGrid({
                 cls: 'grupos',
-                //caption: 'Grid test', 
+                //caption: 'Grid test',
                 caption: function() {
                     return 'Grid test (func)';
                 },
@@ -34,9 +34,12 @@
                         filters: JSON.stringify([['id', 7183]])
                     }
                 },
-                search_params_: {
+                search_params: {
                     url: "{{tg.url('/dashboard/test_search/')}}",
                     data: { cls: 'alumnos' }
+                },
+                onLoad: function(res) {
+                    console.log(res.esto_es_una_prueba);
                 },
                 /*search_func: function(q, rp, pos) {
                     //console.log([q, rp, pos].join(', ')); 

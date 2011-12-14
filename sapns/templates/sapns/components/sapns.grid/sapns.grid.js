@@ -73,6 +73,7 @@ catch(e) {
         set(this, 'hide_id', false);
         set(this, 'dblclick', null);
         set(this, 'select_first', false);
+        set(this, 'onLoad', null);
         
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
@@ -386,6 +387,11 @@ catch(e) {
 
                     self.data = response.data;
                     self.loadData();
+                    
+                    // onLoad
+                    if (self.onLoad) {
+                        self.onLoad(response);
+                    }
                 }
             }
         }, self.search_params);

@@ -935,6 +935,7 @@ class DashboardController(BaseController):
             cols.append(dict(title=col))
         
         return dict(status=True,
+                    esto_es_una_prueba=u'Hola, mundo!',
                     cols_=[dict(title='id', width=30),
                           dict(title='ABC', align='right', width=100),
                           dict(title='DEF', width=300),
