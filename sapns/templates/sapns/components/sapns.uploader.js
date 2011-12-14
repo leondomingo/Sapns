@@ -157,7 +157,7 @@
                     url: "{{tg.url('/dashboard/docs/remove_file')}}",
                     data: {
                         file_name: f,
-                        id_repo: self.getRepo(),
+                        id_repo: self.getRepo()
                     },
                     success: function(data) {
                         if (data.status) {
