@@ -29,6 +29,7 @@
         set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
         set(this, 'repo', '');
         set(this, 'show_button', true);
+        set(this, 'auto_upload', true);
         set(this, 'onUpload', null);
         set(this, 'onDelete', null);
         set(this, 'onError', null);
@@ -66,18 +67,29 @@
     // upload
     SapnsUploader.prototype.upload = function() {
         
-        if ($('#upload_file_form_' + this.name + ' input[name=f]').val() == '') {
+        var self = this;
+        
+        if ($('#upload_file_form_' + self.name + ' input[name=f]').val() == '') {
             return;
         }
         
-        if (this.getRepo() == '') {
-            this.showWarning($('#btn_upload_' + this.name), 
-                    "{{_('There is no repo selected')}}");
+        if (self.getRepo() == '') {
+            
+            var msg = "{{_('There is no repo selected')}}";
+            
+            if (!self.auto_upload) {
+                self.showWarning($('#btn_upload_' + self.name), msg);
+            }
+            else {
+                alert(msg);
+                $('#upload_file_form_' + self.name + ' input[type=file]').val('');
+            }
+            
             return;
         }
         
-        $('#upload_file_form_' + this.name + ' input[name=id_repo]').val(this.repo);
-        $('#upload_file_form_' + this.name).submit();
+        $('#upload_file_form_' + self.name + ' input[name=id_repo]').val(self.repo);
+        $('#upload_file_form_' + self.name).submit();
     }
     
     // getUploaded
@@ -187,10 +199,10 @@
                     ' <input type="hidden" name="id_repo" value="">' +
                     ' <input id="file_' + sufix + '" type="file" name="f">';
                     
-            if (sapnsUploader.show_button) {
+            if (sapnsUploader.show_button && !sapnsUploader.auto_upload) {
                 content += ' <input id="btn_upload_' + sufix + '" type="button" value="Upload">';
             }
-                    
+            
             content += ' </form>';
             
             content += 
@@ -217,6 +229,13 @@
                 
                 sapnsUploader.setUploaded(false);
             });
+            
+            // autoUpload
+            if (sapnsUploader.auto_upload) {
+                $('#upload_file_form_' + sufix + ' input[type=file]').change(function() {
+                    sapnsUploader.upload();                    
+                });
+            }
             
             // event handlers 
             var container = this;
