@@ -40,7 +40,7 @@
                     data: { cls: 'alumnos' }
                 },
                 onLoad: function(res) {
-                    console.log(res.esto_es_una_prueba);
+                    console.log(res.data.length);
                 },
                 /*search_func: function(q, rp, pos) {
                     //console.log([q, rp, pos].join(', ')); 
@@ -51,12 +51,28 @@
                            ];
                 },*/
                 //default_: { col_width: 10, col_align: 'left' },
-                cols_: [{title: 'id', width: 30}, 
-                       {title: 'Úno', align: 'right', width: 100}, 
-                       {title: 'đæßß', width: 300}, 
-                       {title: 'trEs', align: 'left'},
-                       {title: 'CUATRO'}
-                       ],
+                cols_: [
+                        {
+                            title: 'id', 
+                            width: 30
+                        },
+                        {
+                            title: 'Úno', 
+                            align: 'right', 
+                            width: 100
+                        }, 
+                        {
+                            title: 'đæßß', 
+                            width: 300
+                        }, 
+                        {
+                            title: 'trEs', 
+                            align: 'left'
+                        },
+                        {
+                            title: 'CUATRO'
+                        }
+                        ],
                 actions_: {},
                 actions__: [{title: 'act1', url: '/act1', type: 'process', require_id: true},
                           {title: 'act2', url: '/act2', type: 'process'},
@@ -64,34 +80,61 @@
                           ],
                 actions: function() {
                     //console.log(this.cls);
-                    return [{title: 'New', url: '/act1', type: 'new', required_id: false},
-                            {title: 'Edit', url: '/act2', type: 'edit'},
-                            {title: 'Delete', url: '/act3', type: 'delete'},
-                            {title: 'ACT4_F',
-                             type: {
-                                 id:'act4_f', 
-                                 f: function(id) {
-                                     alert('act4_f: id=' + id);
-                                 }
-                             },
-                             require_id: true
+                    return [
+                            {
+                                title: 'New', 
+                                url: '/act1', 
+                                type: 'new', 
+                                required_id: false
                             },
-                            {title: 'act5_f',
-                             type: {
-                                 id:'act5_f',                                    
-                                 f: function(id) {
-                                     alert('act5_f: byyyyyye! ' + id);
-                                 }
-                             },
-                             require_id: false
+                            {
+                                title: 'Edit', 
+                                url: '/act2', 
+                                type: 'edit'
+                            },
+                            {
+                                title: 'Delete', 
+                                url: '/act3', 
+                                type: 'delete'
+                            },
+                            {
+                                title: 'ACT4_F',
+                                type: {
+                                    id:'act4_f', 
+                                    f: function(id) {
+                                        alert('act4_f: id=' + id);
+                                    }
+                                },
+                                require_id: true
+                            },
+                            {
+                                title: 'act5_f',
+                                type: {
+                                    id:'act5_f',
+                                    f: function(id) {
+                                        alert('act5_f: byyyyyye! ' + id);
+                                    }
+                                },
+                                require_id: false
+                            },
+                            {
+                                title: "Select all",
+                                type: {
+                                    id: "select_all",
+                                    f: function() {
+                                        $('#g').sapnsGrid('setRp', 0); // all 
+                                        $('#g').sapnsGrid('search', true, function() {
+                                            $('#g .sp-grid-rowid').attr('checked', true);
+                                        });
+                                    }
+                                },
+                                require_id: false
                             }
                            ]
                 },
                 exportable: true
             });
-        }); //.sapnsGrid('search');
-        
-        //$('#g').sapnsGrid('search');
+        }); //.sapnsGrid('search'); 
     </script>
 </body>
 </html>
