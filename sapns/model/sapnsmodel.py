@@ -1048,9 +1048,10 @@ class SapnsClass(DeclarativeBase):
     # get attributes
     def get_attributes(self, id_user):
         
-        logger = logging.getLogger('get_attributes')
+        #logger = logging.getLogger('SapnsClass.get_attributes')
 
         def _get_attributes():
+            
             _cmp = SapnsAttrPrivilege.cmp_access
             
             class_attr_priv = {}
@@ -1058,6 +1059,7 @@ class SapnsClass(DeclarativeBase):
             last_attr = None
             
             # role based
+            # attr privileges
             for attr_priv in dbs.query(SapnsAttrPrivilege).\
                     join((SapnsRole,
                           SapnsRole.group_id == SapnsAttrPrivilege.role_id)).\
@@ -1078,34 +1080,33 @@ class SapnsClass(DeclarativeBase):
                 last_attr = attr_priv.attribute_id
 
                 if class_attr_priv.has_key(attr_priv.attribute_id):
-                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
+                    if _cmp(class_attr_priv[attr_priv.attribute_id].access, attr_priv.access) == -1:
                         class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access, pos=i)
     
                 else:
                     class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access, pos=i)
 
-#            # user based
-#            for attr_priv in dbs.query(SapnsAttrPrivilege).\
-#                    join((SapnsAttribute,
-#                          and_(SapnsAttribute.attribute_id == SapnsAttrPrivilege.attribute_id,
-#                               SapnsAttribute.class_id == self.class_id,
-#                               SapnsAttrPrivilege.user_id == id_user
-#                               ))):
-#                
-#                if class_attr_priv.has_key(attr_priv.attribute_id):
-#                    if _cmp(class_attr_priv[attr_priv.attribute_id], attr_priv.access) == -1:
-#                        class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-#    
-#                else:
-#                    class_attr_priv[attr_priv.attribute_id] = Dict(access=attr_priv.access)
-    
+            user = dbs.query(SapnsUser).get(id_user)
+
+            # class attributes (insertion order, field_regex, ...)
             class_attributes = []
             for attr in dbs.query(SapnsAttribute).\
                     filter(SapnsAttribute.class_id == self.class_id).\
                     order_by(SapnsAttribute.insertion_order):
-                
+
+                # what about the privileges on the related class?
                 if class_attr_priv.has_key(attr.attribute_id): 
-                # and class_attr_priv[attr.attribute_id].access != SapnsAttrPrivilege.ACCESS_DENIED:
+                
+                    if attr.related_class_id and \
+                    class_attr_priv[attr.attribute_id].access == SapnsAttrPrivilege.ACCESS_READWRITE:
+                    
+                        # related class
+                        rc = dbs.query(SapnsClass).get(attr.related_class_id)
+                        
+                        if not user.has_privilege(rc.name) or \
+                        not user.has_permission(u'%s#%s' % (rc.name, SapnsPermission.TYPE_LIST)):
+                            class_attr_priv[attr.attribute_id].access = SapnsAttrPrivilege.ACCESS_READONLY
+                
                     class_attributes.append(
                         Dict(id=attr.attribute_id,
                              name=attr.name,
@@ -1116,9 +1117,10 @@ class SapnsClass(DeclarativeBase):
                              field_regex=attr.field_regex,
                             ))
             
+            # merge list of attributes and privileges on those attributes in one list
             return zip(class_attributes, sorted(class_attr_priv.values(), 
                                                 cmp=lambda x, y: cmp(x.pos, y.pos)))
-        
+            
         _cache = cache.get_cache(SapnsClass.CACHE_ID_ATTR)
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
                                 createfunc=_get_attributes, expiretime=3600)
@@ -1206,7 +1208,7 @@ class SapnsPrivilege(DeclarativeBase):
     @staticmethod
     def has_privilege(id_user, cls):
         
-        logger = logging.getLogger('SapnsPrivilege.has_privilege')
+        #logger = logging.getLogger('SapnsPrivilege.has_privilege')
 
         if isinstance(cls, (str, unicode)):
             id_class = SapnsClass.by_name(cls).class_id
@@ -1216,23 +1218,21 @@ class SapnsPrivilege(DeclarativeBase):
         
         def _has_privilege():
             
-            logger.info('> class=%s' % cls)
+            #logger.info('> class=%s' % cls)
             
-            # user
-            priv = SapnsPrivilege.get_privilege(id_class, id_user=id_user)
-            
-            if not priv:
-                # role
-                priv = dbs.query(SapnsPrivilege).\
-                    join((SapnsRole,
-                          SapnsRole.group_id == SapnsPrivilege.role_id)).\
-                    join((SapnsUserRole,
-                          and_(SapnsUserRole.role_id == SapnsRole.group_id,
-                               SapnsUserRole.user_id == id_user))).\
-                    filter(SapnsPrivilege.class_id == id_class).\
-                    first()
-                    
-            return priv.granted
+            # role based
+            priv = dbs.query(SapnsPrivilege).\
+                join((SapnsRole,
+                      SapnsRole.group_id == SapnsPrivilege.role_id)).\
+                join((SapnsUserRole,
+                      and_(SapnsUserRole.role_id == SapnsRole.group_id,
+                           SapnsUserRole.user_id == id_user))).\
+                filter(and_(SapnsPrivilege.class_id == id_class,
+                            SapnsPrivilege.granted,
+                            )).\
+                first()
+               
+            return priv != None
         
         _cache = cache.get_cache(SapnsPrivilege.CACHE_ID)
         return _cache.get_value(key='%d_%d' % (id_user, id_class),
@@ -1323,9 +1323,9 @@ class SapnsAttrPrivilege(DeclarativeBase):
     
     access = Column(Unicode(15)) # denied, read-only, read/write
     
-    ACCESS_DENIED = 'denied'
-    ACCESS_READONLY = 'read-only'
-    ACCESS_READWRITE = 'read/write'
+    ACCESS_DENIED = u'denied'
+    ACCESS_READONLY = u'read-only'
+    ACCESS_READWRITE = u'read/write'
     
     CACHE_ID = 'attrpriv_get_access'
     
@@ -1749,6 +1749,139 @@ class SapnsDoc(DeclarativeBase):
         t = (self.title or _('NO_TITLE'))
         pat = re.compile(r'[^a-z0-9_\-.]', re.I)
         return re.sub(pat, '_', t).encode('utf-8')
+    
+    def register(self, cls, object_id):
+        """
+        IN
+          cls        <int>/<unicode>/<str>
+          object_id  <int>
+        """
+        
+        if isinstance(cls, int):
+            cls = dbs.query(SapnsClass).get(cls)
+            
+        elif isinstance(cls, (str, unicode,)):
+            cls = SapnsClass.by_name(cls, parent=False)
+
+        # assign doc to object/class
+        ad = SapnsAssignedDoc()
+        ad.doc_id = self.doc_id
+        ad.class_id = cls.class_id
+        ad.object_id = object_id
+        
+        dbs.add(ad)
+        dbs.flush()
+    
+    @staticmethod
+    def delete_doc(id_doc):
+        """
+        IN
+          id_doc  <int>
+        """
+        
+        id_doc = int(id_doc)
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        
+        # remove file from disk
+        SapnsDoc.remove_file(doc.repo_id, doc.filename)
+        
+        # remove doc
+        dbs.query(SapnsDoc).filter(SapnsDoc.doc_id == id_doc).delete()
+        dbs.flush()
+    
+    @staticmethod
+    def upload(f, id_repo):
+        """
+        IN
+          f        <file>
+          id_repo  <int>
+          
+        OUT
+          {uploaded_file: <str>,
+           file_name:     <str>,
+           file_size:     <int>}
+        """
+        
+        import hashlib as hl
+        import random
+        
+        # get repo
+        repo = dbs.query(SapnsRepo).get(id_repo)
+        if not repo:
+            raise Exception(_('Repo [%d] was not found') % id_repo)
+        
+        repo_path = repo.abs_path()
+        
+        # calculate random name for the new file
+        def _file_path():
+            
+            # create hash
+            s256 = hl.sha256()
+            
+            random.seed()
+            s256.update('%s%6.6d' % (f.filename.encode('utf-8'), random.randint(0, 999999)))
+            
+            file_name = s256.hexdigest()
+            return os.path.join(repo_path, file_name), file_name
+        
+        while True:
+            file_path, file_name = _file_path()
+            # does it exist???
+            if not os.access(file_path, os.F_OK):
+                break
+        
+        f.file.seek(0)
+        with file(file_path, 'wb') as fu:
+            fu.write(f.file.read())
+            
+        return dict(uploaded_file=f.filename,
+                    file_name=file_name,
+                    file_size=f.file.tell())
+        
+    @staticmethod
+    def download(id_doc):
+        """
+        IN
+          id_doc  <int>
+          
+        OUT
+          (<content>, <mime type>, <file name>,)
+        """
+        
+        import mimetypes
+        
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        if not doc:
+            # TODO: document does not exist
+            pass
+        
+        content = ''
+        f = file(os.path.join(doc.repo.abs_path(), doc.filename), 'rb')
+        try:
+            content = f.read()
+        
+        finally:
+            f.close()
+            
+        file_name = ('%s.%s' % (doc.title_as_filename(), doc.docformat.extension)).encode('utf-8')
+            
+        mt = doc.docformat.mime_type
+        if not mt:
+            mt = mimetypes.guess_type(file_name)[0]
+            
+        return content, mt, file_name
+    
+    @staticmethod
+    def remove_file(id_repo, file_name):
+
+        repo = dbs.query(SapnsRepo).get(id_repo)
+        if not repo:
+            raise Exception(_('Repo [%d] was not found') % id_repo)
+        
+        path_file = os.path.join(repo.abs_path(), file_name) 
+        if os.access(path_file, os.F_OK):
+            os.remove(path_file)
+
 
 class SapnsDocType(DeclarativeBase):
     

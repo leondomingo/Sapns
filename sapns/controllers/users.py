@@ -106,7 +106,7 @@ class UsersController(BaseController):
         
         except EUser, e:
             logger.error(e)
-            return dict(status=False, message=str(e).decode('utf-8'))
+            return dict(status=False, message=unicode(e))
         
         except Exception, e:
             logger.error(e)

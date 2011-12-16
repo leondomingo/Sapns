@@ -1,8 +1,6 @@
 # -*- coding: utf-8 -*-
-"""Documents controller"""
 
-# turbogears imports
-from neptuno.dataset import DataSet
+"""Documents controller"""
 from neptuno.dict import Dict
 from neptuno.postgres.search import search
 from neptuno.util import get_paramw
@@ -10,17 +8,12 @@ from pylons.i18n import ugettext as _
 from repoze.what import authorize, predicates as p
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsAssignedDoc, \
-    SapnsClass
+from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
 from tg import expose, config, request, require, response
 import logging
-import mimetypes
-import os
 import simplejson as sj #@UnresolvedImport
 
 __all__ = ['DocsController']
-
-#REPO_BASE_PATH = config.get('app.repo_base')
 
 class DocsController(BaseController):
     
@@ -96,23 +89,6 @@ class DocsController(BaseController):
         return dict(status=True, cols=cols, data=ds.to_data(), 
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
     
-    @expose('sapns/docs/index.html')
-    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
-    def all(self, **kw):
-        came_from = kw.get('came_from')
-        
-        doclist = DataSet(['title', 'format', 'type', 'author', 'repo'])
-        
-        for i in xrange(30):
-            doclist.append(dict(title='Title %d' % i,
-                                format='Format %d' % i,
-                                type='Type %d' % i,
-                                author='Author %d' % i,
-                                repo='Repo %d' % i,
-                                ))
-        
-        return dict(page='all-docs', doclist=doclist, came_from=came_from)
-    
     @expose('sapns/docs/edit.html')
     @require(authorize.has_any_permission('manage', 'docs'))
     def edit(self, **kw):
@@ -141,6 +117,7 @@ class DocsController(BaseController):
         doc.id_type = doc_.doctype_id
         doc.id_format = doc_.docformat_id
         doc.filename = doc_.filename
+        doc.id_repo = doc_.repo_id
         
         return dict(doc=doc)
     
@@ -185,15 +162,8 @@ class DocsController(BaseController):
             
             if not id_doc:
                 # (only at creation)
-                # assign doc to object/class
-                assigned_doc = SapnsAssignedDoc()
-                assigned_doc.doc_id = new_doc.doc_id
-                assigned_doc.class_id = id_class
-                assigned_doc.object_id = id_object
+                new_doc.register(id_class, id_object)
                 
-                dbs.add(assigned_doc)
-                dbs.flush()
-            
             return dict(status=True)
     
         except Exception, e:
@@ -206,17 +176,7 @@ class DocsController(BaseController):
 
         logger = logging.getLogger('DocsController.delete')        
         try:
-            id_doc = int(id_doc)
-            doc = dbs.query(SapnsDoc).get(id_doc)
-            
-            # TODO: remove file from disk
-            self.remove_file(file_name=doc.filename, id_repo=doc.repo_id)
-            
-            # remove doc
-            dbs.query(SapnsDoc).filter(SapnsDoc.doc_id == id_doc).delete()
-            
-            dbs.flush()
-            
+            SapnsDoc.delete_doc(int(id_doc))
             return dict(status=True)
         
         except Exception, e:
@@ -229,34 +189,13 @@ class DocsController(BaseController):
         
         logger = logging.getLogger('DocsController.upload_file')
         try:
-            import hashlib as hl
-            import random
-            
-            logger.info(kw)
-
-            # create hash
-            s256 = hl.sha256()
-            
-            random.seed()
-            s256.update('%s%6.6d' % (f.filename, random.randint(0, 999999)))
-            
-            file_name = s256.hexdigest()
-            
-            # repo
             id_repo = get_paramw(kw, 'id_repo', int)
-            
-            repo = dbs.query(SapnsRepo).get(id_repo)
-            if not repo:
-                raise Exception(_('Repo [%d] was not found') % id_repo)
-            
-            f.file.seek(0)
-            with file(os.path.join(repo.abs_path(), file_name), 'wb') as fu:
-                fu.write(f.file.read())
+            r = SapnsDoc.upload(f, id_repo)
             
             return sj.dumps(dict(status=True, 
-                                 uploaded_file=f.filename,
-                                 file_name=file_name,
-                                 file_size=f.file.tell(),
+                                 uploaded_file=r['uploaded_file'],
+                                 file_name=r['file_name'],
+                                 file_size=r['file_size'],
                                  ))
         
         except Exception, e:
@@ -267,26 +206,9 @@ class DocsController(BaseController):
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def download(self, id_doc):
         
-        doc = dbs.query(SapnsDoc).get(id_doc)
-        if not doc:
-            pass
-        
-        content = ''
-        f = file(os.path.join(doc.repo.abs_path(), doc.filename), 'rb')
-        try:
-            content = f.read()
-        
-        finally:
-            f.close()
-            
-        file_name = ('%s.%s' % (doc.title_as_filename(), doc.docformat.extension)).encode('utf-8')
-            
-        mt = doc.docformat.mime_type
-        if not mt:
-            mt = mimetypes.guess_type(file_name)[0]
-            
+        content, mt, file_name = SapnsDoc.download(int(id_doc))
         response.headerlist.append(('Content-Type', mt.encode('utf-8')))
-        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))            
+        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
         
         return content
         
@@ -299,13 +221,7 @@ class DocsController(BaseController):
             file_name = get_paramw(kw, 'file_name', unicode)
             id_repo = get_paramw(kw, 'id_repo', int)
             
-            repo = dbs.query(SapnsRepo).get(id_repo)
-            if not repo:
-                raise Exception(_('Repo [%d] was not found') % id_repo)
-            
-            path_file = os.path.join(repo.abs_path(), file_name) 
-            if os.access(path_file, os.F_OK):
-                os.remove(path_file)
+            SapnsDoc.remove_file(id_repo, file_name)
             
             return dict(status=True)
         

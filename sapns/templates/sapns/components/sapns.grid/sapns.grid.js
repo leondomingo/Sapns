@@ -69,7 +69,8 @@ try {
         set(this, 'hide_id', false);
         set(this, 'dblclick', null);
         set(this, 'select_first', false);
-
+        set(this, 'onLoad', null);
+        
         set(this, 'default_', {});
         set(this.default_, 'col_width', 60, this.default_);
         set(this.default_, 'col_align', 'center', this.default_);
@@ -299,7 +300,7 @@ try {
     }
 
     // search
-    SapnsGrid.prototype.search = function(q, force) {
+    SapnsGrid.prototype.search = function(q, force, on_load) {
         var self = this;
 
         if (force == undefined) {
@@ -419,8 +420,17 @@ try {
                     
                     self.data = response.data;
                     self.loadData();
-                } // if
-            } // sucess 
+                    
+                    // onLoad
+                    if (on_load) {
+                        on_load(response);
+                    }
+                    
+                    if (self.onLoad) {
+                        self.onLoad(response);
+                    }
+                }
+            }
         }, self.search_params);
 
         var curr_ajx_data = JSON.stringify(ajx.data);
@@ -597,8 +607,9 @@ try {
             // console.log('click');
             if ($(this).attr('clickable') == 'true') {
                 var row_id = $(this).parent().parent().find('.sp-grid-rowid');
-                $('#' + self.name + ' .sp-grid-rowid').each(function() {
-                    if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
+                $('#'+self.name + ' .sp-grid-rowid').each(function() {
+                    var ctrl = event.ctrlKey || event.metaKey;
+                    if ($(this) != row_id && !self.multiselect && !ctrl) {
                         $(this).attr('checked', false);
                     }
                 });
@@ -724,10 +735,10 @@ try {
             
             // child attribute
             var ch_attr = self.ch_attr;
-
-            // if CTRL is pressed open in a new tab
+            
+            // if CTRL or CMD (Mac) is pressed open in a new tab 
             var target = '';
-            if (event.ctrlKey) {
+            if (event.ctrlKey || event.metaKey) {
                 target = '_blank';
             }
 
@@ -1138,6 +1149,12 @@ try {
                 self.loadData();
             }
             // search
+            // sapnsGrid('search', <string>/<bool>, [<function>])
+            // sapnsGrid('search', 'john doe')
+            // sapnsGrid('search', true)
+            // a function is executed after data is loaded (before "general" onLoad)
+            // sapnsGrid('search', true, function() {})
+            // sapnsGrid('search', 'john doe', function() {})
             else if (arg1 == "search") {
                 var q = '';
 
@@ -1150,17 +1167,18 @@ try {
                 if (self.with_search) {
                     $('#' + self.name + ' .sp-search-txt').val(q);
                 }
-
-                self.search(q, true);
+                
+                self.search(q, true, arg3);
             }
             // getSelectedIds
             else if (arg1 == "getSelectedIds") {
                 return self.getSelectedIds();
             }
-            // delete
-            /*
-             * else if (arg1 == "delete") { self.std_delete(); }
-             */
+            // setRp
+            else if (arg1 == "setRp") {
+                self.rp = arg2;
+                $('#'+self.name + ' .sp-grid-rp [value='+arg2+']').attr('selected', true);
+            }
             // TODO: other sapnsGrid methods
         }
 

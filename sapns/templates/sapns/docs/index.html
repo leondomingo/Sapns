@@ -6,7 +6,6 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    
     <link rel="stylesheet" type="text/css" media="screen" 
         href="{{tg.url('/css/docs.min.css')}}">
 {% endblock %}
@@ -234,6 +233,9 @@
                                     $('#doc_title').val(this.getUploadedfile());
                                 }
                             }
+                            /*onError: function(msg) {
+                                alert(msg);
+                            }*/
                         });
                         
                         // assign repo (if there's any) 
@@ -289,6 +291,8 @@
                     modal: true,
                     resizable: false,
                     title: "{{_('Delete document')}}",
+                    width: 'auto',
+                    height: 'auto',
                     buttons: {
                         "{{_('Ok')}}": function() {
                             var callback_success = function() {
@@ -323,11 +327,10 @@
                 actions: [{
                     title: "{{_('Add')}}",
                     type: {
-                        id: "add",
+                        id: "add", 
                         f: function() { edit_doc(); }
-                    },
-                    require_id: false
-                    
+                     },
+                     require_id: false
                 },
                 {
                     title: "{{_('Edit')}}",
@@ -346,7 +349,6 @@
                                 '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
                                 '</form>';
                             $(form).appendTo('body').submit().remove();
-                                //alert('downloading...'); 
                         }
                     },
                     require_id: true
