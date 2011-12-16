@@ -267,7 +267,7 @@ catch(e) {
     }
     
     // search
-    SapnsGrid.prototype.search = function(q, force) {
+    SapnsGrid.prototype.search = function(q, force, on_load) {
         var self = this;
         
         if (force == undefined) {
@@ -389,6 +389,10 @@ catch(e) {
                     self.loadData();
                     
                     // onLoad
+                    if (on_load) {
+                        on_load(response);
+                    }
+                    
                     if (self.onLoad) {
                         self.onLoad(response);
                     }
@@ -1077,6 +1081,12 @@ catch(e) {
                 self.loadData();
             }
             // search
+            // sapnsGrid('search', <string>/<bool>, [<function>])
+            // sapnsGrid('search', 'john doe')
+            // sapnsGrid('search', true)
+            // a function is executed after data is loaded (before "general" onLoad)
+            // sapnsGrid('search', true, function() {})
+            // sapnsGrid('search', 'john doe', function() {})
             else if (arg1 == "search") {
                 var q = '';
                 
@@ -1091,16 +1101,17 @@ catch(e) {
                     $('#'+self.name + ' .sp-search-txt').val(q);
                 }
                 
-                self.search(q, true);
+                self.search(q, true, arg3);
             }
             // getSelectedIds
             else if (arg1 == "getSelectedIds") {
                 return self.getSelectedIds();
             }
-            // delete
-            /*else if (arg1 == "delete") {
-                self.std_delete();
-            }*/
+            // setRp
+            else if (arg1 == "setRp") {
+                self.rp = arg2;
+                $('#'+self.name + ' .sp-grid-rp [value='+arg2+']').attr('selected', true);
+            }
             // TODO: other sapnsGrid methods
         }
         
