@@ -40,7 +40,6 @@
     <input id="username_or_email" type="text">
 </div>
 
-{% block middle %}
 <div id="loginform">
 <form action="{{tg.url('/login_handler', params=dict(came_from_=came_from_.encode('utf-8'), __logins=login_counter.encode('utf-8')))}}" method="post" accept-charset="UTF-8" class="loginfields">
     <h2><span>Login</span></h2>
