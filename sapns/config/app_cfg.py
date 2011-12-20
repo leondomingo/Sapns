@@ -13,13 +13,59 @@ convert them into boolean, for example, you should use the
  
 """
 
-from tg.configuration import AppConfig
-import sapns
 from sapns import model
 from sapns.lib import app_globals, helpers
+from tg.configuration import AppConfig
 import neptuno.util as np_util
+import sapns
 
 class CustomConfig(AppConfig):
+    
+    def __init__(self):
+        super(CustomConfig, self).__init__()
+        self.use_toscawidgets = True
+        
+        self.renderers = []
+        
+        self.package = sapns
+        
+        #Enable json in expose
+        self.renderers.append('json')
+        #Set the default renderer
+        self.default_renderer = 'jinja'
+        self.renderers.append('jinja')
+        self.jinja_extensions = ['jinja2.ext.i18n']
+        
+        #Configure the base SQLALchemy Setup
+        self.use_sqlalchemy = True
+        self.model = sapns.model #@UndefinedVariable
+        self.DBSession = sapns.model.DBSession #@UndefinedVariable
+        
+        # Configure the authentication backend
+        self.sa_auth.cookie_secret = 'LxxuuTrt-UOG2-FleS-JA6z-KHQmP8zkO0uA'
+        self.auth_backend = 'sqlalchemy'
+        self.sa_auth.dbsession = model.DBSession
+        # what is the class you want to use to search for users in the database
+        self.sa_auth.user_class = model.User
+        # what is the class you want to use to search for groups in the database
+        self.sa_auth.group_class = model.Group
+        # what is the class you want to use to search for permissions in the database
+        self.sa_auth.permission_class = model.Permission
+        
+        # override this if you would like to provide a different who plugin for
+        # managing login and logout of your application
+        self.sa_auth.form_plugin = None
+        
+        # override this if you are using a different charset for the login form
+        self.sa_auth.charset = 'utf-8'
+        
+        # You may optionally define a page where you want users to be redirected to
+        # on login:
+        self.sa_auth.post_login_url = '/post_login'
+        
+        # You may optionally define a page where you want users to be redirected to
+        # on logout:
+        self.sa_auth.post_logout_url = '/post_logout'        
     
     def setup_routes(self):
         """Setup the default TG2 routes
@@ -103,58 +149,9 @@ class CustomConfig(AppConfig):
  
         config['pylons.app_globals'].jinja2_env.filters[func_name] = func
 
-#base_config = AppConfig()
 base_config = CustomConfig()
-base_config.renderers = []
-
-base_config.package = sapns
-
-#Enable json in expose
-base_config.renderers.append('json')
-#Set the default renderer
-base_config.default_renderer = 'jinja'
-base_config.renderers.append('jinja')
-base_config.jinja_extensions = ['jinja2.ext.i18n']
-# if you want raw speed and have installed chameleon.genshi
-# you should try to use this renderer instead.
-# warning: for the moment chameleon does not handle i18n translations
-#base_config.renderers.append('chameleon_genshi')
-
-#Configure the base SQLALchemy Setup
-base_config.use_sqlalchemy = True
-base_config.model = sapns.model #@UndefinedVariable
-base_config.DBSession = sapns.model.DBSession #@UndefinedVariable
-
-# Configure the authentication backend
-
-# YOU MUST CHANGE THIS VALUE IN PRODUCTION TO SECURE YOUR APP 
-base_config.sa_auth.cookie_secret = "ChangeME" 
-
-base_config.auth_backend = 'sqlalchemy'
-base_config.sa_auth.dbsession = model.DBSession
-# what is the class you want to use to search for users in the database
-base_config.sa_auth.user_class = model.User
-# what is the class you want to use to search for groups in the database
-base_config.sa_auth.group_class = model.Group
-# what is the class you want to use to search for permissions in the database
-base_config.sa_auth.permission_class = model.Permission
-
-# override this if you would like to provide a different who plugin for
-# managing login and logout of your application
-base_config.sa_auth.form_plugin = None
-
-# override this if you are using a different charset for the login form
-base_config.sa_auth.charset = 'utf-8'
-
-# You may optionally define a page where you want users to be redirected to
-# on login:
-base_config.sa_auth.post_login_url = '/post_login'
-
-# You may optionally define a page where you want users to be redirected to
-# on logout:
-base_config.sa_auth.post_logout_url = '/post_logout'
 
 # Sapns settings
 def format_float(value):
     return np_util.format_float(value, thousands_sep=',', decimal_sep='.', 
-                                show_sign=False, n_dec=2) 
+                                show_sign=False, n_dec=2)
