@@ -623,7 +623,9 @@ class DashboardController(BaseController):
             if class_.name != u'sp_logs':
                 _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
                 _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
-            
+                
+        #logger.info(row)
+        
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
@@ -640,7 +642,9 @@ class DashboardController(BaseController):
                 value = default_values[attr.name]
 
             elif row:
-                if row[attr.name]:
+                #logger.info(row[attr.name])
+                #logger.info(attr)
+                if row[attr.name] != None: 
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
                         value = datetostr(row[attr.name], fmt=date_fmt)
@@ -648,6 +652,10 @@ class DashboardController(BaseController):
                     # datetime
                     elif attr.type == SapnsAttribute.TYPE_DATETIME:
                         value = row[attr.name].strftime(datetime_fmt) if row[attr.name] else ''
+                        
+                    # numeric (int, float)
+                    elif attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:                                       
+                        value = row[attr.name]
                     
                     # rest of types
                     else:
