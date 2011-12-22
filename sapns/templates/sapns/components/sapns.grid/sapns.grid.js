@@ -70,6 +70,7 @@ catch(e) {
         set(this, 'url_base', '');
         set(this, 'multiselect', false);
         set(this, 'actions_inline', false);
+        set(this, 'hide_check', false);
         set(this, 'hide_id', false);
         set(this, 'dblclick', null);
         set(this, 'select_first', false);
@@ -141,19 +142,30 @@ catch(e) {
     // loadData
     SapnsGrid.prototype.loadData = function() {
         
+        //console.log('loadData');
+        
         var self = this;
-        
-        var g_table = 
-            '<table class="sp-grid">' +
-            '<tr><td class="sp-col-title">#</td>';
-        
-        if (self.actions_inline) {
-            g_table += '<td class="sp-col-title">*</td>';
-        }
         
         var cols = self.cols;
         if (typeof(cols) == 'function') {
             cols = cols();
+        }
+        
+        var g_wd = 50; // min-width: 20px;
+        for (var i=0, l=cols.length; i<l; i++) {
+            var col = cols[i];
+            g_wd += (col.width + 4);
+        }
+        
+        // <table>
+        var g_table = '<div style="width: ' + g_wd + 'px;">';
+        
+        if (!self.hide_check) {
+            g_table += '<div class="sp-grid-row"><div class="sp-col-title">#</div>';
+        }
+        
+        if (self.actions_inline) {
+            g_table += '<div class="sp-col-title">*</div>';
         }
         
         for (var i=0, l=cols.length; i<l; i++) {
@@ -167,10 +179,10 @@ catch(e) {
                 continue;
             }
             
-            g_table += '<td class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</td>';
+            g_table += '<div class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</div>';
         }
 
-        g_table += '</tr>';
+        g_table += '</div>';
         
         var data = self.data;
         if (typeof(data) == 'function') {
@@ -183,18 +195,20 @@ catch(e) {
             
             var row = data[i];
             
-            g_table += 
-                '<tr class="sp-grid-row">' +
-                '<td title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></td>';
+            g_table += '<div class="sp-grid-row">';
+            
+            if (!self.hide_check) {
+                g_table += '<div class="sp-grid-cell" title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
+            }
             
             if (self.actions_inline) {
                 var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
                 g_table +=
-                '<td style="font-size: 10px; width: 35px;">' +
-                '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
-                '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
-                '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
-                '</td>';
+                '<div class="sp-grid-cell" style="font-size: 10px; width: 35px;">' +
+                    '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
+                    '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
+                    '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
+                '</div>';
             }
             
             for (var j=0, lr=cols.length; j<lr; j++) {
@@ -223,10 +237,10 @@ catch(e) {
                     width = ' width: ' + wd + 'px;';
                 }
                 
-                g_table += '<td><div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
+                g_table += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
                 
                 if (cell) {
-                    g_table += 'title="' + cell + '"';
+                    g_table += 'title="' + cell.replace(/"/gi, '\'') + '"';
                 }
                 else {
                     g_table += 'title="({{_("empty")}})"';
@@ -242,10 +256,10 @@ catch(e) {
                 }*/
                 g_table += cell;
                 
-                g_table += '</div></td>';
+                g_table += '</div>';
             }
             
-            g_table += '</tr>';
+            g_table += '</div>';
         }
         }
         else {
@@ -254,11 +268,13 @@ catch(e) {
                 n = 3;
             }
             g_table += 
-                '<tr class="sp-grid-row" style="width: 100%;">' +
-                    '<td class="sp-grid-cell sp-grid-noresults"' + 
-                        ' colspan="' + (cols.length+n) + '">{{_("No results")}}</td>' +
-                '</tr>';
+                '<div class="sp-grid-row">' +
+                    '<div class="sp-grid-cell sp-grid-noresults" style="width: 99%;" >{{_("No results")}}</div>' +
+                '</div>';
         }
+        
+        //g_table += '</table>';
+        g_table += '</div>';
         
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
         if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
@@ -575,7 +591,7 @@ catch(e) {
         $('#'+self.name + ' .sp-grid-cell').live('click', function(event) {
             //console.log('click');
             if ($(this).attr('clickable') == 'true') {
-                var row_id = $(this).parent().parent().find('.sp-grid-rowid');
+                var row_id = $(this).parent().find('.sp-grid-rowid');
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
                     var ctrl = event.ctrlKey || event.metaKey;
                     if ($(this) != row_id && !self.multiselect && !ctrl) {
