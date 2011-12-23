@@ -23,7 +23,7 @@ class CustomConfig(AppConfig):
     
     def __init__(self):
         super(CustomConfig, self).__init__()
-        self.use_toscawidgets = True
+        self.use_toscawidgets = False
         
         self.renderers = []
         
