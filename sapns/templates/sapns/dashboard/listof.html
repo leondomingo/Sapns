@@ -10,11 +10,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <script type="text/javascript" src="/js/sprintf.min.js"></script>
 {% endblock %}
-
-{#{% block header %}
-{% endblock %}#}
 
 {% block middle %}
     {{ super() }}
@@ -31,7 +27,8 @@
         <button id="rel-classes-show" class="sp-button">{{_('Show')}}</button>
     </div>
     {% endif %}
-        
+
+    <script type="text/javascript" src="/js/sprintf.min.js"></script>
     <script type="text/javascript">
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {

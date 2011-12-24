@@ -15,12 +15,12 @@ function load_css(href) {
     fileref.setAttribute("href", href);
 }
 
-try {
+/*try {
     sprintf;
 }
 catch (e) {
     load_script("{{tg.url('/js/sprintf.min.js')}}");
-}
+}*/
 
 /*try {
     qtip;
@@ -91,12 +91,12 @@ catch(e) {
         var formats = [{
             id: 'csv',
             title: 'CSV',
-            url: '/dashboard/tocsv'
+            url: "{{tg.url('/dashboard/tocsv')}}"
         },
         {
             id: 'excel',
             title: 'Excel',
-            url: '/dashboard/toxls'
+            url: "{{tg.url('/dashboard/toxls')}}"
         }];
         set(this, 'exportable_formats', formats);
         
@@ -844,7 +844,7 @@ catch(e) {
         // get object's title 
         var title = '';
         $.ajax({
-            url: "/dashboard/title",
+            url: "{{tg.url('/dashboard/title')}}",
             type: "get",
             dataType: "json",
             data: {
