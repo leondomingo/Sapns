@@ -214,7 +214,7 @@ class DashboardController(BaseController):
         
         cols = []
         for col in ds.labels:
-            w = 900 / len(ds.labels)
+            w = 1100 / len(ds.labels)
             if col == 'id':
                 w = 60
                 

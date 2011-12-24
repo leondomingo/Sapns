@@ -38,7 +38,7 @@
 	position: fixed;
 	background-color: #BCC170; /*#CCCFA5;*/
 	border: 3px solid gray;
-	width: 982px;
+	width: 1183px; /*982px;*/
 	height: 150px;
 	padding: 5px;
 	opacity: 0.85;
@@ -151,7 +151,7 @@
 
 #right_desc {
 	position: absolute; 
-    left: 360px; 
+    right: 10px; 
     top: 12px; 
     padding-right: 10px; 
     width: 617px; 

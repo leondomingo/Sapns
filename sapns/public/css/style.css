@@ -7,7 +7,7 @@ html {
 
 body {
 	text-align: left;
-	width: 1000px;
+	width: 1200px;
 	margin: 0 auto;
 	padding: 0;
 	font-size: 12px;
@@ -256,12 +256,8 @@ clear:both;
 }
 
 .sp_middle {
-	background-color: ltgray;
-	/*color: orange;*/
 	min-height: 600px;
 	border: 1px solid darkgray;
-	/*background-image: url('/images/sapns.gif');
-	background-repeat: no-repeat;*/
 }
 
 #you-are-in {
@@ -397,7 +393,6 @@ clear:both;
 }
 
 .sp-grid-row {
-	/*background-color: white;*/
 	clear: left;
 	height: 31px;
 	margin-bottom: -1px;
@@ -406,6 +401,7 @@ clear:both;
 .sp-grid-cell {
 	background-color: white;
 	border: 1px solid lightgray;
+	/*border-right: 1px solid lightgray;*/
 	font-family: arial;
 	font-size: 11px;
 	height: 25px;
@@ -415,6 +411,7 @@ clear:both;
 	padding: 2px;
 	float: left;
 	margin-right: -1px;
+	margin-bottom: -1px;
 }
 
 .sp-grid-noresults {

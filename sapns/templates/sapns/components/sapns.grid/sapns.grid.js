@@ -151,14 +151,13 @@ catch(e) {
             cols = cols();
         }
         
-        var g_wd = 50; // min-width: 20px;
+        var g_wd = 20; // min-width: 20px;
         for (var i=0, l=cols.length; i<l; i++) {
             var col = cols[i];
-            g_wd += (col.width + 4);
+            g_wd += (col.width + 8);
         }
         
-        // <table>
-        var g_table = '<div style="width: ' + g_wd + 'px;">';
+        var g_table = '<div class="sp-grid" style="width: ' + g_wd + 'px;">';
         
         if (!self.hide_check) {
             g_table += '<div class="sp-grid-row"><div class="sp-col-title">#</div>';
@@ -246,17 +245,7 @@ catch(e) {
                     g_table += 'title="({{_("empty")}})"';
                 }
                 
-                g_table += 'clickable="true">';
-                
-                /*if (cell.length > 30) {
-                    g_table += (cell+'').substr(0, 30) + '...';
-                }
-                else {
-                    g_table += cell;
-                }*/
-                g_table += cell;
-                
-                g_table += '</div>';
+                g_table += 'clickable="true">' + cell + '</div>';
             }
             
             g_table += '</div>';
@@ -269,7 +258,7 @@ catch(e) {
             }
             g_table += 
                 '<div class="sp-grid-row">' +
-                    '<div class="sp-grid-cell sp-grid-noresults" style="width: 99%;" >{{_("No results")}}</div>' +
+                    '<div class="sp-grid-cell sp-grid-noresults" style="width: ' + (g_wd - cols.length*4) + 'px;" >{{_("No results")}}</div>' +
                 '</div>';
         }
         
@@ -1005,7 +994,7 @@ catch(e) {
             
             var g_table = 
                 '<div class="sp-grid-parent" style="overflow: auto; clear: left; ' + 
-                    'height: ' + g.height + 'px; background-color: transparent;"></div>';
+                    'height: ' + (g.height+5) + 'px; background-color: transparent;"></div>';
             
             // pager
             var g_pager = '';
