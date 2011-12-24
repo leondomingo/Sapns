@@ -239,7 +239,7 @@ catch(e) {
                 g_table += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
                 
                 if (cell) {
-                    g_table += 'title="' + cell.replace(/"/gi, '\'') + '"';
+                    g_table += 'title="' + cell.replace(/"/gi, "''") + '"';
                 }
                 else {
                     g_table += 'title="({{_("empty")}})"';
