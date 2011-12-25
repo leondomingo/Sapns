@@ -37,11 +37,12 @@
 #edit-header {
 	position: fixed;
 	background-color: #BCC170; /*#CCCFA5;*/
-	border: 3px solid gray;
-	width: 1183px; /*982px;*/
+	border: 1px solid gray;
+	width: 1188px;
 	height: 150px;
 	padding: 5px;
 	opacity: 0.85;
+	margin-left: -1px;
 }
 
 #edit-back {
