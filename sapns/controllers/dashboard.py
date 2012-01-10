@@ -16,7 +16,7 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
-from sapns.lib.sapns.util import pagination
+from sapns.lib.sapns.util import pagination, init_lang, get_languages
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -79,17 +79,13 @@ class DashboardController(BaseController):
             sc_parent = None
             
         # number of messages
-        messages = user.messages()
-        unread = user.unread_messages()
+        #messages = user.messages()
+        #unread = user.unread_messages()
         
-        return dict(page='dashboard', curr_lang=curr_lang, shortcuts=shortcuts,
-                    messages=messages, unread=unread,
-                    sc_type=sc_type, sc_parent=sc_parent, _came_from=came_from)
+        return dict(page='dashboard', lang=init_lang(), languages=get_languages(), 
+                    shortcuts=shortcuts, sc_type=sc_type, 
+                    sc_parent=sc_parent, _came_from=came_from)
         
-    @expose()
-    def init(self):
-        redirect(url('/dashboard/util/init'))
-
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
     def list(self, cls, **params):
@@ -136,7 +132,8 @@ class DashboardController(BaseController):
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
-        return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=came_from, 
+        return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=came_from,
+                    lang=init_lang(), languages=get_languages(),
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
                               q=q.replace('"', '\\\"'), rp=rp, pag_n=pag_n,
@@ -824,7 +821,8 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='insertion order', insertion=class_.insertion(),
-                    title=class_.title, came_from=url(came_from))
+                    title=class_.title, came_from=url(came_from),
+                    lang=init_lang(), languages=get_languages())
 
     @expose()
     @require(p.in_group(u'managers'))
@@ -880,7 +878,8 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='reference order', reference=class_.reference(all=True), 
-                    came_from=came_from)
+                    came_from=came_from, lang=init_lang(), 
+                    languages=get_languages())
     
     @expose()
     @require(p.in_group(u'managers'))

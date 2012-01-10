@@ -107,13 +107,13 @@
         border: 2px solid white;">
     <div style="float: left; margin-left: 10px;margin-right: 5px;"> 
         <a href="{{tg.url('/setlang', params=dict(lang='en'))}}">
-            <img {% if curr_lang[0] == 'en' %} src="{{tg.url('/images/flags/uk.jpg')}}"
+            <img {% if lang == 'en' %} src="{{tg.url('/images/flags/uk.jpg')}}"
             {% else %} src="/images/flags/uk-disabled.jpg" {% endif %};
             title="english"/>
             </a></div>    
     <div style="float: left;">
         <a href="{{tg.url('/setlang', params=dict(lang='es'))}}">
-            <img {% if curr_lang[0] == 'es' %} src="{{tg.url('/images/flags/spain.jpg')}}"
+            <img {% if lang == 'es' %} src="{{tg.url('/images/flags/spain.jpg')}}"
             {% else %} src="/images/flags/spain-disabled.jpg" {% endif %};
             title="español"/>
             </a></div>

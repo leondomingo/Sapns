@@ -16,22 +16,32 @@
 {% endif %}
 <div id="language_selector">
     <select>
-        <option>{{_('Select your language')}}</option>
-        <option value="en">English</option>
-        <option value="es">Español</option>
+        <option value="">{{_('Select your language')}}</option>
+        {% if not languages %}
+        <option value="en" {% if lang == 'en' %} selected {% endif %}>English</option>
+        <option value="es" {% if lang == 'es' %} selected {% endif %}>Español</option>
+        {% else %}
+        {% for l in languages %}
+        <option value="{{l.code}}" {% if lang == l.code %} selected {% endif %}>{{l.name}}</option>
+        {% endfor %}
+        {% endif %}
+        <!-- rest of languages -->
     </select>
 </div>
 
 <script type="text/javascript">
     $(document).ready(function() {
         $('#language_selector select').change(function() {
-            $.ajax({
-                url: "{{tg.url('/setlang')}}",
-                data: { lang: $('#language_selector option:selected').val() },
-                success: function() {
-                    window.location = document.URL;
-                }
-            });
+            var _lang = $(this).val();
+            if (_lang) {
+                $.ajax({
+                    url: "{{tg.url('/setlang')}}",
+                    data: { lang: $('#language_selector option:selected').val() },
+                    success: function() {
+                        window.location.reload();
+                    }
+                });
+            }
         });
     });
 </script>

@@ -1,19 +1,20 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
+from jinja2.environment import Environment
+from jinja2.loaders import PackageLoader
 from pylons.i18n import ugettext as _
 from repoze.what import predicates
 from sapns.controllers.dashboard import DashboardController
 from sapns.controllers.error import ErrorController
 from sapns.lib.base import BaseController
+from sapns.lib.sapns.util import save_language, init_lang, get_languages
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
 from sqlalchemy.sql.expression import or_, func
-from tg import expose, flash, require, url, request, redirect, config
-from tg.i18n import set_lang, get_lang
+from tg import expose, require, url, request, redirect, config
+from tg.i18n import set_lang
 import logging
-from jinja2.environment import Environment
-from jinja2.loaders import PackageLoader
 
 __all__ = ['RootController']
 
@@ -51,8 +52,7 @@ class RootController(BaseController):
         if home and home != '/':
             redirect(url(home))
             
-        curr_lang = get_lang()
-        return dict(curr_lang=curr_lang)
+        return dict(lang=init_lang())
         
     @expose()
     def init(self):
@@ -76,10 +76,12 @@ class RootController(BaseController):
     def login(self, came_from=url('/')):
         """Start the user login."""
         login_counter = request.environ['repoze.who.logins']
-        if login_counter > 0:
-            flash(_('Wrong credentials'), 'warning')
+#        if login_counter > 0:
+#            flash(_('Wrong credentials'), 'warning')
+            
         return dict(page='', login_counter=str(login_counter),
-                    came_from_=came_from)
+                    came_from_=came_from, lang=init_lang(),
+                    languages=get_languages())
 
     @expose()
     def post_login(self, came_from='/'):
@@ -91,7 +93,6 @@ class RootController(BaseController):
             login_counter = request.environ['repoze.who.logins'] + 1
             redirect('/login', came_from=came_from, __logins=login_counter)
         userid = request.identity['repoze.who.userid']
-        flash(_('Welcome back, %s!') % userid)
         redirect(came_from)
 
     @expose()
@@ -100,23 +101,20 @@ class RootController(BaseController):
         Redirect the user to the initially requested page on logout and say
         goodbye as well.
         """
-        flash(_('We hope to see you soon!'))
+        #flash(_('We hope to see you soon!'))
         redirect(came_from)
 
     @expose()
-    def setlang(self, lang='en', **kw):
+    def setlang(self, lang='en'):
+        save_language(lang)
         set_lang(lang)
-        came_from = kw.get('came_from')
-        if came_from:
-            redirect(url(came_from))
-            
+        
     @expose('json')
-    def remember_password(self, username_or_email, **kw):
+    def remember_password(self, username_or_email):
         
         from neptuno.enviaremail import enviar_email
         import random
         import hashlib as hl
-        from sapns.lib.sapns.util import extract_lang
         
         logger = logging.getLogger('RootController.remember_passsword')
         try:
@@ -152,7 +150,7 @@ class RootController(BaseController):
             remitente = (config.get('avisos.e_mail'), config.get('avisos.nombre'),)
             
             # get e-mail templates
-            lang = extract_lang(get_lang(), r'^[a-z]{2}$')
+            lang = init_lang()
             root_folder = config.get('app.root_folder')
             env = Environment(loader=PackageLoader('sapns', 'templates'))
             
