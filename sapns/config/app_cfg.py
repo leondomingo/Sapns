@@ -42,7 +42,7 @@ class CustomConfig(AppConfig):
         self.DBSession = sapns.model.DBSession #@UndefinedVariable
         
         # Configure the authentication backend
-        self.sa_auth.cookie_secret = 'LxxuuTrt-UOG2-FleS-JA6z-KHQmP8zkO0uA'
+        #self.sa_auth.cookie_secret = ''
         self.auth_backend = 'sqlalchemy'
         self.sa_auth.dbsession = model.DBSession
         # what is the class you want to use to search for users in the database
