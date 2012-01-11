@@ -521,9 +521,9 @@ def init_lang():
 
 def get_languages():
     languages = []
-    _languages = config.get('app.languages').decode('utf-8')
+    _languages = config.get('app.languages')
     if _languages:
-        for l in _languages.split(','):
+        for l in _languages.decode('utf-8').split(','):
             l = l.strip()
             m = re.search(r'^(\w+)\#(\w+)$', l, re.U)
             if m:
