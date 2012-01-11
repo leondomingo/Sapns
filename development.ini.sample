@@ -64,6 +64,8 @@ app.company_url = http://www.sapns.org
 app.home = /dashboard
 app.repo_base = %(here)s/sapns/public/repo
 app.url = http://localhost:8081/
+app.language_cookie = sp_language
+app.languages = en#English,es#Español
 
 htmltopdf.path =
 

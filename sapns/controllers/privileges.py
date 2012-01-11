@@ -1,26 +1,20 @@
 # -*- coding: utf-8 -*-
 """Privilege management controller"""
 
-# turbogears imports
-from tg import expose, url, redirect
-
-# third party imports
-from pylons import cache
-from pylons.i18n import ugettext as _
-#from pylons.i18n import lazy_ugettext as l_
-from repoze.what import authorize #, predicates
-
-# project specific imports
-import logging
-import simplejson as sj
-from sapns.lib.base import BaseController
-from sapns.model import DBSession as dbs
-
-from sapns.model.sapnsmodel import SapnsUser , SapnsClass,\
-    SapnsRole, SapnsAttrPrivilege, SapnsPermission
 from neptuno.dict import Dict
 from neptuno.util import get_paramw, strtobool
+from pylons import cache
+from pylons.i18n import ugettext as _
+from repoze.what import authorize #, predicates
+from sapns.lib.base import BaseController
+from sapns.lib.sapns.util import init_lang, get_languages
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsRole, \
+    SapnsAttrPrivilege, SapnsPermission
 from sqlalchemy.sql.expression import and_
+from tg import expose, url, redirect
+import logging
+import simplejson as sj
 
 __all__ = ['PrivilegesController']
 
@@ -41,7 +35,9 @@ class PrivilegesController(BaseController):
             came_from = kw.get('came_from', '/')
             page = _('Privilege management for "%s"') % role.group_name 
             
-            return dict(page=page, id_role=id_role, id_user=id_user, came_from=came_from)
+            return dict(page=page, id_role=id_role, id_user=id_user, 
+                        came_from=came_from, lang=init_lang(),
+                        languages=get_languages())
         
         except Exception, e:
             logger.error(e)
