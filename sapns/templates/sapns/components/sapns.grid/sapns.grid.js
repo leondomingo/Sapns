@@ -15,11 +15,11 @@ function load_css(href) {
     fileref.setAttribute("href", href);
 }
 
-try {
+/*try {
     sprintf;
 } catch (e) {
     load_script("{{tg.url('/js/sprintf.min.js')}}");
-}
+}*/
 
 /*
  * try { qtip; } catch(e) {
@@ -66,6 +66,7 @@ try {
         set(this, 'url_base', '');
         set(this, 'multiselect', false);
         set(this, 'actions_inline', false);
+        set(this, 'hide_check', false);
         set(this, 'hide_id', false);
         set(this, 'dblclick', null);
         set(this, 'select_first', false);
@@ -151,24 +152,35 @@ try {
 
     // loadData
     SapnsGrid.prototype.loadData = function() {
-
-        // console.log('loadData');
-
+        
+        //console.log('loadData');
+        
         var self = this;
-
-        var g_table = '<table class="sp-grid">'
-            + '<tr><td class="sp-col-title">#</td>';
-
-        if (self.actions_inline) {
-            g_table += '<td class="sp-col-title">*</td>';
-        }
-
+        
         var cols = self.cols;
         if (typeof(cols) == 'function') {
             cols = cols();
         }
-
-        for (var i=0, l=cols.length; i < l; i++) {
+        
+        var g_wd = 20; // min-width: 20px;
+        for (var i=0, l=cols.length; i<l; i++) {
+            var col = cols[i];
+            g_wd += (col.width + 8);
+        }
+        
+        var g_table = '<div class="sp-grid" style="width: ' + g_wd + 'px;">';
+        
+        var grid_header = '<div class="sp-grid-row">\n';
+        
+        if (!self.hide_check) {
+            grid_header += '<div class="sp-col-title" style="width: 23px;">#</div>\n';
+        }
+        
+        if (self.actions_inline) {
+            grid_header += '<div class="sp-col-title" style="%(actions_wd)s">*</div>\n';
+        }
+        
+        for (var i=0, l=cols.length; i<l; i++) {
             var col = cols[i];
             var wd = col.width;
             if (!wd) {
@@ -178,12 +190,12 @@ try {
             if (self.hide_id && col.title == 'id') {
                 continue;
             }
-
-            g_table += sprintf('<td class="sp-col-title" style="width: %(wd)dpx;">%(title)s</td>', {wd: wd, title:col.title});
+            
+            grid_header += '<div class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</div>\n';
         }
 
-        g_table += '</tr>';
-
+        grid_header += '</div>';
+        
         var data = self.data;
         if (typeof (data) == 'function') {
             data = data();
@@ -191,28 +203,29 @@ try {
         
         var ld = data.length;
         if (ld > 0) {
-            for(var i=0; i < ld; i++) {
+            for (var i=0; i<ld; i++) {
                 
                 var row = data[i];
-
-                g_table += '<tr class="sp-grid-row">' + 
-                    '<td title="' + (i + 1) + '">' + 
-                        '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '">' + 
-                    '</td>';
-
+                
+                var grid_row = '<div class="sp-grid-row">\n';
+                
+                if (!self.hide_check) {
+                    grid_row += '<div class="sp-grid-cell" title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>\n';
+                }
+                
                 if (self.actions_inline) {
                     
                     var actions_wd = 'width: 100px;';
                     
                     var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
-                    var _actions = '<td style="font-size: 10px;">' + 
-                        '<div style="%(actions_wd)s">' +
+                    var _actions = //'<div style="font-size: 10px;">' + 
+                        '<div class="sp-grid-cell" style="%(actions_wd)s">\n' +
                         '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' + 
-                            'src="{{tg.url("/images/sapns/icons/edit.png")}}">' + 
+                            'src="{{tg.url("/images/sapns/icons/edit.png")}}">\n' + 
                         '<img class="inline_action delete_inline" title="{{_("Delete")}}" ' + 
-                            'src="{{tg.url("/images/sapns/icons/delete.png")}}">' + 
+                            'src="{{tg.url("/images/sapns/icons/delete.png")}}">\n' + 
                         '<img class="inline_action docs_inline" title="{{_("Docs")}}" ' + 
-                            'src="{{tg.url("/images/sapns/icons/docs.png")}}">';
+                            'src="{{tg.url("/images/sapns/icons/docs.png")}}">\n';
                     
                     var nonstd = '';
                     var la = self.actions.length;
@@ -221,78 +234,93 @@ try {
                             var act = self.actions[a];
                             if ((act.type === 'process' || typeof (act.type) == 'object') && act.require_id) {
                                 if (typeof(act.type) == 'object') {
-                                    nonstd += sprintf('<option value="%(id)s">%(title)s</option>', {id: act.type.id, title: act.title});
+                                    nonstd += sprintf('<option value="%(id)s">%(title)s</option>\n', {id: act.type.id, title: act.title});
                                 } 
                                 else {
-                                    nonstd += sprintf('<option value="%(name)s">%(title)s</option>', {name: act.name, title: act.title});
+                                    nonstd += sprintf('<option value="%(name)s">%(title)s</option>\n', {name: act.name, title: act.title});
                                 }
                             }
                         }
                     }
                     
                     if (nonstd) {
-                        nonstd = '<select class="nonstd_actions"><option value=""></option>' 
+                        nonstd = '<select class="nonstd_actions">\n<option value=""></option>\n' 
                             + nonstd 
-                            + '</select>';
+                            + '</select>\n';
                     }
                     else {
                         actions_wd = 'width: 75px;';
                     }
                     
-                    g_table += sprintf(_actions, {actions_wd: actions_wd}) + nonstd;
-                    g_table += '</div></td>';
+                    grid_row += sprintf(_actions, {actions_wd: actions_wd}) + nonstd + '\n';
+                    grid_row += '</div>\n';
                 }
-
-                for (var j = 0, lr = cols.length; j < lr; j++) {
+                
+                // grid_header
+                if (i == 0) {
+                    //console.log(grid_header);
+                    g_table += sprintf(grid_header, {actions_wd: actions_wd});
+                }
+                
+                for (var j=0, lr=cols.length; j<lr; j++) {
                     var col = cols[j];
                     var al = col.align;
                     if (!al) {
                         al = self.default_.col_align;
                     }
-
+                    
                     var wd = col.width;
                     if (!wd) {
                         wd = self.default_.col_width;
                     }
-
+                    
                     var cell = row[j];
                     if (!cell) {
                         cell = self.default_.empty_value;
                     }
-
+                    
                     if (self.hide_id && col.title == 'id') {
                         continue;
                     }
-
+                    
                     var width = '';
                     if (wd > 0) {
-                        width = sprintf(' width: %(wd)d px;', {wd: wd});
+                        width = ' width: ' + wd + 'px;';
                     }
                     
-                    g_table += sprintf('<td><div class="sp-grid-cell" style="text-align: %(al)s; %(wd)s"', {al: al, wd: width});
-
+                    grid_row += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
+                    
                     if (cell) {
-                        g_table += 'title="' + cell + '"';
-                    } else {
-                        g_table += 'title="({{_("empty")}})"';
+                        grid_row += 'title="' + cell.replace(/"/gi, "''") + '"';
                     }
-
-                    g_table += 'clickable="true">' + cell + '</div></td>';
+                    else {
+                        grid_row += 'title="({{_("empty")}})"';
+                    }
+                    
+                    grid_row += 'clickable="true">' + cell + '</div>\n';
                 }
-
-                g_table += '</tr>';
+                
+                grid_row += '</div>\n';
+                //console.log(grid_row);
+                
+                g_table += grid_row;
             }
-        } else {
+        }
+        else {
             var n = 1;
             if (self.actions_inline) {
                 n = 3;
             }
-            
-            g_table += '<tr class="sp-grid-row" style="width: 100%; height: ' + (self.height-50) + 'px;">' + 
-                '<td class="sp-grid-cell sp-grid-noresults"' + 
-                ' colspan="' + (cols.length + n) + '">{{_("No results")}}</td></tr>';
+            g_table += 
+                grid_header +
+                '<div class="sp-grid-row">' +
+                    '<div class="sp-grid-cell sp-grid-noresults" style="width: ' + (g_wd - cols.length*4) + 'px;" >{{_("No results")}}</div>' +
+                '</div>';
         }
-
+        
+        //g_table += '</table>';
+        g_table += '</div>';
+        
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
         if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
             $('#' + self.name + ' .sp-grid-row input[type=checkbox]:first').attr('checked', true);
@@ -606,7 +634,7 @@ try {
         $('#' + self.name + ' .sp-grid-cell').live('click', function(event) {
             // console.log('click');
             if ($(this).attr('clickable') == 'true') {
-                var row_id = $(this).parent().parent().find('.sp-grid-rowid');
+                var row_id = $(this).parent().find('.sp-grid-rowid');
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
                     var ctrl = event.ctrlKey || event.metaKey;
                     if ($(this) != row_id && !self.multiselect && !ctrl) {
@@ -1052,10 +1080,11 @@ try {
                 }
                 g_content += '</div>';
             }
-
-            var g_table = sprintf('<div class="sp-grid-parent" style="overflow: auto; clear: left;' +
-                    ' height: %(hg)dpx; background-color: transparent;"></div>', {hg: g.height});
-
+            
+            var g_table = 
+                '<div class="sp-grid-parent" style="overflow: auto; clear: left; ' + 
+                    'height: ' + (g.height+5) + 'px; background-color: transparent;"></div>';
+            
             // pager
             var g_pager = '';
             if (g.with_pager) {

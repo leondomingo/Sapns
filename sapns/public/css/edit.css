@@ -45,6 +45,14 @@
 	position: absolute;
 	right: 12px;
 	bottom: 3px;
+	position: fixed;
+	background-color: #BCC170; /*#CCCFA5;*/
+	border: 1px solid gray;
+	width: 990px;
+	height: 150px;
+	padding: 5px;
+	opacity: 0.85;
+	margin-left: -1px;
 }
 
 #edit-back {
@@ -146,8 +154,8 @@
 
 #right_desc {
 	position: absolute; 
-    left: 15px; 
-    top: 0px; 
+    right: 10px; 
+    top: 12px; 
     padding-right: 10px; 
     width: 617px; 
     background-color: transparent;
