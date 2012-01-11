@@ -125,13 +125,17 @@
         {% if attr.type == 'int' and attr.related_class == None %}
         <input class="sp_integer_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %}
-            value="{{attr.value or ''}}">
+            {% if attr.value != None %}
+            value="{{attr.value}}"
+            {% endif %}>
             
         <!-- {# Float #} -->
         {% elif attr.type == 'float' %}
         <input class="sp_float_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %}
-            value="{{attr.value or ''}}">
+            {% if attr.value != None %}
+            value="{{attr.value}}"
+            {% endif %}>
         
         <!-- {# Boolean #} -->
         {%- elif attr.type == 'bool' %}

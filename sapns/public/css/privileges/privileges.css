@@ -101,7 +101,7 @@
 
 .attr_granted {
 	font-size: 10px;
-	width: 110px;
+	width: 115px;
 	text-align: center;
 }
 
@@ -155,7 +155,7 @@
 }
 
 .attr_name {
-    width: 488px;
+    width: 486px;
     float: left;
 }
 
@@ -196,7 +196,7 @@
 }
 
 .action_name {
-    width: 554px;
+    width: 553px;
     float: left;
 }
 

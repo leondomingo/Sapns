@@ -12,6 +12,7 @@ from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
 from tg import expose, config, request, require, response
 import logging
 import simplejson as sj #@UnresolvedImport
+from sapns.lib.sapns.util import init_lang
 
 __all__ = ['DocsController']
 
@@ -29,8 +30,8 @@ class DocsController(BaseController):
         
         title = SapnsClass.object_title(cls, id_object)
         
-        return dict(page='',
-                    came_from=kw.get('came_from'), 
+        return dict(page='', came_from=kw.get('came_from'),
+                    lang=init_lang(), 
                     obj=dict(id_class=class_.class_id, 
                              id=id_object,
                              title=title),

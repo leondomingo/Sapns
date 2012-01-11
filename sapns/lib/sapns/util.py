@@ -9,7 +9,8 @@ from sqlalchemy.dialects.postgresql.base import TIME, TIMESTAMP, BYTEA
 from sqlalchemy.sql.expression import and_
 from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
     BOOLEAN, BLOB
-from tg import config
+from tg import config, response, request
+from tg.i18n import set_lang, get_lang
 import logging
 import re
 
@@ -501,3 +502,32 @@ def extract_lang(lang_list, pattern):
             return item
         
     return None
+
+def save_language(lang):
+    _language = config.get('app.language_cookie', 'sp_language')
+    response.set_cookie(_language, value=lang, max_age=60*60*24*30*365) # 1 year
+
+def init_lang():
+    default_lang = extract_lang(get_lang(), r'^[a-z]{2}$')
+    _language = config.get('app.language_cookie', 'sp_language') 
+    lang = request.cookies.get(_language)
+    if not lang:
+        lang = default_lang
+        save_language(lang)
+        
+    set_lang(lang)
+    
+    return lang
+
+def get_languages():
+    languages = []
+    _languages = config.get('app.languages')
+    if _languages:
+        for l in _languages.decode('utf-8').split(','):
+            l = l.strip()
+            m = re.search(r'^(\w+)\#(\w+)$', l, re.U)
+            if m:
+                languages.append(dict(code=m.group(1),
+                                      name=m.group(2)))
+                
+    return languages

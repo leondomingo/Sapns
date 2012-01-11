@@ -16,7 +16,7 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
-from sapns.lib.sapns.util import pagination
+from sapns.lib.sapns.util import pagination, init_lang, get_languages
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -108,12 +108,9 @@ class DashboardController(BaseController):
     def index(self, **kw):
         curr_lang = get_lang()
         return dict(page='dashboard', came_from=kw.get('came_from'), 
+                    lang=init_lang(), languages=get_languages(), 
                     curr_lang=curr_lang, shortcuts=[])
-        
-    @expose()
-    def init(self):
-        redirect(url('/dashboard/util/init'))
-
+      
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
     def list(self, cls, **params):
@@ -160,7 +157,8 @@ class DashboardController(BaseController):
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
-        return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=came_from, 
+        return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=came_from,
+                    lang=init_lang(), languages=get_languages(),
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
                               q=q.replace('"', '\\\"'), rp=rp, pag_n=pag_n,
@@ -647,7 +645,9 @@ class DashboardController(BaseController):
             if class_.name != u'sp_logs':
                 _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
                 _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
-            
+                
+        #logger.info(row)
+        
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
@@ -664,7 +664,9 @@ class DashboardController(BaseController):
                 value = default_values[attr.name]
 
             elif row:
-                if row[attr.name]:
+                #logger.info(row[attr.name])
+                #logger.info(attr)
+                if row[attr.name] != None: 
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
                         value = datetostr(row[attr.name], fmt=date_fmt)
@@ -672,6 +674,10 @@ class DashboardController(BaseController):
                     # datetime
                     elif attr.type == SapnsAttribute.TYPE_DATETIME:
                         value = row[attr.name].strftime(datetime_fmt) if row[attr.name] else ''
+                        
+                    # numeric (int, float)
+                    elif attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:                                       
+                        value = row[attr.name]
                     
                     # rest of types
                     else:
@@ -840,7 +846,8 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='insertion order', insertion=class_.insertion(),
-                    title=class_.title, came_from=url(came_from))
+                    title=class_.title, came_from=url(came_from),
+                    lang=init_lang(), languages=get_languages())
 
     @expose()
     @require(p.in_group(u'managers'))
@@ -896,7 +903,8 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='reference order', reference=class_.reference(all=True), 
-                    came_from=came_from)
+                    came_from=came_from, lang=init_lang(), 
+                    languages=get_languages())
     
     @expose('json')
     @require(p.in_group(u'managers'))
