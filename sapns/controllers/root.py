@@ -8,7 +8,7 @@ from repoze.what import predicates
 from sapns.controllers.dashboard import DashboardController
 from sapns.controllers.error import ErrorController
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import save_language, init_lang, get_languages
+from sapns.lib.sapns.util import add_language, save_language, init_lang
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
 from sqlalchemy.sql.expression import or_, func
@@ -36,6 +36,7 @@ class RootController(BaseController):
     dashboard = DashboardController()
 
     @expose('sapns/index.html')
+    @add_language
     def index(self):
         
         logger = logging.getLogger('RootController.index')
@@ -52,7 +53,7 @@ class RootController(BaseController):
         if home and home != '/':
             redirect(url(home))
             
-        return dict(lang=init_lang())
+        return dict()
         
     @expose()
     def init(self):
@@ -73,6 +74,7 @@ class RootController(BaseController):
         return dict(environment=request.environ)
 
     @expose('sapns/login.html')
+    @add_language
     def login(self, came_from=url('/')):
         """Start the user login."""
         login_counter = request.environ['repoze.who.logins']
@@ -80,8 +82,7 @@ class RootController(BaseController):
 #            flash(_('Wrong credentials'), 'warning')
             
         return dict(page='', login_counter=str(login_counter),
-                    came_from_=came_from, lang=init_lang(),
-                    languages=get_languages())
+                    came_from_=came_from)
 
     @expose()
     def post_login(self, came_from='/'):

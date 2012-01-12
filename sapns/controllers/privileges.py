@@ -7,7 +7,7 @@ from pylons import cache
 from pylons.i18n import ugettext as _
 from repoze.what import authorize #, predicates
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import init_lang, get_languages
+from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsRole, \
     SapnsAttrPrivilege, SapnsPermission
@@ -23,6 +23,7 @@ class PrivilegesController(BaseController):
     allow_only = authorize.in_group('managers')
     
     @expose('sapns/privileges/index.html')
+    @add_language
     def index(self, **kw):
         
         logger = logging.getLogger('PrivilegesController.index')
@@ -36,8 +37,7 @@ class PrivilegesController(BaseController):
             page = _('Privilege management for "%s"') % role.group_name 
             
             return dict(page=page, id_role=id_role, id_user=id_user, 
-                        came_from=came_from, lang=init_lang(),
-                        languages=get_languages())
+                        came_from=came_from)
         
         except Exception, e:
             logger.error(e)

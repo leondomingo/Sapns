@@ -1,19 +1,14 @@
 # -*- coding: utf-8 -*-
 """Users management controller"""
 
-# turbogears imports
-from tg import expose, require
-
-# third party imports
 from repoze.what import authorize, predicates as p
-
-# project specific imports
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsUser , SapnsRole, SapnsUserRole
-
-import logging
+from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
 from sqlalchemy.sql.expression import and_
+from tg import expose, require
+import logging
+from sapns.lib.sapns.util import add_language
 
 __all__ = ['RolesControllers']
 
@@ -23,6 +18,7 @@ class RolesController(BaseController):
 
     @expose('sapns/roles/users.html')
     @require(p.in_group(u'managers'))
+    @add_language
     def users(self, id_role, **kw):
 
         logger = logging.getLogger('RolesController.roles')        
