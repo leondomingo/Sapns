@@ -1,0 +1,12 @@
+<div class="sp_logout">
+    <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
+        <a href="{{tg.url('/dashboard/users/edit/sp_users/%s?came_from=' % request.identity.user.user_id)}}"
+            target="_blank" title="{{_('Click here to edit user data')}}">
+            {{request.identity.user.display_name}}
+        </a>
+    </div>
+    <div class="sp-logout-btn">
+        <a title="{{_('Click here to logout')}}" 
+            href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
+    </div>
+</div>

@@ -39,6 +39,8 @@
     width: 988px;
     height: 125px;
     padding: 5px;
+    background-color: #ddd;
+    opacity: 0.8;
 }
 
 #edit_buttons {

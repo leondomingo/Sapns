@@ -727,7 +727,8 @@ class DashboardController(BaseController):
                     related_classes=class_.related_classes(),
                     attributes=attributes, reference=ref,
                     _created=_created, _updated=_updated,
-                    actions=actions, came_from=url(came_from))
+                    actions=actions, came_from=url(came_from),
+                    lang=init_lang(), languages=get_languages())
     
     @expose('sapns/dashboard/delete.html')
     @expose('json')

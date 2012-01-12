@@ -2,48 +2,7 @@
 <div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>
 
 {% if request.identity %}
-<div class="sp_logout">
-    <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
-        <a href="{{tg.url('/dashboard/users/edit/sp_users/%s?came_from=' % request.identity.user.user_id)}}"
-            target="_blank" title="{{_('Click here to edit user data')}}">
-            {{request.identity.user.display_name}}
-        </a>
-    </div>
-    <div class="sp-logout-btn">
-        <a title="{{_('Click here to logout')}}" 
-            href="{{tg.url('/logout_handler')}}">{{_('logout')}}</a>
-    </div>
-</div>
+    {% include 'sapns/logout.html' %}
 {% endif %}
 
-<div id="language_selector">
-    <select>
-        <option value="">{{_('Select your language')}}</option>
-        {% if not languages %}
-        <option value="en" {% if lang == 'en' %} selected {% endif %}>English</option>
-        <option value="es" {% if lang == 'es' %} selected {% endif %}>Español</option>
-        {% else %}
-        {% for l in languages %}
-        <option value="{{l.code}}" {% if lang == l.code %} selected {% endif %}>{{l.name}}</option>
-        {% endfor %}
-        {% endif %}
-        <!-- rest of languages -->
-    </select>
-</div>
-
-<script type="text/javascript">
-    $(function() {
-        $('#language_selector select').change(function() {
-            var _lang = $(this).val();
-            if (_lang) {
-                $.ajax({
-                    url: "{{tg.url('/setlang')}}",
-                    data: { lang: $('#language_selector option:selected').val() },
-                    success: function() {
-                        window.location.reload();
-                    }
-                });
-            }
-        });
-    });
-</script>
+{% include 'sapns/lang_selector.html' %}
