@@ -16,7 +16,7 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
-from sapns.lib.sapns.util import pagination, init_lang, get_languages
+from sapns.lib.sapns.util import pagination, add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -58,6 +58,7 @@ class DashboardController(BaseController):
 
     @expose('sapns/dashboard/index.html')
     @require(p.not_anonymous())
+    @add_language
     def index(self, sc_type='list', sc_parent=None):
         curr_lang = get_lang()
 
@@ -82,12 +83,12 @@ class DashboardController(BaseController):
         #messages = user.messages()
         #unread = user.unread_messages()
         
-        return dict(page='dashboard', lang=init_lang(), languages=get_languages(), 
-                    shortcuts=shortcuts, sc_type=sc_type, 
+        return dict(page='dashboard', shortcuts=shortcuts, sc_type=sc_type, 
                     sc_parent=sc_parent, _came_from=came_from)
         
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
+    @add_language
     def list(self, cls, **params):
         
         #logger = logging.getLogger(__name__ + '/list')
@@ -133,7 +134,6 @@ class DashboardController(BaseController):
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
         return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=came_from,
-                    lang=init_lang(), languages=get_languages(),
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
                               q=q.replace('"', '\\\"'), rp=rp, pag_n=pag_n,
@@ -808,6 +808,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/order/insert.html')
     @require(p.in_group(u'managers'))
+    @add_language
     def ins_order(self, cls, came_from='/'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -821,8 +822,7 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='insertion order', insertion=class_.insertion(),
-                    title=class_.title, came_from=url(came_from),
-                    lang=init_lang(), languages=get_languages())
+                    title=class_.title, came_from=url(came_from))
 
     @expose()
     @require(p.in_group(u'managers'))
@@ -865,6 +865,7 @@ class DashboardController(BaseController):
     
     @expose('sapns/order/reference.html')
     @require(p.in_group(u'managers'))
+    @add_language
     def ref_order(self, cls, came_from='/'):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -878,8 +879,7 @@ class DashboardController(BaseController):
         class_ = SapnsClass.by_name(cls)
         
         return dict(page='reference order', reference=class_.reference(all=True), 
-                    came_from=came_from, lang=init_lang(), 
-                    languages=get_languages())
+                    came_from=came_from)
     
     @expose()
     @require(p.in_group(u'managers'))

@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+from decorator import decorator
 from pylons.i18n import lazy_ugettext as l_
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute, \
@@ -531,3 +532,21 @@ def get_languages():
                                       name=m.group(2)))
                 
     return languages
+
+def _add_language(f, *args, **kw):
+    
+    result = f(*args, **kw)
+    
+    if not result.get('lang'):
+        result[f.lang_key] = init_lang()
+        
+    if not result.get('languages'):
+        result[f.languages_key] = get_languages()
+        
+    return result
+
+# decorator for add "lang" and "languages" to the resulting dict
+def add_language(f): #, lang='lang', languages='languages'):
+    f.lang_key = 'lang'
+    f.languages_key = 'languages'
+    return decorator(_add_language, f)
