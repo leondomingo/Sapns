@@ -1,6 +1,6 @@
 .sp-edit-panel{height:600px}#rel-classes,#actions{width:700px}#rel-classes-title,#actions-title{float:left;margin-top:3px;margin-right:5px;font-size:11px;width:200px;text-align:left}
 .related-classes-count,.actions-count{font-weight:bold;font-size:9px}#rel-classes-sel,#actions-sel{float:left;font-size:11px;margin-top:2px;width:300px}
-#rel-classes-show,#action-go{cursor:pointer}#edit-header{position:relative;border-bottom:1px solid #ccc;width:988px;height:125px;padding:5px;background-color:#ddd;opacity:0.8;}
+#rel-classes-show,#action-go{cursor:pointer}#edit-header{position:relative;border-bottom:1px solid #ccc;margin:10px 10px 10px 10px;height:125px;padding:5px;background-color:#ddd;opacity:0.8;}
 #edit_buttons{position:absolute;right:12px;bottom:3px}#edit-back{z-index:100}#back-button,#save-button{cursor:pointer}
 #back-button:hover,#save-button:hover,#action-go:hover,#rel-classes-show:hover{color:white}
 .sp-save-button{width:70px}#edit_fields{overflow:auto;height:463px;width:998px}.sp-text-field{width:97%;max-width:97%;min-width:97%;margin-left:1%}

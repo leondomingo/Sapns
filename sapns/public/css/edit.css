@@ -36,7 +36,7 @@
 #edit-header {
     position: relative;
     border-bottom: 1px solid #ccc;
-    width: 988px;
+    margin: 10px 10px 10px 10px;
     height: 125px;
     padding: 5px;
     background-color: #ddd;
