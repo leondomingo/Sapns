@@ -3,8 +3,8 @@
 }
 
 #rel-classes, #actions {
-	width: 700px;
-	/*border: 1px solid gray;*/
+    width: 700px;
+    /*border: 1px solid gray;*/
 }
 
 #rel-classes-title, #actions-title {
@@ -12,59 +12,51 @@
     /*color: gray;*/ 
     margin-top: 3px;
     margin-right: 5px;
-    font-size: 11px; 
+    font-size: 11px;
     width: 200px; 
     text-align: left;
 }
 
 .related-classes-count, .actions-count {
-	font-weight: bold;
-	font-size: 9px;
+    font-weight: bold;
+    font-size: 9px;
 }
 
 #rel-classes-sel, #actions-sel {
-	float: left; 
-	font-size: 11px; 
-	margin-top: 2px;
-	width: 300px;
+    float: left; 
+    font-size: 11px; 
+    margin-top: 2px;
+    width: 300px;
 }
 
 #rel-classes-show, #action-go {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 #edit-header {
-	position: relative;
-	border-bottom: 1px solid #ccc;
-	width: 990px;
-	height: 125px;
-	padding: 5px;
+    position: relative;
+    border-bottom: 1px solid #ccc;
+    width: 988px;
+    height: 125px;
+    padding: 5px;
 }
 
 #edit_buttons {
-	position: absolute;
-	right: 12px;
-	bottom: 3px;
-	position: fixed;
-	background-color: #BCC170; /*#CCCFA5;*/
-	border: 1px solid gray;
-	width: 990px;
-	height: 150px;
-	padding: 5px;
-	opacity: 0.85;
-	margin-left: -1px;
+    position: absolute;
+    right: 12px;
+    bottom: 3px;
 }
 
 #edit-back {
-	z-index: 100;
+    z-index: 100;
 }
 
 #back-button, #save-button {
-	cursor: pointer;
+    cursor: pointer;
 }
 
 #back-button:hover, #save-button:hover, #action-go:hover, #rel-classes-show:hover {
-	color: white;
+    color: white;
 }
 
 .sp-save-button {
@@ -72,9 +64,9 @@
 }
 
 #edit_fields {
-	overflow: auto;
-	height: 463px;
-	width: 999px;
+    overflow: auto;
+    height: 463px;
+    width: 998px;
 }
 
 .sp-edit-field {
@@ -99,7 +91,7 @@
 }
 
 .url_field_text:focus {
-	border: 1px solid orange;
+    border: 1px solid orange;
 }
 
 .sp-select-field {
@@ -108,7 +100,7 @@
 }
 
 .sp-select-text {
-	width: 90%;
+    width: 90%;
     border: 1px solid gray;
 }
 
@@ -117,7 +109,7 @@
 }
 
 .sp-select-button, .sp-empty-button {
-	height: 25px !important;
+    height: 25px !important;
 }
 
 .sp-checkbox-field {
@@ -129,7 +121,7 @@
 }
 
 .sp_integer_field, .sp_float_field {
-	margin-left: 1%;
+    margin-left: 1%;
 }
 
 .sp-time-field {
@@ -144,20 +136,20 @@
 }
 
 .sp-search-text {
-	width: 650px;
-	border: 1px solid gray;
+    width: 650px;
+    border: 1px solid gray;
 }
 
 .sp-search-text:focus {
-	border: 1px solid orange;
+    border: 1px solid orange;
 }
 
 #right_desc {
-	position: absolute; 
-    right: 10px; 
-    top: 12px; 
+    position: absolute; 
+    left: 15px; 
+    top: 0px; 
     padding-right: 10px; 
-    width: 617px; 
+    width: 810px; 
     background-color: transparent;
 }
 
@@ -176,9 +168,9 @@
 }
 
 #reference {
-	margin-left: 0; 
-	font-size: 15px; 
-	color: black; 
+    margin-left: 0; 
+    font-size: 15px; 
+    color: black; 
     background-color: none; 
     text-align: left; 
     height: 22px;
@@ -192,14 +184,14 @@
 }
 
 .created {
-	width: 100px;
-	border: 1px solid lightgray;
-	float: left; 
-	margin-right: 5px;
-	text-align: center;
+    width: 100px;
+    border: 1px solid lightgray;
+    float: left; 
+    margin-right: 5px;
+    text-align: center;
 }
 
 .created:hover {
-	background-color: lightgray;
-	color: white;
+    background-color: lightgray;
+    color: white;
 }
