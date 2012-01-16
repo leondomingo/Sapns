@@ -739,9 +739,14 @@ function load_css(href) {
 
         // delete
         $('#' + self.name + ' .delete_inline').live('click', function(event) {
-            var id = $(this).parent().parent().parent().find('.sp-grid-rowid').attr('id_row');
+            var ids = self.getSelectedIds();
+            if (ids.length == 0) {
+                var id = $(this).parent().parent().find('.sp-grid-rowid').attr('id_row');
+                ids = [id];
+            }
+            
             var act = self.getAction('delete');
-            self.std_delete([id], act.url);
+            self.std_delete(ids, act.url);
         });
 
         // docs
@@ -749,7 +754,7 @@ function load_css(href) {
             run_action($(this), 'docs');
         });
 
-        // non-standar actions
+        // non-standard actions
         $('#' + self.name + ' .nonstd_actions').live('change', function(event) {
             var action_id = $(this).val();
             if (action_id) {
