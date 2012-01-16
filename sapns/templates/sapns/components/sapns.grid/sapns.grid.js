@@ -173,7 +173,7 @@ function load_css(href) {
         var grid_header = '<div class="sp-grid-row">\n';
         
         if (!self.hide_check) {
-            grid_header += '<div class="sp-col-title" style="width: 23px;">#</div>\n';
+            grid_header += '<div class="sp-col-title" style="width: 23px;"><input class="sp-grid-select-all" type="checkbox"/></div>\n';
         }
         
         if (self.actions_inline) {
@@ -401,31 +401,31 @@ function load_css(href) {
                             
                     var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
                     
-                    $('#' + self.name + ' .first-page').attr('title', "{{_('page 1')}}");
+                    $('#' + self.name + ' .sp-grid-first-page').attr('title', "{{_('page 1')}}");
                     
                     // page-back
                     if (params.curr_page > 1) {
                         var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page - 1});
-                        $('#' + self.name + ' .page-back').attr('title', prev_page).attr('disabled', false);
+                        $('#' + self.name + ' .sp-grid-page-back').attr('title', prev_page).attr('disabled', false);
                     } 
                     else {
-                        $('#' + self.name + ' .page-back').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-back').attr('disabled', true);
                     }
                     
                     // page-forth
                     if (params.curr_page < params.total_page) {
                         var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page + 1});
-                        $('#' + self.name + ' .page-forth').attr('title', next_page).attr('disabled', false);
+                        $('#' + self.name + ' .sp-grid-page-forth').attr('title', next_page).attr('disabled', false);
                     } 
                     else {
-                        $('#' + self.name + ' .page-forth').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-forth').attr('disabled', true);
                     }
                     
                     
                     // last-page
                     var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
                             
-                    $('#' + self.name + ' .last-page').attr('title', last_page);
+                    $('#' + self.name + ' .sp-grid-last-page').attr('title', last_page);
                     
                     $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
                     $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
@@ -634,6 +634,7 @@ function load_css(href) {
         $('#' + self.name + ' .sp-grid-cell').live('click', function(event) {
             // console.log('click');
             if ($(this).attr('clickable') == 'true') {
+                $('#'+self.name + ' .sp-grid-select-all').attr('checked', false);
                 var row_id = $(this).parent().find('.sp-grid-rowid');
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
                     var ctrl = event.ctrlKey || event.metaKey;
@@ -1034,6 +1035,15 @@ function load_css(href) {
             }
         });
     }
+    
+    SapnsGrid.prototype.selectAll = function(chk) {
+        var self = this;
+        if (chk === undefined) {
+            chk = true;
+        }
+        
+        $('#'+self.name + ' .sp-grid-rowid').attr('checked', chk);
+    }
 
     $.fn.sapnsGrid = function(arg1, arg2, arg3) {
 
@@ -1126,13 +1136,18 @@ function load_css(href) {
                         + sel_all
                         + '>{{_("All")}}</option>'
                         + '</select>'
-                        + '<button class="sp-button first-page" style="float: left;">|&lt;&lt;</button>'
-                        + '<button class="sp-button page-back" style="float: left;">&lt;&lt;</button>'
+                        + '<button class="sp-button sp-grid-first-page" style="float: left;">|&lt;&lt;</button>'
+                        + '<button class="sp-button sp-grid-page-back" style="float: left;">&lt;&lt;</button>'
                         + '<input class="sp-grid-current-page" type="text" style="text-align: center; font-size: 11px; margin-top: 3px;" readonly>'
-                        + '<button class="sp-button page-forth" style="float: left;">&gt;&gt</button>'
-                        + '<button class="sp-button last-page" style="float: left;">&gt;&gt|</button></div>';
+                        + '<button class="sp-button sp-grid-page-forth" style="float: left;">&gt;&gt</button>'
+                        + '<button class="sp-button sp-grid-last-page" style="float: left;">&gt;&gt|</button></div>';
 
                 g_pager += '</div>';
+                
+                $('#' + g.name + ' .sp-grid-select-all').live('click', function() {
+                    var chk = $(this).attr('checked');
+                    g.selectAll(chk);
+                });
 
                 $('#' + g.name + ' .sp-grid-rp').live('change', function() {
                     g.rp = $(this).val();
@@ -1140,19 +1155,19 @@ function load_css(href) {
                     g.search(g.q);
                 });
 
-                $('#' + g.name + ' .first-page').live('click', function() {
+                $('#' + g.name + ' .sp-grid-first-page').live('click', function() {
                     g.pag_n = 1;
                     g.search(g.q);
                 });
 
-                $('#' + g.name + ' .page-back').live('click', function() {
+                $('#' + g.name + ' .sp-grid-page-back').live('click', function() {
                     if (g.pag_n > 1) {
                         g.pag_n -= 1;
                         g.search(g.q);
                     }
                 });
 
-                $('#' + g.name + ' .page-forth').live('click', function() {
+                $('#' + g.name + ' .sp-grid-page-forth').live('click', function() {
                     if (g.pag_n < g.total_pag) {
                         g.pag_n *= 1
                         g.pag_n += 1;
@@ -1160,7 +1175,7 @@ function load_css(href) {
                     }
                 });
 
-                $('#' + g.name + ' .last-page').live('click', function() {
+                $('#' + g.name + ' .sp-grid-last-page').live('click', function() {
                     g.pag_n = g.total_pag;
                     g.search(g.q);
                 });
@@ -1213,6 +1228,10 @@ function load_css(href) {
             else if (arg1 == "setRp") {
                 self.rp = arg2;
                 $('#'+self.name + ' .sp-grid-rp [value='+arg2+']').attr('selected', true);
+            }
+            // selectAll
+            else if (arg1 == "selectAll") {
+                self.selectAll();
             }
             // TODO: other sapnsGrid methods
         }
