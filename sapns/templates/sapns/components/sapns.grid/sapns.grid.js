@@ -698,7 +698,7 @@ function load_css(href) {
 
         function run_action(item, action_name, ctrl) {
             var act = self.getAction(action_name);
-            var id = item.parent().parent().parent().find('.sp-grid-rowid').attr('id_row');
+            var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
             
             if (typeof(act.type) != 'object') {
                 var a = act.url;
