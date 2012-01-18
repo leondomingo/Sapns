@@ -15,21 +15,6 @@ function load_css(href) {
     fileref.setAttribute("href", href);
 }
 
-/*try {
-    sprintf;
-}
-catch (e) {
-    load_script("{{tg.url('/js/sprintf.min.js')}}");
-}*/
-
-/*try {
-    qtip;
-}
-catch(e) {
-    load_css("{{tg.url('/js/qtip2/jquery.qtip.min.css')}}");
-    load_script("{{tg.url('/js/qtip2/jquery.qtip.min.js')}}");
-}*/
-
 (function($) {
 
     // SapnsGrid (constructor)
@@ -160,7 +145,8 @@ catch(e) {
         var g_table = '<div class="sp-grid" style="width: ' + g_wd + 'px;">';
         
         if (!self.hide_check) {
-            g_table += '<div class="sp-grid-row"><div class="sp-col-title">#</div>';
+            g_table += '<div class="sp-grid-row"><div class="sp-col-title">' + 
+                '<input class="sp-grid-select-all" type="checkbox"/></div>';
         }
         
         if (self.actions_inline) {
@@ -197,17 +183,18 @@ catch(e) {
             g_table += '<div class="sp-grid-row">';
             
             if (!self.hide_check) {
-                g_table += '<div class="sp-grid-cell" title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
+                g_table += '<div class="sp-grid-cell" title="' + (i+1) + '">' + 
+                    '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
             }
             
             if (self.actions_inline) {
                 var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
                 g_table +=
-                '<div class="sp-grid-cell" style="font-size: 10px; width: 35px;">' +
-                    '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
-                    '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
-                    '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
-                '</div>';
+                    '<div class="sp-grid-cell" style="font-size: 10px; width: 35px;">' +
+                        '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
+                        '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
+                        '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
+                    '</div>';
             }
             
             for (var j=0, lr=cols.length; j<lr; j++) {
@@ -343,33 +330,33 @@ catch(e) {
                     
                     var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
                     
-                    $('#' + self.name + ' .first-page').attr('title', "{{_('page 1')}}");
+                    $('#' + self.name + ' .sp-grid-first-page').attr('title', "{{_('page 1')}}");
                     
                     // page-back
                     if (params.curr_page > 1) {
                         var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page-1});
-                        $('#' + self.name + ' .page-back').
+                        $('#' + self.name + ' .sp-grid-page-back').
                             attr('title', prev_page).
                             attr('disabled', false);
                     }
                     else {
-                        $('#' + self.name + ' .page-back').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-back').attr('disabled', true);
                     }
                     
                     // page-forth
                     if (params.curr_page < params.total_page) {
                         var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page+1}); 
-                        $('#' + self.name + ' .page-forth').
+                        $('#' + self.name + ' .sp-grid-page-forth').
                             attr('title', next_page).
                             attr('disabled', false);
                     }
                     else {
-                        $('#' + self.name + ' .page-forth').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-forth').attr('disabled', true);
                     }
                     
                     // last-page
                     var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
-                    $('#' + self.name + ' .last-page').attr('title', last_page);
+                    $('#' + self.name + ' .sp-grid-last-page').attr('title', last_page);
                     
                     $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
                     $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
@@ -580,6 +567,7 @@ catch(e) {
         $('#'+self.name + ' .sp-grid-cell').live('click', function(event) {
             //console.log('click');
             if ($(this).attr('clickable') == 'true') {
+                $('#'+self.name + ' .sp-grid-select-all').attr('checked', false);
                 var row_id = $(this).parent().find('.sp-grid-rowid');
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
                     var ctrl = event.ctrlKey || event.metaKey;
@@ -1029,15 +1017,20 @@ catch(e) {
                     '<option value="100"' + sel_100 + '>100</option>' +
                     '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
                     '</select>' +
-                    '<button class="sp-button first-page" style="float: left;">|&lt;&lt;</button>' +
-                    '<button class="sp-button page-back" style="float: left;">&lt;&lt;</button>' +
+                    '<button class="sp-button sp-grid-first-page" style="float: left;">|&lt;&lt;</button>' +
+                    '<button class="sp-button sp-grid-page-back" style="float: left;">&lt;&lt;</button>' +
                     '<div>' +
                     '<input class="sp-grid-current-page" type="text" style="text-align: center;" readonly>' +
                     '</div>' +
-                    '<button class="sp-button page-forth" style="float: left;">&gt;&gt</button>' +
-                    '<button class="sp-button last-page" style="float: left;">&gt;&gt|</button>';
+                    '<button class="sp-button sp-grid-page-forth" style="float: left;">&gt;&gt</button>' +
+                    '<button class="sp-button sp-grid-last-page" style="float: left;">&gt;&gt|</button>';
                 
                 g_pager += '</div>';
+                
+                $('#' + g.name + ' .sp-grid-select-all').live('click', function() {
+                    var chk = $(this).attr('checked');
+                    $('#' + g.name + ' .sp-grid-rowid').attr('checked', chk);
+                });
                 
                 $('#' + g.name + ' .sp-grid-rp').live('change', function() {
                     g.rp = $(this).val();
@@ -1045,19 +1038,19 @@ catch(e) {
                     g.search(g.q);
                 });
                 
-                $('#' + g.name + ' .first-page').live('click', function() {
+                $('#' + g.name + ' .sp-grid-first-page').live('click', function() {
                     g.pag_n = 1;
                     g.search(g.q);
                 });
                 
-                $('#' + g.name + ' .page-back').live('click', function() {
+                $('#' + g.name + ' .sp-grid-page-back').live('click', function() {
                     if (g.pag_n > 1) {
                         g.pag_n -= 1;
                         g.search(g.q);
                     }
                 });
                 
-                $('#' + g.name + ' .page-forth').live('click', function() {
+                $('#' + g.name + ' .sp-grid-page-forth').live('click', function() {
                     if (g.pag_n < g.total_pag) {
                         g.pag_n *= 1
                         g.pag_n += 1;
@@ -1065,7 +1058,7 @@ catch(e) {
                     }
                 });
                 
-                $('#' + g.name + ' .last-page').live('click', function() {
+                $('#' + g.name + ' .sp-grid-last-page').live('click', function() {
                     g.pag_n = g.total_pag;
                     g.search(g.q);
                 });
