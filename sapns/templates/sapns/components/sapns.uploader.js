@@ -29,6 +29,7 @@
         set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
         set(this, 'repo', '');
         set(this, 'show_button', true);
+        set(this, 'button_caption', "Upload");
         set(this, 'auto_upload', true);
         set(this, 'onUpload', null);
         set(this, 'onDelete', null);
@@ -88,6 +89,7 @@
             return;
         }
         
+        $('#file_' + self.name).css('cursor', 'wait');
         $('#upload_file_form_' + self.name + ' input[name=id_repo]').val(self.repo);
         $('#upload_file_form_' + self.name).submit();
     }
@@ -200,7 +202,7 @@
                     ' <input id="file_' + sufix + '" type="file" name="f">';
                     
             if (sapnsUploader.show_button && !sapnsUploader.auto_upload) {
-                content += ' <input id="btn_upload_' + sufix + '" type="button" value="Upload">';
+                content += ' <input id="btn_upload_' + sufix + '" type="button" value="' + sapnsUploader.button_caption + '">';
             }
             
             content += ' </form>';
@@ -215,7 +217,6 @@
                 $('#file_name_' + sufix).css('display', 'none');
             }
             else {
-                //console.log(sapnsUploader.getFilename());
                 $('#upload_file_form_' + sufix).hide();
                 $('#file_name_' + sufix).find('div').html(sapnsUploader.getUploadedfile()).show();                
             }
@@ -245,9 +246,9 @@
                     result = JSON.parse(result);
                     if (result.status) {
                         $('#upload_file_form_' + sufix).hide();
-                        $('#file_' + sufix).val('');                        
+                        $('#file_' + sufix).css('cursor', '').val('');
                         $('#file_name_' + sufix).find('div').html(result.uploaded_file);
-                        $('#file_name_' + sufix).show();
+                        $('#file_name_' + sufix).css('cursor', '').show();
                         
                         sapnsUploader.uploaded_file = result.uploaded_file;
                         sapnsUploader.file_name = result.file_name;
