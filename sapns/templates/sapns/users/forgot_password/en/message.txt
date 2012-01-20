@@ -1,2 +1,2 @@
-Hi {{ user_name }},
-Your new password is {{ new_password }}.
+Hi {{ display_name }},
+Your new access data are {{ user_name }} / {{ new_password }}.
