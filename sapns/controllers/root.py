@@ -117,10 +117,16 @@ class RootController(BaseController):
         logger = logging.getLogger('RootController.remember_passsword')
         try:
             root_folder = config.get('app.root_folder', 'sapns')
-            
-            m = __import__('sapns.lib.%s.forgot_password' % root_folder, fromlist=['ForgotPassword'])
-            fp = m.ForgotPassword(username_or_email)
-            fp()
+            try:
+                m = __import__('sapns.lib.%s.forgot_password' % root_folder, fromlist=['ForgotPassword'])
+                fp = m.ForgotPassword(username_or_email)
+                fp()
+                
+            except ImportError:
+                
+                from sapns.lib.sapns.forgot_password import ForgotPassword
+                fp = ForgotPassword(username_or_email)
+                fp()
                 
             return dict(status=True)
         
