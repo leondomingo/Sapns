@@ -42,14 +42,10 @@ class CustomConfig(AppConfig):
         self.DBSession = sapns.model.DBSession #@UndefinedVariable
         
         # Configure the authentication backend
-        #self.sa_auth.cookie_secret = ''
         self.auth_backend = 'sqlalchemy'
         self.sa_auth.dbsession = model.DBSession
-        # what is the class you want to use to search for users in the database
         self.sa_auth.user_class = model.User
-        # what is the class you want to use to search for groups in the database
         self.sa_auth.group_class = model.Group
-        # what is the class you want to use to search for permissions in the database
         self.sa_auth.permission_class = model.Permission
         
         # override this if you would like to provide a different who plugin for
@@ -103,7 +99,7 @@ class CustomConfig(AppConfig):
         from tg.configuration import config
         from routes.mapper import Mapper
 
-        map = Mapper(directory=config['pylons.paths']['controllers'],
+        map_ = Mapper(directory=config['pylons.paths']['controllers'],
                      always_scan=config['debug'])
 
         # Setup a default route for the root of object dispatch
@@ -112,43 +108,10 @@ class CustomConfig(AppConfig):
         if root_folder:
             controller_ = '%s/root' % root_folder
 
-        map.connect('*url', controller=controller_, action='routes_placeholder')
+        map_.connect('*url', controller=controller_, action='routes_placeholder')
 
-        config['routes.map'] = map
+        config['routes.map'] = map_
     
-    def setup_jinja_renderer(self):
-        
-        from tg.configuration import config, warnings
-        from jinja2 import ChoiceLoader, Environment, FileSystemLoader
-        from tg.render import render_jinja
- 
-        if not 'jinja_extensions' in self :
-            self.jinja_extensions = []
-            
-        # TODO: Load jinja filters automatically from given modules
-        if not 'jinja_filters' in self:
-            self.jinja_filter = []
- 
-        config['pylons.app_globals'].jinja2_env = Environment(loader=ChoiceLoader(
-                 [FileSystemLoader(path) for path in self.paths['templates']]),
-                 auto_reload=self.auto_reload_templates, extensions=self.jinja_extensions)
-       
-        # Jinja's unable to request c's attributes without strict_c
-        warnings.simplefilter("ignore")
-        config['pylons.strict_c'] = True
-        warnings.resetwarnings()
-        config['pylons.stritmpl_contextt_tmpl_context'] = True
-        self.render_functions.jinja = render_jinja
- 
-    def add_jinja_filter(self, func, func_name=None):
-        
-        from tg.configuration import config
- 
-        if not func_name:
-            func_name = func.__name__
- 
-        config['pylons.app_globals'].jinja2_env.filters[func_name] = func
-
 base_config = CustomConfig()
 
 # Sapns settings
