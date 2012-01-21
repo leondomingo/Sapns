@@ -26,8 +26,8 @@
             
             // the object assigned to these documents 
             var obj = {
-                    id_class: {{obj.id_class}},
-                    id_object: {{obj.id}},
+                    id_class: "{{obj.id_class}}",
+                    id_object: "{{obj.id}}",
                     title: "{{obj.title}}"
             };
             
@@ -177,7 +177,6 @@
                         // doc_type 
                         var id_doctype = $('#doc_type').attr('id_type');
                         $('#doc_type').sapnsSelector({
-                            name: 'doctype',
                             value: id_doctype,
                             title: "{{_('Document type')}}",
                             rc: 'sp_doctypes',
@@ -187,7 +186,6 @@
                         // doc_format 
                         var id_docformat = $('#doc_format').attr('id_format');
                         $('#doc_format').sapnsSelector({
-                            name: 'docformat',
                             value: id_docformat,
                             title: "{{_('Document format')}}",
                             rc: 'sp_docformats',
@@ -197,7 +195,6 @@
                         // doc repo 
                         var id_repo = $('#doc_repo').attr('id_repo');
                         $('#doc_repo').sapnsSelector({
-                            name: 'docrepo',
                             value: '', //id_repo, 
                             title: "{{_('Document repository')}}",
                             rc: 'sp_repos',
@@ -211,7 +208,6 @@
                         // doc author 
                         var id_author = $('#doc_author').attr('id_author');
                         $('#doc_author').sapnsSelector({
-                            name: 'docauthor',
                             value: id_author, 
                             title: "{{_('Document author')}}",
                             rc: 'sp_users',

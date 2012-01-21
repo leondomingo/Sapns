@@ -1,2 +1,2 @@
-Hola {{ user_name }},
-Tu nueva contraseña es {{ new_password }}.
+Hola {{ display_name }},
+Tus nuevos datos de acceso son {{ user_name }} / {{ new_password }}.

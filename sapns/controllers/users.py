@@ -6,6 +6,7 @@ from pylons import cache
 from pylons.i18n import ugettext as _
 from repoze.what import authorize, predicates
 from sapns.lib.base import BaseController
+from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
 from sqlalchemy.sql.expression import and_
@@ -24,6 +25,7 @@ class UsersController(BaseController):
     
     @expose('sapns/users/edit.html')
     @require(predicates.not_anonymous())
+    @add_language
     def edit(self, cls, id_, **params):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -119,6 +121,7 @@ class UsersController(BaseController):
     
     @expose('sapns/users/roles.html')
     @require(predicates.has_any_permission('manage', 'users'))
+    @add_language
     def roles(self, id_user, **kw):
 
         logger = logging.getLogger('UsersController.roles')        
@@ -139,9 +142,6 @@ class UsersController(BaseController):
                                   name=r.group_name,
                                   selected=has_role != None,
                                   ))
-                
-#            for i in xrange(50):
-#                roles.append(dict(id=0, name='Role %d' % i, selected=False))
                 
             return dict(page='User roles', came_from=kw.get('came_from'),
                         user=dict(id=user.user_id, name=user.user_name), 
