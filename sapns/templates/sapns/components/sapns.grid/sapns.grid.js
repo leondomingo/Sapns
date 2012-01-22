@@ -1,6 +1,6 @@
 /* Sapns grid */
 
-function load_script(src) {
+/*function load_script(src) {
     //console.log('Loading from: ' + src);
     var fileref = document.createElement('script');
     fileref.setAttribute("type", "text/javascript");
@@ -13,7 +13,7 @@ function load_css(href) {
     fileref.setAttribute("rel", "stylesheet");
     fileref.setAttribute("type", "text/css");
     fileref.setAttribute("href", href);
-}
+}*/
 
 (function($) {
 
@@ -136,16 +136,19 @@ function load_css(href) {
             cols = cols();
         }
         
-        var g_wd = 20; // min-width: 20px;
-        for (var i=0, l=cols.length; i<l; i++) {
+        var l = cols.length,
+            g_wd = 23+60;
+        for (var i=0; i<l; i++) {
             var col = cols[i];
-            g_wd += (col.width + 8);
+            g_wd += col.width;
         }
         
-        var g_table = '<div class="sp-grid" style="width: ' + g_wd + 'px;">';
+        //console.log(g_wd);
+        
+        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+10) + 'px;">';
         
         if (!self.hide_check) {
-            g_table += '<div class="sp-grid-row"><div class="sp-col-title">' + 
+            g_table += '<div class="sp-grid-row"><div class="sp-col-title" style="width: 23px; border-radius: 5px 0px 0px 0px;">' + 
                 '<input class="sp-grid-select-all" type="checkbox"/></div>';
         }
         
@@ -154,8 +157,8 @@ function load_css(href) {
         }
         
         for (var i=0, l=cols.length; i<l; i++) {
-            var col = cols[i];
-            var wd = col.width;
+            var col = cols[i],
+                wd = col.width;
             if (!wd) {
                 wd = self.default_.col_width;
             }
@@ -164,7 +167,16 @@ function load_css(href) {
                 continue;
             }
             
-            g_table += '<div class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</div>';
+            var border_radius = '';
+            if (i == l-1) {
+                border_radius = 'border-radius: 0px 5px 0px 0px;';
+            }
+            
+            if (self.hide_check && i == 0 || self.hide_check && self.hide_id && i == 1) {
+                border_radius = 'border-radius: 5px 0px 0px 0px;';
+            }
+            
+            g_table += '<div class="sp-col-title" style="width: ' + wd + 'px;' + border_radius + '">' + col.title + '</div>';
         }
 
         g_table += '</div>';
@@ -176,67 +188,82 @@ function load_css(href) {
         
         var ld = data.length;
         if (ld > 0) {
-        for (var i=0; i<ld; i++) {
-            
-            var row = data[i];
-            
-            g_table += '<div class="sp-grid-row">';
-            
-            if (!self.hide_check) {
-                g_table += '<div class="sp-grid-cell" title="' + (i+1) + '">' + 
-                    '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
+            for (var i=0; i<ld; i++) {
+                
+                var row = data[i];
+                
+                g_table += '<div class="sp-grid-row">';
+                
+                if (!self.hide_check) {
+                    var border_radius = '';
+                    if (i == ld-1) {
+                        border_radius = 'border-radius: 0px 0px 0px 5px;';
+                    }
+                    
+                    g_table += '<div class="sp-grid-cell" title="' + (i+1) + '" style="' + border_radius + '">' + 
+                        '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
+                }
+                
+                if (self.actions_inline) {
+                    var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
+                    g_table +=
+                        '<div class="sp-grid-cell" style="font-size: 10px; width: 35px;">' +
+                            '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
+                            '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
+                            '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
+                        '</div>';
+                }
+                
+                for (var j=0, lr=cols.length; j<lr; j++) {
+                    var col = cols[j],
+                        al = col.align;
+                    if (!al) {
+                        al = self.default_.col_align;
+                    }
+                    
+                    var wd = col.width;
+                    if (!wd) {
+                        wd = self.default_.col_width;
+                    }
+                    
+                    var cell = row[j];
+                    if (!cell) {
+                        cell = self.default_.empty_value;
+                    }
+                    
+                    if (self.hide_id && col.title == 'id') {
+                        continue;
+                    }
+                    
+                    var width = '';
+                    if (wd > 0) {
+                        width = ' width: ' + wd + 'px;';
+                    }
+                    
+                    var border_radius = '';
+                    if ((self.hide_check && i == ld-1) && 
+                            (!self.hide_id && j == 0 || self.hide_id && j == 1)) {
+                        border_radius = 'border-radius: 0px 0px 0px 5px;';
+                    }
+                    
+                    if (i == ld-1 && j == lr-1) {
+                        border_radius = 'border-radius: 0px 0px 5px 0px;';
+                    }
+                    
+                    g_table += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + border_radius + '"';
+                    
+                    if (cell) {
+                        g_table += 'title="' + cell.replace(/"/gi, "''") + '"';
+                    }
+                    else {
+                        g_table += 'title="({{_("empty")}})"';
+                    }
+                    
+                    g_table += 'clickable="true">' + cell + '</div>';
+                }
+                
+                g_table += '</div>';
             }
-            
-            if (self.actions_inline) {
-                var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
-                g_table +=
-                    '<div class="sp-grid-cell" style="font-size: 10px; width: 35px;">' +
-                        '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
-                        '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
-                        '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
-                    '</div>';
-            }
-            
-            for (var j=0, lr=cols.length; j<lr; j++) {
-                var col = cols[j];
-                var al = col.align;
-                if (!al) {
-                    al = self.default_.col_align;
-                }
-                
-                var wd = col.width;
-                if (!wd) {
-                    wd = self.default_.col_width;
-                }
-                
-                var cell = row[j];
-                if (!cell) {
-                    cell = self.default_.empty_value;
-                }
-                
-                if (self.hide_id && col.title == 'id') {
-                    continue;
-                }
-                
-                var width = '';
-                if (wd > 0) {
-                    width = ' width: ' + wd + 'px;';
-                }
-                
-                g_table += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
-                
-                if (cell) {
-                    g_table += 'title="' + cell.replace(/"/gi, "''") + '"';
-                }
-                else {
-                    g_table += 'title="({{_("empty")}})"';
-                }
-                
-                g_table += 'clickable="true">' + cell + '</div>';
-            }
-            
-            g_table += '</div>';
-        }
         }
         else {
             var n = 1;
@@ -245,11 +272,10 @@ function load_css(href) {
             }
             g_table += 
                 '<div class="sp-grid-row">' +
-                    '<div class="sp-grid-cell sp-grid-noresults" style="width: ' + (g_wd - cols.length*4) + 'px;" >{{_("No results")}}</div>' +
+                    '<div class="sp-grid-cell sp-grid-noresults" style="width: ' + g_wd + 'px; border-radius: 0px 0px 5px 5px;" >{{_("No results")}}</div>' +
                 '</div>';
         }
         
-        //g_table += '</table>';
         g_table += '</div>';
         
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
@@ -361,24 +387,25 @@ function load_css(href) {
                     $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
                     $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
                     
+                    self.data = response.data;
+                    self.loadData();
+                    
+                    // qtip2
                     try {
                         $('.sp-grid-cell').qtip({
                             content: {
                                 text: true
                             },
                             position: {
-                                my: "left top",
+                                my: "top left",
                                 at: "bottom center"
                             },
-                            style: "ui-tooltip-dark ui-tooltip-rounded"
+                            style: "ui-tooltip-rounded"
                         });
                     } catch (e) {
-                        // console.log(e);
-                        // qtip2 is not loaded
-                    }
-
-                    self.data = response.data;
-                    self.loadData();
+                        //console.log(e);
+                        //qtip2 is not loaded
+                    }                    
                     
                     // onLoad
                     if (on_load) {
@@ -851,9 +878,6 @@ function load_css(href) {
                     
                     $('#grid-dialog_' + self.name + ' #object-title').html(title);
                 }
-            },
-            error: function() {
-                // alert('error!'); 
             }
         });
 
@@ -897,10 +921,10 @@ function load_css(href) {
                                     message += "</ul>";
                                 }
                                 
-                                // {# load message #} 
+                                // load message 
                                 $('#grid-dialog_' + self.name).html(error_html).find('#delete-error-message').html(message);
                                 
-                                // {# show error dialog #} 
+                                // show error dialog 
                                 $('#grid-dialog_' + self.name).dialog({
                                     width: 700,
                                     height: 250,
@@ -949,7 +973,6 @@ function load_css(href) {
                 
                 g_content += 
                     '<div><div id="search_box" style="float: left;">' +
-                        //'<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
                         '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
                         '<button class="sp-button sp-search-btn" style="float: left;">{{_("Search...")}}</button></div>';                     
                         
