@@ -15,18 +15,6 @@ function load_css(href) {
     fileref.setAttribute("href", href);
 }
 
-/*try {
-    sprintf;
-} catch (e) {
-    load_script("{{tg.url('/js/sprintf.min.js')}}");
-}*/
-
-/*
- * try { qtip; } catch(e) {
- * load_css("{{tg.url('/js/qtip2/jquery.qtip.min.css')}}");
- * load_script("{{tg.url('/js/qtip2/jquery.qtip.min.js')}}"); }
- */
-
 (function($) {
 
     // SapnsGrid (constructor)
@@ -323,7 +311,7 @@ function load_css(href) {
         
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
         if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
-            $('#' + self.name + ' .sp-grid-row input[type=checkbox]:first').attr('checked', true);
+            $('#' + self.name + ' .sp-grid-rowid:first').attr('checked', true);
         }
     }
 
