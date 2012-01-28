@@ -3,7 +3,7 @@
 </div>
 
 <script type="text/javascript">
-    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.grid/sapns.min.grid.js' %}
     $(document).ready(function() {
         
         $('#{{grid.name}}').sapnsGrid({
@@ -19,7 +19,7 @@
             actions: [],
             with_pager: false,
             exportable: false,
-            height: 420,
+            height: 400,
             select_first: true,
         });
         

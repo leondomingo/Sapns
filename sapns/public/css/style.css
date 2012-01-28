@@ -316,7 +316,7 @@ clear:both;
 .sp-logout-btn {
 	text-align: center;
 	background-color: white;
-    border: 2px solid gray;
+    border: 2px solid #777;
     border-radius: 10px;
     width: 90px;
     margin-left: 205px;
@@ -363,13 +363,18 @@ clear:both;
 }
 
 .sp-search-txt {
-	border: 1px solid gray;
+	border: 1px solid #ddd;
+	border-bottom-color: #777;
+	border-right-color: #777;
+	border-radius: 3px;
+	padding: 2px;
 	width: 450px;
 }
 
 .sp-search-btn {
 	float: none;
 	width: 80px;
+	font-size: 11px;
 }
 
 .sp-col-title {
@@ -381,12 +386,19 @@ clear:both;
 	font-size: 11px;
 	height: 29px;
 	min-width: 20px;
-	border: 1px solid lightgray;
-	/*cursor: pointer;*/
+	border: 1px solid #ddd;
 	float: left;
 	margin-right: -1px;
 	padding: 2px;
     overflow: hidden;
+}
+
+.sp-grid .sp-col-title:first-child {
+	border-radius: 5px 0 0 0;
+}
+
+.sp-grid .sp-col-title:last-child {
+	border-radius: 0 5px 0 0;
 }
 
 .sp-grid-row-id {
@@ -398,9 +410,18 @@ clear:both;
 	margin-bottom: -1px;
 }
 
+.sp-grid .sp-grid-row .sp-grid-cell:last-child {
+	border-right-color: #777;
+}
+
+.sp-grid .sp-grid-row:last-child .sp-grid-cell {
+	border-bottom-color: #777;
+	border-right-color: #777;
+}
+
 .sp-grid-cell {
 	background-color: white;
-	border: 1px solid lightgray;
+	border: 1px solid #ddd;
 	/*border-right: 1px solid lightgray;*/
 	font-family: arial;
 	font-size: 11px;
@@ -419,17 +440,25 @@ clear:both;
 	color: maroon; 
 	font-weight: bold; 
 	font-size: 15px;
+	height: 30px; 
+	padding-top: 15px; 
+	border-radius: 0 0 5px 5px;
+	border-bottom-color: #777;
+	border-right-color: #777;
 }
 
 .sp-grid-pager {
-	border: 1px solid gray;
+	border: 1px solid #ddd;
+	border-bottom-color: #777;
+	border-right-color: #777;
+	border-radius: 3px;
 	height: 30px;
 }
 
 .sp-grid-pager-desc {
-	color: gray;
+	color: #777;
 	font-family: arial;
-	/*background-color: gray;*/
+	/*background-color: #777;*/
 	width: 450px;
 	text-align: center;
 	float: left;
@@ -441,7 +470,7 @@ clear:both;
 
 .sp-grid-current-page {
 	width: 40px;
-	color: gray; 
+	color: #777; 
 	font-weight: bold;
 	float: left;
 }
@@ -450,12 +479,8 @@ clear:both;
 	float: left;
 }
 
-.sp-grid-pag-back {
-	float: left;
-}
-
 .sp-grid-actions {
-	/*border: 1px solid gray;*/
+	/*border: 1px solid #777;*/
 	clear: left;
 	background-color: #CCCFA5; /*#B4BD3C;*/
 	height: 25px;
@@ -467,7 +492,7 @@ clear:both;
 	float: left;
 	clear: left;
 	margin-top: 5px;
-	color: gray; /*#F9F9F9;*/
+	color: #777; /*#F9F9F9;*/
 	font-weight: bold;
 	font-size: 10px;
 	/*border: 1px dotted white;*/
@@ -480,7 +505,7 @@ clear:both;
 
 .sp-grid-relatedinfo-title {
 	float: left; 
-	color: gray; 
+	color: #777; 
 	margin-top: 3px; 
 	width: 150px;
     font-size: 10px; 
@@ -498,9 +523,9 @@ clear:both;
 .sp-text-field {
 	font-family: sans-serif;
 	border-top: 1px solid #605B7C;
-	border-left: 1px solid gray;
-	border-right: 1px solid gray;
-	border-bottom: 1px solid gray;
+	border-left: 1px solid #777;
+	border-right: 1px solid #777;
+	border-bottom: 1px solid #777;
 }
 
 .sp-text-field:focus {
@@ -527,7 +552,7 @@ clear:both;
 .count-message {
 	padding-left: 20px;
 	font-size: 10px;
-	color: gray;
+	color: #777;
 }
 
 #sc-container {
@@ -595,7 +620,7 @@ clear:both;
 /* Standard deletion */
 
 #object-title {
-	color: gray; 
+	color: #777; 
 	font-size: 13px;
 	font-style: italic;
 }

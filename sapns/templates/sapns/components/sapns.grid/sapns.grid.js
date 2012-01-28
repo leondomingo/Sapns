@@ -1,20 +1,5 @@
 /* Sapns grid */
 
-/*function load_script(src) {
-    //console.log('Loading from: ' + src);
-    var fileref = document.createElement('script');
-    fileref.setAttribute("type", "text/javascript");
-    fileref.setAttribute("src", src);
-    document.getElementsByTagName("head")[0].appendChild(fileref)
-}
-
-function load_css(href) {
-    var fileref = document.createElement("link");
-    fileref.setAttribute("rel", "stylesheet");
-    fileref.setAttribute("type", "text/css");
-    fileref.setAttribute("href", href);
-}*/
-
 (function($) {
 
     // SapnsGrid (constructor)
@@ -127,8 +112,6 @@ function load_css(href) {
     // loadData
     SapnsGrid.prototype.loadData = function() {
         
-        //console.log('loadData');
-        
         var self = this;
         
         var cols = self.cols;
@@ -137,18 +120,18 @@ function load_css(href) {
         }
         
         var l = cols.length,
-            g_wd = 23+60;
+            g_wd = 23;
         for (var i=0; i<l; i++) {
             var col = cols[i];
             g_wd += col.width;
         }
         
-        //console.log(g_wd);
+        g_wd += l*5;
         
-        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+10) + 'px;">';
+        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+15) + 'px;">';
         
         if (!self.hide_check) {
-            g_table += '<div class="sp-grid-row"><div class="sp-col-title" style="width: 23px; border-radius: 5px 0px 0px 0px;">' + 
+            g_table += '<div class="sp-grid-row"><div class="sp-col-title" style="width: 23px;">' + 
                 '<input class="sp-grid-select-all" type="checkbox"/></div>';
         }
         
@@ -167,16 +150,7 @@ function load_css(href) {
                 continue;
             }
             
-            var border_radius = '';
-            if (i == l-1) {
-                border_radius = 'border-radius: 0px 5px 0px 0px;';
-            }
-            
-            if (self.hide_check && i == 0 || self.hide_check && self.hide_id && i == 1) {
-                border_radius = 'border-radius: 5px 0px 0px 0px;';
-            }
-            
-            g_table += '<div class="sp-col-title" style="width: ' + wd + 'px;' + border_radius + '">' + col.title + '</div>';
+            g_table += '<div class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</div>';
         }
 
         g_table += '</div>';
@@ -197,7 +171,7 @@ function load_css(href) {
                 if (!self.hide_check) {
                     var border_radius = '';
                     if (i == ld-1) {
-                        border_radius = 'border-radius: 0px 0px 0px 5px;';
+                        border_radius = 'border-radius: 0 0 0 5px;';
                     }
                     
                     g_table += '<div class="sp-grid-cell" title="' + (i+1) + '" style="' + border_radius + '">' + 
@@ -243,11 +217,11 @@ function load_css(href) {
                     var border_radius = '';
                     if ((self.hide_check && i == ld-1) && 
                             (!self.hide_id && j == 0 || self.hide_id && j == 1)) {
-                        border_radius = 'border-radius: 0px 0px 0px 5px;';
+                        border_radius = 'border-radius: 0 0 0 5px;';
                     }
                     
                     if (i == ld-1 && j == lr-1) {
-                        border_radius = 'border-radius: 0px 0px 5px 0px;';
+                        border_radius = 'border-radius: 0 0 5px 0;';
                     }
                     
                     g_table += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + border_radius + '"';
@@ -271,8 +245,9 @@ function load_css(href) {
                 n = 3;
             }
             g_table += 
-                '<div class="sp-grid-row">' +
-                    '<div class="sp-grid-cell sp-grid-noresults" style="width: ' + g_wd + 'px; border-radius: 0px 0px 5px 5px;" >{{_("No results")}}</div>' +
+                '<div class="sp-grid-row">'
+                    + '<div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' 
+                        + 'style="width: ' + g_wd + 'px;" >{{_("No results")}}</div>' +
                 '</div>';
         }
         

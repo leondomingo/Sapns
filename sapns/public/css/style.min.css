@@ -26,27 +26,30 @@ div.clearingdiv{clear:both}.sp_header{position:relative;background-color:#b4bd3c
 .sp_app_subtitle{position:absolute;left:0;top:40px;font-size:12px;text-align:left;color:#723532;margin-left:10px}
 .sp_logout{position:absolute;right:10px;top:20px;border:1px solid;background-color:#cccfa5;border-radius:10px}
 .sp-logout-user{padding-left:10px;float:left;font-style:italic;font-family:Arial;font-size:13px;color:white}
-.sp-logout-btn{text-align:center;background-color:white;border:2px solid gray;border-radius:10px;width:90px;margin-left:205px;font-family:Arial;height:14px}
+.sp-logout-btn{text-align:center;background-color:white;border:2px solid #777;border-radius:10px;width:90px;margin-left:205px;font-family:Arial;height:14px}
 .sp-logout-btn:hover{background-color:orange}#language_selector{position:absolute;right:10px;top:70px}
 #language_selector select{font-size:9px}.sp-button{font-size:11px;text-align:center;margin:2px}
 .sp-grid-container{padding-left:15px;padding-right:15px}.sp-grid-caption{font-size:18px;margin-left:0;width:100%;height:25px;overflow:hidden}
-.sp-search-txt{border:1px solid gray;width:450px}.sp-search-btn{float:none;width:80px}
-.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;padding:2px;overflow:hidden}
-.sp-grid-row{clear:left;height:31px;margin-bottom:-1px}.sp-grid-cell{background-color:white;border:1px solid lightgray;font-family:arial;font-size:11px;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
-.sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px}
-.sp-grid-pager{border:1px solid gray;height:30px}.sp-grid-pager-desc{color:gray;font-family:arial;width:450px;text-align:center;float:left;height:30px;vertical-align:middle;margin-top:5px;height:25px}
-.sp-grid-current-page{width:40px;color:gray;font-weight:bold;float:left}.sp-grid-rp{float:left}
-.sp-grid-pag-back{float:left}.sp-grid-actions{clear:left;background-color:#cccfa5;height:25px}
-.sp-grid-actions-title{width:150px;text-align:center;float:left;clear:left;margin-top:5px;color:gray;font-weight:bold;font-size:10px}
-.sp-grid-action{min-width:80px;margin:2px}.sp-grid-relatedinfo-title{float:left;color:gray;margin-top:3px;width:150px;font-size:10px;font-weight:bold;text-align:center;margin-top:5px}
-.sp_field_error{background-color:red;color:white}.sp-text-field{font-family:sans-serif;border-top:1px solid #605b7c;border-left:1px solid gray;border-right:1px solid gray;border-bottom:1px solid gray}
+.sp-search-txt{border:1px solid #ddd;border-bottom-color:#777;border-right-color:#777;border-radius:3px;padding:2px;width:450px}
+.sp-search-btn{float:none;width:80px;font-size:11px}.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid #ddd;float:left;margin-right:-1px;padding:2px;overflow:hidden}
+.sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}.sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}
+.sp-grid-row{clear:left;height:31px;margin-bottom:-1px}.sp-grid .sp-grid-row .sp-grid-cell:last-child{border-right-color:#777}
+.sp-grid .sp-grid-row:last-child .sp-grid-cell{border-bottom-color:#777;border-right-color:#777}
+.sp-grid-cell{background-color:white;border:1px solid #ddd;font-family:arial;font-size:11px;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
+.sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px;height:30px;padding-top:15px;border-radius:0 0 5px 5px;border-bottom-color:#777;border-right-color:#777}
+.sp-grid-pager{border:1px solid #ddd;border-bottom-color:#777;border-right-color:#777;border-radius:3px;height:30px}
+.sp-grid-pager-desc{color:#777;font-family:arial;width:450px;text-align:center;float:left;height:30px;vertical-align:middle;margin-top:5px;height:25px}
+.sp-grid-current-page{width:40px;color:#777;font-weight:bold;float:left}.sp-grid-rp{float:left}
+.sp-grid-actions{clear:left;background-color:#cccfa5;height:25px}.sp-grid-actions-title{width:150px;text-align:center;float:left;clear:left;margin-top:5px;color:#777;font-weight:bold;font-size:10px}
+.sp-grid-action{min-width:80px;margin:2px}.sp-grid-relatedinfo-title{float:left;color:#777;margin-top:3px;width:150px;font-size:10px;font-weight:bold;text-align:center;margin-top:5px}
+.sp_field_error{background-color:red;color:white}.sp-text-field{font-family:sans-serif;border-top:1px solid #605b7c;border-left:1px solid #777;border-right:1px solid #777;border-bottom:1px solid #777}
 .sp-text-field:focus{border:1px solid orange}.sp-label-field{color:#605b7c;font-family:sans-serif}
 .sp-label-field-must{font-weight:bold}.sp_message{font-size:25px;color:#605b7c;margin-top:20px;padding-left:20px}
-.count-message{padding-left:20px;font-size:10px;color:gray}#sc-container{border:1px solid white;border-radius:10px;height:430px;overflow:auto;margin-top:10px;margin-left:3px;margin-right:3px}
+.count-message{padding-left:20px;font-size:10px;color:#777}#sc-container{border:1px solid white;border-radius:10px;height:430px;overflow:auto;margin-top:10px;margin-left:3px;margin-right:3px}
 .sp_shortcut{margin-left:20px;margin-right:20px;margin-top:5px;margin-bottom:2px;border-radius:10px}
 .sp_shortcut:hover{background-color:orange!important}.sp-shortcut-title{width:350px;float:left;margin-top:2px;padding-left:20px}
 .sp-select-shortcut{width:200px}.sp-shortcut-ins-order{float:left;border:1px solid #b4bd3c;padding-left:2px;padding-right:2px;margin-top:2px;margin-left:5px;margin-right:5px;width:140px;text-align:center}
 .sp-shortcut-ref-order{border:1px solid #b4bd3c;float:left;padding-left:2px;padding-right:2px;margin-top:2px;margin-left:5px;margin-right:5px;width:140px;text-align:center}
-.sp_messages{font-size:10px;color:navy}#object-title{color:gray;font-size:13px;font-style:italic}
+.sp_messages{font-size:10px;color:navy}#object-title{color:#777;font-size:13px;font-style:italic}
 #delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
