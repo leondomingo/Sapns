@@ -174,7 +174,8 @@
                         border_radius = 'border-radius: 0 0 0 5px;';
                     }
                     
-                    g_table += '<div class="sp-grid-cell" title="' + (i+1) + '" style="' + border_radius + '">' + 
+                    console.log(1);
+                    g_table += '<div class="sp-grid-cell" title="' + (i+1) + '" style="width: 23px;' + border_radius + '">' + 
                         '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
                 }
                 
