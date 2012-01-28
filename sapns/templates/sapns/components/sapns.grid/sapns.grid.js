@@ -119,16 +119,22 @@
             cols = cols();
         }
         
-        var l = cols.length,
-            g_wd = 23;
-        for (var i=0; i<l; i++) {
-            var col = cols[i];
-            g_wd += col.width;
+        var g_wd = 23;
+        if (self.hide_check) {
+            g_wd = -6;
         }
         
-        g_wd += l*5;
+        for (var i=0, l=cols.length; i<l; i++) {
+            var col = cols[i];
+            
+            if (self.hide_id && col.title == 'id') {
+                continue;
+            }
+            
+            g_wd += (col.width + 5);
+        }
         
-        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+15) + 'px;">';
+        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+5) + 'px;">';
         
         if (!self.hide_check) {
             g_table += '<div class="sp-grid-row"><div class="sp-col-title" style="width: 23px;">' + 
