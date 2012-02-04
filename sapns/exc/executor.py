@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
 import os
@@ -11,6 +12,9 @@ from paste.deploy import appconfig
 from sapns.config.environment import load_environment
 
 class Executor(object):
+    
+    def __init__(self, args=None):
+        self.args = args
 
     def load_config(self, filename):
         conf = appconfig('config:' + os.path.abspath(filename))
@@ -23,8 +27,13 @@ class Executor(object):
         return parser.parse_args()
     
     def execute(self, pkg_name, func_name, *args, **kwargs):
-        _args = self.parse_args()
-        self.load_config(_args.conf_file)
+        if not self.args:
+            conf_file = self.parse_args().conf_file
+            
+        else:
+            conf_file = self.args.conf_file
+            
+        self.load_config(conf_file)
         
         m = __import__(pkg_name, fromlist=[func_name])
         func = getattr(m, func_name)
@@ -36,3 +45,26 @@ class Executor(object):
         else:
             # "func" is a function executed with the passed arguments
             func(*args, **kwargs)
+            
+if __name__ == '__main__':
+    
+    try:
+        from executions import EXECUTIONS
+    except ImportError:
+        from executions_default import EXECUTIONS
+    
+    pr = ArgumentParser(description=__doc__)
+    pr.add_argument("conf_file", help="configuration file")
+    pr.add_argument('exc_id', help='execution identifier')
+    pr.add_argument('extra_args', metavar='a', nargs='*', help='extra argument')
+    _args = pr.parse_args()
+    
+    if EXECUTIONS.has_key(_args.exc_id):
+        _pkg_name = EXECUTIONS[_args.exc_id][0]
+        _func_name = EXECUTIONS[_args.exc_id][1]
+        
+        e = Executor(args=_args)
+        e.execute(_pkg_name, _func_name, *_args.extra_args)
+        
+    else:
+        sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)
