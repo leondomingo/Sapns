@@ -59,12 +59,25 @@ if __name__ == '__main__':
     pr.add_argument('extra_args', metavar='a', nargs='*', help='extra argument')
     _args = pr.parse_args()
     
+    a = _args.extra_args
+    kw = {}
+    
     if EXECUTIONS.has_key(_args.exc_id):
         _pkg_name = EXECUTIONS[_args.exc_id][0]
         _func_name = EXECUTIONS[_args.exc_id][1]
         
+        # *args
+        if len(EXECUTIONS[_args.exc_id]) > 2:
+            exc_args = EXECUTIONS[_args.exc_id][2]
+            if exc_args: 
+                a = a + list(exc_args) 
+        
+            # **kwargs
+            if len(EXECUTIONS[_args.exc_id]) > 3:
+                kw = EXECUTIONS[_args.exc_id][3]
+        
         e = Executor(args=_args)
-        e.execute(_pkg_name, _func_name, *_args.extra_args)
+        e.execute(_pkg_name, _func_name, *a, **kw)
         
     else:
         sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)
