@@ -13,5 +13,5 @@
 .sp-search-text:focus{border:1px solid orange}#right_desc{position:absolute;left:15px;top:0;padding-right:10px;width:810px;background-color:transparent}
 #class_title{color:#666;font-size:22px;font-weight:bold;height:31px;margin-left:0;margin-top:7px;overflow:hidden}
 #reference{margin-left:0;font-size:15px;color:black;background-color:none;text-align:left;height:22px;overflow:hidden}
-#created_updated{height:9px;font-size:9px;cursor:pointer}.created{width:100px;border:1px solid lightgray;float:left;margin-right:5px;text-align:center}
+#created_updated{height:9px;font-size:9px;cursor:pointer}.created{width:120px;border:1px solid lightgray;float:left;margin-right:5px;text-align:center}
 .created:hover{background-color:lightgray;color:white}
