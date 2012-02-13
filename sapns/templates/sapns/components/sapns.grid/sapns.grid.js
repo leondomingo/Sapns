@@ -1,20 +1,5 @@
 /* Sapns grid */
 
-function load_script(src) {
-    // console.log('Loading from: ' + src);
-    var fileref = document.createElement('script');
-    fileref.setAttribute("type", "text/javascript");
-    fileref.setAttribute("src", src);
-    document.getElementsByTagName("head")[0].appendChild(fileref)
-}
-
-function load_css(href) {
-    var fileref = document.createElement("link");
-    fileref.setAttribute("rel", "stylesheet");
-    fileref.setAttribute("type", "text/css");
-    fileref.setAttribute("href", href);
-}
-
 (function($) {
 
     // SapnsGrid (constructor)
@@ -150,22 +135,32 @@ function load_css(href) {
             cols = cols();
         }
         
-        var g_wd = 20; // min-width: 20px;
+        var g_wd = 23; // min-width: 20px;
+        if (self.hide_check) {
+            g_wd = -6;
+        }
+
         for (var i=0, l=cols.length; i<l; i++) {
             var col = cols[i];
-            g_wd += (col.width + 8);
+            
+            if (self.hide_id && col.title == 'id') {
+                continue;
+            }
+            
+            g_wd += (col.width + 5);
         }
         
-        var g_table = '<div class="sp-grid" style="width: ' + g_wd + 'px;">';
+        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+5) + 'px;">';
         
-        var grid_header = '<div class="sp-grid-row">\n';
+        var grid_header = '<div class="sp-grid-row">';
         
         if (!self.hide_check) {
-            grid_header += '<div class="sp-col-title" style="width: 23px;"><input class="sp-grid-select-all" type="checkbox"/></div>\n';
+            grid_header += '<div class="sp-col-title" style="width: 23px;">' + 
+                '<input class="sp-grid-select-all" type="checkbox"/></div>';
         }
         
         if (self.actions_inline) {
-            grid_header += '<div class="sp-col-title" style="%(actions_wd)s">*</div>\n';
+            grid_header += '<div class="sp-col-title" style="%(actions_wd)s">*</div>';
         }
         
         for (var i=0, l=cols.length; i<l; i++) {
@@ -198,7 +193,13 @@ function load_css(href) {
                 var grid_row = '<div class="sp-grid-row">\n';
                 
                 if (!self.hide_check) {
-                    grid_row += '<div class="sp-grid-cell" title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>\n';
+                    var border_radius = '';
+                    if (i == ld-1) {
+                        border_radius = 'border-radius: 0 0 0 5px;';
+                    }
+                    
+                    grid_row += '<div class="sp-grid-cell" title="' + (i+1) + '" style="width: 23px;' + border_radius + '">' +
+                        '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
                 }
                 
                 if (self.actions_inline) {
@@ -246,7 +247,6 @@ function load_css(href) {
                 
                 // grid_header
                 if (i == 0) {
-                    //console.log(grid_header);
                     g_table += sprintf(grid_header, {actions_wd: actions_wd});
                 }
                 
@@ -276,7 +276,17 @@ function load_css(href) {
                         width = ' width: ' + wd + 'px;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
+                    var border_radius = '';
+                    if ((self.hide_check && i == ld-1) && 
+                            (!self.hide_id && j == 0 || self.hide_id && j == 1)) {
+                        border_radius = 'border-radius: 0 0 0 5px;';
+                    }
+                    
+                    if (i == ld-1 && j == lr-1) {
+                        border_radius = 'border-radius: 0 0 5px 0;';
+                    }
+                    
+                    grid_row += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
                         grid_row += 'title="' + cell.replace(/"/gi, "''") + '"';
@@ -299,14 +309,15 @@ function load_css(href) {
             if (self.actions_inline) {
                 n = 3;
             }
+            
             g_table += 
-                grid_header +
-                '<div class="sp-grid-row">' +
-                    '<div class="sp-grid-cell sp-grid-noresults" style="width: ' + (g_wd - cols.length*4) + 'px;" >{{_("No results")}}</div>' +
-                '</div>';
+                sprintf(grid_header, {actions_wd: actions_wd}) +
+                '<div class="sp-grid-row">'
+                    + '<div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' 
+                        + 'style="width: ' + (g_wd + 25) + 'px;" >{{_("No results")}}</div>' +
+                '</div>';            
         }
         
-        //g_table += '</table>';
         g_table += '</div>';
         
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
