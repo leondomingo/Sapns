@@ -345,6 +345,14 @@ div.clearingdiv {
 .sp-grid {
 }
 
+.sp-grid .sp-col-title:first-child {
+    border-radius: 5px 0 0 0;
+}
+
+.sp-grid .sp-col-title:last-child {
+    border-radius: 0 5px 0 0;
+}
+
 .sp-grid-caption {
     color: #666666;
     font-size: 22px;
@@ -414,10 +422,14 @@ div.clearingdiv {
 	color: maroon; 
 	font-weight: bold; 
 	font-size: 15px;
+	border-radius: 0 0 5px 5px;
 }
 
 .sp-grid-pager {
-	border: 1px solid gray;
+    border-color: #DDDDDD #777777 #777777 #DDDDDD;
+    border-radius: 3px 3px 3px 3px;
+    border-style: solid;
+    border-width: 1px;	
 	height: 30px;
 }
 
