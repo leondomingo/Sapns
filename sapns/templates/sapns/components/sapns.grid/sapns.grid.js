@@ -183,6 +183,42 @@
         if (typeof (data) == 'function') {
             data = data();
         }
+
+        // actions
+        var button_actions = '';
+        var nonstd = '';
+        var la = self.actions.length;
+        if (la > 0) {
+            for (var a=0; a<la; a++) {
+                var act = self.actions[a];
+                console.log(act);
+                if (self.actions_inline) {
+                    if ((act.type === 'process' || typeof (act.type) == 'object') && act.require_id) {
+                        if (self.actions_inline) {
+                            if (typeof(act.type) == 'object') {
+                                nonstd += sprintf('<option value="%(id)s">%(title)s</option>\n', {id: act.type.id, title: act.title});
+                            } 
+                            else {
+                                nonstd += sprintf('<option value="%(name)s">%(title)s</option>\n', {name: act.name, title: act.title});
+                            }
+                        }
+                    }
+                }
+                // button actions
+                else if (act.type != 'new') {
+                    button_actions += sprintf('<button id="%(id)s" class="sp-grid-button-action">%(title)s</button>\n', {id: act.type.id, title: act.title});
+                }
+            }
+        }
+        
+        if (nonstd) {
+            nonstd = '<select class="nonstd_actions">\n<option value=""></option>\n' 
+                + nonstd 
+                + '</select>\n';
+        }
+        else {
+            actions_wd = 'width: 75px;';
+        }
         
         var ld = data.length;
         if (ld > 0) {
@@ -216,37 +252,16 @@
                         '<img class="inline_action docs_inline" title="{{_("Docs")}}" ' + 
                             'src="{{tg.url("/images/sapns/icons/docs.png")}}">\n';
                     
-                    var nonstd = '';
-                    var la = self.actions.length;
-                    if (la > 0) {
-                        for (var a=0; a<la; a++) {
-                            var act = self.actions[a];
-                            if ((act.type === 'process' || typeof (act.type) == 'object') && act.require_id) {
-                                if (typeof(act.type) == 'object') {
-                                    nonstd += sprintf('<option value="%(id)s">%(title)s</option>\n', {id: act.type.id, title: act.title});
-                                } 
-                                else {
-                                    nonstd += sprintf('<option value="%(name)s">%(title)s</option>\n', {name: act.name, title: act.title});
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (nonstd) {
-                        nonstd = '<select class="nonstd_actions">\n<option value=""></option>\n' 
-                            + nonstd 
-                            + '</select>\n';
-                    }
-                    else {
-                        actions_wd = 'width: 75px;';
-                    }
-                    
                     grid_row += sprintf(_actions, {actions_wd: actions_wd}) + nonstd + '\n';
                     grid_row += '</div>\n';
                 }
                 
                 // grid_header
                 if (i == 0) {
+                    if (button_actions) {
+                        g_table += '<div class="sp-grid-button-actions">' + button_actions + '</div>';
+                    }
+                        
                     g_table += sprintf(grid_header, {actions_wd: actions_wd});
                 }
                 
@@ -306,15 +321,17 @@
         }
         else {
             var n = 1;
+            var wd_ = g_wd;
             if (self.actions_inline) {
                 n = 3;
+                wd_ += 25;
             }
-            
+
             g_table += 
                 sprintf(grid_header, {actions_wd: actions_wd}) +
                 '<div class="sp-grid-row">'
                     + '<div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' 
-                        + 'style="width: ' + (g_wd + 25) + 'px;" >{{_("No results")}}</div>' +
+                        + 'style="width: ' + wd_ + 'px;" >{{_("No results")}}</div>' +
                 '</div>';            
         }
         

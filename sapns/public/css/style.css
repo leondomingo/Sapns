@@ -391,6 +391,16 @@ div.clearingdiv {
     overflow: hidden;
 }
 
+.sp-grid-button-actions {
+	height: 26px;
+	padding: 3px;
+}
+
+.sp-grid-button-action {
+	min-width: 80px;
+	font-size: 10px;
+}
+
 .sp-grid-row-id {
 }
 
