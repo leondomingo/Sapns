@@ -392,13 +392,15 @@ div.clearingdiv {
 }
 
 .sp-grid-button-actions {
-	height: 26px;
-	padding: 3px;
+	clear: left;
+	height: 20px;
+	padding: 2px;
+	background-color: red;
 }
 
 .sp-grid-button-action {
 	min-width: 80px;
-	font-size: 10px;
+	font-size: 9px;
 }
 
 .sp-grid-row-id {
