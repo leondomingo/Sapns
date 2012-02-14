@@ -50,8 +50,8 @@ catch (e) {
         
         set(this, 'dialog', {});
         
-        set(this.dialog, 'width', 950, this.dialog);
-        set(this.dialog, 'height', 550, this.dialog);
+        set(this.dialog, 'width', 1100, this.dialog);
+        set(this.dialog, 'height', 600, this.dialog);
         set(this.dialog, 'results', 25, this.dialog);
     }
     
