@@ -30,7 +30,7 @@
 
     <script type="text/javascript" src="/js/sprintf.min.js"></script>
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
@@ -46,8 +46,8 @@
         	    parent_id: "{{grid.parent_id or ''}}",
         	    actions: {},
         	    url_base: "/dashboard/list/{{grid.cls}}",
-        	    height: 470, //470,
-        	    actions_inline: true, // temporal hasta que funcionen las acciones "inline" 
+        	    height: 470,
+        	    actions_inline: true, 
         	    dblclick: 'edit'
         	});
         	

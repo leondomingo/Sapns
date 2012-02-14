@@ -55,6 +55,13 @@
             this.actions = this.actions();
         }
         
+        set(this, '_new_default', {
+            name: 'new',
+            url: '/dashboard/new/',
+            require_id: 'false',
+            type: 'new'
+        });
+        
         set(this, '_edit_default', {
             name: 'edit',
             url: '/dashboard/edit/',
@@ -67,6 +74,13 @@
             url: '/dashboard/delete/',
             require_id: 'true',
             type: 'delete'
+        });
+        
+        set(this, '_docs_default', {
+            name: 'docs',
+            url: '/dashboard/docs/',
+            require_id: 'true',
+            type: 'docs'
         });
 
         set(this, 'exportable', true);
@@ -589,11 +603,21 @@
         for (var i=0, l=self.actions.length; i<l; i++) {
             var act = self.actions[i];
             if (typeof(act.type) === 'string') {
-                if (act.type === 'edit') {
-                    self.actions[i] = $.extend(act, self._edit_default);
+                // new
+                if (act.type === 'new') {
+                    self.actions[i] = $.extend(self._new_default, act);
                 }
+                // edit
+                else if (act.type === 'edit') {
+                    self.actions[i] = $.extend(self._edit_default, act);
+                }
+                // delete
                 else if (act.type === 'delete') {
-                    self.actions[i] = $.extend(act, self._delete_default);
+                    self.actions[i] = $.extend(self._delete_default, act);
+                }
+                // docs
+                else if (act.type === 'docs') {
+                    self.actions[i] = $.extend(self._docs_default, act);
                 }
             }
         }
@@ -758,7 +782,6 @@
                 var selected_ids = ids;
                 if (act.require_id) {
                     if (selected_ids.length > 0) {
-                        // TODO: _runaction
                         act.type.f(selected_ids[0], selected_ids);
                     } 
                     else {

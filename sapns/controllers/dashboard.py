@@ -949,7 +949,7 @@ class DashboardController(BaseController):
     
     @expose('sapns/components/sapns.grid/grid_test.html')
     @require(p.in_group('managers'))
-    def test_grid(self):
+    def test_grid(self, **kw):
         return dict()
     
     @expose('sapns/example_pdf.html')
