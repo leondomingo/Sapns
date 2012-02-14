@@ -54,6 +54,20 @@
         if (typeof (this.actions) == 'function') {
             this.actions = this.actions();
         }
+        
+        set(this, '_edit_default', {
+            name: 'edit',
+            url: '/dashboard/edit/',
+            require_id: 'true',
+            type: 'edit'
+        });
+        
+        set(this, '_delete_default', {
+            name: 'delete',
+            url: '/dashboard/delete/',
+            require_id: 'true',
+            type: 'delete'
+        });
 
         set(this, 'exportable', true);
 
@@ -125,9 +139,7 @@
 
     // loadData
     SapnsGrid.prototype.loadData = function() {
-        
-        //console.log('loadData');
-        
+
         var self = this;
         
         var cols = self.cols;
@@ -210,7 +222,7 @@
                     }
                     
                     var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
-                    var _actions = //'<div style="font-size: 10px;">' + 
+                    var _actions = 
                         '<div class="sp-grid-cell" style="%(actions_wd)s">\n' +
                         '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' + 
                             'src="{{tg.url("/images/sapns/icons/edit.png")}}">\n' + 
@@ -277,7 +289,6 @@
                 }
                 
                 grid_row += '</div>\n';
-                //console.log(grid_row);
                 
                 g_table += grid_row;
             }
@@ -475,18 +486,19 @@
 
     SapnsGrid.prototype._loadActions = function(actions) {
 
-        // console.log('_loadActions');
-
         var self = this;
         var g_actions = '';
         
         self.nonstd = '';
+        
+        var button_ = '<button id="%(id)s" class="sp-grid-button-action">%(title)s</button>';
+        var option_ = '<option value="%(id)s">%(title)s</option>';
 
         if (actions.length > 0) {
             
             g_actions = '';
             for (var i=0, l=actions.length; i < l; i++) {
-
+                
                 var act = actions[i];
 
                 var req_id = act.require_id;
@@ -494,40 +506,40 @@
                     req_id = true;
                 }
 
-                if (typeof (act.type) === 'string') {
-
-                    var a = '<div style="float: left;">';
-                    a += '<button class="sp-button sp-grid-action standard_action" ' + 
-                        ' id="' + self.name + '_' + act.name + '"' + ' title="' + act.url + 
-                        '" url="' + act.url + '" action-type="' + act.type + '"' + 
-                        ' require_id="' + req_id + '" >' + act.title + '</button></div>';
-
-                    if (act.type === 'new') {
-                        var new_btn = '<img class="inline_action new_inline" ' 
-                            + 'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
-                        $('#search_box').append(new_btn);
+                if (typeof(act.type) === 'string' && act.type === 'new') {
+                    var new_btn = '<img class="inline_action new_inline" ' 
+                        + 'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
+                    $('#search_box').append(new_btn);
+                }
+                else if (!self.actions_inline) {
+                    $('#'+self.name + ' .sp-grid-button-actions').show();
+                    
+                    var button_data;
+                    
+                    if (typeof(act.type) == 'object') {
+                        button_data = {id: act.type.id, title: act.title};
                     }
-                    else if (!self.actions_inline) {
-                        //console.log(act);
-                        $('#'+self.name + ' .sp-grid-button-actions').show();
+                    else {
+                        button_data = {id: act.name, title: act.title}; 
+                    }
+                    
+                    $('#'+self.name + ' .sp-grid-button-actions').append(sprintf(button_, button_data));
+                }
+                else if (self.actions_inline) {
+                    if (typeof(act.type) === 'string' && (act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
+                        continue;
+                    }
+                    else {
+                        var option_data;
                         
-                        $('#'+self.name + ' .sp-grid-button-actions').
-                            append(sprintf('<button class="sp-grid-button-action" _name="%(name)s">%(title)s</button>\n', {
-                                name: act.name,
-                                title: act.title}));
-                    }
-                    else if (self.actions_inline) {
-                        if ((act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
-                            continue;
-                        }
+                        if (typeof(act.type) == 'object') {
+                            option_data = {id: act.type.id, title: act.title};
+                        } 
                         else {
-                            if (typeof(act.type) == 'object') {
-                                self.nonstd += sprintf('<option value="%(id)s">%(title)s</option>\n', {id: act.type.id, title: act.title});
-                            } 
-                            else {
-                                self.nonstd += sprintf('<option value="%(name)s">%(title)s</option>\n', {name: act.name, title: act.title});
-                            }
+                            option_data = {id: act.name, title: act.title}
                         }
+                        
+                        self.nonstd += sprintf(option_, option_data);
                     }
                 }
             }
@@ -569,10 +581,25 @@
 
         return g_actions;
     }
+    
+    SapnsGrid.prototype.complete_actions = function() {
+        
+        var self = this;
+        
+        for (var i=0, l=self.actions.length; i<l; i++) {
+            var act = self.actions[i];
+            if (typeof(act.type) === 'string') {
+                if (act.type === 'edit') {
+                    self.actions[i] = $.extend(act, self._edit_default);
+                }
+                else if (act.type === 'delete') {
+                    self.actions[i] = $.extend(act, self._delete_default);
+                }
+            }
+        }
+    }
 
     SapnsGrid.prototype.loadActions = function() {
-
-        // console.log('loadActions');
 
         var self = this;
         var g_actions = '';
@@ -590,54 +617,22 @@
                         if (response.status) {
                             self.actions = response.actions;
                         }
-
+                        
+                        self.complete_actions();
+                        
                         $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
                     }
                 }, self.actions);
 
                 $.ajax(ajx);
             } else {
+                self.complete_actions();
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
-                
-                // actions
-                for (var a=0, la=self.actions.length; a<la; a++) {
-                    var act = self.actions[a];
-                    if (typeof(act.type) == 'object' && !act.require_id) {
-                        $('#'+self.name + ' .sp-grid-button-actions').show();
-                        $('#'+self.name + ' .sp-grid-button-actions').append(
-                                sprintf('<button id="%(id)s" class="sp-grid-button-action" style="font-size: 11px; min-width: 80px;">%(title)s</button>',
-                                        {id: act.type.id, title: act.title}));
-                    }
-                }
-                
-                $('#'+self.name + ' .sp-grid-button-action').live('click', function() {
-                    var act = self.getAction($(this).attr('id'));
-                    
-                    if (act.require_id) {
-                        var selected_ids = self.getSelectedIds();
-                        if (selected_ids.length > 0) {
-                            act.type.f(selected_ids[0], selected_ids);
-                        } 
-                        else {
-                            self.warningSelectedId();
-                        }
-                    } else {
-                        var selected_ids = self.getSelectedIds();
-                        
-                        if (selected_ids.length > 0) {
-                            act.type.f(selected_ids[0], selected_ids);
-                        } 
-                        else {
-                            act.type.f();
-                        }
-                    }
-                });
             }
         }
 
         // if the row is selected, then mark the checkbox
         $('#' + self.name + ' .sp-grid-cell').live('click', function(event) {
-            // console.log('click');
             if ($(this).attr('clickable') == 'true') {
                 $('#'+self.name + ' .sp-grid-select-all').attr('checked', false);
                 var row_id = $(this).parent().find('.sp-grid-rowid');
@@ -687,22 +682,24 @@
             }
 
             var f = '<form type="post" action="' + action + '" target="'
-                    + target + '">'
+                    + target + '">\n'
                     + '<input type="hidden" name="came_from" value="'
-                    + came_from + '">';
+                    + came_from + '"/>\n';
 
             if (self.ch_attr) {
                 f += '<input type="hidden" name="_' + self.ch_attr
-                        + '" value="' + self.parent_id + '">';
+                        + '" value="' + self.parent_id + '"/>\n';
             }
 
-            f += '</form>';
+            f += '</form>\n';
 
             return f;
         }
         
-        function _run_action(id, act, ctrl) {
-            if (typeof(act.type) != 'object') {
+        function _run_action(id, ids, act, ctrl) {
+            
+            if (typeof(act.type) === 'string') {
+                
                 var a = act.url;
                 if (a[a.length - 1] != '/') {
                     a += '/';
@@ -714,35 +711,84 @@
                 }
                 
                 if (act.type == 'process') {
-                    a += id;
+                    if (act.require_id) {
+                        if (id) {
+                            a += id;
+                        }
+                        else {
+                            self.warningSelectedId();
+                            return;
+                        }
+                    } else {
+                        if (id) {
+                            a += id;
+                        }
+                    }
                 }
                 else if (act.type == 'new') {
                     a += sprintf('%s/', self.cls);
                 }
+                else if (act.type == 'delete') {
+                    self.std_delete(ids, act.url);
+                    return;
+                }
                 else {
-                    a += sprintf('%s/%s', self.cls, id);
+                    if (act.require_id) {
+                        if (id) {
+                            a += sprintf('%s/%s', self.cls, id);
+                        }
+                        else {
+                            self.warningSelectedId();
+                            return;
+                        }
+                    } else {
+                        if (id) {
+                            a += sprintf('%s/%s', self.cls, id);
+                        } 
+                        else {
+                            a += sprintf('%s/', self.cls);
+                        }
+                    }
                 }
 
                 $(form(a, target)).appendTo('body').submit().remove();
             }
             else {
-                act.type.f(id);
+                // typeof(act.type) === 'object'
+                var selected_ids = ids;
+                if (act.require_id) {
+                    if (selected_ids.length > 0) {
+                        // TODO: _runaction
+                        act.type.f(selected_ids[0], selected_ids);
+                    } 
+                    else {
+                        self.warningSelectedId();
+                        return;
+                    }
+                } else {
+                    if (selected_ids.length > 0) {
+                        act.type.f(selected_ids[0], selected_ids);
+                    } 
+                    else {
+                        act.type.f();
+                    }
+                }
             }
         }
 
         function run_action(item, action_name, ctrl) {
             var act = self.getAction(action_name);
             var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
-            _run_action(id, act, ctrl);
+            _run_action(id, [], act, ctrl);
         }
-        
-        if (self.actions_inline) {
 
-            // new
-            $('#' + self.name + ' .new_inline').live('click', function(event) {
-                run_action($(this), 'new', event.ctrlKey || event.metaKey);
-            });
-    
+        // new
+        $('#' + self.name + ' .new_inline').live('click', function(event) {
+            run_action($(this), 'new', event.ctrlKey || event.metaKey);
+        });
+
+        if (self.actions_inline) {
+            
             // edit
             $('#' + self.name + ' .edit_inline').live('click', function(event) {
                 run_action($(this), 'edit', event.ctrlKey || event.metaKey);
@@ -773,115 +819,14 @@
                 }
             });
         }
+        // !actions_inline
         else {
             $('#'+self.name + ' .sp-grid-button-action').live('click', function(event) {
-                var act = self.getAction($(this).attr('_name'));
+                var act = self.getAction($(this).attr('id'));
                 var selected_ids = self.getSelectedIds();
-                // TODO: open one tab per selected row???
-                // TODO: control wether id is required
-                _run_action(selected_ids[0], act, event.ctrlKey || event.metaKey);
+                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey);
             });
         }
-
-        // standard actions
-        /*
-        $('#' + self.name + ' .standard_action').live('click', function(event) {
-            
-            // child attribute
-            var ch_attr = self.ch_attr;
-            
-            // if CTRL or CMD (Mac) is pressed open in a new tab 
-            var target = '';
-            if (event.ctrlKey || event.metaKey) {
-                target = '_blank';
-            }
-
-            var url = $(this).attr('url');
-            var action_type = $(this).attr('action-type')
-            var _func = $(this).attr('_func');
-            // console.log(action_type + ': ' + url + ' ' +
-            // _func);
-            if (!_func) {
-
-                var a = $(this).attr('url');
-                if (a[a.length - 1] != '/') {
-                    a += '/';
-                }
-
-                var selected_ids = self.getSelectedIds();
-
-                // with selection
-                if ($(this).attr('require_id') == 'true') {
-
-                    if (selected_ids.length > 0) {
-                        // delete (std)
-                        if (action_type == 'delete') {
-                            self.std_delete(selected_ids, url);
-                        }
-                        // non-standard actions
-                        else if (action_type == 'process') {
-                            if (selected_ids.length == 1) {
-                                a += selected_ids[0];
-                                $(form(a, target)).appendTo(
-                                        'body').submit()
-                                        .remove();
-                            } else {
-                                // multiselect
-                                var a0 = a;
-                                for (var i = 0, l = selected_ids.length; i < l; i++) {
-                                    $(form(a0+ selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                                }
-                            }
-                        }
-                        // standard actions
-                        else {
-                            // edit, docs, ...
-                            if (selected_ids.length == 1) {
-                                a += sprintf('%s/%s', self.cls, selected_ids[0] + '');
-                                $(form(a, target)).appendTo('body').submit().remove();
-                            } else {
-                                // multiselect
-                                a += sprintf('%s/', self.cls);
-                                var a0 = a;
-                                for (var i = 0, l = selected_ids.length; i < l; i++) {
-                                    $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                                }
-                            }
-                        }
-                    } else {
-                        self.warningSelectedId();
-                    }
-                }
-                // selection is not required
-                else {
-                    // new (standard)
-                    if (action_type == 'new') {
-                        a += sprintf('%s/', self.cls);
-                        $(form(a, target)).appendTo('body').submit().remove();
-                    }
-                    // non-standard actions
-                    else if (action_type == 'process') {
-                        if (selected_ids.length == 1) {
-                            a += sprintf('%s/', selected_ids[0]+ '');
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        } 
-                        else if (selected_ids.length > 1) {
-                            // multiselect
-                            var a0 = a;
-                            for (var i = 0, l = selected_ids.length; i < l; i++) {
-                                $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                            }
-                        } else {
-                            // no selection at all
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        }
-                    }
-                }
-            } else {
-                _func();
-            }
-        });
-        */
 
         // export button
         $('#grid-export_' + self.name).live('change', function() {
