@@ -284,7 +284,7 @@ $(document).ready(function() {
             success: function(content) {
                 $('#edit-dialog').html(content).dialog({
                     title: "Logs",
-                    width: 900,
+                    width: 1100,
                     height: 600,
                     resizable: false,
                     modal: true,

@@ -54,6 +54,34 @@
         if (typeof (this.actions) == 'function') {
             this.actions = this.actions();
         }
+        
+        set(this, '_new_default', {
+            name: 'new',
+            url: '/dashboard/new/',
+            require_id: 'false',
+            type: 'new'
+        });
+        
+        set(this, '_edit_default', {
+            name: 'edit',
+            url: '/dashboard/edit/',
+            require_id: 'true',
+            type: 'edit'
+        });
+        
+        set(this, '_delete_default', {
+            name: 'delete',
+            url: '/dashboard/delete/',
+            require_id: 'true',
+            type: 'delete'
+        });
+        
+        set(this, '_docs_default', {
+            name: 'docs',
+            url: '/dashboard/docs/',
+            require_id: 'true',
+            type: 'docs'
+        });
 
         set(this, 'exportable', true);
 
@@ -125,9 +153,7 @@
 
     // loadData
     SapnsGrid.prototype.loadData = function() {
-        
-        //console.log('loadData');
-        
+
         var self = this;
         
         var cols = self.cols;
@@ -183,7 +209,7 @@
         if (typeof (data) == 'function') {
             data = data();
         }
-        
+
         var ld = data.length;
         if (ld > 0) {
             for (var i=0; i<ld; i++) {
@@ -205,9 +231,12 @@
                 if (self.actions_inline) {
                     
                     var actions_wd = 'width: 100px;';
+                    if (!self.nonstd) {
+                        actions_wd = 'width: 75px;';
+                    }
                     
                     var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
-                    var _actions = //'<div style="font-size: 10px;">' + 
+                    var _actions = 
                         '<div class="sp-grid-cell" style="%(actions_wd)s">\n' +
                         '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' + 
                             'src="{{tg.url("/images/sapns/icons/edit.png")}}">\n' + 
@@ -216,32 +245,7 @@
                         '<img class="inline_action docs_inline" title="{{_("Docs")}}" ' + 
                             'src="{{tg.url("/images/sapns/icons/docs.png")}}">\n';
                     
-                    var nonstd = '';
-                    var la = self.actions.length;
-                    if (la > 0) {
-                        for (var a=0; a<la; a++) {
-                            var act = self.actions[a];
-                            if ((act.type === 'process' || typeof (act.type) == 'object') && act.require_id) {
-                                if (typeof(act.type) == 'object') {
-                                    nonstd += sprintf('<option value="%(id)s">%(title)s</option>\n', {id: act.type.id, title: act.title});
-                                } 
-                                else {
-                                    nonstd += sprintf('<option value="%(name)s">%(title)s</option>\n', {name: act.name, title: act.title});
-                                }
-                            }
-                        }
-                    }
-                    
-                    if (nonstd) {
-                        nonstd = '<select class="nonstd_actions">\n<option value=""></option>\n' 
-                            + nonstd 
-                            + '</select>\n';
-                    }
-                    else {
-                        actions_wd = 'width: 75px;';
-                    }
-                    
-                    grid_row += sprintf(_actions, {actions_wd: actions_wd}) + nonstd + '\n';
+                    grid_row += sprintf(_actions, {actions_wd: actions_wd}) + self.nonstd + '\n';
                     grid_row += '</div>\n';
                 }
                 
@@ -299,22 +303,23 @@
                 }
                 
                 grid_row += '</div>\n';
-                //console.log(grid_row);
                 
                 g_table += grid_row;
             }
         }
         else {
             var n = 1;
+            var wd_ = g_wd;
             if (self.actions_inline) {
                 n = 3;
+                wd_ += 25;
             }
-            
+
             g_table += 
                 sprintf(grid_header, {actions_wd: actions_wd}) +
                 '<div class="sp-grid-row">'
                     + '<div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' 
-                        + 'style="width: ' + (g_wd + 25) + 'px;" >{{_("No results")}}</div>' +
+                        + 'style="width: ' + wd_ + 'px;" >{{_("No results")}}</div>' +
                 '</div>';            
         }
         
@@ -495,16 +500,19 @@
 
     SapnsGrid.prototype._loadActions = function(actions) {
 
-        // console.log('_loadActions');
-
         var self = this;
         var g_actions = '';
+        
+        self.nonstd = '';
+        
+        var button_ = '<button id="%(id)s" class="sp-grid-button-action">%(title)s</button>';
+        var option_ = '<option value="%(id)s">%(title)s</option>';
 
         if (actions.length > 0) {
-
+            
             g_actions = '';
             for (var i=0, l=actions.length; i < l; i++) {
-
+                
                 var act = actions[i];
 
                 var req_id = act.require_id;
@@ -512,23 +520,48 @@
                     req_id = true;
                 }
 
-                if (typeof (act.type) === 'string') {
-
-                    var a = '<div style="float: left;">';
-                    a += '<button class="sp-button sp-grid-action standard_action" ' + 
-                        ' id="' + self.name + '_' + act.name + '"' + ' title="' + act.url + 
-                        '" url="' + act.url + '" action-type="' + act.type + '"' + 
-                        ' require_id="' + req_id + '" >' + act.title + '</button></div>';
-
-                    if (act.type === 'new') {
-                        var new_btn = '<img class="inline_action new_inline" ' 
-                            + 'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
-                        $('#search_box').append(new_btn);
-                    } 
-                    else if (self.actions_inline && (act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
+                if (typeof(act.type) === 'string' && act.type === 'new') {
+                    var new_btn = '<img class="inline_action new_inline" ' 
+                        + 'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
+                    $('#search_box').append(new_btn);
+                }
+                else if (!self.actions_inline) {
+                    $('#'+self.name + ' .sp-grid-button-actions').show();
+                    
+                    var button_data;
+                    
+                    if (typeof(act.type) == 'object') {
+                        button_data = {id: act.type.id, title: act.title};
+                    }
+                    else {
+                        button_data = {id: act.name, title: act.title}; 
+                    }
+                    
+                    $('#'+self.name + ' .sp-grid-button-actions').append(sprintf(button_, button_data));
+                }
+                else if (self.actions_inline) {
+                    if (typeof(act.type) === 'string' && (act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
                         continue;
-                    } 
-                } 
+                    }
+                    else {
+                        var option_data;
+                        
+                        if (typeof(act.type) == 'object') {
+                            option_data = {id: act.type.id, title: act.title};
+                        } 
+                        else {
+                            option_data = {id: act.name, title: act.title}
+                        }
+                        
+                        self.nonstd += sprintf(option_, option_data);
+                    }
+                }
+            }
+            
+            if (self.nonstd) {
+                self.nonstd = '<select class="nonstd_actions">\n<option value=""></option>\n' 
+                    + self.nonstd 
+                    + '</select>\n';
             }
         }
 
@@ -562,10 +595,35 @@
 
         return g_actions;
     }
+    
+    SapnsGrid.prototype.complete_actions = function() {
+        
+        var self = this;
+        
+        for (var i=0, l=self.actions.length; i<l; i++) {
+            var act = self.actions[i];
+            if (typeof(act.type) === 'string') {
+                // new
+                if (act.type === 'new') {
+                    self.actions[i] = $.extend(self._new_default, act);
+                }
+                // edit
+                else if (act.type === 'edit') {
+                    self.actions[i] = $.extend(self._edit_default, act);
+                }
+                // delete
+                else if (act.type === 'delete') {
+                    self.actions[i] = $.extend(self._delete_default, act);
+                }
+                // docs
+                else if (act.type === 'docs') {
+                    self.actions[i] = $.extend(self._docs_default, act);
+                }
+            }
+        }
+    }
 
     SapnsGrid.prototype.loadActions = function() {
-
-        // console.log('loadActions');
 
         var self = this;
         var g_actions = '';
@@ -583,55 +641,22 @@
                         if (response.status) {
                             self.actions = response.actions;
                         }
-
+                        
+                        self.complete_actions();
+                        
                         $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
-
                     }
                 }, self.actions);
 
                 $.ajax(ajx);
             } else {
+                self.complete_actions();
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
-                
-                // actions
-                for (var a=0, la=self.actions.length; a<la; a++) {
-                    var act = self.actions[a];
-                    if (typeof(act.type) == 'object' && !act.require_id) {
-                        $('#'+self.name + ' .actions').show();
-                        $('#'+self.name + ' .actions').append(
-                                sprintf('<button id="%(id)s" class="below_actions" style="font-size: 11px; min-width: 80px;">%(title)s</button>',
-                                        {id: act.type.id, title: act.title}));
-                    }
-                }
-                
-                $('.below_actions').live('click', function() {
-                    var act = self.getAction($(this).attr('id'));
-                    
-                    if (act.require_id) {
-                        var selected_ids = self.getSelectedIds();
-                        if (selected_ids.length > 0) {
-                            act.type.f(selected_ids[0], selected_ids);
-                        } 
-                        else {
-                            self.warningSelectedId();
-                        }
-                    } else {
-                        var selected_ids = self.getSelectedIds();
-                        
-                        if (selected_ids.length > 0) {
-                            act.type.f(selected_ids[0], selected_ids);
-                        } 
-                        else {
-                            act.type.f();
-                        }
-                    }
-                });
             }
         }
 
         // if the row is selected, then mark the checkbox
         $('#' + self.name + ' .sp-grid-cell').live('click', function(event) {
-            // console.log('click');
             if ($(this).attr('clickable') == 'true') {
                 $('#'+self.name + ' .sp-grid-select-all').attr('checked', false);
                 var row_id = $(this).parent().find('.sp-grid-rowid');
@@ -681,25 +706,24 @@
             }
 
             var f = '<form type="post" action="' + action + '" target="'
-                    + target + '">'
+                    + target + '">\n'
                     + '<input type="hidden" name="came_from" value="'
-                    + came_from + '">';
+                    + came_from + '"/>\n';
 
             if (self.ch_attr) {
                 f += '<input type="hidden" name="_' + self.ch_attr
-                        + '" value="' + self.parent_id + '">';
+                        + '" value="' + self.parent_id + '"/>\n';
             }
 
-            f += '</form>';
+            f += '</form>\n';
 
             return f;
         }
-
-        function run_action(item, action_name, ctrl) {
-            var act = self.getAction(action_name);
-            var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
+        
+        function _run_action(id, ids, act, ctrl) {
             
-            if (typeof(act.type) != 'object') {
+            if (typeof(act.type) === 'string') {
+                
                 var a = act.url;
                 if (a[a.length - 1] != '/') {
                     a += '/';
@@ -711,20 +735,74 @@
                 }
                 
                 if (act.type == 'process') {
-                    a += id;
+                    if (act.require_id) {
+                        if (id) {
+                            a += id;
+                        }
+                        else {
+                            self.warningSelectedId();
+                            return;
+                        }
+                    } else {
+                        if (id) {
+                            a += id;
+                        }
+                    }
                 }
                 else if (act.type == 'new') {
                     a += sprintf('%s/', self.cls);
                 }
+                else if (act.type == 'delete') {
+                    self.std_delete(ids, act.url);
+                    return;
+                }
                 else {
-                    a += sprintf('%s/%s', self.cls, id);
+                    if (act.require_id) {
+                        if (id) {
+                            a += sprintf('%s/%s', self.cls, id);
+                        }
+                        else {
+                            self.warningSelectedId();
+                            return;
+                        }
+                    } else {
+                        if (id) {
+                            a += sprintf('%s/%s', self.cls, id);
+                        } 
+                        else {
+                            a += sprintf('%s/', self.cls);
+                        }
+                    }
                 }
 
                 $(form(a, target)).appendTo('body').submit().remove();
             }
             else {
-                act.type.f(id);
+                // typeof(act.type) === 'object'
+                var selected_ids = ids;
+                if (act.require_id) {
+                    if (selected_ids.length > 0) {
+                        act.type.f(selected_ids[0], selected_ids);
+                    } 
+                    else {
+                        self.warningSelectedId();
+                        return;
+                    }
+                } else {
+                    if (selected_ids.length > 0) {
+                        act.type.f(selected_ids[0], selected_ids);
+                    } 
+                    else {
+                        act.type.f();
+                    }
+                }
             }
+        }
+
+        function run_action(item, action_name, ctrl) {
+            var act = self.getAction(action_name);
+            var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
+            _run_action(id, [], act, ctrl);
         }
 
         // new
@@ -732,135 +810,46 @@
             run_action($(this), 'new', event.ctrlKey || event.metaKey);
         });
 
-        // edit
-        $('#' + self.name + ' .edit_inline').live('click', function(event) {
-            run_action($(this), 'edit', event.ctrlKey || event.metaKey);
-        });
-
-        // delete
-        $('#' + self.name + ' .delete_inline').live('click', function(event) {
-            var ids = self.getSelectedIds();
-            if (ids.length == 0) {
-                var id = $(this).parent().parent().find('.sp-grid-rowid').attr('id_row');
-                ids = [id];
-            }
+        if (self.actions_inline) {
             
-            var act = self.getAction('delete');
-            self.std_delete(ids, act.url);
-        });
-
-        // docs
-        $('#' + self.name + ' .docs_inline').live('click', function(event) {
-            run_action($(this), 'docs');
-        });
-
-        // non-standard actions
-        $('#' + self.name + ' .nonstd_actions').live('change', function(event) {
-            var action_id = $(this).val();
-            if (action_id) {
-                run_action($(this), action_id);
-            }
-        });
-
-        // standard actions
-        /*
-        $('#' + self.name + ' .standard_action').live('click', function(event) {
-            
-            // child attribute
-            var ch_attr = self.ch_attr;
-            
-            // if CTRL or CMD (Mac) is pressed open in a new tab 
-            var target = '';
-            if (event.ctrlKey || event.metaKey) {
-                target = '_blank';
-            }
-
-            var url = $(this).attr('url');
-            var action_type = $(this).attr('action-type')
-            var _func = $(this).attr('_func');
-            // console.log(action_type + ': ' + url + ' ' +
-            // _func);
-            if (!_func) {
-
-                var a = $(this).attr('url');
-                if (a[a.length - 1] != '/') {
-                    a += '/';
+            // edit
+            $('#' + self.name + ' .edit_inline').live('click', function(event) {
+                run_action($(this), 'edit', event.ctrlKey || event.metaKey);
+            });
+    
+            // delete
+            $('#' + self.name + ' .delete_inline').live('click', function(event) {
+                var ids = self.getSelectedIds();
+                if (ids.length == 0) {
+                    var id = $(this).parent().parent().find('.sp-grid-rowid').attr('id_row');
+                    ids = [id];
                 }
-
+                
+                var act = self.getAction('delete');
+                self.std_delete(ids, act.url);
+            });
+    
+            // docs
+            $('#' + self.name + ' .docs_inline').live('click', function(event) {
+                run_action($(this), 'docs');
+            });
+    
+            // non-standard actions
+            $('#' + self.name + ' .nonstd_actions').live('change', function(event) {
+                var action_id = $(this).val();
+                if (action_id) {
+                    run_action($(this), action_id);
+                }
+            });
+        }
+        // !actions_inline
+        else {
+            $('#'+self.name + ' .sp-grid-button-action').live('click', function(event) {
+                var act = self.getAction($(this).attr('id'));
                 var selected_ids = self.getSelectedIds();
-
-                // with selection
-                if ($(this).attr('require_id') == 'true') {
-
-                    if (selected_ids.length > 0) {
-                        // delete (std)
-                        if (action_type == 'delete') {
-                            self.std_delete(selected_ids, url);
-                        }
-                        // non-standard actions
-                        else if (action_type == 'process') {
-                            if (selected_ids.length == 1) {
-                                a += selected_ids[0];
-                                $(form(a, target)).appendTo(
-                                        'body').submit()
-                                        .remove();
-                            } else {
-                                // multiselect
-                                var a0 = a;
-                                for (var i = 0, l = selected_ids.length; i < l; i++) {
-                                    $(form(a0+ selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                                }
-                            }
-                        }
-                        // standard actions
-                        else {
-                            // edit, docs, ...
-                            if (selected_ids.length == 1) {
-                                a += sprintf('%s/%s', self.cls, selected_ids[0] + '');
-                                $(form(a, target)).appendTo('body').submit().remove();
-                            } else {
-                                // multiselect
-                                a += sprintf('%s/', self.cls);
-                                var a0 = a;
-                                for (var i = 0, l = selected_ids.length; i < l; i++) {
-                                    $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                                }
-                            }
-                        }
-                    } else {
-                        self.warningSelectedId();
-                    }
-                }
-                // selection is not required
-                else {
-                    // new (standard)
-                    if (action_type == 'new') {
-                        a += sprintf('%s/', self.cls);
-                        $(form(a, target)).appendTo('body').submit().remove();
-                    }
-                    // non-standard actions
-                    else if (action_type == 'process') {
-                        if (selected_ids.length == 1) {
-                            a += sprintf('%s/', selected_ids[0]+ '');
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        } 
-                        else if (selected_ids.length > 1) {
-                            // multiselect
-                            var a0 = a;
-                            for (var i = 0, l = selected_ids.length; i < l; i++) {
-                                $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                            }
-                        } else {
-                            // no selection at all
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        }
-                    }
-                }
-            } else {
-                _func();
-            }
-        });
-        */
+                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey);
+            });
+        }
 
         // export button
         $('#grid-export_' + self.name).live('change', function() {
@@ -1180,9 +1169,9 @@
                 });
             }
             
-            var g_actions = '<div class="actions" style="padding: 2px; height: 25px; display: none;"></div>';
+            var g_actions = '<div class="sp-grid-button-actions" style="display: none;"></div>';
 
-            this.append(g_content + g_table + g_actions + g_pager + '</div>');
+            this.append(g_content + g_actions + g_table + g_pager + '</div>');
 
             g.loadActions();
 

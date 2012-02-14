@@ -9,6 +9,7 @@
 {{ u.jquery_ui() }}
 {#{{ u.qtip2() }}#}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
+<script type="text/javascript" src="/js/sprintf.min.js"></script>
 <script type="text/javascript">
     {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
 </script>
@@ -20,7 +21,7 @@
         $(document).ready(function() {
             
             $('#g').sapnsGrid({
-                cls: 'grupos',
+                cls: 'productos',
                 //caption: 'Grid test',
                 caption: function() {
                     return 'Grid test (func)';
@@ -29,18 +30,19 @@
                 rp: 30,
                 height: 500,
                 //with_search: false,
-                actions_inline: true,
+                actions_inline: false,
+                url_base: '/dashboard/test_grid/',
                 search_params_: {
                     data: {
                         filters: JSON.stringify([['id', 7183]])
                     }
                 },
-                search_params: {
+                search_params_: {
                     url: "{{tg.url('/dashboard/test_search/')}}",
                     data: { cls: 'alumnos' }
                 },
                 onLoad: function(res) {
-                    console.log(res.data.length);
+                    console.log('[onLoad] ' + res.data.length);
                 },
                 /*search_func: function(q, rp, pos) {
                     //console.log([q, rp, pos].join(', ')); 
@@ -82,25 +84,21 @@
                     //console.log(this.cls);
                     return [
                             {
-                                title: 'New', 
-                                url: '/act1', 
-                                type: 'new', 
-                                required_id: false
+                                title: "nuev0",
+                                type: 'new' 
                             },
                             {
-                                title: 'Edit', 
-                                url: '/act2', 
+                                title: 'EDITAR',
                                 type: 'edit'
                             },
                             {
-                                title: 'Delete', 
-                                url: '/act3', 
-                                type: 'delete'
+                                title: 'BoRRaR', 
+                                type: 'delete',
                             },
                             {
                                 title: 'ACT4_F',
                                 type: {
-                                    id:'act4_f', 
+                                    id: 'act4_f', 
                                     f: function(id) {
                                         alert('act4_f: id=' + id);
                                     }
@@ -111,8 +109,8 @@
                                 title: 'act5_f',
                                 type: {
                                     id:'act5_f',
-                                    f: function(id) {
-                                        alert('act5_f: byyyyyye! ' + id);
+                                    f: function(id, ids) {
+                                        alert('act5_f: byyyyyye! ' + id + ' | ' + ids);
                                     }
                                 },
                                 require_id: false
