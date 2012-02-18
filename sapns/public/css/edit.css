@@ -175,7 +175,7 @@
 
 .created {
     width: 120px;
-    border: 1px solid lightgray;
+    border: 1px solid #bbb;
     float: left; 
     margin-right: 5px;
     text-align: center;

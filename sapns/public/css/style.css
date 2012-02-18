@@ -230,6 +230,11 @@ form.loginfields input#submit {
 .sp-grid {
 }
 
+.sp-grid-search-box {
+	float: left;
+	margin-bottom: 5px;
+}
+
 .sp-grid .sp-col-title:first-child {
     border-radius: 5px 0 0 0;
 }
@@ -239,7 +244,7 @@ form.loginfields input#submit {
 }
 
 .sp-grid-caption {
-    color: #666666;
+    color: #666;
     font-size: 22px;
     font-weight: bold;
     height: 31px;
@@ -250,7 +255,7 @@ form.loginfields input#submit {
 }
 
 .sp-search-txt {
-	border: 1px solid gray;
+	border: 1px solid #777;
 	width: 450px;
 }
 

@@ -523,7 +523,7 @@
                 if (typeof(act.type) === 'string' && act.type === 'new') {
                     var new_btn = '<img class="inline_action new_inline" ' 
                         + 'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
-                    $('#search_box').append(new_btn);
+                    $('#'+self.name + ' .sp-grid-search-box').append(new_btn);
                 }
                 else if (!self.actions_inline) {
                     $('#'+self.name + ' .sp-grid-button-actions').show();
@@ -589,7 +589,7 @@
                     + '<option value="">({{_("Export")}})</option>'
                     + options + '</select></div>';
                 
-                $('#search_box').append(s_export);
+                $('#'+self.name + ' .sp-grid-search-box').append(s_export);
             }
         }
 
@@ -1051,7 +1051,7 @@
 
             if (g.with_search) {
 
-                g_content += '<div><div id="search_box" style="float: left;">' +
+                g_content += '<div><div class="sp-grid-search-box">' +
                         '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
                         '<img class="inline_action sp-search-btn" ' + 
                             'src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
