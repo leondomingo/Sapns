@@ -81,6 +81,16 @@
     max-width: 97%;
     min-width: 97%;
     margin-left: 1%;
+    font-family: sans-serif;
+}
+
+.sp-label-field {
+    color: #605B7C;
+    font-family: sans-serif;
+}
+
+.sp-label-field-must {
+    font-weight: bold;
 }
 
 .url_field_text {
@@ -90,12 +100,6 @@
     margin-left: 1%;
     font-family: Courier;
     font-weight: bold;
-    /*font-size: 12px;*/
-    border: 1px solid gray;
-}
-
-.url_field_text:focus {
-    border: 1px solid orange;
 }
 
 .sp-select-field {
@@ -105,15 +109,6 @@
 
 .sp-select-text {
     width: 90%;
-    border: 1px solid gray;
-}
-
-.sp-select-text:focus {
-    border: 1px solid orange;
-}
-
-.sp-select-button, .sp-empty-button {
-    height: 25px !important;
 }
 
 .sp-checkbox-field {
@@ -141,11 +136,6 @@
 
 .sp-search-text {
     width: 650px;
-    border: 1px solid gray;
-}
-
-.sp-search-text:focus {
-    border: 1px solid orange;
 }
 
 #right_desc {
@@ -158,17 +148,13 @@
 }
 
 #class_title {
-    /*font-size: 25px; 
-    text-align: left;*/
-    
-    color: #666666;
+    color: #666;
     font-size: 22px;
     font-weight: bold;
     height: 31px;
     margin-left: 0;
     margin-top: 7px;
     overflow: hidden;    
-    
 }
 
 #reference {
