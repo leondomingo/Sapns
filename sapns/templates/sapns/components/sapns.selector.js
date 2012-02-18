@@ -198,9 +198,7 @@ catch (e) {
             // select text
             var select_text = 
                 '<input id="st_' + sapnsSelector.name + '"' + 
-                ' class="sp-select-text"' + 
-                ' type="text" readonly' + 
-                ' value=""';
+                ' class="sp-select-text" type="text" readonly value=""';
             
             if (this.attr('readonly') || this.attr('disabled')) {
                 sapnsSelector.read_only = true;
@@ -238,9 +236,8 @@ catch (e) {
             var title = sprintf('{{_("Set a value for [%s]")}}', sapnsSelector.title);
             var select_button = 
                 '<button id="sb_' + sapnsSelector.name + '"' +
-                ' class="sp-button sp-select-button" ' +
-                ' title="' + title + '" ' +
-                ' style="font-weight: bold;"';
+                ' class="sp-select-button" ' +
+                ' title="' + title + '"'
             
             if (sapnsSelector.read_only) {
                 select_button += ' disabled';
@@ -291,18 +288,14 @@ catch (e) {
             sapnsSelector.setTitle();
             
             // remove button
-            var remove_button =
-                '<button id="rb_' + sapnsSelector.name + '"' +
-                ' class="sp-button sp-empty-button"';
+            var remove_button = '<button id="rb_' + sapnsSelector.name + '" class="sp-empty-button"';
             
             if (sapnsSelector.read_only) {
                 remove_button += ' disabled ';
             }
             
             var title = sprintf("{{_('Remove value of [%s]')}}", sapnsSelector.title);
-            remove_button += 
-                ' title="' + title + '" ' +
-                ' style="font-weight: bold; color: red;">x</button>';
+            remove_button += ' title="' + title + '">x</button>';
 
             this.append(remove_button);
             
