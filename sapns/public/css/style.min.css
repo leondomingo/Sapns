@@ -22,7 +22,7 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}.sp-grid-caption{color:#666;font-size:22px;font-weight:bold;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
 .sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px}
 .sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;padding:2px;overflow:hidden}
-.sp-grid-button-actions{clear:left;height:20px;padding:2px}.sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px;}
+.sp-grid-button-actions{clear:left;height:20px;padding:2px}.sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px}
 .sp-grid-row{clear:left;height:31px;margin-bottom:-1px;width:950px}.sp-grid-cell{background-color:white;border:1px solid lightgray;font-family:arial;font-size:11px;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
 .sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px;border-radius:0 0 5px 5px}
 .sp-grid-pager{border-color:#ddd #777 #777 #ddd;border-radius:3px 3px 3px 3px;border-style:solid;border-width:1px;height:30px}
@@ -48,6 +48,5 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px}
 .subactions ul{margin-top:0;margin-bottom:0;list-style-type:circle}.subaction{font-weight:normal;color:#333;font-size:13px}
 .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
-input[type=text]:focus,input[type=password]:focus,textarea:focus{background-color:#ffb835}
 .sp-select-text{border:1px solid red;border-radius:3px}.sp-select-button,.sp-empty-button{height:20px;font-size:10px;font-family:arial;font-weight:bold;margin-left:3px}
 .sp-empty-button{color:red}
