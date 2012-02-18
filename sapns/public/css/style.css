@@ -290,6 +290,7 @@ form.loginfields input#submit {
 .sp-grid-button-action {
 	min-width: 80px;
 	font-size: 9px;
+	margin-right: 3px;
 }
 
 .sp-grid-row-id {

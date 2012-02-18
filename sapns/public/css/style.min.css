@@ -22,7 +22,7 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}.sp-grid-caption{color:#666;font-size:22px;font-weight:bold;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
 .sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px}
 .sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;padding:2px;overflow:hidden}
-.sp-grid-button-actions{clear:left;height:20px;padding:2px}.sp-grid-button-action{min-width:80px;font-size:9px}
+.sp-grid-button-actions{clear:left;height:20px;padding:2px}.sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px;}
 .sp-grid-row{clear:left;height:31px;margin-bottom:-1px;width:950px}.sp-grid-cell{background-color:white;border:1px solid lightgray;font-family:arial;font-size:11px;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
 .sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px;border-radius:0 0 5px 5px}
 .sp-grid-pager{border-color:#ddd #777 #777 #ddd;border-radius:3px 3px 3px 3px;border-style:solid;border-width:1px;height:30px}
