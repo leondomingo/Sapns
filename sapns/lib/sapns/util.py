@@ -497,10 +497,10 @@ def pagination(rp, pag_n, total):
     return (this_page, total_pag,)
 
 def extract_lang(lang_list, pattern):
-    
-    for item in lang_list:
-        if re.match(pattern, item):
-            return item
+    if lang_list:
+        for item in lang_list:
+            if re.match(pattern, item):
+                return item
         
     return None
 
