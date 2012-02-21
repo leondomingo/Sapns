@@ -1,13 +1,14 @@
 {% macro date_field(tg, _, selector) %}
 
-// {# date format settings #} 
-var first_day = "{{tg.config.get('js.first_day', '1')}}";
-// "datepicker" setting 
-var date_fmt0 = "{{tg.config.get('js.date_format', 'mm/dd/yyyy')}}";
-// "format date library" setting 
-var date_fmt1 = "{{tg.config.get('js.date_format2', 'mm/dd/yyyy')}}";
-
 $("{{selector}}").each(function() {
+    
+    // {# date format settings #} 
+    var first_day = "{{tg.config.get('js.first_day', '1')}}";
+    // "datepicker" setting 
+    var date_fmt0 = "{{tg.config.get('js.date_format', 'mm/dd/yyyy')}}";
+    // "format date library" setting 
+    var date_fmt1 = "{{tg.config.get('js.date_format2', 'mm/dd/yyyy')}}";
+    
 	if (!$(this).attr('disabled')) {
 		$(this).datepicker({
 		    firstDay: first_day,
