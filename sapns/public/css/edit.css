@@ -69,8 +69,8 @@
 
 #edit_fields {
     overflow: auto;
-    height: 443px;
-    width: 998px;
+    height: 343px;
+    width: 100%;
 }
 
 .sp-edit-field {

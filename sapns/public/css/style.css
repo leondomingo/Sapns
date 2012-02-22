@@ -123,13 +123,8 @@ form.loginfields input#submit {
 	background-color: #B4BD3C;
 	color: white;
 	height: 100px;
-	margin-top: 20px;
+	margin-top: 5px;
 	border-radius: 5px 5px 0 0;
-}
-
-.sp_middle {
-	min-height: 600px;
-	border: 1px solid darkgray;
 }
 
 #you-are-in {
@@ -143,6 +138,36 @@ form.loginfields input#submit {
 	height: 80px;
 	text-align: right;
 	border-radius: 0 0 5px 5px;
+}
+
+.sp_middle {
+    position: relative;
+    height: 500px;
+    border: 1px solid darkgray;
+}
+
+.sp_sidebar {
+    position: absolute;
+    width: 165px;
+    height: 480px;
+    overflow: auto;
+    box-shadow: 0 0 11px #888888 inset;
+    left: 0px;
+    top: 0px;
+    padding: 10px 10px 10px 25px;
+    font-size: 16px;
+    /*background: url(http://localhost/fondo_header_atenea.jpg);*/
+    border: 1px solid darkGray;
+}
+
+.sp_center {
+    position: absolute;
+    width: 997px;
+    height: 500px;
+    left: 200px;
+    top: 0px;
+    box-shadow: 0 0 11px #888888 inset;
+    border: 1px solid darkGray;
 }
 
 .sp_app_title {
@@ -523,36 +548,6 @@ form.loginfields input#submit {
 	/*background-image: url('/images/sapns/icons/help.png') no-repeat center center fixed;*/
 }
 
-.sp_middle {
-	position: relative;
-    min-height: 600px;
-}
-
-.sp_sidebar {
-    position: absolute;
-    width: 165px;
-    height: 580px;
-    overflow: auto;
-    box-shadow: 0 0 11px #888888 inset;
-    left: 0px;
-    top: 0px;
-    padding: 10px 10px 10px 25px;
-    font-size: 16px;
-    /*background: url(http://localhost/fondo_header_atenea.jpg);*/
-    border: 1px solid darkGray;
-}
-
-.sp_center {
-    position: absolute;
-    width: 997px;
-    height: 100%;
-    left: 200px;
-    top: 0px;
-    box-shadow: 0 0 11px #888888 inset;
-    border: 1px solid darkGray;
-}
-
-
 .item_sb {
 	clear: left;
 }
@@ -621,9 +616,9 @@ input[type=text], input[type=password], textarea {
     padding: 2px;
 }
 
-/*input[type=text]:focus, input[type=password]:focus, textarea:focus {
-	background-color: #FFB835;
-}*/
+input[type=text]:focus, input[type=password]:focus, textarea:focus {
+	border-color: orange;
+}
 
 /* sapns.selector */
 .sp-select-text {
