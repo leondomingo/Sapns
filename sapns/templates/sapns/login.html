@@ -4,14 +4,14 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
-    <style type="text/css">
+    <style>
         .sp_center {
             width: 1198px !important;
             left: 0px !important;
         }
     </style>
     {{ util.jquery_ui() }}
-    <style type="text/css">
+    <style>
         #forgot_password {
             text-align: center;
         }
@@ -54,8 +54,8 @@
     <label>{{_('Forgot my password')}}</label>
 </div>
 
-<script type="text/javascript">
-    $(document).ready(function() {
+<script>
+    $(function() {
         $('#loginusername').focus();
         
         $('#forgot_password label').click(function(event) {

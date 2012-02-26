@@ -1,10 +1,31 @@
 <div class="sp_app_title">{{tg.config.get('app.name', 'Sapns')}}
     <span class="sp_app_title_sep">::</span>
     <span class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</span></div>
-{#<div class="sp_app_subtitle">{{tg.config.get('app.subtitle', 'Web Information System')}}</div>#}
 
 {% if request.identity %}
     {% include 'sapns/logout.html' %}
-{% endif %}
 
-{% include 'sapns/lang_selector.html' %}
+    <script>
+    function _close_options(callback) {
+        $('#sp-user-menu').fadeOut('fast');
+        if (callback) {
+            callback();
+        }
+    }
+    
+    $(function() {
+        $('.sp-logout-user').click(function() {
+            if ($('#sp-user-menu').is(':visible')) {
+                _close_options();
+            }
+            else {
+                $('#sp-user-menu').fadeIn('slow');
+            }
+        });
+        
+        $('.sp-logout-btn').click(function() {
+            window.location = "{{tg.url('/logout_handler')}}";
+        });
+    });
+{% endif %}
+</script>
