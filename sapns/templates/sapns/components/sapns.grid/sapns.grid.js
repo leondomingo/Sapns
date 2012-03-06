@@ -55,6 +55,8 @@
             this.actions = this.actions();
         }
         
+        set(this, 'shift_enabled', false);
+        
         set(this, '_new_default', {
             name: 'new',
             url: '/dashboard/new/',
@@ -659,7 +661,7 @@
                             self.actions = response.actions;
                         }
                         
-                        self.complete_actions();
+                        //self.complete_actions();
                         
                         $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
                     }
@@ -667,7 +669,7 @@
 
                 $.ajax(ajx);
             } else {
-                self.complete_actions();
+                //self.complete_actions();
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
             }
         }
@@ -737,9 +739,29 @@
             return f;
         }
         
-        function _run_action(id, ids, act, ctrl) {
+        function _run_action(id, ids, act, ctrl, shift) {
             
             if (typeof(act.type) === 'string') {
+                
+                if (shift && self.shift_enabled) {
+                    
+                    // new
+                    if (act.type === 'new') {
+                        act = self._new_default;
+                    }
+                    // edit
+                    else if (act.type === 'edit') {
+                        act = self._edit_default;
+                    }
+                    // delete
+                    else if (act.type === 'delete') {
+                        act = self._delete_default;
+                    }
+                    // docs
+                    else if (act.type === 'docs') {
+                        act = self._docs_default;
+                    }
+                }
                 
                 var a = act.url;
                 if (a[a.length - 1] != '/') {
@@ -816,22 +838,22 @@
             }
         }
 
-        function run_action(item, action_name, ctrl) {
+        function run_action(item, action_name, ctrl, shift) {
             var act = self.getAction(action_name);
             var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
-            _run_action(id, [], act, ctrl);
+            _run_action(id, [], act, ctrl, shift);
         }
 
         // new
         $('#' + self.name + ' .new_inline').live('click', function(event) {
-            run_action($(this), 'new', event.ctrlKey || event.metaKey);
+            run_action($(this), 'new', event.ctrlKey || event.metaKey, event.shiftKey);
         });
 
         if (self.actions_inline) {
             
             // edit
             $('#' + self.name + ' .edit_inline').live('click', function(event) {
-                run_action($(this), 'edit', event.ctrlKey || event.metaKey);
+                run_action($(this), 'edit', event.ctrlKey || event.metaKey, event.shiftKey);
             });
     
             // delete
@@ -848,7 +870,7 @@
     
             // docs
             $('#' + self.name + ' .docs_inline').live('click', function(event) {
-                run_action($(this), 'docs');
+                run_action($(this), 'docs', false, event.shiftKey);
             });
     
             // non-standard actions
@@ -864,7 +886,7 @@
             $('#'+self.name + ' .sp-grid-button-action').live('click', function(event) {
                 var act = self.getAction($(this).attr('id'));
                 var selected_ids = self.getSelectedIds();
-                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey);
+                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey, event.shiftKey);
             });
         }
 
