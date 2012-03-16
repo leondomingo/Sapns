@@ -47,7 +47,10 @@
         	    actions: {},
         	    url_base: "/dashboard/list/{{grid.cls}}",
         	    height: 350,
-        	    actions_inline: true, 
+        	    actions_inline: true,
+        	    // {% if grid.shift_enabled %} 
+        	    shift_enabled: true,
+        	    // {% endif %} 
         	    dblclick: 'edit'
         	});
         	

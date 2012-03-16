@@ -134,6 +134,7 @@ class DashboardController(BaseController):
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         permissions = request.identity['permissions']
+        roles = request.identity['groups']
         
         cls_ = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)        
@@ -146,6 +147,9 @@ class DashboardController(BaseController):
             redirect(url('/message', 
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
+            
+        # shift enabled
+        shift_enabled_ = u'managers' in roles
         
         # related classes
         rel_classes = cls_.related_classes()
@@ -166,7 +170,9 @@ class DashboardController(BaseController):
                               # collection
                               ch_attr=ch_attr, parent_id=parent_id,
                               # related classes
-                              rel_classes=rel_classes))
+                              rel_classes=rel_classes,
+                              shift_enabled=shift_enabled_,
+                              ))
         
     def grid_data(self, cls, **params):
         

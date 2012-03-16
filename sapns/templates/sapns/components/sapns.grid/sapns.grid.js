@@ -55,6 +55,8 @@
             this.actions = this.actions();
         }
         
+        set(this, 'shift_enabled', false);
+        
         set(this, '_new_default', {
             name: 'new',
             url: '/dashboard/new/',
@@ -165,6 +167,23 @@
         if (self.hide_check) {
             g_wd = -6;
         }
+        
+        // row width
+        var row_wd = cols.length * 42;
+        
+        // hide_check
+        if (!self.hide_check) {
+            row_wd += 23;
+        }
+        
+        // hide_id
+        if (!self.hide_id) {
+            row_wd += 60;
+        }
+        
+        if (row_wd < 905) {
+            row_wd = 905;
+        }
 
         for (var i=0, l=cols.length; i<l; i++) {
             var col = cols[i];
@@ -176,12 +195,12 @@
             g_wd += (col.width + 5);
         }
         
-        var g_table = '<div class="sp-grid" style="width: ' + (g_wd+5) + 'px;">';
+        var g_table = '<div class="sp-grid" style="width:' + (g_wd+5) + 'px;">';
         
-        var grid_header = '<div class="sp-grid-row">';
+        var grid_header = '<div class="sp-grid-row" style="width:' + row_wd + 'px;">';
         
         if (!self.hide_check) {
-            grid_header += '<div class="sp-col-title" style="width: 23px;">' + 
+            grid_header += '<div class="sp-col-title" style="width:23px;">' + 
                 '<input class="sp-grid-select-all" type="checkbox"/></div>';
         }
         
@@ -200,7 +219,7 @@
                 continue;
             }
             
-            grid_header += '<div class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</div>\n';
+            grid_header += '<div class="sp-col-title" style="width:' + wd + 'px;">' + col.title + '</div>\n';
         }
 
         grid_header += '</div>';
@@ -216,7 +235,7 @@
                 
                 var row = data[i];
                 
-                var grid_row = '<div class="sp-grid-row">\n';
+                var grid_row = '<div class="sp-grid-row" style="width:'+row_wd+'px;">\n';
                 
                 if (!self.hide_check) {
                     var border_radius = '';
@@ -224,7 +243,7 @@
                         border_radius = 'border-radius: 0 0 0 5px;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell" title="' + (i+1) + '" style="width: 23px;' + border_radius + '">' +
+                    grid_row += '<div class="sp-grid-cell" title="' + (i+1) + '" style="width:23px;' + border_radius + '">' +
                         '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
                 }
                 
@@ -235,7 +254,7 @@
                         actions_wd = 'width: 75px;';
                     }
                     
-                    var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
+                    var _action_style = 'style="padding:2px;margin-left:5px;margin-right:5px;border:1px solid lightgray;"';
                     var _actions = 
                         '<div class="sp-grid-cell" style="%(actions_wd)s">\n' +
                         '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' + 
@@ -283,14 +302,14 @@
                     var border_radius = '';
                     if ((self.hide_check && i == ld-1) && 
                             (!self.hide_id && j == 0 || self.hide_id && j == 1)) {
-                        border_radius = 'border-radius: 0 0 0 5px;';
+                        border_radius = 'border-radius:0 0 0 5px;';
                     }
                     
                     if (i == ld-1 && j == lr-1) {
-                        border_radius = 'border-radius: 0 0 5px 0;';
+                        border_radius = 'border-radius:0 0 5px 0;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell" style="text-align: ' + al + ';' + width + border_radius + '"';
+                    grid_row += '<div class="sp-grid-cell" style="text-align:' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
                         grid_row += 'title="' + cell.replace(/"/gi, "''") + '"';
@@ -319,7 +338,7 @@
                 sprintf(grid_header, {actions_wd: actions_wd}) +
                 '<div class="sp-grid-row">'
                     + '<div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' 
-                        + 'style="width: ' + wd_ + 'px;" >{{_("No results")}}</div>' +
+                        + 'style="width:' + wd_ + 'px;" >{{_("No results")}}</div>' +
                 '</div>';            
         }
         
@@ -642,7 +661,7 @@
                             self.actions = response.actions;
                         }
                         
-                        self.complete_actions();
+                        //self.complete_actions();
                         
                         $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
                     }
@@ -650,7 +669,7 @@
 
                 $.ajax(ajx);
             } else {
-                self.complete_actions();
+                //self.complete_actions();
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
             }
         }
@@ -720,9 +739,29 @@
             return f;
         }
         
-        function _run_action(id, ids, act, ctrl) {
+        function _run_action(id, ids, act, ctrl, shift) {
             
             if (typeof(act.type) === 'string') {
+                
+                if (shift && self.shift_enabled) {
+                    
+                    // new
+                    if (act.type === 'new') {
+                        act = self._new_default;
+                    }
+                    // edit
+                    else if (act.type === 'edit') {
+                        act = self._edit_default;
+                    }
+                    // delete
+                    else if (act.type === 'delete') {
+                        act = self._delete_default;
+                    }
+                    // docs
+                    else if (act.type === 'docs') {
+                        act = self._docs_default;
+                    }
+                }
                 
                 var a = act.url;
                 if (a[a.length - 1] != '/') {
@@ -799,22 +838,22 @@
             }
         }
 
-        function run_action(item, action_name, ctrl) {
+        function run_action(item, action_name, ctrl, shift) {
             var act = self.getAction(action_name);
             var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
-            _run_action(id, [], act, ctrl);
+            _run_action(id, [], act, ctrl, shift);
         }
 
         // new
         $('#' + self.name + ' .new_inline').live('click', function(event) {
-            run_action($(this), 'new', event.ctrlKey || event.metaKey);
+            run_action($(this), 'new', event.ctrlKey || event.metaKey, event.shiftKey);
         });
 
         if (self.actions_inline) {
             
             // edit
             $('#' + self.name + ' .edit_inline').live('click', function(event) {
-                run_action($(this), 'edit', event.ctrlKey || event.metaKey);
+                run_action($(this), 'edit', event.ctrlKey || event.metaKey, event.shiftKey);
             });
     
             // delete
@@ -831,7 +870,7 @@
     
             // docs
             $('#' + self.name + ' .docs_inline').live('click', function(event) {
-                run_action($(this), 'docs');
+                run_action($(this), 'docs', false, event.shiftKey);
             });
     
             // non-standard actions
@@ -847,7 +886,7 @@
             $('#'+self.name + ' .sp-grid-button-action').live('click', function(event) {
                 var act = self.getAction($(this).attr('id'));
                 var selected_ids = self.getSelectedIds();
-                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey);
+                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey, event.shiftKey);
             });
         }
 
