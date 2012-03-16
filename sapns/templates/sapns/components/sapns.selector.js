@@ -220,10 +220,15 @@ catch (e) {
                     var id = sapnsSelector.getValue();
                     if (id != '') {
                         var url_edit = sapnsSelector.edit_url;
+                        
+                        if (url_edit[url_edit.length-1] != '/') {
+                            url_edit += '/';
+                        }
+                        
+                        url_edit += sprintf('%s/%s', cls, id);
+                        
                         var form_edit =
                             '<form action="' + url_edit + '" method="post" target="_blank">' +
-                                '<input type="hidden" name="cls" value="' + cls + '">' +   
-                                '<input type="hidden" name="id" value="' + id + '">' +
                                 '<input type="hidden" name="came_from" value="">' +
                             '</form>';
                             
