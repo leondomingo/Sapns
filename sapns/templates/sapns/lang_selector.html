@@ -1,5 +1,5 @@
-<div id="language_selector">
-    <select>
+<div class="sp-user-option">
+    <select id="language_selector">
         <option value="">{{_('Select your language')}}</option>
         {% if not languages %}
         <option value="en" {% if lang == 'en' %} selected {% endif %}>English</option>
@@ -13,9 +13,9 @@
     </select>
 </div>
 
-<script type="text/javascript">
+<script>
     $(function() {
-        $('#language_selector select').change(function() {
+        $('#language_selector').change(function() {
             var _lang = $(this).val();
             if (_lang) {
                 $.ajax({

@@ -118,13 +118,26 @@ form.loginfields input#submit {
     margin-left: -10px;
 }
 
-.sp_header {
-	position: relative;
+.sp_header_top {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 30px;
 	background-color: #B4BD3C;
 	color: white;
-	height: 100px;
-	margin-top: 5px;
-	border-radius: 5px 5px 0 0;
+	/*margin-top: 5px;*/
+	/*border-radius: 5px 5px 0 0;*/
+	/*z-index: 100;*/
+}
+
+.sp_header {
+	position: relative;
+	width: 1200px;
+	height: 100%;
+	margin: 0 auto;
+	/*background-color: red;*/
+	z-index: 200;
 }
 
 #you-are-in {
@@ -142,14 +155,15 @@ form.loginfields input#submit {
 
 .sp_middle {
     position: relative;
-    height: 500px;
+    height: 600px;
+    margin-top: 30px;
     border: 1px solid darkgray;
 }
 
 .sp_sidebar {
     position: absolute;
     width: 165px;
-    height: 480px;
+    height: 580px;
     overflow: auto;
     box-shadow: 0 0 11px #888888 inset;
     left: 0px;
@@ -163,7 +177,7 @@ form.loginfields input#submit {
 .sp_center {
     position: absolute;
     width: 997px;
-    height: 500px;
+    height: 600px;
     left: 200px;
     top: 0px;
     box-shadow: 0 0 11px #888888 inset;
@@ -174,29 +188,32 @@ form.loginfields input#submit {
 	position: absolute;
 	left: 0px;
 	top: 5px;
-	font-size: 30px;
+	font-size: 15px;
 	text-align: left;
 	margin-left: 10px;
 	color: #FFB835;
 }
 
+.sp_app_title_sep {
+	color: #000;
+	font-weight: bold;
+}
+
 .sp_app_subtitle {
-	position: absolute;
-	left: 0px;
-	top: 40px;
 	font-size: 12px;
 	text-align: left;
 	color: #723532;
-	margin-left: 10px;
 }
 
 .sp_logout {
 	position: absolute;
 	right: 10px;
-	top: 20px;
+	top: 5px;
     border: 1px solid;
     background-color: #CCCFA5;
     border-radius: 10px;
+    cursor: pointer;
+    opacity: 0.8;
 }
 
 .sp-logout-user {
@@ -205,6 +222,10 @@ form.loginfields input#submit {
 	font-style: italic;
 	font-family: Arial;
 	font-size: 13px;
+	width: 195px;
+	height: 18px;
+	opacity: 1;
+	border-radius: 10px;
 }
 
 .sp-logout-user a {
@@ -231,13 +252,13 @@ form.loginfields input#submit {
 	background-color: #FFB835;
 }
 
-#language_selector {
+/*#language_selector {
 	position: absolute;
-	right: 10px;
-	top: 70px;
-}
+	right: 350px;
+	top: 5px;
+}*/
 
-#language_selector select {
+#language_selector {
 	font-size: 9px;
 }
 
@@ -634,4 +655,25 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
 
 .sp-empty-button {
 	color: red;
+}
+
+#sp-user-menu {
+    width: 288px;
+    display: none;
+    margin-top: 5px;
+    padding-bottom: 5px;
+}
+
+.sp-user-option {
+    padding: 2px 2px 2px 10px;
+    color: #000;
+    border-radius: 3px;
+    cursor: pointer;
+    margin-left: 1px;
+    width: 99%;
+}
+
+.sp-user-option:hover {
+    background-color: #FFA900;
+    color: #fff;
 }
