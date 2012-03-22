@@ -47,6 +47,7 @@ catch (e) {
         set(this, 'search_params', null);
         set(this, 'edit_url', "{{tg.url('/dashboard/edit/')}}");
         set(this, 'onChange', null);
+        set(this, 'onClick', null);
         
         set(this, 'dialog', {});
         
@@ -256,37 +257,42 @@ catch (e) {
                 
                 if (!sapnsSelector.isReadonly) {
                     
-                    // dialog title
-                    var dialog_title = sapnsSelector.rc_title;
-                    if (typeof(sapnsSelector.rc_title) == 'function') {
-                        dialog_title = sapnsSelector.rc_title();
+                    if (sapnsSelector.onClick) {
+                        sapnsSelector.onClick(sapnsSelector.value);
                     }
-                    
-                    // show search dialog
-                    $('#dialog_' + sapnsSelector.name).dialog({
-                        title: dialog_title,
-                        width: sapnsSelector.dialog.width,
-                        height: sapnsSelector.dialog.height,
-                        resizable: false,
-                        modal: true,
-                        buttons: {
-                            "{{_('Ok')}}": function() {
-                                // get the id of the selected row
-                                
-                                var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
-                                
-                                sapnsSelector.setValue(id_selected);
-                                sapnsSelector.setTitle();
-                                
-                                $('#dialog_' + sapnsSelector.name).dialog('close');
-                            },
-                            "{{_('Cancel')}}": function() {
-                                $('#dialog_' + sapnsSelector.name).dialog('close');
-                            }
+                    else {
+                        // dialog title
+                        var dialog_title = sapnsSelector.rc_title;
+                        if (typeof(sapnsSelector.rc_title) == 'function') {
+                            dialog_title = sapnsSelector.rc_title();
                         }
-                    });
-                    
-                    sapnsSelector.search('');
+                        
+                        // show search dialog
+                        $('#dialog_' + sapnsSelector.name).dialog({
+                            title: dialog_title,
+                            width: sapnsSelector.dialog.width,
+                            height: sapnsSelector.dialog.height,
+                            resizable: false,
+                            modal: true,
+                            buttons: {
+                                "{{_('Ok')}}": function() {
+                                    // get the id of the selected row
+                                    
+                                    var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
+                                    
+                                    sapnsSelector.setValue(id_selected);
+                                    sapnsSelector.setTitle();
+                                    
+                                    $('#dialog_' + sapnsSelector.name).dialog('close');
+                                },
+                                "{{_('Cancel')}}": function() {
+                                    $('#dialog_' + sapnsSelector.name).dialog('close');
+                                }
+                            }
+                        });
+                        
+                        sapnsSelector.search('');
+                    }
                 }
             });
             
