@@ -279,8 +279,7 @@ class InitSapns(object):
                         attr.visible = True
                         attr.insertion_order = i
                         
-                        if attr.type == SapnsAttribute.TYPE_INTEGER and \
-                        not attr.name.startswith('id_'):
+                        if attr.type == SapnsAttribute.TYPE_INTEGER and not attr.name.startswith('id_'):
                             # signed
                             attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
                             
@@ -294,6 +293,17 @@ class InitSapns(object):
                                 
                         elif attr.type == SapnsAttribute.TYPE_TIME:
                             attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
+                            
+                                            
+                        elif attr.type == SapnsAttribute.TYPE_INTEGER and attr.name.startswith('id_'):
+                            # related field
+                            idx_name = '%s__%s' % (tbl['name'], attr.name[3:])
+                            idx_exists = dbs.execute("select search_index('%s', '%s')" % (tbl['name'], idx_name)).fetchone()[0]
+                            if not idx_exists:
+                                logger.info('Creating index: %s' % idx_name)
+                                args = (idx_name, tbl['name'], attr.name, attr.name)
+                                dbs.execute('CREATE INDEX %s ON %s USING BTREE(%s) WHERE %s IS NOT NULL' % args)
+                                dbs.flush()
                         
                         dbs.add(attr)
                         dbs.flush()
@@ -324,7 +334,17 @@ class InitSapns(object):
                                     
                             elif attr.type == SapnsAttribute.TYPE_TIME:
                                 attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
-                    
+
+                        if attr.type == SapnsAttribute.TYPE_INTEGER and attr.name.startswith('id_'):
+                            # related field
+                            idx_name = '%s__%s' % (tbl['name'], attr.name[3:])
+                            idx_exists = dbs.execute("select search_index('%s', '%s')" % (tbl['name'], idx_name)).fetchone()[0]
+                            if not idx_exists:
+                                logger.info('Creating index: %s' % idx_name)
+                                args = (idx_name, tbl['name'], attr.name, attr.name)
+                                dbs.execute('CREATE INDEX %s ON %s USING BTREE(%s) WHERE %s IS NOT NULL' % args)
+                                dbs.flush()
+
                 # foreign key
                 if col['fk_table'] != None:
                     pending_attr[attr.attribute_id] = col['fk_table'].name

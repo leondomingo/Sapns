@@ -17,7 +17,7 @@ import re
 
 ROLE_MANAGERS = u'managers'
 
-def extract_model(all=False): 
+def extract_model(all_=False): 
     logger = logging.getLogger('lib.sapns.extract_model')
     
     meta = MetaData(bind=dbs.bind, reflect=True)
@@ -43,7 +43,7 @@ def extract_model(all=False):
     tables = []
     for tbl in sorted(meta.sorted_tables, cmp=sp_cmp):
         
-        if not tbl.name.startswith('sp_') or all:
+        if not tbl.name.startswith('sp_') or all_:
             
             logger.info('Table: %s' % tbl.name)
             
@@ -135,7 +135,7 @@ def update_metadata():
     managers = SapnsRole.by_name(ROLE_MANAGERS)
     #managers = SapnsRole()
     
-    tables = extract_model(all=True)
+    tables = extract_model(all_=True)
     tables_id = {}
     pending_attr = {}
     for tbl in tables:
@@ -341,7 +341,7 @@ def create_data_exploration():
     
     logger = logging.getLogger('lib.sapns.util.create_data_exploration')
     
-    tables = extract_model(all=True) #['tables']
+    tables = extract_model(all_=True) #['tables']
 
     for us in dbs.query(SapnsUser).\
         join((SapnsUserRole,
