@@ -1,6 +1,78 @@
 /* Sapns grid */
 
 (function($) {
+    
+    function Filter(field, operator, value, active) {
+        this.field = field;
+        this.operator = operator;
+        this.value = value;
+        this.active = active ? active !== undefined : true;
+    }
+    
+    Filter.prototype = {
+            toStr: function() {
+                var self = this;
+                return sprintf('%s %s %s', self.field, self.operator, self.value);
+            },
+            toString: function() {
+                var self = this;
+                
+                var fld = self.field.toLowerCase();
+                fld = fld.replace(/[áäà]/g, 'a');
+                fld = fld.replace(/[éëè]/g, 'e');
+                fld = fld.replace(/[íïì]/g, 'i');
+                fld = fld.replace(/[óöò]/g, 'o');
+                fld = fld.replace(/[úüù]/g, 'u');
+                fld = fld.replace(/[^a-z]/g, '');
+                
+                var _operators = {
+                        // co (contain)
+                        co: '=',
+                        // eq (equal to)
+                        eq: '=',
+                        // lt (less than)
+                        lt: '<',
+                        // gt (greater than)
+                        gt: '>',
+                        // let (less or equal)
+                        let: '<=',
+                        // get (greater or equal)
+                        get: '>=',
+                        // nco (not contain)
+                        nco: '<>',
+                        // neq (not equal)
+                        neq: '<>'
+                };
+                
+                var op = _operators[self.operator];
+                var v = self.value;
+                
+                if (self.operator == 'eq' || self.operator == 'neq') {
+                    
+                    if (v) {
+                        v = sprintf('"%s"', v);
+                    }
+                    else {
+                        if (self.operator == 'eq') {
+                            return sprintf('!%s', fld);
+                        }
+                        else if (self.operator == 'neq') {
+                            return sprintf('#%s', fld);
+                        }
+                    }
+                }
+                else if ((self.operator == 'co' || self.operator == 'nco') && !v) {
+                    if (self.operator == 'co') {
+                        return sprintf('!%s', fld);
+                    }
+                    else if (self.operator == 'nco') {
+                        return sprintf('#%s', fld);
+                    }
+                }
+                
+                return sprintf('%s%s%s', fld, op, v); 
+            }
+    };
 
     // SapnsGrid (constructor)
     function SapnsGrid(settings) {
@@ -107,6 +179,7 @@
         set(this, 'total_count', 0);
         set(this, 'total_pag', 0);
         this.ajx_data = '{}';
+        this.filters = [];
     }
 
     // getSelectedIds
@@ -181,12 +254,19 @@
             row_wd += 60;
         }
         
-        if (row_wd < 905) {
-            row_wd = 905;
+        var MIN_ROW = 905;
+        
+        if (row_wd < MIN_ROW) {
+            row_wd = MIN_ROW;
         }
 
+        var select_fields = '';
         for (var i=0, l=cols.length; i<l; i++) {
             var col = cols[i];
+            
+            if (col.title != 'id') {
+                select_fields += '<option value="' + col.title + '">' + col.title + '</option>';
+            }
             
             if (self.hide_id && col.title == 'id') {
                 continue;
@@ -194,6 +274,8 @@
             
             g_wd += (col.width + 5);
         }
+        
+        $('#'+self.name + ' .sp-grid-filter-field').html(select_fields);
         
         var g_table = '<div class="sp-grid" style="width:' + (g_wd+5) + 'px;">';
         
@@ -353,7 +435,7 @@
     // search
     SapnsGrid.prototype.search = function(q, force, on_load) {
         var self = this;
-
+        
         if (force == undefined) {
             force = false;
         }
@@ -367,7 +449,18 @@
         }
 
         self.q = q;
-
+        
+        // TODO: add filters
+        if (self.filters.length) {
+            if (self.q) {
+                self.q = q + ', ' + self.filters.join(', ');
+            }
+            else {
+                self.q = self.filters.join(', ');
+            }
+        }
+        
+        console.log(self.q);
         var loading = '<div style="padding: 10px; font-size: 15px; ' + 
             sprintf('font-weight: bold; color: gray; height: %(hg)dpx;">{{_("Loading")}}...</div>', {hg: self.height-50});
         
@@ -993,12 +1086,7 @@
                 "{{_('Ok')}}": function() {
                     $.ajax({
                         url: url,
-                        type: "get",
-                        dataType: "json",
-                        data: {
-                            cls: cls,
-                            id_: id
-                        },
+                        data: { cls: cls, id_: id },
                         success: function(res) {
                             if (res.status) {
                                 self.search(self.q, true);
@@ -1094,9 +1182,112 @@
                         '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
                         '<img class="inline_action sp-search-btn" ' + 
                             'src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}" style="margin-left: 5px;"></div>';
+                
+                g_content += '<div class="sp-grid-filters" style="display: none;"></div>';
+                g_content += 
+                    '<div class="sp-grid-edit-filter" style="display: none;">\
+                    <div style="float: left; height: 40px; margin-right: 5px;">\
+                        <div>Campo</div>\
+                        <div><select class="sp-grid-filter-field" style="width: 200px;"></select></div>\
+                    </div>\
+                    <div style="float: left; height: 40px; margin-right: 5px;">\
+                        <div>Operador</div>\
+                        <div>\
+                            <select class="sp-grid-filter-operator" style="width: 200px;">\
+                                <option value="co">Contiene</option>\
+                                <option value="eq">Igual</option>\
+                                <option value="lt">Menor que</option>\
+                                <option value="gt">Mayor que</option>\
+                                <option value="let">Menor o igual que</option>\
+                                <option value="get">Mayor o igual que</option>\
+                                <option value="nco">No contiene</option>\
+                                <option value="neq">Distinto</option>\
+                            </select>\
+                        </div>\
+                    </div>\
+                    <div style="float: left; height: 40px;">\
+                        <div>Valor</div>\
+                        <input class="sp-grid-filter-value" type="text">\
+                    </div>\
+                    </div>';
 
                 $('#' + g.name + ' .sp-search-btn').live('click', function() {
-                    g.search($('#' + g.name + ' .sp-search-txt').val());
+                    // TODO: manage filters
+                    $('<div/>').html($('#'+g.name + ' .sp-grid-filters').html()).dialog({
+                        title: "Filtros",
+                        modal: true,
+                        resizable: false,
+                        width: 900,
+                        height: 400,
+                        buttons: {
+                            "Añadir": function() {
+                                
+                                var dlg = $(this);
+                                
+                                $('<div/>').html($('#'+g.name + ' .sp-grid-edit-filter').html()).dialog({
+                                    title: "Editar filtro",
+                                    modal: true,
+                                    resizable: false,
+                                    width: 700,
+                                    height: 150,
+                                    buttons: {
+                                        "Aceptar": function() {
+                                            
+                                            var filter = new Filter(
+                                                    $(this).find('.sp-grid-filter-field').val(),
+                                                    $(this).find('.sp-grid-filter-operator').val(),
+                                                    $(this).find('.sp-grid-filter-value').val());
+                                            
+                                            g.filters.push(filter);
+                                            
+                                            g.search($('#' + g.name + ' .sp-search-txt').val(), true);
+                                            $(this).dialog('close');
+                                            dlg.dialog('close');
+                                        },
+                                        "Cancelar": function() {
+                                            $(this).dialog('close');
+                                        }
+                                    }
+                                });
+                            },
+                            "Editar": function() {
+                            },
+                            "Borrar": function() {
+                            },
+                            "Borrar todos": function() {
+                            },
+                            "Cerrar": function() {
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
+                    
+                    return;
+                    
+                    $('<div/>').html($('#'+g.name + ' .sp-grid-edit-filter').html()).dialog({
+                        title: "Editar filtro",
+                        modal: true,
+                        resizable: false,
+                        width: 700,
+                        height: 150,
+                        buttons: {
+                            "Aceptar": function() {
+                                
+                                var filter = new Filter(
+                                        $(this).find('.sp-grid-filter-field').val(),
+                                        $(this).find('.sp-grid-filter-operator').val(),
+                                        $(this).find('.sp-grid-filter-value').val());
+                                
+                                g.filters.push(filter);
+                                
+                                g.search($('#' + g.name + ' .sp-search-txt').val(), true);
+                                $(this).dialog('close');
+                            },
+                            "Cancelar": function() {
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
                 });
 
                 $('#' + g.name + ' .sp-search-txt').live('keypress', function(event) {

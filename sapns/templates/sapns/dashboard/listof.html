@@ -30,7 +30,7 @@
 
     <script type="text/javascript" src="/js/sprintf.min.js"></script>
     <script type="text/javascript">
-        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
         $(document).ready(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
@@ -51,6 +51,7 @@
         	    // {% endif %} 
         	    height: 450,
         	    actions_inline: true, 
+        	    hide_id: true,
         	    dblclick: 'edit'
         	});
         	
