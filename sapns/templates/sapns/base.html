@@ -7,11 +7,11 @@
     {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
 {% endblock %}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.min.css')}}">
-{% if tg.config.get('app.root_folder') %}
-  {% set root_folder = tg.config.get('app.root_folder') %}
+<!--{% if tg.config.get('app.root_folder') %}-->
+  <!--{% set root_folder = tg.config.get('app.root_folder') %}-->
   <link rel="stylesheet" type="text/css" media="screen" 
       href="{{tg.url('/css/%s/sapns.css' % root_folder)}}">
-{% endif %}
+<!--{% endif %}-->
 </head>
 <body>
     {% block header %}
@@ -22,9 +22,9 @@
     </div>
     {% endblock %}
     
-    {#{% if page %}
+    <!--{#{% if page %}
     <div id="you-are-in"><a style="font-size: 15px;" href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
-    {% endif %}#}
+    {% endif %}#}-->
 
     <div class="sp_middle">
         <div class="sp_sidebar"></div>
@@ -35,21 +35,19 @@
         </div>
     </div>
     
-    {#
+    <!--{#
     {% block footer %}
     <div class="sp_footer">
         {% include 'sapns/footer.html' %}
     </div>
     {% endblock %}
-    #}
+    #}-->
     
     <script>
         // Load sidebar (don't wait for document load) 
         $.ajax({
             url: "{{tg.url('/dashboard/sidebar/')}}",
-            data: {
-                came_from: "{{came_from or ''}}",
-            },
+            data: {came_from: "{{came_from or ''}}"},
             cache: true, 
             dataType: 'html',
             success: function(content) {
