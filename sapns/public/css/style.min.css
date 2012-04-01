@@ -23,8 +23,11 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .sp-grid-container{padding-left:15px;padding-right:15px}.sp-grid-search-box{float:left;margin-bottom:5px}
 .sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}.sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}
 .sp-grid-caption{color:#666;font-size:22px;font-weight:bold;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
-.sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px}
+.sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px;margin-left:5px}
 .sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;padding:2px;overflow:hidden}
+.sp-col-title-sortable{cursor:pointer}.sp-col-title-sortable:hover{background-color:#444}
+.sp-grid-filter-field{width:200px}.sp-grid-filter-operator{width:200px}.sp-grid-activate-filter,.sp-grid-deactivate-filter{font-size:9px}
+.sp-grid-no-filters{font-size:15px;font-weight:bold}.sp-grid-filter-description{float:left;margin-right:10px;width:450px}
 .sp-grid-button-actions{clear:left;height:20px;padding:2px}.sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px}
 .sp-grid-row{clear:left;height:31px;margin-bottom:-1px}.sp-grid-cell{background-color:white;border:1px solid lightgray;font-family:arial;font-size:11px;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
 .sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px;border-radius:0 0 5px 5px}
@@ -43,9 +46,9 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .sp_messages{font-size:10px;color:navy}#object-title{color:gray;font-size:13px;font-style:italic}
 #delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
-.inline_action{width:20px;height:20px;cursor:pointer;padding-right:5px;float:left}
-.nonstd_actions{width:25px;float:left}.item_sb{clear:left}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}
-.text_sb{font-size:13px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
+.inline_action{background-color:#ddd;border:1px solid #666;border-radius:3px 3px 3px 3px;cursor:pointer;float:left;height:20px;margin-right:1px;padding-left:2px;padding-right:2px;width:20px}
+.inline_action:hover{background-color:#fff}.nonstd_actions{width:25px;float:left;font-size:10px}
+.item_sb{clear:left}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}.text_sb{font-size:13px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
 .text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px}
 .subactions ul{margin-top:0;margin-bottom:0;list-style-type:circle}.subaction{font-weight:normal;color:#333;font-size:13px}
 .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}

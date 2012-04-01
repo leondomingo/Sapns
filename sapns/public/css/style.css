@@ -14,18 +14,11 @@ body {
 	font-family:"Lucida Grande","Lucida Sans Unicode",geneva,verdana,sans-serif;
 }
 
-a {
-	color: #797C33;
-	font-weight: bold;
-	text-decoration: none;
-}
+a { color: #797C33; font-weight: bold; text-decoration: none; }
 
 /* Login form*/
 
-#loginform {
-    text-align: center;
-    margin-top: 100px;
-}
+#loginform { text-align: center; margin-top: 100px; }
 
 form.loginfields {
     text-align: left;
@@ -62,9 +55,7 @@ form.loginfields h2 span {
     padding: 0 10px;
 }
 
-*+html form.loginfields h2 span {
-	padding: 0 20px;
-}
+*+html form.loginfields h2 span { padding: 0 20px; }
 
 form.loginfields label {
     clear: left;
@@ -113,10 +104,7 @@ form.loginfields input#submit {
     cursor: pointer;
 }
 
-* html form.loginfields input#submit {
-    clear: both;
-    margin-left: -10px;
-}
+* html form.loginfields input#submit { clear: both; margin-left: -10px; }
 
 .sp_header_top {
 	position: fixed;
@@ -140,10 +128,7 @@ form.loginfields input#submit {
 	z-index: 200;
 }
 
-#you-are-in {
-	padding-left: 5px;
-	padding-top: 5px;
-}
+#you-are-in { padding-left: 5px; padding-top: 5px; }
 
 .sp_footer {
 	background-color: #B4BD3C;
@@ -308,6 +293,7 @@ form.loginfields input#submit {
 .sp-search-btn {
 	float: none;
 	width: 80px;
+    margin-left: 5px;
 }
 
 .sp-col-title {
@@ -326,6 +312,15 @@ form.loginfields input#submit {
 	padding: 2px;
     overflow: hidden;
 }
+
+.sp-col-title-sortable { cursor: pointer; }
+.sp-col-title-sortable:hover { background-color: #444; }
+
+.sp-grid-filter-field { width: 200px; }
+.sp-grid-filter-operator { width: 200px; }
+.sp-grid-activate-filter, .sp-grid-deactivate-filter { font-size: 9px; }
+.sp-grid-no-filters { font-size: 15px; font-weight: bold; }
+.sp-grid-filter-description { float: left; margin-right: 10px; width: 450px; }
 
 .sp-grid-button-actions {
 	clear: left;
@@ -555,28 +550,21 @@ form.loginfields input#submit {
 
 /* Inline actions */
 .inline_action {
-	width: 20px;
-	height: 20px;
-	cursor: pointer;
-	padding-right: 5px;
-	float: left;
+    background-color: #DDDDDD;
+    border: 1px solid #666666;
+    border-radius: 3px 3px 3px 3px;
+    cursor: pointer;
+    float: left;
+    height: 20px;
+    margin-right: 1px;
+    padding-left: 2px;
+    padding-right: 2px;
+    width: 20px;
 }
 
-.nonstd_actions {
-	width: 25px;
-	float: left;
-	/*background-image: url('/images/sapns/icons/help.png') no-repeat center center fixed;*/
-}
-
-.item_sb {
-	clear: left;
-}
-
-/*
-.item_sb:hover {
-	background-color: #ccc;
-}
-*/
+.inline_action:hover { background-color: #fff; }
+.nonstd_actions { width: 25px; float: left; font-size: 10px; }
+.item_sb { clear: left; }
 
 .icon_sb {
 	width: 25px;
@@ -594,39 +582,15 @@ form.loginfields input#submit {
     margin-bottom: 3px;
 }
 
-.text_sb a {
-	font-weight: bold;
-	color: #333;
-}
+.text_sb a { font-weight: bold; color: #333; }
+.text_sb a:hover { color: black; }
+.subactions { clear: left; min-height: 22px; }
+.subactions ul { margin-top: 0px; margin-bottom: 0px; list-style-type: circle; }
 
-.text_sb a:hover {
-	color: black;
-}
+.subaction { font-weight: normal; color: #333; font-size: 13px; }
+.subaction:hover { color: black; }
 
-.subactions {
-    clear: left;
-    min-height: 22px;
-}
-
-.subactions ul {
-    margin-top: 0px;
-    margin-bottom: 0px;
-    list-style-type: circle;
-}
-
-.subaction {
-    font-weight: normal;
-    color: #333;
-    font-size: 13px;
-}
-
-.subaction:hover {
-    color: black;
-}
-
-input[type=text], input[type=password]  {
-	height: 16px;
-}
+input[type=text], input[type=password] { height: 16px; }
 
 input[type=text], input[type=password], textarea {
 	border: 1px solid #bbb;
