@@ -161,7 +161,7 @@
         set(this, 'multiselect', false);
         set(this, 'actions_inline', false);
         set(this, 'hide_check', false);
-        set(this, 'hide_id', false);
+        set(this, 'hide_id', true);
         set(this, 'dblclick', null);
         set(this, 'select_first', false);
         set(this, 'onLoad', null);
@@ -178,34 +178,6 @@
         
         set(this, 'shift_enabled', false);
         
-        set(this, '_new_default', {
-            name: 'new',
-            url: '/dashboard/new/',
-            require_id: 'false',
-            type: 'new'
-        });
-        
-        set(this, '_edit_default', {
-            name: 'edit',
-            url: '/dashboard/edit/',
-            require_id: 'true',
-            type: 'edit'
-        });
-        
-        set(this, '_delete_default', {
-            name: 'delete',
-            url: '/dashboard/delete/',
-            require_id: 'true',
-            type: 'delete'
-        });
-        
-        set(this, '_docs_default', {
-            name: 'docs',
-            url: '/dashboard/docs/',
-            require_id: 'true',
-            type: 'docs'
-        });
-
         set(this, 'exportable', true);
 
         var formats = [{
@@ -230,6 +202,34 @@
         this.ajx_data = '{}';
         this.filters = [];
         this.order = [];
+        
+        this._new_default = {
+            name: 'new',
+            url: '/dashboard/new/',
+            require_id: 'false',
+            type: 'new'
+        };
+        
+        this._edit_default = {
+            name: 'edit',
+            url: '/dashboard/edit/',
+            require_id: 'true',
+            type: 'edit'
+        };
+        
+        this._delete_default = {
+            name: 'delete',
+            url: '/dashboard/delete/',
+            require_id: 'true',
+            type: 'delete'
+        };
+        
+        this._docs_default = {
+            name: 'docs',
+            url: '/dashboard/docs/',
+            require_id: 'true',
+            type: 'docs'
+        };
     }
 
     // getSelectedIds
@@ -332,8 +332,8 @@
         var grid_header = '<div class="sp-grid-row" style="width:' + row_wd + 'px;">';
         
         if (!self.hide_check) {
-            grid_header += '<div class="sp-col-title" style="width:23px;">\
-                <input class="sp-grid-select-all" type="checkbox"></div>';
+            grid_header += '<div class="sp-col-title" style="width:23px;">' +
+                '<input class="sp-grid-select-all" type="checkbox"></div>';
         }
         
         if (self.actions_inline) {
@@ -378,7 +378,7 @@
             }
             
             grid_header += '<div class="sp-col-title sp-col-title-sortable ' + is_ordered + '"' + order_type + 
-                ' style="width:' + wd + 'px;" col_title="' + col.title + '">' + col.title + order_index + '</div>\n';
+                ' style="width:' + wd + 'px;" col_title="' + col.title + '">' + col.title + order_index + '</div>';
         }
 
         grid_header += '</div>';
@@ -402,29 +402,27 @@
                         border_radius = 'border-radius:0 0 0 5px;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell" title="' + row[0] + '" style="width:23px;' + border_radius + '">\
-                        <input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
+                    grid_row += '<div class="sp-grid-cell" title="' + row[0] + '" style="width:23px;' + border_radius + '">' +
+                        '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
                 }
                 
                 if (self.actions_inline) {
                     
                     var actions_wd = 'width:107px;';
                     if (!self.nonstd) {
-                        actions_wd = 'width:75px;';
+                        actions_wd = 'width:82px;';
                     }
                     
-                    var _action_style = 'style="padding:2px;margin-left:5px;margin-right:5px;border:1px solid lightgray;"';
                     var _actions = 
-                        '<div class="sp-grid-cell" style="%(actions_wd)s">\
-                        <img class="inline_action edit_inline" title="{{_("Edit")}}" \
-                            src="{{tg.url("/images/sapns/icons/edit.png")}}">\
-                        <img class="inline_action delete_inline" title="{{_("Delete")}}" \
-                            src="{{tg.url("/images/sapns/icons/delete.png")}}">\
-                        <img class="inline_action docs_inline" title="{{_("Docs")}}" \
-                            src="{{tg.url("/images/sapns/icons/docs.png")}}">';
+                        '<div class="sp-grid-cell" style="%(actions_wd)s">' +
+                        '<img class="inline_action edit_inline" title="{{_("Edit")}}" ' +
+                            'src="{{tg.url("/images/sapns/icons/edit.png")}}">' +
+                        '<img class="inline_action delete_inline" title="{{_("Delete")}}" ' +
+                            'src="{{tg.url("/images/sapns/icons/delete.png")}}">' + 
+                        '<img class="inline_action docs_inline" title="{{_("Docs")}}" ' +
+                            'src="{{tg.url("/images/sapns/icons/docs.png")}}">';
                     
-                    grid_row += sprintf(_actions, {actions_wd: actions_wd}) + self.nonstd + '\n';
-                    grid_row += '</div>\n';
+                    grid_row += sprintf(_actions, {actions_wd: actions_wd}) + self.nonstd + '</div>';
                 }
                 
                 // grid_header
@@ -468,7 +466,8 @@
                         border_radius = 'border-radius:0 0 5px 0;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip" style="text-align:' + al + ';' + width + border_radius + '"';
+                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip" ' + 
+                        'style="text-align:' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
                         grid_row += sprintf('title="%s"', cell.replace(/"/gi, "''"));
@@ -477,7 +476,7 @@
                         grid_row += 'title="({{_("empty")}})"';
                     }
                     
-                    grid_row += 'clickable="true">' + cell + '</div>\n';
+                    grid_row += 'clickable="true">' + cell + '</div>';
                 }
                 
                 grid_row += '</div>';
@@ -495,10 +494,8 @@
 
             g_table += 
                 sprintf(grid_header, {actions_wd: actions_wd}) +
-                '<div class="sp-grid-row">\
-                    <div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" \
-                        style="width:' + wd_ + 'px;" >{{_("No results")}}</div>\
-                </div>';
+                '<div class="sp-grid-row"><div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' +
+                    'style="width:' + wd_ + 'px;" >{{_("No results")}}</div></div>';
         }
         
         g_table += '</div>';
@@ -561,8 +558,8 @@
             }
         }
         
-        var loading = '<div style="padding:10px;font-size: 15px;\
-            ' + sprintf('font-weight:bold;color:gray;height:%(hg)dpx;">{{_("Loading")}}...</div>', {hg: self.height-50});
+        var loading = '<div style="padding:10px;font-size: 15px; ' +
+            sprintf('font-weight:bold;color:gray;height:%(hg)dpx;">{{_("Loading")}}...</div>', {hg: self.height-50});
         
         $('#' + self.name).find('.sp-grid-parent').html(loading);
         
@@ -730,8 +727,8 @@
                 }
 
                 if (typeof(act.type) === 'string' && act.type === 'new') {
-                    var new_btn = '<img class="inline_action new_inline" \
-                        title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
+                    var new_btn = '<img class="inline_action new_inline" ' +
+                        'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
                     $('#'+self.name + ' .sp-grid-search-box').append(new_btn);
                 }
                 else if (!self.actions_inline) {
@@ -791,12 +788,10 @@
                             + formats[i].title + '</option>';
                 }
 
-                var s_export = '<div id="grid-export_'
-                    + self.name
-                    + '" style="height:25px;float:left;">\
-                    <select id="select-export" class="sp-button sp-grid-action" style="height:20px;">\
-                    <option value="">({{_("Export")}})</option>\
-                    ' + options + '</select></div>';
+                var s_export = '<div id="grid-export_' + self.name + '" style="height:25px;float:left;">' +
+                    '<select id="select-export" class="sp-button sp-grid-action" style="height:20px;">' +
+                    '<option value="">({{_("Export")}})</option>' + 
+                    options + '</select></div>';
                 
                 $('#'+self.name + ' .sp-grid-search-box').append(s_export);
             }
@@ -914,15 +909,15 @@
                         + '&parent_id=' + self.parent_id;
             }
 
-            var f = '<form type="post" action="' + action + '" target="' + target + '">\
-                    <input type="hidden" name="came_from" value="' + came_from + '">';
+            var f = '<form type="post" action="' + action + '" target="' + target + '">' +
+                    '<input type="hidden" name="came_from" value="' + came_from + '">';
 
             if (self.ch_attr) {
-                f += '<input type="hidden" name="_' + self.ch_attr
-                        + '" value="' + self.parent_id + '">';
+                f += '<input type="hidden" name="_' + self.ch_attr + 
+                        '" value="' + self.parent_id + '">';
             }
 
-            f += '</form>\n';
+            f += '</form>';
 
             return f;
         }
@@ -1113,12 +1108,12 @@
                 }
             }
 
-            var form_export = '<form action="' + url + '" method="get">\
-                <input type="hidden" name="cls" value="' + self.cls + '">\
-                <input type="hidden" name="q" value="' + self.q + '">\
-                <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
-                <input type="hidden" name="parent_id" value="' + self.parent_id + '">\
-                ' + extra_params + '</form>';
+            var form_export = '<form action="' + url + '" method="get">' +
+                '<input type="hidden" name="cls" value="' + self.cls + '">' +
+                '<input type="hidden" name="q" value="' + self.q + '">' +
+                '<input type="hidden" name="ch_attr" value="' + self.ch_attr + '">' +
+                '<input type="hidden" name="parent_id" value="' + self.parent_id + '">' +
+                extra_params + '</form>';
 
             $(form_export).appendTo('body').submit().remove();
 
@@ -1135,11 +1130,11 @@
 
         var id = JSON.stringify(ids);
 
-        var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>\
-        		<p id='object-title'></p>";
+        var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
+        		"<p id='object-title'></p>";
 
-        var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>\
-                <div id='delete-error-message'></div>";
+        var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
+                "<div id='delete-error-message'></div>";
 
         $('#grid-dialog_' + self.name).html(delete_html);
 
@@ -1200,10 +1195,8 @@
                                         var attr_title = res.rel_tables[i].attr_title;
                                         message += '<li><span style="font-weight:bold;">'
                                                 + title
-                                                + '</span>\
-                                                (<span style="color:gray;">'
-                                                + attr_title
-                                                + '</span>)</li>';
+                                                + '</span> (<span style="color:#777;">'
+                                                + attr_title + '</span>)</li>';
                                     }
 
                                     message += "</ul>";
@@ -1307,37 +1300,34 @@
 
             if (g.with_search) {
 
-                g_content += '<div><div class="sp-grid-search-box">\
-                        <input class="sp-search-txt" style="float:left;" name="q" type="text" value="">\
-                        <img class="inline_action sp-search-btn" \
-                            src="{{tg.url("/images/sapns/icons/search.png")}}" titlee="{{_("Search...")}}"></div>';
+                g_content += '<div><div class="sp-grid-search-box">' + 
+                        '<input class="sp-search-txt" style="float:left;" name="q" type="text" value="">' +
+                        '<img class="inline_action sp-search-btn" ' +
+                            'src="{{tg.url("/images/sapns/icons/search.png")}}" titlee="{{_("Search...")}}"></div>';
                 
                 g_content += '<div class="sp-grid-filters" style="display:none;"></div>';
-                g_content += '<div class="sp-grid-edit-filter" style="display:none;">\
-                    <div style="float:left;height:40px;margin-right:5px;">\
-                        <div>Campo</div>\
-                        <div><select class="sp-grid-filter-field"></select></div>\
-                    </div>\
-                    <div style="float:left;height:40px;margin-right:5px;">\
-                        <div>Operador</div>\
-                        <div>\
-                            <select class="sp-grid-filter-operator">\
-                                <option value="co">Contiene</option>\
-                                <option value="eq">Igual</option>\
-                                <option value="lt">Menor que</option>\
-                                <option value="gt">Mayor que</option>\
-                                <option value="let">Menor o igual que</option>\
-                                <option value="get">Mayor o igual que</option>\
-                                <option value="nco">No contiene</option>\
-                                <option value="neq">Distinto</option>\
-                            </select>\
-                        </div>\
-                    </div>\
-                    <div style="float:left;height:40px;">\
-                        <div>Valor</div>\
-                        <input class="sp-grid-filter-value" type="text">\
-                    </div>\
-                    </div>';
+                g_content += '<div class="sp-grid-edit-filter" style="display:none;">' +
+                    '<div style="float:left;height:40px;margin-right:5px;">' +
+                        '<div>Campo</div>' +
+                        '<div><select class="sp-grid-filter-field"></select></div>' +
+                    '</div>' +
+                    '<div style="float:left;height:40px;margin-right:5px;">' +
+                        '<div>Operador</div>' +
+                        '<div><select class="sp-grid-filter-operator">' +
+                            '<option value="co">Contiene</option>' +
+                            '<option value="eq">Igual</option>' +
+                            '<option value="lt">Menor que</option>' +
+                            '<option value="gt">Mayor que</option>' +
+                            '<option value="let">Menor o igual que</option>' +
+                            '<option value="get">Mayor o igual que</option>' +
+                            '<option value="nco">No contiene</option>' +
+                            '<option value="neq">Distinto</option>' +
+                        '</select></div>' + 
+                    '</div>' +
+                    '<div style="float:left;height:40px;">' +
+                        '<div>Valor</div>' + 
+                        '<input class="sp-grid-filter-value" type="text">' +
+                    '</div></div>';
                 
                 $('.sp-grid-activate-filter, .sp-grid-deactivate-filter').live('click', function() {
                     var i = $(this).parent().attr('filter_order');
@@ -1375,12 +1365,12 @@
                                     activate_filter = '<button class="sp-grid-activate-filter">Activar</button>';
                                 }
                                 
-                                s += '<div class="sp-grid-row-filter" style="clear:left;" filter_order="' + i + '">\
-                                    <div style="float:left;margin-right:10px;"><input class="sp-grid-check-filter" type="checkbox"></div>\
-                                    <div class="sp-grid-filter-description">&lt;' + f.field + '&gt; ' + 
+                                s += '<div class="sp-grid-row-filter" style="clear:left;" filter_order="' + i + '">' +
+                                    '<div style="float:left;margin-right:10px;"><input class="sp-grid-check-filter" type="checkbox"></div>' +
+                                    '<div class="sp-grid-filter-description">&lt;' + f.field + '&gt; ' + 
                                     f.operator_title().toLowerCase() + 
-                                    ' <span style="font-style:italic;">"' + f.value + '"</span></div>\
-                                    ' + activate_filter + '</div>';
+                                    ' <span style="font-style:italic;">"' + f.value + '"</span></div>' +
+                                    activate_filter + '</div>';
                             }
                         }
                         else {
@@ -1523,8 +1513,8 @@
             }
             
             var g_table = 
-                '<div class="sp-grid-parent" style="overflow:auto;clear:left;\
-                    height:' + (g.height+5) + 'px;background-color:transparent;"></div>';
+                '<div class="sp-grid-parent" style="overflow:auto;clear:left;height:' + 
+                    (g.height+5) + 'px;background-color:transparent;"></div>';
             
             // pager
             var g_pager = '';
@@ -1547,18 +1537,18 @@
                     another_value = '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
                 }
 
-                g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px;">\
-                        <select class="sp-button sp-grid-rp">'
-                        + another_value
-                        + '<option value="10"' + sel_10 + '>10</option>\
-                        <option value="50"' + sel_50 + '>50</option>\
-                        <option value="100"' + sel_100 + '>100</option>\
-                        <option value="0"' + sel_all + '>{{_("All")}}</option>\
-                        </select>\
-                        <button class="sp-button sp-grid-first-page" style="float:left;">|&lt;&lt;</button>\
-                        <button class="sp-button sp-grid-page-back" style="float:left;">&lt;&lt;</button>\
-                        <input class="sp-grid-current-page" type="text" style="text-align:center;font-size:11px;margin-top:3px;" readonly>\
-                        <button class="sp-button sp-grid-page-forth" style="float:left;">&gt;&gt</button>';
+                g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px;">' +
+                        '<select class="sp-button sp-grid-rp">' +
+                        another_value +
+                        '<option value="10"' + sel_10 + '>10</option>' +
+                        '<option value="50"' + sel_50 + '>50</option>' +
+                        '<option value="100"' + sel_100 + '>100</option>' +
+                        '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
+                        '</select>' +
+                        '<button class="sp-button sp-grid-first-page" style="float:left;">|&lt;&lt;</button>' +
+                        '<button class="sp-button sp-grid-page-back" style="float:left;">&lt;&lt;</button>' +
+                        '<input class="sp-grid-current-page" type="text" style="text-align:center;font-size:11px;margin-top:3px;" readonly>' +
+                        '<button class="sp-button sp-grid-page-forth" style="float:left;">&gt;&gt</button>';
                         //<button class="sp-button sp-grid-last-page" style="float:left;">&gt;&gt|</button></div>';
 
                 g_pager += '</div>';
