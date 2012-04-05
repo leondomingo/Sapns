@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 
-import os
-import re
-import logging
+from neptuno.dict import Dict
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsUpdates
+from tg import config
+from todo import TODO
 import datetime as dt
 import encodings
+import logging
+import os
+import re
+import transaction
 _open = encodings.codecs.open
-from tg import config
-from sapns.exc.conexion import Conexion
-from sapns.model.sapnsmodel import SapnsUpdates
-from neptuno.dict import Dict
-from todo import TODO
 
 logger = logging.getLogger('Update')
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -43,7 +44,8 @@ class Update(object):
 
                 logger.info(u'[%s] %s (%s)' % (u.code, u.desc or '', u.type.upper()))
                 
-                dbs = Conexion(config.get('sqlalchemy.url')).session
+                #dbs = Conexion(config.get('sqlalchemy.url')).session
+                transaction.begin()
                 try:
                     # SQL
                     if u.type.lower() == 'sql':
@@ -68,10 +70,12 @@ class Update(object):
                         
                         _update = getattr(module_update, 'update')
                         if isinstance(_update, type):
-                            _update(dbs)()
+                            # class
+                            _update()()
                         
                         else:
-                            _update(dbs)
+                            # function
+                            _update()
                         
                     # save "update"
                     new_u = SapnsUpdates()
@@ -80,10 +84,10 @@ class Update(object):
                     new_u.exec_date = dt.datetime.now()
                 
                     dbs.add(new_u)
-                    dbs.commit()
+                    transaction.commit()
                         
                 except Exception, e:
-                    dbs.rollback()
+                    transaction.abort()
                     logger.error(e)
                     
             else:
