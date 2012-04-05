@@ -10,6 +10,7 @@ sys.path.append(os.path.join(os.path.dirname(__file__), '../..'))
 
 from paste.deploy import appconfig
 from sapns.config.environment import load_environment
+import transaction
 
 class Executor(object):
     
@@ -77,7 +78,8 @@ if __name__ == '__main__':
                 kw = EXECUTIONS[_args.exc_id][3]
         
         e = Executor(args=_args)
-        e.execute(_pkg_name, _func_name, *a, **kw)
+        with transaction.manager:
+            e.execute(_pkg_name, _func_name, *a, **kw)
         
     else:
         sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)

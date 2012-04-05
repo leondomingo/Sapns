@@ -2,7 +2,7 @@
 
 from jinja2 import Environment, FileSystemLoader
 from neptuno.dict import Dict
-from sapns.exc.conexion import Conexion
+from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute, \
     SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole, \
     SapnsPrivilege
@@ -14,30 +14,31 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
 from tg import config
 import logging
 import os
+import transaction
 
 ROLE_MANAGERS = u'managers'
 current_path = os.path.dirname(os.path.abspath(__file__))
 
 class InitSapns(object):
     
-    def __init__(self):
-        self.dbs = Conexion(config.get('sqlalchemy.url')).session
-        
     def __call__(self):
         logger = logging.getLogger('InitSapns')
         
-        logger.info('update_metadata')
-        self.update_metadata()
-        self.dbs.commit()
-        
-        logger.info('create_data_exploration')
-        self.create_data_exploration()
-        self.dbs.commit()
+        transaction.begin()
+        try:
+            logger.info('update_metadata')
+            self.update_metadata()
+            transaction.commit()
+            
+            logger.info('create_data_exploration')
+            self.create_data_exploration()
+            transaction.commit()
+            
+        finally:
+            transaction.abort()
 
     def extract_model(self, all_=False):
         logger = logging.getLogger('lib.sapns.extract_model')
-        
-        dbs = self.dbs
         
         meta = MetaData(bind=dbs.bind, reflect=True)
         logger.info('Connected to "%s"' % meta.bind)
@@ -150,8 +151,6 @@ class InitSapns(object):
     def update_metadata(self):
         
         logger = logging.getLogger('lib.sapns.update_metadata')
-        
-        dbs = self.dbs
         
         env = Environment(loader=FileSystemLoader(current_path))
         
@@ -419,8 +418,6 @@ class InitSapns(object):
         
         logger = logging.getLogger('lib.sapns.util.create_dashboards')
         
-        dbs = self.dbs
-            
         logger.info('Creating dashboard for "%s"' % us.display_name)
         
         # user's dashboard
@@ -470,8 +467,6 @@ class InitSapns(object):
             logger.info('Dashboard already exists')
             
     def create_data_exploration(self):
-        
-        dbs = self.dbs
         
         managers = SapnsRole.by_name(ROLE_MANAGERS)
         #managers = SapnsRole()

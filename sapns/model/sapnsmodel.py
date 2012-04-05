@@ -606,7 +606,7 @@ class SapnsShortcut(DeclarativeBase):
     REORDER_TYPE_UP = 'up'
     REORDER_TYPE_DOWN = 'down'
         
-    def reorder(self, type='up'):
+    def reorder(self, type_='up'):
         
         logger = logging.getLogger('SapnsShortcut.reorder')
         logger.info(unicode(self))
@@ -620,14 +620,14 @@ class SapnsShortcut(DeclarativeBase):
             dbs.add(that)
             dbs.flush()
             
-        if type == SapnsShortcut.REORDER_TYPE_UP:
+        if type_ == SapnsShortcut.REORDER_TYPE_UP:
             if self.order > 0:
                 next_sc = self.parent.by_order(self.order-1, -1)
             
             else:
                 raise Exception('It is not possible to go upper')
             
-        elif type == SapnsShortcut.REORDER_TYPE_DOWN:
+        elif type_ == SapnsShortcut.REORDER_TYPE_DOWN:
             if self.order < self.parent.next_order()-1:
                 next_sc = self.parent.by_order(self.order+1, +1)
             

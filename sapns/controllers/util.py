@@ -1,23 +1,13 @@
 # -*- coding: utf-8 -*-
 """Utilities controller"""
 
-# turbogears imports
-from tg import expose, url, response, config
-from tg.i18n import set_lang
-
-# third party imports
-from pylons.i18n import ugettext as _, lazy_ugettext as l_
-from repoze.what import authorize
-
-# project specific imports
-from sapns.model import DBSession as dbs
-from sapns.lib.base import BaseController
-import sapns.lib.sapns.util as libutil
-from sapns.lib.sapns.update.update import Update
-
-import re
-import logging
+from pylons.i18n import ugettext as _
 from pylons.templating import render_jinja2
+from repoze.what import authorize
+from sapns.lib.base import BaseController
+from tg import expose, url, response
+import re
+import sapns.lib.sapns.util as libutil
 
 __all__ = ['UtilController']
 
@@ -54,9 +44,9 @@ class UtilController(BaseController):
                                              tables=mdl['tables']))
     
     @expose('sapns/util/tables.html')
-    def extract_model(self, all=False):
+    def extract_model(self, all_=False):
         return dict(page='extract_model', came_from=url('/dashboard/util'), 
-                    tables=libutil.extract_model(all))
+                    tables=libutil.extract_model(all_))
         
     @expose(content_type='text/plain')
     def generate_key(self, fmt=None, n=1):
@@ -89,7 +79,7 @@ class UtilController(BaseController):
             """generate a l-length key"""
             pop = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
             r = ''
-            for i in xrange(l):
+            for _i in xrange(l):
                 r += random.choice(pop)
                 
             return r
@@ -105,7 +95,7 @@ class UtilController(BaseController):
             
         # generate n keys with the same "fmt" format
         r = []
-        for i in xrange(int(n)):
+        for _i in xrange(int(n)):
             # replace every [n] with the corresponding n-length key
             r.append(re.sub(r'\[(\d+)\]', sub_f, fmt))
             

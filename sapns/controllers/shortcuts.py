@@ -1,22 +1,14 @@
 # -*- coding: utf-8 -*-
 """Shortcuts management controller"""
 
-# turbogears imports
-from tg import expose, url, config, redirect, request, require
-
-# third party imports
 from pylons import cache
 from pylons.i18n import ugettext as _
-from pylons.i18n import lazy_ugettext as l_
 from repoze.what import authorize, predicates
-
-# project specific imports
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-
+from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut
+from tg import expose, url, redirect, request, require
 import logging
-from sapns.model.sapnsmodel import SapnsUser , SapnsShortcut
-from neptuno.dataset import DataSet
 
 __all__ = ['ShortcutsController']
 
@@ -120,14 +112,14 @@ class ShortcutsController(BaseController):
             return dict(status=False)
         
     @expose('json')
-    def reorder(self, id_sc, type):
+    def reorder(self, id_sc, type_):
         
-        logger = logging.getLogger(__name__ + '/reorder')
+        logger = logging.getLogger('ShortcutsController.reorder')
         try:
             sc = dbs.query(SapnsShortcut).get(id_sc)            
             logger.info('Reordering shortcut (%s %s)' % (sc, type))
             
-            sc.reorder(type)
+            sc.reorder(type_)
             
             return dict(status=True)
             
