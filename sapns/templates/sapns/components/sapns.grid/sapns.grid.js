@@ -9,6 +9,18 @@
         this.active = params.active ? params.active !== undefined : true;
     }
     
+    function normalize(s) {
+        s = s.toLowerCase().trim();
+        s = s.replace(/[áäà]/g, 'a');
+        s = s.replace(/[éëè]/g, 'e');
+        s = s.replace(/[íïì]/g, 'i');
+        s = s.replace(/[óöò]/g, 'o');
+        s = s.replace(/[úüù]/g, 'u');
+        s = s.replace(/[^a-z]/g, '');
+            
+        return s;
+    }
+    
     Filter.prototype = {
             tip: function() {
                 var self = this;
@@ -36,16 +48,11 @@
                     this.active = true;
                 }
             },
+            
             toString: function() {
                 var self = this;
                 
-                var fld = self.field.toLowerCase().trim();
-                fld = fld.replace(/[áäà]/g, 'a');
-                fld = fld.replace(/[éëè]/g, 'e');
-                fld = fld.replace(/[íïì]/g, 'i');
-                fld = fld.replace(/[óöò]/g, 'o');
-                fld = fld.replace(/[úüù]/g, 'u');
-                fld = fld.replace(/[^a-z]/g, '');
+                var fld = normalize(self.field);
                 
                 var _operators = {
                         // co (contain)
@@ -93,17 +100,54 @@
                 }
                 
                 return sprintf('%s%s%s', fld, op, v);
+            },
+            stringify: function() {
+                return sprintf('"%s" %s "%s"', this.field, this.operator, this.value);
             }
     };
     
+    function parseFilters(s) {
+        var terms = s.split(',');
+        var filters = [];
+        for (var i=0, l=terms.length; i<l; i++) {
+            var m = terms[i].trim().match('^"([^"]+)"\\s([a-z]{2,3})\\s"([^"]*)"$');
+            if (m) {
+                filters.push(new Filter({
+                    field: m[1],
+                    operator: m[2],
+                    value: m[3]
+                }));
+            }
+        }
+        
+        return filters;
+    };
+
+    /*
+    var filters = parseFilters('"Nombre" eq "", "Orden" gt "10"');
+    for (var i=0, l=filters.length; i<l; i++) {
+        console.log(filters[i] + ' ==> ' + filters[i].stringify());
+    }
+    */
+    
     function OrderFilter(params) {
         this.field = params.field;
-        this.type = params.type;
+        
+        if (params.type == '+') {
+            this.type = 'asc';
+        }
+        else if (params.type == '-') {
+            this.type = 'desc';
+        }
+        else {
+            this.type = params.type;
+        }
     }
     
     OrderFilter.prototype = {
             toString: function() {
                 var self = this;
+                var type;
                 if (self.type == 'asc') {
                     type = '+';
                 }
@@ -111,17 +155,46 @@
                     type = '-'; 
                 }
                 
-                var fld = self.field.toLowerCase().trim();
-                fld = fld.replace(/[áäà]/g, 'a');
-                fld = fld.replace(/[éëè]/g, 'e');
-                fld = fld.replace(/[íïì]/g, 'i');
-                fld = fld.replace(/[óöò]/g, 'o');
-                fld = fld.replace(/[úüù]/g, 'u');
-                fld = fld.replace(/[^a-z]/g, '');
+                var fld = normalize(self.field);
                 
                 return sprintf('%s%s', type, fld);
+            },
+            stringify: function() {
+                var self = this;
+                
+                var type;
+                if (self.type == 'asc') {
+                    type = '+';
+                }
+                else if (self.type == 'desc') {
+                    type = '-'; 
+                }
+                
+                return sprintf('%s"%s"', type, self.field);
             }
     }
+    
+    function parseOrder(s) {
+        var terms = s.split(',');
+        var order = [];
+        for (var i=0, l=terms.length; i<l; i++) {
+            // (+|-)...........
+            var m = terms[i].trim().match('^(\\+|\\-)"([^"]+)"$');
+            if (m) {
+                order.push(new OrderFilter({
+                    field: m[2],
+                    type: m[1]
+                }));
+            }
+        }
+        
+        return order
+    }
+    
+    /*
+    var o = parseOrder('+"Nombre",   +"F.de nacimiento"');
+    console.log(o);
+    */
 
     // SapnsGrid (constructor)
     function SapnsGrid(settings) {
@@ -200,8 +273,26 @@
         set(this, 'total_count', 0);
         set(this, 'total_pag', 0);
         this.ajx_data = '{}';
+        
+        // obtener las tres partes de la query
+        // q$$filters$$order
+        var q_parts = this.q.split('$$');
+        //console.log(q_parts);
+        
+        // q
+        this.q = q_parts[0];
+        
+        // filters
         this.filters = [];
+        if (q_parts.length > 1) {
+            this.filters = parseFilters(q_parts[1]);
+        }
+        
+        // order
         this.order = [];
+        if (q_parts.length > 2) {
+            this.order = parseOrder(q_parts[2]);
+        }
         
         this._new_default = {
             name: 'new',
@@ -896,25 +987,49 @@
          * self.dblclick(row_id.attr('id_row')*1); } else { $('#'+self.name +
          * '_' + self.dblclick).click(); } } }); }
          */
-
+        
         function form(action, target) {
+            
+            var qry = self.q + '$$';
+            
+            // filters
+            for (var i=0, l=self.filters.length; i<l; i++) {
+                if (i > 0) {
+                    qry += ', ';
+                }
+                
+                qry += self.filters[i].stringify();
+            }
+            
+            // order
+            qry += '$$';
+            for (var i=0, l=self.order.length; i<l; i++) {
+                if (i > 0) {
+                    qry += ', ';
+                }
+                
+                qry += self.order[i].stringify();
+            }
+            
+            //console.log(qry);
+            //return;
+            
+            qry = encodeURI(qry).replace('-', '%2D', 'g').
+                replace('"', '%22', 'g').replace('+', '%2B', 'g').
+                replace('#', '%23', 'g');
+            
             var came_from = '';
             if (target != '_blank') {
-                var came_from = self.url_base
-                        + '?q='
-                        + encodeURI(self.q).replace('-', '%2D', 'g').replace(
-                                '"', '%22', 'g').replace('+', '%2B', 'g')
-                                .replace('#', '%23', 'g') + '&rp=' + self.rp
-                        + '&pag_n=' + self.pag_n + '&ch_attr=' + self.ch_attr
-                        + '&parent_id=' + self.parent_id;
+                var came_from = self.url_base + '?q=' + qry + 
+                    '&rp=' + self.rp + '&pag_n=' + self.pag_n +
+                    '&ch_attr=' + self.ch_attr + '&parent_id=' + self.parent_id;
             }
 
             var f = '<form type="post" action="' + action + '" target="' + target + '">' +
-                    '<input type="hidden" name="came_from" value="' + came_from + '">';
+                '<input type="hidden" name="came_from" value="' + came_from + '">';
 
             if (self.ch_attr) {
-                f += '<input type="hidden" name="_' + self.ch_attr + 
-                        '" value="' + self.parent_id + '">';
+                f += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
             }
 
             f += '</form>';
