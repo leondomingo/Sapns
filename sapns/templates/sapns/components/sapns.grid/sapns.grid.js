@@ -6,7 +6,7 @@
         this.field = params.field.trim();
         this.operator = params.operator;
         this.value = params.value.trim();
-        this.active = params.active ? params.active !== undefined : true;
+        this.active = params.active !== undefined ? !!params.active : true;
     }
     
     function normalize(s) {
@@ -102,7 +102,7 @@
                 return sprintf('%s%s%s', fld, op, v);
             },
             stringify: function() {
-                return sprintf('"%s" %s "%s"', this.field, this.operator, this.value);
+                return sprintf('%s"%s" %s "%s"', !this.active ? '_' : '', this.field, this.operator, this.value);
             }
     };
     
@@ -110,12 +110,13 @@
         var terms = s.split(',');
         var filters = [];
         for (var i=0, l=terms.length; i<l; i++) {
-            var m = terms[i].trim().match('^"([^"]+)"\\s([a-z]{2,3})\\s"([^"]*)"$');
+            var m = terms[i].trim().match('^(_)?"([^"]+)"\\s([a-z]{2,3})\\s"([^"]*)"$');
             if (m) {
                 filters.push(new Filter({
-                    field: m[1],
-                    operator: m[2],
-                    value: m[3]
+                    field: m[2],
+                    operator: m[3],
+                    value: m[4],
+                    active: !m[1]
                 }));
             }
         }
@@ -123,13 +124,6 @@
         return filters;
     };
 
-    /*
-    var filters = parseFilters('"Nombre" eq "", "Orden" gt "10"');
-    for (var i=0, l=filters.length; i<l; i++) {
-        console.log(filters[i] + ' ==> ' + filters[i].stringify());
-    }
-    */
-    
     function OrderFilter(params) {
         this.field = params.field;
         
@@ -191,11 +185,6 @@
         return order
     }
     
-    /*
-    var o = parseOrder('+"Nombre",   +"F.de nacimiento"');
-    console.log(o);
-    */
-
     // SapnsGrid (constructor)
     function SapnsGrid(settings) {
 
@@ -277,7 +266,6 @@
         // obtener las tres partes de la query
         // q$$filters$$order
         var q_parts = this.q.split('$$');
-        //console.log(q_parts);
         
         // q
         this.q = q_parts[0];
@@ -629,13 +617,13 @@
                 active_filters.push(self.filters[i]);
             }
         }
-
+        
         if (active_filters.length) {
             if (q) {
                 q = q + ', ' + active_filters.join(', ');
             }
             else {
-                q = self.filters.join(', ');
+                q = active_filters.join(', ');
             }
         }
         
@@ -1371,7 +1359,13 @@
                     var s = '';
                     if (self.filters.length) {
                         for (var i=0, l=self.filters.length; i<l; i++) {
-                            s += self.filters[i].tip() + '<br>';
+                            
+                            if (!self.filters[i].active) {
+                                s += '<font style="text-decoration:line-through;">' + self.filters[i].tip() + '</font><br>';
+                            }
+                            else {
+                                s += self.filters[i].tip() + '<br>';
+                            }
                         }
                     }
                     else {

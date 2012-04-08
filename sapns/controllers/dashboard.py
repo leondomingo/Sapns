@@ -176,7 +176,7 @@ class DashboardController(BaseController):
         
     def grid_data(self, cls, **params):
         
-        #logger = logging.getLogger('DashboardController.grid_data')
+        _logger = logging.getLogger('DashboardController.grid_data')
 
         # picking up parameters
         q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
@@ -220,12 +220,15 @@ class DashboardController(BaseController):
         _search = Search(dbs, view, strtodatef=_strtodate)
         _search.apply_qry(q.encode('utf-8'))
         _search.apply_filters(filters)
+        _logger.info(_search.sql)
         
-        return _search(rp=rp, offset=pos, collection=col)
+        return _search(rp=rp, offset=pos, collection=col, no_count=True)
     
     @expose('json')
     @require(p.not_anonymous())
     def grid(self, cls, **params):
+        
+        _logger = logging.getLogger('DashboardController.grid')
         
         rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
         pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
@@ -250,6 +253,9 @@ class DashboardController(BaseController):
             cols.append(dict(title=col, width=w, align='center'))
             
         this_page, total_pag = pagination(rp, pag_n, ds.count)
+        
+        if ds.count == rp:
+            total_pag = pag_n + 1
         
         return dict(status=True, cols=cols, data=ds.to_data(), 
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
