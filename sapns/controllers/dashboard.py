@@ -220,7 +220,7 @@ class DashboardController(BaseController):
         _search = Search(dbs, view, strtodatef=_strtodate)
         _search.apply_qry(q.encode('utf-8'))
         _search.apply_filters(filters)
-        _logger.info(_search.sql)
+        #_logger.info(_search.sql)
         
         return _search(rp=rp, offset=pos, collection=col, no_count=True)
     
