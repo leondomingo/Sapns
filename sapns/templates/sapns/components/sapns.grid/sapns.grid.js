@@ -721,7 +721,7 @@
                             
                     $('#' + self.name + ' .sp-grid-last-page').attr('title', last_page);
                     
-                    $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
+                    //$('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
                     $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
 
                     self.data = response.data;
