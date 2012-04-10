@@ -1697,74 +1697,74 @@
                     g.pag_n = g.total_pag;
                     g.search(g.q);
                 });
+            }
+            
+            $(g_id + ' .sp-col-title-sortable').live('click', function(event) {
                 
-                $(g_id + ' .sp-col-title-sortable').live('click', function(event) {
+                var field = $(this).attr('col_title');
+                var shift = event.shiftKey;
+                var ctrl = event.ctrlKey || event.metaKey;
+                
+                // order type (asc, desc)
+                if ($(this).hasClass('sp-grid-ordered-col')) {
+                    var type;
+                    if ($(this).attr('order_type') == 'asc') {
+                        type = 'desc';
+                    }
+                    else {
+                        type = 'asc';
+                    }
                     
-                    var field = $(this).attr('col_title');
-                    var shift = event.shiftKey;
-                    var ctrl = event.ctrlKey || event.metaKey;
-                    
-                    // order type (asc, desc)
-                    if ($(this).hasClass('sp-grid-ordered-col')) {
-                        var type;
-                        if ($(this).attr('order_type') == 'asc') {
-                            type = 'desc';
-                        }
-                        else {
-                            type = 'asc';
+                    if (shift) {
+                        // modify an existing order
+                        for (var i=0, l=g.order.length; i<l; i++) {
+                            if (g.order[i].field === field) {
+                                break;
+                            }
                         }
                         
-                        if (shift) {
-                            // modify an existing order
+                        g.order[i].type = type
+                    }
+                    else {
+                        if (!ctrl) {
+                            // reseting multiple order
+                            if (g.order.length > 1) {
+                                type = 'asc';
+                            }
+                            
+                            var o = new OrderFilter({ field: field, type: type});
+                            g.order = [o];
+                        }
+                        else {
+                            // delete order
                             for (var i=0, l=g.order.length; i<l; i++) {
                                 if (g.order[i].field === field) {
                                     break;
                                 }
                             }
                             
-                            g.order[i].type = type
+                            g.order.splice(i, 1);
+                            $(this).removeClass('sp-grid-ordered-col');
                         }
-                        else {
-                            if (!ctrl) {
-                                // reseting multiple order
-                                if (g.order.length > 1) {
-                                    type = 'asc';
-                                }
-                                
-                                var o = new OrderFilter({ field: field, type: type});
-                                g.order = [o];
-                            }
-                            else {
-                                // delete order
-                                for (var i=0, l=g.order.length; i<l; i++) {
-                                    if (g.order[i].field === field) {
-                                        break;
-                                    }
-                                }
-                                
-                                g.order.splice(i, 1);
-                                $(this).removeClass('sp-grid-ordered-col');
-                            }
-                        }
+                    }
+                }
+                else {
+                    // add a new order
+                    var o = new OrderFilter({field: field, type: 'asc'});
+                    
+                    if (shift) {
+                        g.order.push(o);
                     }
                     else {
-                        // add a new order
-                        var o = new OrderFilter({field: field, type: 'asc'});
-                        
-                        if (shift) {
-                            g.order.push(o);
-                        }
-                        else {
-                            g.order = [o];
-                        }
+                        g.order = [o];
                     }
-                    
-                    //console.log(g.order);
-                    
-                    // refresh
-                    g.search(undefined, true);
-                });
-            }
+                }
+                
+                //console.log(g.order);
+                
+                // refresh
+                g.search(undefined, true);
+            });
             
             var g_actions = '<div class="sp-grid-button-actions" style="display: none;"></div>';
 
