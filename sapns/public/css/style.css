@@ -16,7 +16,7 @@ body {
 
 a {
 	color: #797C33;
-	font-weight: bold;
+	font-weight: normal;
 	text-decoration: none;
 }
 
@@ -326,6 +326,7 @@ clear:both;
     margin-left: 205px;
     font-family: Arial;
     height: 14px;
+    cursor:pointer;
 }
 
 .sp-logout-btn:hover {
@@ -544,6 +545,7 @@ clear:both;
     margin-top: 5px;
     margin-bottom: 2px;
     border-radius: 10px;
+    cursor:pointer;
 }
 
 .sp_shortcut:hover {
@@ -551,14 +553,17 @@ clear:both;
 }
 
 .sp-shortcut-title {
-    width: 350px;
+    width: 710px;
     float: left;
     margin-top: 2px;
     padding-left: 20px;
 }
 
+.sp-shortcut-title a { font-weight: normal; }
+
 .sp-select-shortcut {
     width: 200px;
+    font-size: 10px;
 }
 
 .sp-shortcut-ins-order {

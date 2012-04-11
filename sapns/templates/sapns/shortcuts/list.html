@@ -20,14 +20,14 @@
 </form>
 
 <div id="sc_list">
-    {% for sc in shortcuts %}
+    <!--{% for sc in shortcuts %}-->
     <div class="sp_shortcut" sc_id="{{sc.id}}" sc_parent="{{sc.parent}}"
         cls="{{sc.cls}}" sc_order="{{sc.order}}"
         style="{% if loop.index % 2 == 0 %}background-color: white;{% endif %}">
         
-    {% if sc.action_type %}
+    <!--{% if sc.action_type %}-->
         <!-- List -->
-        {% if sc.action_type == 'list' %}
+        <!--{% if sc.action_type == 'list' %}-->
         <div class="sp-shortcut-title">
             <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
                 target="" >{{sc.title|escape}}</a>
@@ -37,16 +37,16 @@
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
         
-        {% if h.authorize.in_group('managers') %}
+        <!--{% if h.authorize.in_group('managers') %}-->
         <!-- {# insertion order #} -->
         <option value="ins-order">{{_('Insertion order')}}</option>
 
         <!-- {# reference order #} -->
         <option value="ref-order">{{_('Reference order')}}</option>
-        {% endif %}
+        <!--{% endif %}-->
         
         <!-- Process -->
-        {% elif sc.action_type == 'process' %}
+        <!--{% elif sc.action_type == 'process' %}-->
         <div class="sp-shortcut-title">
             <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=_came_from))}}" 
                 target="">{{sc.title|escape}}</a>
@@ -56,7 +56,7 @@
         <option value="">{{_('(Select operation)')}}</option>
 
         <!-- Object -->
-        {% elif sc.action_type == 'object' %}
+        <!--{% elif sc.action_type == 'object' %}-->
         <div class="sp-shortcut-title">
             <a target="_blank" href="{{tg.url(sc.url, params=dict(came_from=_came_from))}}" 
                 target="">{{sc.title|escape}}</a>
@@ -64,15 +64,15 @@
         
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
-        {% else %}
+        <!--{% else %}-->
         <div class="sp-shortcut-title">
             <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
         </div>
         
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
-        {% endif %}
-    {% else %}
+        <!--{% endif %}-->
+    <!--{% else %}-->
         <!-- {# This is a group #} -->
         <div class="sp-shortcut-title">
             <a href="{{tg.url('/dashboard', 
@@ -80,12 +80,12 @@
         </div>
         <select class="sp-select-shortcut">
         <option value="">{{_('(Select operation)')}}</option>
-    {% endif %}
+    <!--{% endif %}-->
         <!-- {# general actions over shortcuts #} -->
     
         <!-- {# Edit #} -->
-        {#<option value="edit" 
-            title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>#}
+        <!--{#<option value="edit" 
+            title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>#}-->
         
         <!-- {# Delete #} -->
         <option value="delete" 
@@ -100,21 +100,26 @@
             title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>
             
         <!-- {# Up #} -->
-        {#<option value="up"
-            title="">{{_('Up')}}</option>#}
+        <!--{#<option value="up"
+            title="">{{_('Up')}}</option>#}-->
             
         <!-- {# Down #} -->
-        {#<option value="down"
-            title="">{{_('Down')}}</option>#}
+        <!--{#<option value="down"
+            title="">{{_('Down')}}</option>#}-->
         
         </select>
         
     </div>
-    {% endfor %}
+    <!--{% endfor %}-->
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(function() {
+        
+        $('.sp-shortcut-title').click(function() {
+            var href = $(this).find('a').attr('href');
+            window.location = href;
+        });
     	
     	$('.sp-select-shortcut').change(function() {
     		var opc = $(this).find('option:selected').val();

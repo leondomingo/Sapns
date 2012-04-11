@@ -1,5 +1,5 @@
 html{background:#cccfa5;text-align:center;margin:0;padding:0}body{text-align:left;width:1000px;margin:0 auto;padding:0;font-size:12px;font-family:"Lucida Grande","Lucida Sans Unicode",geneva,verdana,sans-serif}
-a{color:#797c33;font-weight:bold;text-decoration:none}#content{background:#fff url('../images/contentbg.png') left bottom no-repeat;margin:0 10px 10px 10px;padding:0 10px;overflow:hidden}
+a{color:#797c33;font-weight:normal;text-decoration:none}#content{background:#fff url('../images/contentbg.png') left bottom no-repeat;margin:0 10px 10px 10px;padding:0 10px;overflow:hidden}
 #content .currentpage{margin-top:0}#loginform{text-align:center;margin-top:100px}
 form.loginfields{text-align:left;width:270px;background:url('../images/loginbg.png') top left no-repeat;padding:0;margin:0 auto;border:0}
 form.loginfields h2{font-size:16px;float:left;padding:0;margin:5px;margin-top:0;background:url('../images/loginheader-left.png') top left no-repeat}
@@ -26,7 +26,7 @@ div.clearingdiv{clear:both}.sp_header{position:relative;background-color:#b4bd3c
 .sp_app_subtitle{position:absolute;left:0;top:40px;font-size:12px;text-align:left;color:#723532;margin-left:10px}
 .sp_logout{position:absolute;right:10px;top:20px;border:1px solid;background-color:#cccfa5;border-radius:10px}
 .sp-logout-user{padding-left:10px;float:left;font-style:italic;font-family:Arial;font-size:13px;color:white}
-.sp-logout-btn{text-align:center;background-color:white;border:2px solid gray;border-radius:10px;width:90px;margin-left:205px;font-family:Arial;height:14px}
+.sp-logout-btn{text-align:center;background-color:white;border:2px solid gray;border-radius:10px;width:90px;margin-left:205px;font-family:Arial;height:14px;cursor:pointer}
 .sp-logout-btn:hover{background-color:orange}#language_selector{position:absolute;right:10px;top:70px}
 #language_selector select{font-size:9px}.sp-button{font-size:11px;text-align:center;margin:2px}
 .sp-grid-container{padding-left:15px;padding-right:15px}.sp-grid{margin-top:10px;background-color:#b5afaf}
@@ -44,9 +44,10 @@ div.clearingdiv{clear:both}.sp_header{position:relative;background-color:#b4bd3c
 .sp-text-field:focus{border:1px solid orange}.sp-label-field{color:#605b7c;font-family:sans-serif}
 .sp-label-field-must{font-weight:bold}.sp_message{font-size:25px;color:#605b7c;margin-top:20px;padding-left:20px}
 .count-message{padding-left:20px;font-size:10px;color:gray}#sc-container{border:1px solid white;border-radius:10px;height:430px;overflow:auto;margin-top:10px;margin-left:3px;margin-right:3px}
-.sp_shortcut{margin-left:20px;margin-right:20px;margin-top:5px;margin-bottom:2px;border-radius:10px}
-.sp_shortcut:hover{background-color:orange!important}.sp-shortcut-title{width:350px;float:left;margin-top:2px;padding-left:20px}
-.sp-select-shortcut{width:200px}.sp-shortcut-ins-order{float:left;border:1px solid #b4bd3c;padding-left:2px;padding-right:2px;margin-top:2px;margin-left:5px;margin-right:5px;width:140px;text-align:center}
+.sp_shortcut{margin-left:20px;margin-right:20px;margin-top:5px;margin-bottom:2px;border-radius:10px;cursor:pointer}
+.sp_shortcut:hover{background-color:orange!important}.sp-shortcut-title{width:710px;float:left;margin-top:2px;padding-left:20px}
+.sp-shortcut-title a{font-weight:normal}.sp-select-shortcut{width:200px;font-size:10px}
+.sp-shortcut-ins-order{float:left;border:1px solid #b4bd3c;padding-left:2px;padding-right:2px;margin-top:2px;margin-left:5px;margin-right:5px;width:140px;text-align:center}
 .sp-shortcut-ref-order{border:1px solid #b4bd3c;float:left;padding-left:2px;padding-right:2px;margin-top:2px;margin-left:5px;margin-right:5px;width:140px;text-align:center}
 .sp_messages{font-size:10px;color:navy}#object-title{color:gray;font-size:13px;font-style:italic}
 #delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
