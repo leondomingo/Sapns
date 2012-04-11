@@ -49,6 +49,7 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .inline_action{background-color:#ddd;border:1px solid #666;border-radius:3px 3px 3px 3px;cursor:pointer;float:left;height:20px;margin-right:1px;padding-left:2px;padding-right:2px;width:20px}
 .inline_action:hover{background-color:#fff}.nonstd_actions{width:25px;float:left;font-size:10px}
 .item_sb{clear:left}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}.text_sb{font-size:13px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
+.text_sb,.subaction{padding:3px;cursor:pointer;width:150px}.text_sb:hover,.subaction:hover{background-color:#b4bd3c;border-radius:3px}
 .text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px}
 .subactions ul{margin-top:0;margin-bottom:0;list-style-type:circle}.subaction{font-weight:normal;color:#333;font-size:13px}
 .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
