@@ -1,48 +1,56 @@
-{% if came_from %}
+<!--{% if came_from %}-->
 <div><a href="{{came_from}}">{{_('return')}}</a></div>
-{% endif %}
+<!--{% endif %}-->
 
 <div class="item_sb">
     <img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home">
     <div class="text_sb"><a href="/">Home</a></div>
 </div>
 
-{% for sc in shortcuts %}
-{% if sc.action_type %}
-{% if sc.action_type == 'list' %}
+<!--{% for sc in shortcuts %}-->
+<!--{% if sc.action_type %}-->
+<!--{% if sc.action_type == 'list' %}-->
 <div class="item_sb">
     {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
     <div class="text_sb" title="{{sc.title}}">
         <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">{{sc.title}}</a>
-        {#{% if sc.actions %}
+        <!--{#{% if sc.actions %}
         <div style="float: right;">+</div>
-        {% endif %}#}
+        {% endif %}#}-->
     </div>
     
-    {% if sc.actions %}
+    <!--{% if sc.actions %}-->
     <div class="subactions">
     <ul>
-    {% for subaction in sc.actions %}
+    <!--{% for subaction in sc.actions %}-->
     <li><a class="subaction" href="{{subaction.url}}"
         {% if subaction.desc %}title="{{subaction.desc}}"{% endif %}>{{subaction.title}}</a></li>
-    {% endfor %}
+    <!--{% endfor %}-->
     </ul>
     </div>
-    {% endif %}
+    <!--{% endif %}-->
 </div>
-{% elif sc.action_type == 'process' %}
+<!--{% elif sc.action_type == 'process' %}-->
 <div class="item_sb">
-    {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
+    <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <div class="text_sb" title="{{sc.title}}">
         <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">{{sc.title}}</a>
     </div>
 </div>
-{% elif sc.action_type == 'object' %}
+<!--{% elif sc.action_type == 'object' %}-->
 <div class="item_sb">
     {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
     <div class="text_sb" title="{{sc.title}}"><a href="{{tg.url(sc.url)}}">{{sc.title}}</a></div>
 </div>
-{% endif %}
-{% endif %}
+<!--{% endif %}-->
+<!--{% endif %}-->
 
-{% endfor %}
+<!--{% endfor %}-->
+
+<script>
+    $(function() {
+        $('.text_sb').click(function() {
+            window.location = $(this).find('a').attr('href');
+        });
+    });
+</script>
