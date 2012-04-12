@@ -52,3 +52,6 @@ div.clearingdiv{clear:both}.sp_header{position:relative;background-color:#b4bd3c
 .sp_messages{font-size:10px;color:navy}#object-title{color:gray;font-size:13px;font-style:italic}
 #delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
+input[type=text],input[type=password]{height:16px}input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
+input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:orange}
+.sp-select-text{border:1px solid red;border-radius:3px}.sp-select-button,.sp-empty-button{height:20px;font-size:10px;font-family:arial;font-weight:bold;margin-left:3px}
