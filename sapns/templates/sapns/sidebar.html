@@ -3,8 +3,8 @@
 <!--{% endif %}-->
 
 <div class="item_sb">
-    <img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home">
-    <div class="text_sb"><a href="/">Home</a></div>
+    <a href="{{tg.url('/')}}"><img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home"></a>
+    {#<a href="{{tg.url('/')}}"><label class="text_sb">Home</label></a>#}
 </div>
 
 <!--{% for sc in shortcuts %}-->
@@ -12,12 +12,8 @@
 <!--{% if sc.action_type == 'list' %}-->
 <div class="item_sb">
     {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
-    <div class="text_sb" title="{{sc.title}}">
-        <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">{{sc.title}}</a>
-        <!--{#{% if sc.actions %}
-        <div style="float: right;">+</div>
-        {% endif %}#}-->
-    </div>
+    <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">
+        <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
     
     <!--{% if sc.actions %}-->
     <div class="subactions">
@@ -33,9 +29,8 @@
 <!--{% elif sc.action_type == 'process' %}-->
 <div class="item_sb">
     <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
-    <div class="text_sb" title="{{sc.title}}">
-        <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">{{sc.title}}</a>
-    </div>
+    <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">
+        <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
 </div>
 <!--{% elif sc.action_type == 'object' %}-->
 <div class="item_sb">
@@ -46,11 +41,3 @@
 <!--{% endif %}-->
 
 <!--{% endfor %}-->
-
-<script>
-    $(function() {
-        $('.text_sb').click(function() {
-            window.location = $(this).find('a').attr('href');
-        });
-    });
-</script>

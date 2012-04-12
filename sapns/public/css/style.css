@@ -590,7 +590,7 @@ form.loginfields input#submit {
 .subactions { clear: left; min-height: 22px; }
 .subactions ul { margin-top: 0px; margin-bottom: 0px; list-style-type: circle; }
 
-.subaction { font-weight: normal; color: #333; font-size: 13px; }
+.subaction { font-weight: normal; color: #333; font-size: 11px; }
 .subaction:hover { color: black; }
 
 input[type=text], input[type=password] { height: 16px; }
