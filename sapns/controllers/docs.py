@@ -7,12 +7,12 @@ from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
 from repoze.what import authorize, predicates as p
 from sapns.lib.base import BaseController
+from sapns.lib.sapns.util import init_lang
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
 from tg import expose, config, request, require, response
 import logging
-import simplejson as sj #@UnresolvedImport
-from sapns.lib.sapns.util import init_lang
+import simplejson as sj
 
 __all__ = ['DocsController']
 
@@ -21,23 +21,23 @@ class DocsController(BaseController):
     allow_only = authorize.not_anonymous()
     
     @expose('sapns/docs/index.html')
-    def default(self, cls, id, **kw):
+    def _default(self, cls, id_, **kw):
         
         # TODO: comprobar permisos
         
         class_ = SapnsClass.by_name(cls)
-        id_object = int(id)
+        id_ = int(id_)
         
-        title = SapnsClass.object_title(cls, id_object)
+        title = SapnsClass.object_title(cls, id_)
         
         return dict(page='', came_from=kw.get('came_from'),
                     lang=init_lang(), 
                     obj=dict(id_class=class_.class_id, 
-                             id=id_object,
+                             id=id_,
                              title=title),
                     grid=dict(caption=_('Documents of [%s]') % title,
                               cls=cls,
-                              id_object=id_object,
+                              id_object=id_,
                               ))
         
     @expose('json')
