@@ -466,7 +466,7 @@
         if (typeof (data) == 'function') {
             data = data();
         }
-
+        
         var ld = data.length;
         if (ld > 0) {
             for (var i=0; i<ld; i++) {
@@ -637,12 +637,10 @@
             }
         }
         
-        var loading = '<div style="padding:10px;font-size: 15px; ' +
+        var loading = '<div style="padding:10px;font-size:15px; ' +
             sprintf('font-weight:bold;color:gray;height:%(hg)dpx;">{{_("Loading")}}...</div>', {hg: self.height-50});
         
         $('#' + self.name).find('.sp-grid-parent').html(loading);
-        
-        //console.log(q);
         
         var ajx = $.extend(true, {
             url: "{{tg.url('/dashboard/grid/')}}",
@@ -715,6 +713,8 @@
                         $('#' + self.name + ' .sp-grid-page-forth').attr('disabled', true);
                     }
                     
+                    // set focus on the search box
+                    $('#' + self.name + ' .sp-search-txt').focus();
                     
                     // last-page
                     var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
@@ -906,7 +906,7 @@
         }
     }
 
-    SapnsGrid.prototype.loadActions = function() {
+    SapnsGrid.prototype.loadActions = function(callback) {
 
         var self = this;
         var g_actions = '';
@@ -916,18 +916,19 @@
                 // it's an object
                 var ajx = $.extend(true, {
                     url: "{{tg.url('/dashboard/grid_actions/')}}",
-                    type: "post",
-                    data: {
-                        cls: self.cls
-                    },
+                    //type: "post",
+                    cache: false,
+                    data: { cls: self.cls },
                     success: function(response) {
                         if (response.status) {
                             self.actions = response.actions;
                         }
                         
                         //self.complete_actions();
-                        
                         $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                        if (callback) {
+                            callback();
+                        }
                     }
                 }, self.actions);
 
@@ -937,7 +938,7 @@
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
             }
         }
-
+        
         // if the row is selected, then mark the checkbox
         $('#' + self.name + ' .sp-grid-cell').live('click', function(event) {
             if ($(this).attr('clickable') == 'true') {
@@ -998,9 +999,6 @@
                 
                 qry += self.order[i].stringify();
             }
-            
-            //console.log(qry);
-            //return;
             
             qry = encodeURI(qry).replace('-', '%2D', 'g').
                 replace('"', '%22', 'g').replace('+', '%2B', 'g').
@@ -1244,13 +1242,8 @@
         // get object's title
         var title = '';
         $.ajax({
-            url: "{{tg.url('/dashboard/title')}}",
-            type: "get",
-            dataType: "json",
-            data: {
-                cls: cls,
-                id: id
-            },
+            url: "{{tg.url('/dashboard/title/')}}",
+            data: { cls: cls, id: id },
             success: function(res) {
                 if (res.status) {
                     var title;
@@ -1760,8 +1753,6 @@
                     }
                 }
                 
-                //console.log(g.order);
-                
                 // refresh
                 g.search(undefined, true);
             });
@@ -1770,10 +1761,10 @@
 
             this.append(g_content + g_actions + g_table + g_pager + '</div>');
 
-            g.loadActions();
-
-            $(g_id + ' .sp-search-txt').val(g.q);
-            g.search(g.q)
+            g.loadActions(function() {
+                $(g_id + ' .sp-search-txt').val(g.q);
+                g.search(g.q)
+            });            
         } 
         else if (typeof(arg1) == "string") {
 
