@@ -13,7 +13,7 @@
 <div class="item_sb">
     {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
     <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">
-        <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
+        <span class="text_sb" title="{{sc.title}}">{{sc.title}}</span></a>
     
     <!--{% if sc.actions %}-->
     <div class="subactions">
@@ -30,7 +30,7 @@
 <div class="item_sb">
     <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">
-        <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
+        <div class="text_sb" title="{{sc.title}}">{{sc.title}}</div></a>
 </div>
 <!--{% elif sc.action_type == 'object' %}-->
 <div class="item_sb">

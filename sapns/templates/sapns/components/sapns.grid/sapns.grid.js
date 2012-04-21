@@ -3,14 +3,14 @@
 (function($) {
     
     function Filter(params) {
-        this.field = params.field.trim();
+        this.field = $.trim(params.field);
         this.operator = params.operator;
-        this.value = params.value.trim();
+        this.value = $.trim(params.value);
         this.active = params.active !== undefined ? !!params.active : true;
     }
     
     function normalize(s) {
-        s = s.toLowerCase().trim();
+        s = $.trim(s.toLowerCase());
         s = s.replace(/[áäà]/g, 'a');
         s = s.replace(/[éëè]/g, 'e');
         s = s.replace(/[íïì]/g, 'i');
@@ -110,7 +110,7 @@
         var terms = s.split(',');
         var filters = [];
         for (var i=0, l=terms.length; i<l; i++) {
-            var m = terms[i].trim().match('^(_)?"([^"]+)"\\s([a-z]{2,3})\\s"([^"]*)"$');
+            var m = $.trim(terms[i]).match('^(_)?"([^"]+)"\\s([a-z]{2,3})\\s"([^"]*)"$');
             if (m) {
                 filters.push(new Filter({
                     field: m[2],
@@ -173,7 +173,7 @@
         var order = [];
         for (var i=0, l=terms.length; i<l; i++) {
             // (+|-)...........
-            var m = terms[i].trim().match('^(\\+|\\-)"([^"]+)"$');
+            var m = $.trim(terms[i]).match('^(\\+|\\-)"([^"]+)"$');
             if (m) {
                 order.push(new OrderFilter({
                     field: m[2],
