@@ -936,6 +936,9 @@
             } else {
                 //self.complete_actions();
                 $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
+                if (callback) {
+                    callback();
+                }
             }
         }
         
@@ -1232,7 +1235,7 @@
         var id = JSON.stringify(ids);
 
         var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
-        		"<p id='object-title'></p>";
+                "<p id='object-title'></p>";
 
         var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
                 "<div id='delete-error-message'></div>";
@@ -1763,7 +1766,7 @@
 
             g.loadActions(function() {
                 $(g_id + ' .sp-search-txt').val(g.q);
-                g.search(g.q)
+                g.search(g.q);
             });            
         } 
         else if (typeof(arg1) == "string") {
