@@ -1275,6 +1275,7 @@
                     $.ajax({
                         url: url,
                         data: { cls: cls, id_: id },
+                        dataType: 'json',
                         success: function(res) {
                             if (res.status) {
                                 self.search(self.q, true);
