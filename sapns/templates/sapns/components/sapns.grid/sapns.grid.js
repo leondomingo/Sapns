@@ -406,12 +406,12 @@
         
         $('#'+self.name + ' .sp-grid-filter-field').html(select_fields);
         
-        var g_table = '<div class="sp-grid" style="width:' + (g_wd+5) + 'px;">';
+        var g_table = '<div class="sp-grid" style="width:' + (g_wd+5) + 'px">';
         
-        var grid_header = '<div class="sp-grid-row" style="width:' + row_wd + 'px;">';
+        var grid_header = '<div class="sp-grid-row" style="width:' + (g_wd+10) + 'px">';
         
         if (!self.hide_check) {
-            grid_header += '<div class="sp-col-title" style="width:23px;">' +
+            grid_header += '<div class="sp-col-title" style="width:23px">' +
                 '<input class="sp-grid-select-all" type="checkbox"></div>';
         }
         
@@ -457,7 +457,7 @@
             }
             
             grid_header += '<div class="sp-col-title sp-col-title-sortable ' + is_ordered + '"' + order_type + 
-                ' style="width:' + wd + 'px;" col_title="' + col.title + '">' + col.title + order_index + '</div>';
+                ' style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
         }
 
         grid_header += '</div>';
@@ -473,12 +473,12 @@
                 
                 var row = data[i];
                 
-                var grid_row = '<div class="sp-grid-row" style="width:'+row_wd+'px;">';
+                var grid_row = '<div class="sp-grid-row" style="width:'+(g_wd+10)+'px">';
                 
                 if (!self.hide_check) {
                     var border_radius = '';
                     if (i == ld-1) {
-                        border_radius = 'border-radius:0 0 0 5px;';
+                        border_radius = 'border-radius:0 0 0 5px';
                     }
                     
                     grid_row += '<div class="sp-grid-cell" title="' + row[0] + '" style="width:23px;' + border_radius + '">' +
@@ -574,7 +574,7 @@
             g_table += 
                 sprintf(grid_header, {actions_wd: actions_wd}) +
                 '<div class="sp-grid-row"><div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' +
-                    'style="width:' + wd_ + 'px;" >{{_("No results")}}</div></div>';
+                    'style="width:' + wd_ + 'px" >{{_("No results")}}</div></div>';
         }
         
         g_table += '</div>';
@@ -638,7 +638,7 @@
         }
         
         var loading = '<div style="padding:10px;font-size:15px; ' +
-            sprintf('font-weight:bold;color:gray;height:%(hg)dpx;">{{_("Loading")}}...</div>', {hg: self.height-50});
+            sprintf('font-weight:bold;color:gray;height:%(hg)dpx">{{_("Loading")}}...</div>', {hg: self.height-50});
         
         $('#' + self.name).find('.sp-grid-parent').html(loading);
         
@@ -765,7 +765,7 @@
     SapnsGrid.prototype.warningSelectedId = function() {
         var self = this;
 
-        $('#grid-dialog_' + self.name).html("<p style='text-align:center;font-style:italic;'>{{_('You must select a row before click on this action')}}</p>")
+        $('#grid-dialog_' + self.name).html("<p style='text-align:center;font-style:italic'>{{_('You must select a row before click on this action')}}</p>")
             .dialog({
                 title: self.caption,
                 resizable: false,
@@ -867,8 +867,8 @@
                             + formats[i].title + '</option>';
                 }
 
-                var s_export = '<div id="grid-export_' + self.name + '" style="height:25px;float:left;">' +
-                    '<select id="select-export" class="sp-button sp-grid-action" style="height:20px;">' +
+                var s_export = '<div id="grid-export_' + self.name + '" style="height:25px;float:left">' +
+                    '<select id="select-export" class="sp-button sp-grid-action" style="height:20px">' +
                     '<option value="">({{_("Export")}})</option>' + 
                     options + '</select></div>';
                 
@@ -1284,7 +1284,7 @@
                             else {
                                 $('#grid-dialog_' + self.name).dialog('close');
 
-                                var message = "<p style='color:gray;'>" + res.message + "</p>";
+                                var message = "<p style='color:gray'>" + res.message + "</p>";
 
                                 if (res.rel_tables != undefined && res.rel_tables.length > 0) {
                                     message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
@@ -1293,9 +1293,9 @@
                                     for (var i = 0; i < res.rel_tables.length; i++) {
                                         var title = res.rel_tables[i].class_title;
                                         var attr_title = res.rel_tables[i].attr_title;
-                                        message += '<li><span style="font-weight:bold;">'
+                                        message += '<li><span style="font-weight:bold">'
                                                 + title
-                                                + '</span> (<span style="color:#777;">'
+                                                + '</span> (<span style="color:#777">'
                                                 + attr_title + '</span>)</li>';
                                     }
 
@@ -1358,7 +1358,7 @@
                         for (var i=0, l=self.filters.length; i<l; i++) {
                             
                             if (!self.filters[i].active) {
-                                s += '<font style="text-decoration:line-through;">' + self.filters[i].tip() + '</font><br>';
+                                s += '<font style="text-decoration:line-through">' + self.filters[i].tip() + '</font><br>';
                             }
                             else {
                                 s += self.filters[i].tip() + '<br>';
@@ -1395,7 +1395,7 @@
             this.data('sapnsGrid', g);
             var g_id = '#'+g.name;
 
-            this.append(sprintf('<div id="grid-dialog_%(name)s" style="display:none;"></div>', {name: g.name}));
+            this.append(sprintf('<div id="grid-dialog_%(name)s" style="display:none"></div>', {name: g.name}));
 
             var g_content = '';
             g_content += sprintf('<div class="sp-grid-container" id="%(name)s" cls="%(cls)s">', {name: g.name, cls: g.cls});
@@ -1407,17 +1407,17 @@
             if (g.with_search) {
 
                 g_content += '<div><div class="sp-grid-search-box">' + 
-                        '<input class="sp-search-txt" style="float:left;" name="q" type="text" value="">' +
+                        '<input class="sp-search-txt" style="float:left" name="q" type="text" value="">' +
                         '<img class="inline_action sp-search-btn" ' +
                             'src="{{tg.url("/images/sapns/icons/search.png")}}" titlee="{{_("Search...")}}"></div>';
                 
-                g_content += '<div class="sp-grid-filters" style="display:none;"></div>';
-                g_content += '<div class="sp-grid-edit-filter" style="display:none;">' +
-                    '<div style="float:left;height:40px;margin-right:5px;">' +
+                g_content += '<div class="sp-grid-filters" style="display:none"></div>';
+                g_content += '<div class="sp-grid-edit-filter" style="display:none">' +
+                    '<div style="float:left;height:40px;margin-right:5px">' +
                         '<div>Campo</div>' +
                         '<div><select class="sp-grid-filter-field"></select></div>' +
                     '</div>' +
-                    '<div style="float:left;height:40px;margin-right:5px;">' +
+                    '<div style="float:left;height:40px;margin-right:5px">' +
                         '<div>Operador</div>' +
                         '<div><select class="sp-grid-filter-operator">' +
                             '<option value="co">Contiene</option>' +
@@ -1430,7 +1430,7 @@
                             '<option value="neq">Distinto</option>' +
                         '</select></div>' + 
                     '</div>' +
-                    '<div style="float:left;height:40px;">' +
+                    '<div style="float:left;height:40px">' +
                         '<div>Valor</div>' + 
                         '<input class="sp-grid-filter-value" type="text">' +
                     '</div></div>';
@@ -1471,11 +1471,11 @@
                                     activate_filter = '<button class="sp-grid-activate-filter">Activar</button>';
                                 }
                                 
-                                s += '<div class="sp-grid-row-filter" style="clear:left;" filter_order="' + i + '">' +
-                                    '<div style="float:left;margin-right:10px;"><input class="sp-grid-check-filter" type="checkbox"></div>' +
+                                s += '<div class="sp-grid-row-filter" style="clear:left" filter_order="' + i + '">' +
+                                    '<div style="float:left;margin-right:10px"><input class="sp-grid-check-filter" type="checkbox"></div>' +
                                     '<div class="sp-grid-filter-description">&lt;' + f.field + '&gt; ' + 
                                     f.operator_title().toLowerCase() + 
-                                    ' <span style="font-style:italic;">"' + f.value + '"</span></div>' +
+                                    ' <span style="font-style:italic">"' + f.value + '"</span></div>' +
                                     activate_filter + '</div>';
                             }
                         }
@@ -1602,14 +1602,14 @@
                 });
 
                 if (g.link) {
-                    g_content += '<div style="padding-left:20px;">'
-                            + "<button id='link-shortcut' class='sp-button' style='float:left;'>{{_('Create a shortcut')}}</button>"
-                            + '<div style="font-size:9px;margin-top:7px; width:100px;float:left;">'
+                    g_content += '<div style="padding-left:20px">'
+                            + "<button id='link-shortcut' class='sp-button' style='float:left'>{{_('Create a shortcut')}}</button>"
+                            + '<div style="font-size:9px;margin-top:7px; width:100px;float:left">'
                             + "<a id='this-search' href='"
                             + g.link
                             + "' target='_blank'>[{{_('this search')}}]</a>"
                             + '</div>'
-                            + '<div id="link-shortcut-dialog" style="display:none;">'
+                            + '<div id="link-shortcut-dialog" style="display:none">'
                             + "<p>{{_('Do you want to create a shortcut for this search?')}}</p>"
                             + "<label>{{_('Shortcut title')}}:</label>"
                             + "<input id='link-shortcut-title' type='text' value='({{_('title')}})'>"
@@ -1620,7 +1620,7 @@
             
             var g_table = 
                 '<div class="sp-grid-parent" style="overflow:auto;clear:left;height:' + 
-                    (g.height+5) + 'px;background-color:transparent;"></div>';
+                    (g.height+5) + 'px;background-color:transparent"></div>';
             
             // pager
             var g_pager = '';
@@ -1643,7 +1643,7 @@
                     another_value = '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
                 }
 
-                g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px;">' +
+                g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px">' +
                         '<select class="sp-button sp-grid-rp">' +
                         another_value +
                         '<option value="10"' + sel_10 + '>10</option>' +
@@ -1651,11 +1651,11 @@
                         '<option value="100"' + sel_100 + '>100</option>' +
                         '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
                         '</select>' +
-                        '<button class="sp-button sp-grid-first-page" style="float:left;">|&lt;&lt;</button>' +
-                        '<button class="sp-button sp-grid-page-back" style="float:left;">&lt;&lt;</button>' +
-                        '<input class="sp-grid-current-page" type="text" style="text-align:center;font-size:11px;margin-top:3px;" readonly>' +
-                        '<button class="sp-button sp-grid-page-forth" style="float:left;">&gt;&gt</button>';
-                        //<button class="sp-button sp-grid-last-page" style="float:left;">&gt;&gt|</button></div>';
+                        '<button class="sp-button sp-grid-first-page" style="float:left">|&lt;&lt;</button>' +
+                        '<button class="sp-button sp-grid-page-back" style="float:left">&lt;&lt;</button>' +
+                        '<input class="sp-grid-current-page" type="text" style="text-align:center;font-size:11px;margin-top:3px" readonly>' +
+                        '<button class="sp-button sp-grid-page-forth" style="float:left">&gt;&gt</button>';
+                        //<button class="sp-button sp-grid-last-page" style="float:left">&gt;&gt|</button></div>';
 
                 g_pager += '</div>';
                 
@@ -1761,7 +1761,7 @@
                 g.search(undefined, true);
             });
             
-            var g_actions = '<div class="sp-grid-button-actions" style="display: none;"></div>';
+            var g_actions = '<div class="sp-grid-button-actions" style="display:none"></div>';
 
             this.append(g_content + g_actions + g_table + g_pager + '</div>');
 
