@@ -406,9 +406,9 @@
         
         $('#'+self.name + ' .sp-grid-filter-field').html(select_fields);
         
-        var g_table = '<div class="sp-grid" style="width:' + (g_wd+5) + 'px">';
+        var g_table = '<div class="sp-grid" style="width:' + (g_wd+200) + 'px">';
         
-        var grid_header = '<div class="sp-grid-row" style="width:' + (g_wd+10) + 'px">';
+        var grid_header = '<div class="sp-grid-row" style="width:' + (g_wd+150) + 'px">';
         
         if (!self.hide_check) {
             grid_header += '<div class="sp-col-title" style="width:23px">' +
@@ -473,7 +473,7 @@
                 
                 var row = data[i];
                 
-                var grid_row = '<div class="sp-grid-row" style="width:'+(g_wd+10)+'px">';
+                var grid_row = '<div class="sp-grid-row" style="width:'+(g_wd+150)+'px">';
                 
                 if (!self.hide_check) {
                     var border_radius = '';

@@ -244,9 +244,16 @@ class DashboardController(BaseController):
         
         ds.float_fmt = app_cfg.format_float
         
+        visible_width = 800
+        min_width = visible_width / 6
+        
+        default_width = visible_width / len(ds.labels)
+        if default_width < min_width:
+            default_width = min_width
+        
         cols = []
         for col in ds.labels:
-            w = 765 / len(ds.labels)
+            w = default_width
             if col == 'id':
                 w = 60
                 
