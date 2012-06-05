@@ -144,16 +144,14 @@ catch (e) {
         // search
         $.ajax({
             url: this.search_url,
-            //type: 'post',
             dataType: 'html',
             data: params,
-            success: function(res) {
-                $(dialog_name).html(res);
+            success: function(content) {
+                $(dialog_name).html(content);
             },
             error: function(f, status, error) {
                 alert('error!');
                 sapnsSelector.search();
-                // $(dialog_name).dialog('close'); 
             }
         });
     }
@@ -192,9 +190,6 @@ catch (e) {
             
             var sapnsSelector = new SapnsSelector(arg1);
             
-            // dialog
-            this.append('<div id="dialog_' + sapnsSelector.name + '" style="display: none;"></div>'); 
-
             // select text
             var select_text = 
                 '<input id="st_' + sapnsSelector.name + '"' + 
@@ -260,26 +255,33 @@ catch (e) {
                         dialog_title = sapnsSelector.rc_title();
                     }
                     
+                    var dialog_name = 'dialog_' + sapnsSelector.name;
+                    $('#'+dialog_name).remove();
+                    $('<div id="' + dialog_name + '"></div>').appendTo('body');
+                    
                     // show search dialog
-                    $('#dialog_' + sapnsSelector.name).dialog({
+                    $('#'+dialog_name).dialog({
                         title: dialog_title,
                         width: sapnsSelector.dialog.width,
                         height: sapnsSelector.dialog.height,
                         resizable: false,
                         modal: true,
+                        close: function() {
+                            $('#' + dialog_name).remove();
+                        },
                         buttons: {
                             "{{_('Ok')}}": function() {
                                 // get the id of the selected row
                                 
-                                var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
+                                var id_selected = $('#'+dialog_name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
                                 
                                 sapnsSelector.setValue(id_selected);
                                 sapnsSelector.setTitle();
                                 
-                                $('#dialog_' + sapnsSelector.name).dialog('close');
+                                $('#' + dialog_name).dialog('destroy').remove();
                             },
                             "{{_('Cancel')}}": function() {
-                                $('#dialog_' + sapnsSelector.name).dialog('close');
+                                $('#' + dialog_name).dialog('destroy').remove();
                             }
                         }
                     });
