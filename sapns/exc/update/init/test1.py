@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from sapns.model.sapnsmodel import SapnsClass
-from base import BaseUpdate
+from sapns.model import DBSession as dbs
 
-class Test1(BaseUpdate):
+class Test1(object):
     
     def __call__(self):
-        
-        dbs = self.dbs
         
         for cls in dbs.query(SapnsClass):
             cls.description = u'Class: %s' % cls.name

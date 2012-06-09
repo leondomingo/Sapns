@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from sapns.model.sapnsmodel import SapnsClass, SapnsRole, SapnsPermission
-from base import BaseUpdate
+from sapns.model import DBSession as dbs
 
-class UsersRoles(BaseUpdate):
+class UsersRoles(object):
     
     def __call__(self):
-        
-        dbs = self.dbs
         
         roles = dbs.query(SapnsClass).\
             filter(SapnsClass.name == u'sp_roles').\
