@@ -888,6 +888,10 @@ class SapnsClass(DeclarativeBase):
                         
                     require_id = ac.requires_id # True
                     pos = 100
+                    
+                    # PROCESS: actions associated with this class with no implementation
+                    if ac.type == SapnsPermission.TYPE_PROCESS and not url:
+                        continue
                         
                     if ac.type == SapnsPermission.TYPE_NEW:
                         if not ac.url:
