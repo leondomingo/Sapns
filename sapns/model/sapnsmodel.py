@@ -878,6 +878,9 @@ class SapnsClass(DeclarativeBase):
                         
                     require_id = ac.requires_id # True
                     pos = 100
+                    
+                    if ac.type == SapnsPermission.TYPE_PROCESS and not url:
+                        continue
                         
                     if ac.type == SapnsPermission.TYPE_NEW:
                         if not ac.url:
