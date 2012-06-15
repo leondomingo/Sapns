@@ -1,13 +1,11 @@
 # -*- coding: utf-8 -*-
 
 from sapns.model.sapnsmodel import SapnsPermission
-from base import BaseUpdate
+from sapns.model import DBSession as dbs
 
-class UsersEdit(BaseUpdate):
+class UsersEdit(object):
     
     def __call__(self):
-        
-        dbs = self.dbs
         
         # sp_users#new
         p_new = dbs.query(SapnsPermission).\
