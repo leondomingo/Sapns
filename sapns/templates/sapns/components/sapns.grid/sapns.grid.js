@@ -262,6 +262,7 @@
         set(this, 'total_count', 0);
         set(this, 'total_pag', 0);
         this.ajx_data = '{}';
+        this.styles = [];
         
         // obtener las tres partes de la query
         // q$$filters$$order
@@ -473,6 +474,11 @@
                 
                 var row = data[i];
                 
+                var row_style = '';
+                if (self.styles.length && self.styles.length > i) {
+                    row_style = self.styles[i];
+                }
+                
                 var grid_row = '<div class="sp-grid-row" style="width:'+(g_wd+150)+'px">';
                 
                 if (!self.hide_check) {
@@ -545,7 +551,7 @@
                         border_radius = 'border-radius:0 0 5px 0;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip" ' + 
+                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip ' + row_style + '" ' + 
                         'style="text-align:' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
@@ -679,6 +685,11 @@
                     // actions
                     if (response.actions) {
                         self.actions = response.actions;
+                    }
+                    
+                    // styles
+                    if (response.styles) {
+                        self.styles = response.styles;
                     }
                     
                     // update pager

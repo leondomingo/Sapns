@@ -264,7 +264,7 @@ class DashboardController(BaseController):
         if ds.count == rp:
             total_pag = pag_n + 1
         
-        return dict(status=True, cols=cols, data=ds.to_data(), 
+        return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
             
     @expose('json')
