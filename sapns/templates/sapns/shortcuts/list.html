@@ -6,163 +6,75 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.jquery_jstree() }}
-    <style type="text/css">
-        #sc_list {
-            height: 565px;
-            overflow: auto;
-        }
+    <style>
+        .caja3d { border:1px solid #999; border-bottom:2px solid #777; border-right:2px solid #777 }
+        #sc_list { height:565px; overflow:auto }
+        #sp-exploration-head { height:20px; padding-left:25px; padding-top:2px;
+        background-color:white; border-radius:3px; margin:4px 10px }
         
-        #exploration_head {
-            height: 20px;
-            padding-left: 25px;
-            padding-top: 2px;
-            border: 1px solid gray;
-            border-radius: 5px;
-            margin: 4px;
-        }
+        a.sp-shortcut-up { font-weight:normal }
+        .sp-shortcut-list { margin:0 10px 10px 10px; padding:5px; background-color:#fff; height:540px;
+        overflow:auto; border-radius:3px }
+        a.sp-shortcut { font-weight:normal; color:#444; border-radius:3px; 
+        width:101px; height:75px; margin:5px; padding:2px; text-align:center; 
+        float:left; font-size:13px; word-wrap:break-word }
+        a.sp-shortcut.group { background-color:#979e32; color:#fff }
+        a.sp-shortcut.list { background-color:#B4BD3C }
+        a.sp-shortcut.process { background-color:#FFB835 }
     </style>
 {% endblock %}
 
 {% block middle %}
 <!-- {# dialogs (now ain't visible) #} -->
-{#<div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
+<!--{#<div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
   <p>{{_('Do you want to delete this shortcut?')}}</p>
   <p id="sp-shortcut-title" style="font-weight: bold;"></p>  
-</div>#}
+</div>#}-->
 
-{#
+<!--{#
 <div id="bookmark-confirmation" style="display: none;" title="{{_('Send to dashboard')}}">
   <p>{{_('Do you want to send this shortcut to the dashboard?')}}</p>
   <p id="sp-shortcut-title" style="font-weight: bold;"></p>
 </div>
-#}
+#}-->
 
-{#
+<!--{#
 <div id="share-dialog" style="display: none;" title="{{_('Shortcut sharing')}}">
     <p>{{_('What user do you want to share this shortcut with?')}}</p>
     <p id="sp-shortcut-title" style="font-weight: bold;"></p>
     <select id="users-to-share-with"></select>
 </div>
-#}
+#}-->
 
 <form id="order-form" action="" method="post" target="_blank">
     <input type="hidden" name="came_from" />
 </form>
 
-<div id="exploration_head">
-    {% if sc_parent %}
-    <a href="{{tg.url('/dashboard/data_exploration', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
-    {% else %}
+<div id="sp-exploration-head" class="caja3d">
+    <!--{% if sc_parent %}-->
+    <a class="sp-shortcut-up" href="{{tg.url('/dashboard/data_exploration', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
+    <!--{% else %}-->
     <div>&nbsp;</div>
-    {% endif %}
+    <!--{% endif %}-->
 </div>
 
-<div id="sc_list">
-    {% for sc in shortcuts %}
-    <div class="sp_shortcut" sc_id="{{sc.id}}" sc_parent="{{sc.parent}}"
-        cls="{{sc.cls}}" sc_order="{{sc.order}}"
-        style="{% if loop.index % 2 == 0 %}background-color: white;{% endif %}">
-        
-    {% if sc.action_type %}
-        <!-- List -->
-        {% if sc.action_type == 'list' %}
-        <div class="sp-shortcut-title">
-            <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
-                target="" >{{sc.title|escape}}</a>
-        </div>
-        
-        <!-- {# actions over "list" shortcuts #} -->
-        <select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>
-        
-        {% if h.authorize.in_group('managers') %}
-        <!-- {# insertion order #} -->
-        <option value="ins-order">{{_('Insertion order')}}</option>
-
-        <!-- {# reference order #} -->
-        <option value="ref-order">{{_('Reference order')}}</option>
-        </select>
-        {% endif %}
-        
-        <!-- Process -->
-        {% elif sc.action_type == 'process' %}
-        <div class="sp-shortcut-title">
-            <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=_came_from))}}" 
-                target="">{{sc.title|escape}}</a>
-        </div>
-        
-        <div style="clear: right;"></div>
-        
-        {#<select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>#}
-
-        <!-- Object -->
-        {% elif sc.action_type == 'object' %}
-        <div class="sp-shortcut-title">
-            <a target="_blank" href="{{tg.url(sc.url, params=dict(came_from=_came_from))}}" 
-                target="">{{sc.title|escape}}</a>
-        </div>
-        
-        <div style="clear: right;"></div>
-        
-        {#<select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>#}
-        {% else %}
-        <div class="sp-shortcut-title">
-            <a href="{{tg.url(sc.url)}}">{{sc.title}}</a>
-        </div>
-        
-        <div style="clear: right;"></div>
-        
-        {#<select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>#}
-        {% endif %}
-    {% else %}
-        <!-- {# This is a group #} -->
-        <div class="sp-shortcut-title" style="clear: left;">
-            <a href="{{tg.url('/dashboard/data_exploration/', 
-                params=dict(sc_parent=sc.id))}}">&lt;{{sc.title}}&gt;</a>
-        </div>
-        
-        <div style="clear: right; height: 25px;">&nbsp;</div>
-        
-        {#<select class="sp-select-shortcut">
-        <option value="">{{_('(Select operation)')}}</option>#}
-    {% endif %}
-        <!-- {# general actions over shortcuts #} -->
-    
-        <!-- {# Edit #} -->
-        {#<option value="edit" 
-            title="{{_('Edit this shortcut')}}">{{_('Edit')}}</option>#}
-        
-        <!-- {# Delete #} -->
-        {#<option value="delete" 
-            title="{{_('Remove this shortcut')}}">{{_('Delete')}}</option>#}
-    
-        <!-- {# To dashboard #} -->
-        {#<option value="to-dashboard"
-            title="{{_('Put this shortcut on the dashboard')}}">{{_('Send to dashboard')}}</option>#}
-
-        <!-- {# Share #} -->
-        {#<option value="share"
-            title="{{_('Share this shortcut with another user')}}">{{_('Share')}}</option>#}
-            
-        <!-- {# Up #} -->
-        {#<option value="up"
-            title="">{{_('Up')}}</option>#}
-            
-        <!-- {# Down #} -->
-        {#<option value="down"
-            title="">{{_('Down')}}</option>#}
-        
-        {#</select>#}
-        
-    </div>
-    {% endfor %}
+<div class="sp-shortcut-list caja3d">
+    <!--{% for sc in shortcuts %}-->
+    <!--{% if sc.action_type == '' %}-->
+    <a class="sp-shortcut caja3d group" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc.id))}}"
+        title="{{sc.title}}">{{sc.title}}</a>
+    <!--{% elif sc.action_type == 'list' %}-->
+    <a class="sp-shortcut caja3d list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
+        title="{{sc.title}}">{{sc.title|escape}}</a>
+    <!--{% elif sc.action_type == 'process' %}-->
+    <a class="sp-shortcut caja3d process" href="{{tg.url(sc.url)}}"
+        title="{{sc.title}}">{{sc.title|escape}}</a>
+    <!--{% endif %}-->
+    <!--{% endfor %}-->
 </div>
 
 <script type="text/javascript">
-    $(document).ready(function() {
+    $(function() {
     	
     	$('.sp-select-shortcut').change(function() {
     		var opc = $(this).find('option:selected').val();

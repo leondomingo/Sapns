@@ -4,14 +4,22 @@
 
 <div class="item_sb">
     <a href="{{tg.url('/')}}"><img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home"></a>
-    {#<a href="{{tg.url('/')}}"><label class="text_sb">Home</label></a>#}
+    <!--{#<a href="{{tg.url('/')}}"><label class="text_sb">Home</label></a>#}-->
 </div>
+
+{#
+<div style="font-size:9px">
+<!--{% for sc in shortcuts %}-->
+<div>{{sc.title}} "{{sc.action_type}}"</div>
+<!--{% endfor %}-->
+</div>
+#}
 
 <!--{% for sc in shortcuts %}-->
 <!--{% if sc.action_type %}-->
 <!--{% if sc.action_type == 'list' %}-->
 <div class="item_sb">
-    {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
+    <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">
         <span class="text_sb" title="{{sc.title}}">{{sc.title}}</span></a>
     
@@ -30,14 +38,18 @@
 <div class="item_sb">
     <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">
-        <div class="text_sb" title="{{sc.title}}">{{sc.title}}</div></a>
+        <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
 </div>
 <!--{% elif sc.action_type == 'object' %}-->
 <div class="item_sb">
-    {#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}
+    <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <div class="text_sb" title="{{sc.title}}"><a href="{{tg.url(sc.url)}}">{{sc.title}}</a></div>
 </div>
 <!--{% endif %}-->
+<!--{% else %}-->
+<div class="item_sb">
+    <a href="{{tg.url('/dashboard/data_exploration/?sc_parent=%d' % sc.id)}}"><label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
+</div>
 <!--{% endif %}-->
 
 <!--{% endfor %}-->
