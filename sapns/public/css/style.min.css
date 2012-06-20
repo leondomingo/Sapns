@@ -46,13 +46,16 @@ form.loginfields input#submit{background:url('../images/loginbottombg.png') bott
 .sp_messages{font-size:10px;color:navy}#object-title{color:gray;font-size:13px;font-style:italic}
 #delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
-.inline_action{background-color:#ddd;border:1px solid #666;border-radius:3px;cursor:pointer;float:left;height:19px;margin-right:1px;padding-left:2px;padding-right:2px;width:19px}
+.inline_action{background-color:#DDD;border:1px solid #666;border-radius:3px;cursor:pointer;float:left;height:19px;margin-right:1px;padding-left:2px;padding-right:2px;width:19px}
 .inline_action:hover{background-color:#fff}.nonstd_actions{width:22px;float:left;font-size:10px}
-.item_sb{clear:left}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}.text_sb{font-size:13px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
+.item_sb{clear:left;min-height:22px;margin-top:2px;padding:2px}.item_sb_dragging{border:1px solid #b4bd3c;border-radius:3px;height:25px}
+.item_sb a{font-weight:normal}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}
+.text_sb{font-size:12px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
 .text_sb,.subaction{padding:3px;cursor:pointer;width:150px}.text_sb:hover,.subaction:hover{background-color:#b4bd3c;border-radius:3px}
 .text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px}
-.subactions ul{margin-top:0;margin-bottom:0;list-style-type:circle}.subaction{font-weight:normal;color:#333;font-size:11px}
-.subaction:hover{color:black}input[type=text],input[type=password]{height:16px}input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
+.subactions ul{margin-top:0;margin-bottom:0;list-style-type:circle}.item_sb .subaction{font-weight:normal;color:#999;font-size:11px;height:18px}
+.item_sb .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}
+input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
 input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:orange}
 .sp-select-text{border:1px solid red;border-radius:3px}.sp-select-button,.sp-empty-button{height:20px;font-size:10px;font-family:arial;font-weight:bold;margin-left:3px}
 .sp-empty-button{color:red}#sp-user-menu{width:288px;display:none;margin-top:5px;padding-bottom:5px}

@@ -12,7 +12,7 @@ from sapns.model.auth import User, user_group_table, Group, Permission, \
 from sqlalchemy import MetaData, Table, ForeignKey, Column, UniqueConstraint, \
     DefaultClause
 from sqlalchemy.exc import NoSuchTableError
-from sqlalchemy.orm import relation
+from sqlalchemy.orm import relation, synonym
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
     DateTime, BigInteger
@@ -529,7 +529,7 @@ class SapnsShortcut(DeclarativeBase):
     permission_id = Column('id_permission', Integer,
                            ForeignKey('sp_permission.id',
                                       onupdate='CASCADE', ondelete='SET NULL')) #, nullable=False)
-    # permission
+    # permission (SapnsPermission)
     
     def __str__(self):
         return unicode(self).encode('utf-8')
@@ -602,6 +602,8 @@ class SapnsShortcut(DeclarativeBase):
         
         dbs.add(new_sc)
         dbs.flush()
+        
+        return new_sc
         
     REORDER_TYPE_UP = 'up'
     REORDER_TYPE_DOWN = 'down'
@@ -894,29 +896,29 @@ class SapnsClass(DeclarativeBase):
                         continue
                         
                     if ac.type == SapnsPermission.TYPE_NEW:
-                        if not ac.url:
-                            url = SapnsPermission.URL_NEW
+#                        if not ac.url:
+#                            url = SapnsPermission.URL_NEW
                             
                         require_id = False
                         pos = 1
                     
                     elif ac.type == SapnsPermission.TYPE_EDIT:
-                        if not ac.url:
-                            url = SapnsPermission.URL_EDIT
+#                        if not ac.url:
+#                            url = SapnsPermission.URL_EDIT
                             
                         require_id = True
                         pos = 2
                     
                     elif ac.type == SapnsPermission.TYPE_DELETE:
-                        if not ac.url:
-                            url = SapnsPermission.URL_DELETE
+#                        if not ac.url:
+#                            url = SapnsPermission.URL_DELETE
                             
                         require_id = True
                         pos = 3
                         
                     elif ac.type == SapnsPermission.TYPE_DOCS:
-                        if not ac.url:
-                            url = SapnsPermission.URL_DOCS
+#                        if not ac.url:
+#                            url = SapnsPermission.URL_DOCS
                             
                         require_id = True
                         pos = 4
@@ -1452,13 +1454,40 @@ class SapnsAttrPrivilege(DeclarativeBase):
 class SapnsPermission(Permission):
     """List of available actions in Sapns"""
     
-    #__tablename__ = 'sp_actions'
-    
-    #action_id = Column('id', Integer, autoincrement=True, primary_key=True)
-
-    #name = Column(Unicode(100), nullable=False)
     display_name = Column(Unicode(50), nullable=False)
-    url = Column(Unicode(200))
+    
+    # url
+    _url = Column('url', Unicode(200))
+    
+    def _get_url(self):
+        if self.type == SapnsPermission.TYPE_NEW and not self._url:
+            url = SapnsPermission.URL_NEW
+                
+        elif self.type == SapnsPermission.TYPE_EDIT and not self._url:
+            url = SapnsPermission.URL_EDIT
+                
+        elif self.type == SapnsPermission.TYPE_DELETE and not self._url:
+            url = SapnsPermission.URL_DELETE
+                
+        elif self.type == SapnsPermission.TYPE_DOCS and not self._url:
+            url = SapnsPermission.URL_DOCS
+            
+        elif self.type == SapnsPermission.TYPE_LIST and not self._url:
+            url = SapnsPermission.URL_LIST % self.class_.name
+
+        else:
+            url = self._url
+            
+        return url
+    
+    def _set_url(self, url):
+        if url and url[-1] != '/':
+            url += '/'
+            
+        self._url = url
+    
+    url = synonym('_url', descriptor=property(_get_url, _set_url))
+    
     type = Column(Unicode(20))
     requires_id = Column(Boolean, default=True)
     
@@ -1485,6 +1514,7 @@ class SapnsPermission(Permission):
     URL_EDIT =   u'/dashboard/edit/'
     URL_DELETE = u'/dashboard/delete/'
     URL_DOCS =   u'/dashboard/docs/'
+    URL_LIST =   u'/dashboard/list/%s/'
     
     CACHE_ID = 'user_actions'
     
