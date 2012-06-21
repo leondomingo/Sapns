@@ -123,7 +123,7 @@ class DashboardController(BaseController):
                 r = m.REDIRECTIONS.get(cls)
                 if r:
                     _logger.info('Redirecting to...%s' % r)
-                    redirect(r)
+                    redirect(r, params=kw)
                 
         except ImportError:
             pass
