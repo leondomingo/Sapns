@@ -16,6 +16,7 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
+from sapns.lib.sapns.lists import List
 from sapns.lib.sapns.util import pagination, add_language, init_lang, \
     get_languages
 from sapns.model import DBSession as dbs
@@ -66,10 +67,6 @@ class DashboardController(BaseController):
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=None)
         
-#        shortcuts.append(dict(title=u'Data exploration',
-#                              url=u'/dashboard/data_exploration/',
-#                              action_type=SapnsPermission.TYPE_PROCESS))
-
         return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''))
     
     @expose('sapns/shortcuts/list.html')
@@ -115,158 +112,34 @@ class DashboardController(BaseController):
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
     @add_language
-    def list(self, cls, **params):
+    def list(self, cls, **kw):
         
-        #logger = logging.getLogger(__name__ + '/list')
+        _logger = logging.getLogger('DashboardController.list')
         
-        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
-        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
-        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
-
-        came_from = params.get('came_from', '')
-        if came_from:
-            came_from = url(came_from)
-            
-        # collections
-        ch_attr = params.get('ch_attr')
-        parent_id = params.get('parent_id')
+        try:
+            proj_name = config.get('app.root_folder')
+            if proj_name:
+                m = __import__('sapns.lib.%s.list_redirection' % proj_name, None, None, ['REDIRECTIONS'])
+                r = m.REDIRECTIONS.get(cls)
+                if r:
+                    _logger.info('Redirecting to...%s' % r)
+                    redirect(r)
+                
+        except ImportError:
+            pass
         
-        # does this user have permission on this table?
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-        roles = request.identity['groups']
-        
-        cls_ = SapnsClass.by_name(cls)
-        ch_cls_ = SapnsClass.by_name(cls, parent=False)        
-            
-        #logger.info('Parent class: %s' % cls_.name)
-        #logger.info('Child class: %s' % ch_cls_.name)
-             
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
-            redirect(url('/message', 
-                         params=dict(message=_('Sorry, you do not have privilege on this class'),
-                                     came_from=came_from)))
-            
-        # shift enabled
-        shift_enabled_ = u'managers' in roles
-        
-        # related classes
-        rel_classes = cls_.related_classes()
-        
-        # collection
-        caption = ch_cls_.title
-        if ch_attr and parent_id:
-            
-            p_cls = cls_.attr_by_name(ch_attr).related_class
-            p_title = SapnsClass.object_title(p_cls.name, parent_id)
-            
-            caption = _('%s of [%s]') % (ch_cls_.title, p_title)
-            
-        return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=came_from,
-                    grid=dict(cls=ch_cls_.name,
-                              caption=caption,
-                              q=q.replace('"', '\\\"'), rp=rp, pag_n=pag_n,
-                              # collection
-                              ch_attr=ch_attr, parent_id=parent_id,
-                              # related classes
-                              rel_classes=rel_classes,
-                              shift_enabled=shift_enabled_,
-                              ))
-        
-    def grid_data(self, cls, **params):
-        
-        _logger = logging.getLogger('DashboardController.grid_data')
-
-        # picking up parameters
-        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
-        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
-        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
-        pos = (pag_n-1) * rp
-        
-        # collections
-        ch_attr = params.get('ch_attr')
-        parent_id = params.get('parent_id')
-        
-        # filters
-        filters = get_paramw(params, 'filters', sj.loads, opcional=True)
-
-        cls_ = SapnsClass.by_name(cls)
-        ch_cls_ = SapnsClass.by_name(cls, parent=False)        
-            
-        #logger.info('Parent class: %s' % cls_.name)
-        #logger.info('Child class: %s' % ch_cls_.name)
-        
-        # does this user have permission on this table?
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-             
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
-            return dict(status=False, 
-                        message=_('Sorry, you do not have privilege on this class'))
-        
-        # get view name
-        view = user.get_view_name(ch_cls_.name)
-            
-        #logger.info('search...%s / q=%s' % (view, q))
-        
-        # collection
-        col = None
-        if ch_attr and parent_id:
-            col = (cls, ch_attr, parent_id,)
-
-        # get dataset
-        _search = Search(dbs, view, strtodatef=_strtodate)
-        _search.apply_qry(q.encode('utf-8'))
-        _search.apply_filters(filters)
-        #_logger.info(_search.sql)
-        
-        return _search(rp=rp, offset=pos, collection=col, no_count=True)
+        list_ = List(cls, **kw)
+        return list_()
     
     @expose('json')
     @require(p.not_anonymous())
-    def grid(self, cls, **params):
+    def grid(self, cls, **kw):
         
         _logger = logging.getLogger('DashboardController.grid')
         
-        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
-        pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
+        list_ = List(cls, **kw)
+        return list_.grid()
         
-        ds = self.grid_data(cls, **params)        
-        
-        # Reading global settings
-        ds.date_fmt = date_fmt
-        ds.time_fmt = config.get('formats.time', default='%H:%M')
-        ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
-        ds.true_const = _('Yes')
-        ds.false_const = _('No')
-        
-        ds.float_fmt = app_cfg.format_float
-        
-        visible_width = 800
-        min_width = visible_width / 6
-        
-        default_width = visible_width / len(ds.labels)
-        if default_width < min_width:
-            default_width = min_width
-        
-        cols = []
-        for col in ds.labels:
-            w = default_width
-            if col == 'id':
-                w = 60
-                
-            cols.append(dict(title=col, width=w, align='center'))
-            
-        this_page, total_pag = pagination(rp, pag_n, ds.count)
-        
-        if ds.count == rp:
-            total_pag = pag_n + 1
-        
-        return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
-                    this_page=this_page, total_count=ds.count, total_pag=total_pag)
-            
     @expose('json')
     @require(p.not_anonymous())
     def grid_actions(self, cls, **kw):
