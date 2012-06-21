@@ -163,7 +163,7 @@ class DashboardController(BaseController):
     
     @expose('sapns/dashboard/search.html')
     @require(p.not_anonymous())
-    def search(self, **params):
+    def search(self, **kw):
         
         logger = logging.getLogger('DashboardController.search')
         try:
@@ -171,11 +171,14 @@ class DashboardController(BaseController):
             random.seed()
             
             #params['caption'] = ''
-            g = self.list(**params)
+            #g = self.list(**params)
+            kw_ = kw.copy()
+            del kw_['cls']
+            g = List(kw.get('cls'), **kw_)()
             
             g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
-            g['grid']['q'] = get_paramw(params, 'q', unicode, opcional=True)
-            g['grid']['filters'] = params.get('filters')
+            g['grid']['q'] = get_paramw(kw, 'q', unicode, opcional=True)
+            g['grid']['filters'] = kw.get('filters')
             
             return g
     
@@ -189,7 +192,8 @@ class DashboardController(BaseController):
         
         # all records
         kw['rp'] = 0
-        ds = self.grid_data(cls, **kw)
+        list_ = List(cls, **kw)
+        ds = list_.grid_data()
         
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.csv' % cls.encode('utf-8')))
@@ -202,7 +206,8 @@ class DashboardController(BaseController):
         
         # all records
         kw['rp'] = 0
-        ds = self.grid_data(cls, **kw)
+        list_ = List(cls, **kw)
+        ds = list_.grid_data()
 
         response.headerlist.append(('Content-Disposition',
                                     'attachment;filename=%s.xls' % cls.encode('utf-8')))
@@ -235,7 +240,7 @@ class DashboardController(BaseController):
         
         except Exception, e:
             logger.error(e)
-            return dict(status=False, message=str(e).decode('utf-8'))        
+            return dict(status=False, message=str(e).decode('utf-8'))
     
     @expose('json')
     @require(p.not_anonymous())
