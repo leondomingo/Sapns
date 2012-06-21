@@ -73,7 +73,7 @@
     <a class="sp-shortcut caja3d list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
         shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" cls="{{sc.cls}}" title="{{sc.title}}">{{sc.title|escape}}</a>
     <!--{% elif sc.action_type == 'process' %}-->
-    <a class="sp-shortcut caja3d process" href="{{tg.url(sc.url)}}"
+    <a class="sp-shortcut caja3d process" href="{{tg.url(sc.url, params=dict(came_from=_came_from))}}"
         shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" title="{{sc.title}}">{{sc.title|escape}}</a>
     <!--{% endif %}-->
     <!--{% endfor %}-->
@@ -185,7 +185,11 @@ background-color:#ddd; margin:10px 50px 0 0; text-align:center; word-wrap:break-
                                 success: function(res) {
                                     if (res.status) {
                                         $('#delete-confirmation').dialog('close');
+                                        // delete shortcut (right pane) 
                                         ui.draggable.fadeOut();
+                                        
+                                        // delete shortcut from sidebar (left pane), if it exists 
+                                        $('.sp_sidebar').find('div[shortcut_id=' + shortcut_id + ']').fadeOut();
                                     }
                                 },
                                 error: function() {

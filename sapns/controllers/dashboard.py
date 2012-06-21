@@ -116,7 +116,7 @@ class DashboardController(BaseController):
         shortcuts = user.get_shortcuts(id_parent=db.shortcut_id)
         
         return dict(page='dashboard', came_from=kw.get('came_from'), 
-                    shortcuts=shortcuts)
+                    shortcuts=shortcuts, _came_from=url('/dashboard/'))
       
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
