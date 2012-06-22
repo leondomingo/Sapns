@@ -114,9 +114,7 @@ form.loginfields input#submit {
 	height: 30px;
 	background-color: #B4BD3C;
 	color: white;
-	/*margin-top: 5px;*/
-	/*border-radius: 5px 5px 0 0;*/
-	/*z-index: 100;*/
+	z-index: 1000;
 }
 
 .sp_header {
@@ -124,7 +122,6 @@ form.loginfields input#submit {
 	width: 1200px;
 	height: 100%;
 	margin: 0 auto;
-	/*background-color: red;*/
 	z-index: 200;
 }
 
