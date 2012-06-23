@@ -82,7 +82,7 @@ $(document).ready(function() {
         $('.sp-checkbox-field').each(function() {
             var name = $(this).parent().parent().attr('name');
             
-            params['fld_'+name] = $(this).attr('checked');
+            params['fld_'+name] = $(this).prop('checked');
         });
 
         // date 
@@ -227,7 +227,7 @@ $(document).ready(function() {
         url += id;
         
         $('#action-form').attr('action', url).submit();
-        $('#actions-sel option:first').attr('selected', true);
+        $('#actions-sel option:first').prop('selected', true);
     });
     
     var selectors = $('.sp_selector');

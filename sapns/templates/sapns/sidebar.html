@@ -2,23 +2,15 @@
 <div><a href="{{came_from}}">{{_('return')}}</a></div>
 <!--{% endif %}-->
 
-<div class="item_sb">
+<div class="item_sb item_home">
     <a href="{{tg.url('/')}}"><img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home"></a>
     <!--{#<a href="{{tg.url('/')}}"><label class="text_sb">Home</label></a>#}-->
 </div>
 
-{#
-<div style="font-size:9px">
-<!--{% for sc in shortcuts %}-->
-<div>{{sc.title}} "{{sc.action_type}}"</div>
-<!--{% endfor %}-->
-</div>
-#}
-
 <!--{% for sc in shortcuts %}-->
 <!--{% if sc.action_type %}-->
 <!--{% if sc.action_type == 'list' %}-->
-<div class="item_sb">
+<div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">
         <span class="text_sb" title="{{sc.title}}">{{sc.title}}</span></a>
@@ -35,19 +27,19 @@
     <!--{% endif %}-->
 </div>
 <!--{% elif sc.action_type == 'process' %}-->
-<div class="item_sb">
+<div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">
         <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
 </div>
 <!--{% elif sc.action_type == 'object' %}-->
-<div class="item_sb">
+<div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <!--{#<img class="icon_sb" src="{{tg.url('/images/sapns/icons/new2.png')}}" title="{{sc.title}}">#}-->
     <div class="text_sb" title="{{sc.title}}"><a href="{{tg.url(sc.url)}}">{{sc.title}}</a></div>
 </div>
 <!--{% endif %}-->
 <!--{% else %}-->
-<div class="item_sb">
+<div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <a href="{{tg.url('/dashboard/data_exploration/?sc_parent=%d' % sc.id)}}"><label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
 </div>
 <!--{% endif %}-->

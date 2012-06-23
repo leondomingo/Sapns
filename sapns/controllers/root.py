@@ -35,7 +35,7 @@ class RootController(BaseController):
     
     error = ErrorController()
     dashboard = DashboardController()
-
+    
     @expose('sapns/index.html')
     @add_language
     def index(self):
