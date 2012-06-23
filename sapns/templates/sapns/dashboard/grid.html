@@ -9,15 +9,15 @@
                 var row_id = $(this).parent().find('.sp-grid-rowid');
                 $('.sp-grid-rowid').each(function() {
                 	if ($(this) != row_id) {
-                		$(this).attr('checked', false);
+                		$(this).prop('checked', false);
                 	}
                 });
                 
-                if (row_id.attr('checked') == true) {
-                    row_id.attr('checked', false);
+                if (row_id.prop('checked') == true) {
+                    row_id.prop('checked', false);
                 }
                 else {
-                    row_id.attr('checked', true);
+                    row_id.prop('checked', true);
                 }
             }
         });
@@ -154,7 +154,7 @@
             var id_selected = null;
             $('#' + grid + ' .sp-grid-row ').each(function() {
                 var rowid = $(this).find('.sp-grid-rowid');
-                if (rowid.attr('checked') == true) {
+                if (rowid.prop('checked') == true) {
                     id_selected = rowid.attr('id_row');
                     selected_row = $(this);
                 }
@@ -345,7 +345,7 @@
     		$(form_html).appendTo('body').submit().remove();
     		
     		// reset the select 
-    		$(this).find('option:first').attr('selected', true);
+    		$(this).find('option:first').prop('selected', true);
     	});
     	
     	// create a shortcut from this search 

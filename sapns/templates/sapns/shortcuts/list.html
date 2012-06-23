@@ -229,7 +229,7 @@ width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:bre
     			move_shortcut(sc, opc);
     		}
     		
-    		$(this).find('option:first').attr('selected', true);
+    		$(this).find('option:first').prop('selected', true);
     	});
     	
     	function ins_order(sc) {
@@ -299,18 +299,18 @@ width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:bre
                                     alert('Error!');
                                 }
                                 
-                                $('#users-to-share-with option:first').attr('selected', true);
+                                $('#users-to-share-with option:first').prop('selected', true);
                                 $('#share-dialog').dialog('close');
                             },
                             error: function() {
                                 alert('Error!');
-                                $('#users-to-share-with option:first').attr('selected', true);
+                                $('#users-to-share-with option:first').prop('selected', true);
                                 $('#share-dialog').dialog('close');
                             }
                         });
                     },
                     "{{_('Cancel')}}": function() {
-                    	$('#users-to-share-with').find('option:first').attr('selected', true);
+                    	$('#users-to-share-with').find('option:first').prop('selected', true);
                         $('#share-dialog').dialog('close');
                     }
                 }
