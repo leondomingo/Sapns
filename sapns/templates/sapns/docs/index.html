@@ -33,17 +33,17 @@
             
             $('.col_value').click(function() {
                 var check = $(this).parent().find('.row_check');
-                var checked = check.attr('checked');
+                var checked = check.prop('checked');
                 
                 $('.row_check').each(function() {
-                    $(this).attr('checked', false);
+                    $(this).prop('checked', false);
                 });
                 
                 if (checked) {
-                    check.attr('checked', false);
+                    check.prop('checked', false);
                 }
                 else {
-                    check.attr('checked', true);
+                    check.prop('checked', true);
                 }
             });
             

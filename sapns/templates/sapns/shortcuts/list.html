@@ -7,29 +7,34 @@
     {{ util.jquery_ui() }}
     {{ util.jquery_jstree() }}
     <style>
-        .caja3d { border:1px solid #999; border-bottom:2px solid #777; border-right:2px solid #777 }
+        .caja3d { border:1px solid #999; border-bottom:2px solid #777; 
+        border-right:2px solid #777; border-radius:3px }
         #sc_list { height:565px; overflow:auto }
         #sp-exploration-head { height:20px; padding-left:25px; padding-top:2px;
         background-color:white; border-radius:3px; margin:4px 10px }
+        #sp-exploration-head * { float:left }
+        #sp-exploration-head button { font-size:9px }
         
-        a.sp-shortcut-up { font-weight:normal }
-        .sp-shortcut-list { margin:0 10px 10px 10px; padding:5px; background-color:#fff; height:540px;
-        overflow:auto; border-radius:3px }
-        a.sp-shortcut { font-weight:normal; color:#444; border-radius:3px; 
-        width:101px; height:75px; margin:5px; padding:2px; text-align:center; 
-        float:left; font-size:13px; word-wrap:break-word }
-        a.sp-shortcut.group { background-color:#979e32; color:#fff }
-        a.sp-shortcut.list { background-color:#B4BD3C }
-        a.sp-shortcut.process { background-color:#FFB835 }
+        .sp-shortcut-up { font-weight:normal; width:90% }
+        #sp-shortcut-list { margin:0 10px 10px 10px; padding:5px; background-color:#fff; 
+        height:540px; overflow:auto }
+        .on-dragging { height:415px !important }
+        a.sp-shortcut { font-weight:normal; color:#000; border-radius:3px; 
+        width:101px; height:80px; margin:5px; padding:2px; text-align:center;
+        float:left; font-size:13px; word-wrap:break-word; padding-top:0px }
+        a.sp-shortcut.group { background:#979e32 url('/images/sapns/icons/group.png') no-repeat center center; color:#fff }
+        a.sp-shortcut.list { background:#B4BD3C url('/images/sapns/icons/list.png') no-repeat center center }
+        a.sp-shortcut.process { background:#FFB835 url('/images/sapns/icons/process.png') no-repeat center center }
+        .sp_sidebar.activo { border:2px solid red }
     </style>
 {% endblock %}
 
 {% block middle %}
 <!-- {# dialogs (now ain't visible) #} -->
-<!--{#<div id="delete-confirmation" style="display: none;" title="{{_('Delete shortcut')}}">
+<div id="delete-confirmation" style="display:none" title="{{_('Delete shortcut')}}">
   <p>{{_('Do you want to delete this shortcut?')}}</p>
   <p id="sp-shortcut-title" style="font-weight: bold;"></p>  
-</div>#}-->
+</div>
 
 <!--{#
 <div id="bookmark-confirmation" style="display: none;" title="{{_('Send to dashboard')}}">
@@ -54,27 +59,153 @@
     <!--{% if sc_parent %}-->
     <a class="sp-shortcut-up" href="{{tg.url('/dashboard/data_exploration', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
     <!--{% else %}-->
-    <div>&nbsp;</div>
+    <div class="sp-shortcut-up">&nbsp;</div>
     <!--{% endif %}-->
+    <div><button>New</button></div>
 </div>
 
-<div class="sp-shortcut-list caja3d">
+<div id="sp-shortcut-list" class="caja3d">
     <!--{% for sc in shortcuts %}-->
     <!--{% if sc.action_type == '' %}-->
-    <a class="sp-shortcut caja3d group" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc.id))}}"
-        title="{{sc.title}}">{{sc.title}}</a>
+    <a class="sp-shortcut group" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc.id))}}"
+        shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" title="{{sc.title}}">{{sc.title}}</a>
     <!--{% elif sc.action_type == 'list' %}-->
-    <a class="sp-shortcut caja3d list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
-        title="{{sc.title}}">{{sc.title|escape}}</a>
+    <a class="sp-shortcut list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
+        shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" cls="{{sc.cls}}" title="{{sc.title}}">{{sc.title|escape}}</a>
     <!--{% elif sc.action_type == 'process' %}-->
-    <a class="sp-shortcut caja3d process" href="{{tg.url(sc.url)}}"
-        title="{{sc.title}}">{{sc.title|escape}}</a>
+    <a class="sp-shortcut process" href="{{tg.url(sc.url, params=dict(came_from=_came_from))}}"
+        shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" title="{{sc.title}}">{{sc.title|escape}}</a>
     <!--{% endif %}-->
     <!--{% endfor %}-->
 </div>
 
+<style>
+#sp-shortcut-options { height:100px; margin:0 10px 10px 10px; padding:5px; background-color:#fff }
+#sp-shortcut-options .option { float:left; border-radius:3px; font-weight:normal; 
+width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:break-word; border:1px solid transparent }
+#sp-shortcut-options .option.users { background: #ddd url('/images/sapns/icons/users.png') no-repeat center center; margin-left:50px }
+#sp-shortcut-options .option.roles { background: #ddd url('/images/sapns/icons/roles.png') no-repeat center center }
+#sp-shortcut-options .option.delete { background: #ddd url('/images/sapns/icons/delete.png') no-repeat center center }
+#sp-shortcut-options .option.accept { border:1px solid #FFB835 }
+
+</style>
+
+<div id="sp-shortcut-options" class="caja3d" style="display:none">
+    <div class="option users">Users</div>
+    <div class="option roles">Roles</div>
+    <div class="option delete">Delete</div>
+</div>
+
 <script type="text/javascript">
     $(function() {
+        
+        $('.sp-shortcut').draggable({
+            helper: 'clone',
+            start: function() {
+                $('#sp-shortcut-list').addClass('on-dragging');
+                $('#sp-shortcut-options').slideDown();
+            },
+            stop: function() {
+                $('#sp-shortcut-options').slideUp(function() {
+                    $('#sp-shortcut-list').removeClass('on-dragging');
+                });
+            }
+        });
+        
+        $('.sp_sidebar').droppable({
+            accept: '.sp-shortcut[action_type=list]',
+            hoverClass: 'activo',
+            drop: function(e, ui) {
+                $.ajax({
+                    url: "{{tg.url('/dashboard/sc/bookmark/')}}",
+                    data: { id_shortcut: ui.draggable.attr('shortcut_id') },
+                    success: function(res) {
+                        if (res) {
+                            
+                            var new_shortcut = '<div class="item_sb item_sb_sortable" shortcut_id="' + res.shortcut.id + '">\
+                                <a href="' + res.shortcut.url + '">\
+                                <span class="text_sb" title="' + res.shortcut.title + '">' + res.shortcut.title + '</span>\
+                                </a></div>' 
+                            
+                            $('.sp_sidebar').append(new_shortcut);
+                        }
+                    },
+                    error: function() {
+                    }
+                });
+            }
+        });
+        
+        $('#sp-shortcut-options .users').droppable({
+            accept: '.sp-shortcut',
+            hoverClass: 'accept',
+            drop: function(e, ui) {
+                var action_type = ui.draggable.attr('action_type');
+                var cls;
+                if (action_type === 'list') {
+                    console.log(action_type + ' ' + cls);
+                }
+                else {
+                    console.log(action_type);
+                }
+            }
+        });
+        
+        $('#sp-shortcut-options .roles').droppable({
+            accept: '.sp-shortcut',
+            hoverClass: 'accept',
+            drop: function(e, ui) {
+                var action_type = ui.draggable.attr('action_type');
+                var cls;
+                if (action_type === 'list') {
+                    console.log(action_type + ' ' + cls);
+                }
+                else {
+                    console.log(action_type);
+                }
+            }
+        });
+        
+        $('#sp-shortcut-options .delete').droppable({
+            accept: '.sp-shortcut',
+            hoverClass: 'accept',
+            drop: function(e, ui) {
+                var shortcut_id = ui.draggable.attr('shortcut_id');
+                var action_type = ui.draggable.attr('action_type');
+                var cls = ui.draggable.attr('cls');
+                
+                $('#delete-confirmation').dialog({
+                    modal: true,
+                    resizable: false,
+                    width: 450,
+                    buttons: {
+                        "{{_('Ok')}}": function() {
+                            $.ajax({
+                                url: "{{tg.url('/dashboard/sc/delete/')}}",
+                                data: { id_shortcut: shortcut_id },
+                                success: function(res) {
+                                    if (res.status) {
+                                        $('#delete-confirmation').dialog('close');
+                                        // delete shortcut (right pane) 
+                                        ui.draggable.fadeOut();
+                                        
+                                        // delete shortcut from sidebar (left pane), if it exists 
+                                        $('.sp_sidebar').find('div[shortcut_id=' + shortcut_id + ']').fadeOut();
+                                    }
+                                },
+                                error: function() {
+                                    alert('Error!');
+                                    $('#delete-confirmation').dialog('close');
+                                }
+                            });
+                        },
+                        "{{_('Cancel')}}": function() {
+                            $('#delete-confirmation').dialog('close');
+                        }
+                    }
+                });
+            }
+        });
     	
     	$('.sp-select-shortcut').change(function() {
     		var opc = $(this).find('option:selected').val();
@@ -98,7 +229,7 @@
     			move_shortcut(sc, opc);
     		}
     		
-    		$(this).find('option:first').attr('selected', true);
+    		$(this).find('option:first').prop('selected', true);
     	});
     	
     	function ins_order(sc) {
@@ -110,90 +241,6 @@
     		var cls = sc.attr('cls');
     		$('#order-form').attr('action', "/dashboard/ref_order/" + cls).submit();
     	}
-        
-        // delete 
-        function delete_shortcut(sc) {
-            var sc_id = sc.attr('sc_id');
-            
-            var sc_title = sc.find('a').html();
-            
-            $('#delete-confirmation').find('#sp-shortcut-title').html(sc_title);
-            
-            $('#delete-confirmation').
-            dialog({
-                resizable: false,
-                height: 200,
-                width: 450,
-                modal: true,
-                buttons: {
-                    "{{_('Ok')}}": function() {
-                        $.ajax({
-                            url: "{{tg.url('/dashboard/sc/delete')}}",
-                            type: 'post',
-                            dataType: 'json',
-                            data: {
-                                id_shortcut: sc_id,
-                            },
-                            success: function(res) {
-                                sc.fadeOut();
-                                $('#delete-confirmation').dialog('close');
-                            },
-                            error: function() {
-                                alert('Error!');
-                                $('#delete-confirmation').dialog('close');
-                            }
-                        });
-                    },
-                    "{{_('Cancel')}}": function() {
-                        $('#delete-confirmation').dialog('close');
-                    }
-                }
-            });
-        }
-        
-        // {# bookmark #} 
-        function sendto_dashboard(sc) {
-            var sc_id = sc.attr('sc_id');
-            
-            var sc_title = sc.find('a').html();            
-            $('#bookmark-confirmation').find('#sp-shortcut-title').html(sc_title);
-            
-            $('#bookmark-confirmation').dialog({
-                resizable: false,
-                height: 190,
-                width: 500,
-                modal: true,
-                buttons: {
-                    "{{_('Ok')}}": function() { 
-                        $.ajax({
-                            url: "{{tg.url('/dashboard/sc/bookmark')}}",
-                            type: 'post',
-                            dataType: 'json',
-                            data: {
-                                id_shortcut: sc_id,
-                            },
-                            success: function(res) {
-                                if (res.status) {
-                                    sc.effect('highlight', {color: 'red'}, 400);
-                                }
-                                else {
-                                    alert('Error!');
-                                }
-                                
-                                $('#bookmark-confirmation').dialog('close');
-                            },
-                            error: function() {
-                                alert('Error!');
-                                $('#bookmark-confirmation').dialog('close');
-                            }
-                        });
-                    },
-                    "{{_('Cancel')}}": function() { 
-                        $('#bookmark-confirmation').dialog('close');
-                    }
-                }
-            });
-        }
         
         // {# share #} 
         function share_shortcut(sc) {
@@ -252,83 +299,22 @@
                                     alert('Error!');
                                 }
                                 
-                                $('#users-to-share-with option:first').attr('selected', true);
+                                $('#users-to-share-with option:first').prop('selected', true);
                                 $('#share-dialog').dialog('close');
                             },
                             error: function() {
                                 alert('Error!');
-                                $('#users-to-share-with option:first').attr('selected', true);
+                                $('#users-to-share-with option:first').prop('selected', true);
                                 $('#share-dialog').dialog('close');
                             }
                         });
                     },
                     "{{_('Cancel')}}": function() {
-                    	$('#users-to-share-with').find('option:first').attr('selected', true);
+                    	$('#users-to-share-with').find('option:first').prop('selected', true);
                         $('#share-dialog').dialog('close');
                     }
                 }
             });
-        }
-        
-        function reorder_sc(sc_id, type) {
-        	var other;
-        	var shortcuts = {};
-        	var n;
-        	$('#sc-container').find('.sp_shortcut').each(function(index) {
-        		shortcuts[index] = $(this);
-        		$(this).remove();
-        		n = index;
-        	});
-        	
-        	for (var index=0; index<=n; index++) {
-        		console.log(index);
-        		var self = shortcuts[index];
-        		if (self != null) {
-            		if (self.attr('sc_id') == sc_id) {
-            			console.log(type);
-            			if (type == 'up') {
-            				other = shortcuts[index-1];
-            				//shortcuts[index-1] = null; 
-            				other.remove();
-            				$('#sc-container').append(self);
-                            $('#sc-container').append(other);
-            			}
-            			else {
-            				// down 
-            				other = shortcuts[index+1];
-            				shortcuts[index+1] = null;
-            				$('#sc-container').append(other);
-            				$('#sc-container').append(self);
-            			}
-            		}
-            		else {
-            			$('#sc-container').append(self);
-            		}
-        		}
-        	} 
-        }
-        
-        function move_shortcut(sc, type) {
-        	window.location = document.URL;
-        	/*var sc_id = sc.attr('sc_id');
-        	$.ajax({
-        		url: "{{tg.url('/dashboard/sc/reorder/')}}",
-        		type: "get",
-        		dataType: "json",
-        		data: {
-        			id_sc: sc_id,
-        			type: type
-        		},
-        		success: function(data) {
-        			if (data.status) {
-        				// TODO: reorder list of shortcuts 
-        				reorder_sc(sc_id, type);
-        			}
-        			else {
-        				alert('error!');
-        			}
-        		},        		
-        	});*/
         }
     });
 </script>
