@@ -969,44 +969,40 @@
         // if the row is selected, then mark the checkbox
         var cell_selector = sprintf('#%s .sp-grid-cell', self.name);
         $(document).off('click', cell_selector).on('click', cell_selector, function(event) {
-            if ($(this).attr('clickable') == 'true') {
-                $('#'+self.name + ' .sp-grid-select-all').prop('checked', false);
-                var row_id = $(this).parent().find('.sp-grid-rowid');
-                $('#'+self.name + ' .sp-grid-rowid').each(function() {
-                    var ctrl = event.ctrlKey || event.metaKey;
-                    if ($(this) != row_id && !self.multiselect && !ctrl) {
-                        $(this).prop('checked', false);
-                    }
-                });
+            
+            if ($(this).attr('clickable') === 'true') {
+                var ctrl = event.ctrlKey || event.metaKey;
                 
-                row_id.prop('checked', row_id.prop('checked') ? false : true);
-
-                /*if (row_id.prop('checked') == true) {
-                    row_id.prop('checked', false);
-                } 
+                var row_id = $(this).parent().find('.sp-grid-rowid');
+                if (!row_id.prop('checked') || ctrl || self.multiselect) {
+                    
+                    $('#'+self.name + ' .sp-grid-select-all').prop('checked', false);
+                    
+                    $('#'+self.name + ' .sp-grid-rowid').each(function() {
+                        if ($(this) != row_id && !self.multiselect && !ctrl) {
+                            $(this).prop('checked', false);
+                            $(this).parent().parent().removeClass('sp-grid-row-selected');
+                        }
+                    });
+                    
+                    if (row_id.prop('checked')) {
+                        row_id.prop('checked', false);
+                        $(this).parent().removeClass('sp-grid-row-selected');
+                    }
+                    else {
+                        row_id.prop('checked', true);
+                        $(this).parent().addClass('sp-grid-row-selected');
+                    }
+                }
                 else {
-                    row_id.prop('checked', true);
-                }*/
+                    if (self.dblclick) {
+                        // run 'dblclick' action
+                        run_action(row_id.attr('id_row')*1, self.dblclick, event.ctrlKey || event.metaKey, event.shiftKey);
+                    }
+                }
             }
         });
 
-        /*
-         * if (self.dblclick) { $('#'+self.name + '
-         * .sp-grid-cell').live('dblclick', function(event) {
-         * //console.log('dbl-click'); if ($(this).attr('clickable') == 'true') {
-         * var row_id = $(this).parent().find('.sp-grid-rowid'); $('#'+self.name + '
-         * .sp-grid-rowid').each(function() { if ($(this) != row_id &&
-         * !self.multiselect && !event.ctrlKey) { $(this).prop('checked',
-         * false); } });
-         * 
-         * if (row_id.prop('checked') == true) { row_id.prop('checked', false); }
-         * else { row_id.prop('checked', true); }
-         * 
-         * if (typeof(self.dblclick) == 'function') {
-         * self.dblclick(row_id.attr('id_row')*1); } else { $('#'+self.name +
-         * '_' + self.dblclick).click(); } } }); }
-         */
-        
         function form(action, target) {
             
             var qry = self.q + '$$';
@@ -1154,7 +1150,14 @@
 
         function run_action(item, action_name, ctrl, shift) {
             var act = self.getAction(action_name);
-            var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
+            
+            if (typeof(item) !== 'number') {
+                var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
+            }
+            else {
+                var id = item;
+            }
+            
             _run_action(id, [], act, ctrl, shift);
         }
 

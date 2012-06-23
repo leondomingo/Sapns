@@ -101,13 +101,10 @@ class DashboardController(BaseController):
         return dict(page=u'Data exploration', shortcuts=shortcuts,
                     sc_parent=sc_parent, _came_from=came_from)
 
-    #@expose('sapns/dashboard/index.html')
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
     @add_language
     def index(self, **kw):
-        curr_lang = get_lang()
-        
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         db = user.get_dashboard()
         shortcuts = user.get_shortcuts(id_parent=db.shortcut_id)
