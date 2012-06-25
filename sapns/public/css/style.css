@@ -340,7 +340,7 @@ form.loginfields input#submit {
 	margin-bottom: -1px;
 }
 
-.sp-grid-row-selected .sp-grid-cell { color:#B4BD3C }
+/*.sp-grid-row-selected .sp-grid-cell { color:#B4BD3C }*/
 
 .sp-grid-cell {
 	background-color: white;
