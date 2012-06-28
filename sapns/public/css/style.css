@@ -468,7 +468,7 @@ form.loginfields input#submit {
 	margin-right: 3px;
 }
 
-.sp_shortcut {
+/*.sp_shortcut {
 	margin-left: 20px;
 	margin-right: 20px;
     margin-top: 5px;
@@ -513,7 +513,7 @@ form.loginfields input#submit {
     margin-right: 5px;
     width: 140px;
     text-align: center;
-}
+}*/
 
 .sp_messages {
 	font-size: 10px;
@@ -623,3 +623,24 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
     background-color: #FFA900;
     color: #fff;
 }
+
+/* shortcuts */
+.caja3d { border:1px solid #999; border-bottom:2px solid #777; 
+border-right:2px solid #777; border-radius:3px }
+#sc_list { height:565px; overflow:auto }
+#sp-exploration-head { height:20px; padding-left:25px; padding-top:2px;
+background-color:white; border-radius:3px; margin:4px 10px }
+#sp-exploration-head * { float:left }
+#sp-exploration-head button { font-size:9px }
+
+.sp-shortcut-up { font-weight:normal; width:90% }
+#sp-shortcut-list { margin:0 10px 10px 10px; padding:5px; background-color:#fff; 
+height:540px; overflow:auto }
+.on-dragging { height:415px !important }
+a.sp-shortcut { font-weight:normal; color:#000; border-radius:3px; 
+width:101px; height:80px; margin:5px; padding:2px; text-align:center;
+float:left; font-size:13px; word-wrap:break-word; padding-top:0px }
+a.sp-shortcut.group { background:#979e32 url('/images/sapns/icons/group.png') no-repeat center center; color:#fff }
+a.sp-shortcut.list { background:#B4BD3C url('/images/sapns/icons/list.png') no-repeat center center }
+a.sp-shortcut.process { background:#FFB835 url('/images/sapns/icons/process.png') no-repeat center center }
+.sp_sidebar.activo { border:2px solid red }

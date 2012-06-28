@@ -7,6 +7,7 @@
     {{ util.jquery_ui() }}
     {{ util.jquery_jstree() }}
     <style>
+        /*
         .caja3d { border:1px solid #999; border-bottom:2px solid #777; 
         border-right:2px solid #777; border-radius:3px }
         #sc_list { height:565px; overflow:auto }
@@ -26,6 +27,7 @@
         a.sp-shortcut.list { background:#B4BD3C url('/images/sapns/icons/list.png') no-repeat center center }
         a.sp-shortcut.process { background:#FFB835 url('/images/sapns/icons/process.png') no-repeat center center }
         .sp_sidebar.activo { border:2px solid red }
+        */
     </style>
 {% endblock %}
 
@@ -57,7 +59,7 @@
 
 <div id="sp-exploration-head" class="caja3d">
     <!--{% if sc_parent %}-->
-    <a class="sp-shortcut-up" href="{{tg.url('/dashboard/data_exploration', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
+    <a class="sp-shortcut-up" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent))}}">[{{_('up')}}]</a>
     <!--{% else %}-->
     <div class="sp-shortcut-up">&nbsp;</div>
     <!--{% endif %}-->
