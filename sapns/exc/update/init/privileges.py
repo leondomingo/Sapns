@@ -5,6 +5,8 @@ from sapns.model.sapnsmodel import SapnsClass, SapnsRole, SapnsPermission
 
 class Privileges(object):
     
+    __desc__ = u'init: roles/users privileges'
+    
     def __call__(self):
         
         roles = dbs.query(SapnsClass).\
@@ -27,5 +29,3 @@ class Privileges(object):
             first()
             
         managers.permissions_.append(ap_r)
-
-update = Privileges

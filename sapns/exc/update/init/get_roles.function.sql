@@ -1,3 +1,4 @@
+-- desc: init: get_roles 
 CREATE OR REPLACE FUNCTION get_roles(user_id integer)
   RETURNS text AS
 $BODY$

@@ -5,6 +5,8 @@ from sapns.model import DBSession as dbs
 
 class UsersRoles(object):
     
+    __desc__ = u'init: users/roles'
+    
     def __call__(self):
         
         roles = dbs.query(SapnsClass).\
@@ -40,5 +42,3 @@ class UsersRoles(object):
             first()
         managers.permissions_.append(p1)
         managers.permissions_.append(p2)
-
-update = UsersRoles

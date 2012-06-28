@@ -5,6 +5,8 @@ from sapns.model.sapnsmodel import SapnsClass, SapnsRole, SapnsPermission
 
 class CopyPrivileges(object):
     
+    __desc__ = u'init: copy privileges'
+    
     def __call__(self):
         
         roles = dbs.query(SapnsClass).\
@@ -25,5 +27,3 @@ class CopyPrivileges(object):
             filter(SapnsRole.group_name == u'managers').\
             first()
         managers.permissions_.append(ap_r)
-
-update = CopyPrivileges

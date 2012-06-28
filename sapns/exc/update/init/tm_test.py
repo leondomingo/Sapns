@@ -6,6 +6,8 @@ import logging
 
 class TM_Test(object):
     
+    __desc__ = u'init: tm_test'
+    
     def __call__(self):
         
         logger = logging.getLogger('TM_Test')
@@ -30,5 +32,3 @@ class TM_Test(object):
                 
         attributes(SapnsClass.by_name(u'alumnos'))
         attributes(SapnsClass.by_name(u'clientes'))
-        
-update = TM_Test

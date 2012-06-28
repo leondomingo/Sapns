@@ -5,6 +5,8 @@ from sapns.model import DBSession as dbs
 
 class UsersEdit(object):
     
+    __desc__ = u'sapns: users edit'
+    
     def __call__(self):
         
         # sp_users#new
@@ -28,5 +30,3 @@ class UsersEdit(object):
         
         dbs.add(p_edit)
         dbs.flush()
-
-update = UsersEdit

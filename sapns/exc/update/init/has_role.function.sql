@@ -1,3 +1,4 @@
+-- desc: init: has_role
 CREATE OR REPLACE FUNCTION has_role(user_id integer, role_name text)
   RETURNS boolean AS
 $BODY$

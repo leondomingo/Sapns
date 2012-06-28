@@ -1,3 +1,4 @@
+-- desc: init: sp_attr_privileges
 CREATE OR REPLACE VIEW _view_sp_attr_privileges AS 
   SELECT attr_p.id, cls.name AS "Class name", attr.name AS "Name", 
     attr_p.access AS "Access", usr.user_name AS "User", 
