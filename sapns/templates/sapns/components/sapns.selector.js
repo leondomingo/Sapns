@@ -22,11 +22,11 @@ catch (e) {
         
         function set(this_object, key, value, obj) {
             
-            if (obj == undefined) {
+            if (obj === undefined) {
                 obj = settings;
             }
 
-            if (obj[key] == undefined) {
+            if (obj[key] === undefined) {
                 this_object[key] = value;
             }
             else {
@@ -119,10 +119,9 @@ catch (e) {
     SapnsSelector.prototype.search = function(q) {
         
         var self = this;
-        var dialog_name = "#dialog_" + self.name;
         
-        if (q == undefined) {
-            q = $(dialog_name + ' .sp-search-text').val();
+        if (q === undefined) {
+            q = $(self.dialog_name() + ' .sp-search-text').val();
         }
         
         // search params
@@ -133,10 +132,10 @@ catch (e) {
         };
         
         if (self.search_params != null) {
-            if (typeof(self.search_params) == 'object') {
+            if (typeof(self.search_params) === 'object') {
                 params = $.extend(true, params, self.search_params);
             }
-            else if (typeof(self.search_params) == 'function') {
+            else if (typeof(self.search_params) === 'function') {
                 params.search_params = self.search_params;
                 params.search_params();
             }
@@ -145,11 +144,10 @@ catch (e) {
         // search
         $.ajax({
             url: this.search_url,
-            //type: 'post',
             dataType: 'html',
             data: params,
             success: function(res) {
-                $(dialog_name).html(res);
+                $(self.dialog_name()).html(res);
             },
             error: function(f, status, error) {
                 alert('error!');
@@ -161,7 +159,7 @@ catch (e) {
 
     // search_kp
     SapnsSelector.prototype.search_kp = function(event) {
-        if (event.which == 13) {
+        if (event.which === 13) {
             this.search();
         }
     }
@@ -186,35 +184,33 @@ catch (e) {
         $('#rb_' + self.name).attr('disabled', value);
         self.read_only = value;
     }
-
+    
+    SapnsSelector.prototype.dialog_name = function() {
+        var self = this;
+        return '#sp-selector-dialog-' + self.name;
+    }
+    
     $.fn.sapnsSelector = function(arg1, arg2, arg3) {
         
-        if (typeof(arg1) == "object") {
+        if (typeof(arg1) === "object") {
             
+            var self = this;
             var sapnsSelector = new SapnsSelector(arg1);
             
-            // dialog
-            this.append('<div id="dialog_' + sapnsSelector.name + '" style="display: none;"></div>'); 
-
             // select text
-            var select_text = 
-                '<input id="st_' + sapnsSelector.name + '"' + 
-                ' class="sp-select-text" type="text" readonly value=""';
+            var select_text = '<input id="st_' + sapnsSelector.name + '" class="sp-select-text" type="text" readonly value=""';
             
-            if (this.attr('readonly') || this.attr('disabled')) {
+            if (self.attr('readonly') || self.attr('disabled')) {
                 sapnsSelector.read_only = true;
-            }
-            
-            if (sapnsSelector.read_only) {
                 select_text += ' disabled';
             }
             
             select_text += '>';
             
-            this.append(select_text);
+            self.append(select_text);
             
             // double-click to edit the selected object (if there's any)
-            this.find('#st_' + sapnsSelector.name).dblclick(function() {
+            self.find('#st_' + sapnsSelector.name).dblclick(function() {
                 
                 if (!sapnsSelector.isReadonly) {
                     var cls = sapnsSelector.getClass();
@@ -251,9 +247,9 @@ catch (e) {
             
             select_button += '>...</button>';
             
-            this.append(select_button);
+            self.append(select_button);
 
-            this.find('#sb_' + sapnsSelector.name).click(function() {
+            self.find('#sb_' + sapnsSelector.name).click(function() {
                 
                 if (!sapnsSelector.isReadonly) {
                     
@@ -263,12 +259,16 @@ catch (e) {
                     else {
                         // dialog title
                         var dialog_title = sapnsSelector.rc_title;
-                        if (typeof(sapnsSelector.rc_title) == 'function') {
+                        if (typeof(sapnsSelector.rc_title) === 'function') {
                             dialog_title = sapnsSelector.rc_title();
                         }
                         
+                        var dialog_name_ = sapnsSelector.dialog_name().replace('#', '');
+                        $(sapnsSelector.dialog_name()).remove();
+                        $('<div id="' + dialog_name_ + '"></div>').appendTo('body');
+                        
                         // show search dialog
-                        $('#dialog_' + sapnsSelector.name).dialog({
+                        $(sapnsSelector.dialog_name()).dialog({
                             title: dialog_title,
                             width: sapnsSelector.dialog.width,
                             height: sapnsSelector.dialog.height,
@@ -278,15 +278,15 @@ catch (e) {
                                 "{{_('Ok')}}": function() {
                                     // get the id of the selected row
                                     
-                                    var id_selected = $('#dialog_' + sapnsSelector.name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
+                                    var id_selected = $(sapnsSelector.dialog_name() + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
                                     
                                     sapnsSelector.setValue(id_selected);
                                     sapnsSelector.setTitle();
                                     
-                                    $('#dialog_' + sapnsSelector.name).dialog('close');
+                                    $(sapnsSelector.dialog_name()).dialog('destroy').remove();
                                 },
                                 "{{_('Cancel')}}": function() {
-                                    $('#dialog_' + sapnsSelector.name).dialog('close');
+                                    $(sapnsSelector.dialog_name()).dialog('destroy').remove();
                                 }
                             }
                         });
@@ -319,33 +319,33 @@ catch (e) {
             //this.sapnsSelector = sapnsSelector;
             this.data('sapnsSelector', sapnsSelector);
         }
-        else if (typeof(arg1) == "string") {
+        else if (typeof(arg1) === "string") {
             
             var sapnsSelector = this.data('sapnsSelector');
             
             // setValue(arg2)
             // $(element).sapnsSelector("setValue", 123);
             // $(element).sapnsSelector("setValue", null);
-            if (arg1 == "setValue") {
+            if (arg1 === "setValue") {
                 sapnsSelector.setValue(arg2, arg3);
                 sapnsSelector.setTitle();
             }
             // getValue()
-            else if (arg1 == "getValue") {
+            else if (arg1 === "getValue") {
                 return sapnsSelector.value;
             }
             // getTitle()
-            else if (arg1 == "getTitle") {
+            else if (arg1 === "getTitle") {
                 return sapnsSelector.title;
             }
             // getClass()
-            else if (arg1 == "getClass") {
+            else if (arg1 === "getClass") {
                 return sapnsSelector.rc;
             }
-            else if (arg1 == "setReadonly") {
+            else if (arg1 === "setReadonly") {
                 sapnsSelector.setReadonly(arg2);
             }
-            else if (arg1 == "isReadonly") {
+            else if (arg1 === "isReadonly") {
                 return sapnsSelector.read_only;
             }
             // TODO: other sapnsSelector methods
