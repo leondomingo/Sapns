@@ -86,7 +86,6 @@ class Update(object):
                                                         try:
                                                             callable_obj()
                                                             
-                                                            add_update(code__, desc__)
                                                             transaction.commit()
                                                             
                                                         except Exception, e:
@@ -105,8 +104,7 @@ class Update(object):
                                         except Exception, e:
                                             logger.error(e)
                                             logger.info(name + ' ' + member[0])
-                                            
-                                    
+                                
                             except ImportError, e:
                                 logger.warning(e)
                             
@@ -129,22 +127,24 @@ class Update(object):
                                             
                                         logger.info('[%s] %s: __code__ = "%s"' % (topid, fn, code__))
                                         
-                                        for script in sql_text.split('--#'):
-                                            if script.strip():
-                                                
-                                                logger.info(' > Executing "%s..."' % script.strip()[:50])
-                                                
-                                                transaction.begin()
-                                                try:
+                                        transaction.begin()
+                                        try:
+                                            for script in sql_text.split('--#'):
+                                                if script.strip():
+                                                    
+                                                    logger.info(' > Executing "%s..."' % script.strip()[:50])
+                                                    
                                                     dbs.execute(script.strip())
                                                     dbs.flush()
                                                     
-                                                    add_update(code__, desc__)
-                                                    transaction.commit()
-                                                    
-                                                except Exception, e:
-                                                    logger.error(e)
-                                                    transaction.abort()
+                                            # register update
+                                            add_update(code__, desc__)
+                                        
+                                            transaction.commit()
+                                                        
+                                        except Exception, e:
+                                            logger.error(e)
+                                            transaction.abort()
 
                                     else:
                                         logger.warning(u'[%s] Skipping [%s "%s"]' % (topid, fn, code__))
