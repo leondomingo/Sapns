@@ -127,12 +127,12 @@ class Update(object):
                                             desc__ = m_desc.group(1).strip()
                                             logger.info(desc__)
                                             
-                                        continue
-                                        
                                         logger.info('[%s] %s: __code__ = "%s"' % (topid, fn, code__))
                                         
                                         for script in sql_text.split('--#'):
                                             if script.strip():
+                                                
+                                                logger.info(' > Executing "%s..."' % script.strip()[:50])
                                                 
                                                 transaction.begin()
                                                 try:
