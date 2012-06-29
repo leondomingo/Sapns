@@ -14,6 +14,7 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
 from tg import config
 import logging
 import os
+import re
 import transaction
 
 ROLE_MANAGERS = u'managers'
@@ -268,7 +269,8 @@ class InitSapns(object):
                         
                         attr = SapnsAttribute()
                         attr.name = col['name']
-                        attr.title = col['name'].replace('_', ' ').title()
+                        col_name = re.sub(r'^id_', '', col['name'])
+                        attr.title = col_name.replace('_', ' ').title()
                         attr.class_id = klass.class_id
                         attr.type = col['type_name']
                         if attr.type == SapnsAttribute.TYPE_STRING and not first_ref:
