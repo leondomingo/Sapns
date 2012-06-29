@@ -5,7 +5,8 @@ from sapns.model import DBSession as dbs
 
 class UsersRoles(object):
     
-    __desc__ = u'init: users/roles'
+    __code__ = u'init: users/roles'
+    __desc__ = u'Assign some permissions to "managers" role'
     
     def __call__(self):
         

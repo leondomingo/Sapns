@@ -5,7 +5,7 @@ from sapns.model.sapnsmodel import SapnsClass, SapnsRole, SapnsPermission
 
 class CopyPrivileges(object):
     
-    __desc__ = u'init: copy privileges'
+    __code__ = u'init: copy privileges'
     
     def __call__(self):
         

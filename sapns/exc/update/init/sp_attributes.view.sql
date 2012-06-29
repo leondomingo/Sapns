@@ -1,4 +1,4 @@
--- desc: init: sp_attributes
+-- code: init: sp_attributes
 create or replace view _view_sp_attributes
 as
 select attr.id, attr.name as "Name", attr.title as "Title", 

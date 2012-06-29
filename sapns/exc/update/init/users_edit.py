@@ -5,7 +5,7 @@ from sapns.model import DBSession as dbs
 
 class UsersEdit(object):
     
-    __desc__ = u'sapns: users edit'
+    __code__ = u'sapns: users edit'
     
     def __call__(self):
         

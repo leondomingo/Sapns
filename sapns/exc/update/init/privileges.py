@@ -5,7 +5,7 @@ from sapns.model.sapnsmodel import SapnsClass, SapnsRole, SapnsPermission
 
 class Privileges(object):
     
-    __desc__ = u'init: roles/users privileges'
+    __code__ = u'init: roles/users privileges'
     
     def __call__(self):
         

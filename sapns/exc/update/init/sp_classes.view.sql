@@ -1,4 +1,4 @@
--- desc: init: sp_classes
+-- code: init: sp_classes
 create view _view_sp_classes
 as
 select cls.id, cls.name as "Name", cls.title as "Title", 

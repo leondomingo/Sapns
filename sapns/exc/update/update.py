@@ -35,17 +35,17 @@ class Update(object):
         
     def __call__(self):
         
-        tops = [('init', os.path.join(current_path, 'init'),)]
+        tops = [('sapns', os.path.join(current_path, 'init'),)]
         
         root_folder = config.get('app.root_folder')
         if root_folder:
             tops.append((root_folder, os.path.join(current_path, root_folder),))
             
-        def add_update(code):
+        def add_update(code, description):
             # save "update"
             new_u = SapnsUpdates()
             new_u.code = code
-            #new_u.description =
+            new_u.description = description
             new_u.exec_date = dt.datetime.now()
         
             dbs.add(new_u)
@@ -72,19 +72,21 @@ class Update(object):
                                             
                                             callable_obj = cls()
                                             
-                                            if hasattr(callable_obj, '__desc__'):
+                                            code__ = getattr(callable_obj, '__code__', None)
+                                            if code__:
                                                 
-                                                desc__ = callable_obj.__desc__
-                                                if not SapnsUpdates.by_code(desc__):
+                                                if not SapnsUpdates.by_code(code__):
                                                     
-                                                    logger.warning(u'[%s] Executing [%s.%s %s]' % (topid, m.__name__, member[0], desc__))
+                                                    desc__ = getattr(callable_obj, '__desc__', None)
+                                                    
+                                                    logger.warning(u'[%s] Executing [%s.%s "%s"]' % (topid, m.__name__, member[0], code__))
                                                     
                                                     if hasattr(callable_obj, '__call__'):
                                                         transaction.begin()
                                                         try:
                                                             callable_obj()
                                                             
-                                                            add_update(desc__)
+                                                            add_update(code__, desc__)
                                                             transaction.commit()
                                                             
                                                         except Exception, e:
@@ -95,10 +97,10 @@ class Update(object):
                                                         raise Exception('[%s] Class "%s.%s" in not callable' % (topid, m.__name__, member[0]))
                                                     
                                                 else:
-                                                    logger.warning(u'[%s] Skipping [%s.%s %s]' % (topid, m.__name__, member[0], desc__))
+                                                    logger.warning(u'[%s] Skipping [%s.%s "%s"]' % (topid, m.__name__, member[0], code__))
                                                 
                                             else:
-                                                logger.warning('[%s] PY: %s.%s lacks of "__desc__"' % (topid, m.__name__, member[0]))
+                                                logger.warning('[%s] PY: %s.%s lacks of "__code__"' % (topid, m.__name__, member[0]))
                                         
                                         except Exception, e:
                                             logger.error(e)
@@ -113,12 +115,21 @@ class Update(object):
                             try:
                                 sql_text = f_sql.read()
                                 
-                                m = re.search(r'^--\s*desc\:(.+)$', sql_text.split('\n')[0])
-                                if m:
-                                    desc__ = m.group(1).strip()
+                                m_code = re.search(r'^--\s*code\:(.+)$', sql_text, re.M)
+                                if m_code:
+                                    code__ = m_code.group(1).strip()
                                     
-                                    if not SapnsUpdates.by_code(desc__):
-                                        logger.info('[%s] %s: __desc__ = %s' % (topid, fn, desc__))
+                                    if not SapnsUpdates.by_code(code__):
+                                        
+                                        desc__ = None
+                                        m_desc = re.search(r'^--\s*desc\:(.+)$', sql_text, re.M)
+                                        if m_desc:
+                                            desc__ = m_desc.group(1).strip()
+                                            logger.info(desc__)
+                                            
+                                        continue
+                                        
+                                        logger.info('[%s] %s: __code__ = "%s"' % (topid, fn, code__))
                                         
                                         for script in sql_text.split('--#'):
                                             if script.strip():
@@ -128,7 +139,7 @@ class Update(object):
                                                     dbs.execute(script.strip())
                                                     dbs.flush()
                                                     
-                                                    add_update(desc__)
+                                                    add_update(code__, desc__)
                                                     transaction.commit()
                                                     
                                                 except Exception, e:
@@ -136,67 +147,10 @@ class Update(object):
                                                     transaction.abort()
 
                                     else:
-                                        logger.warning(u'[%s] Skipping [%s %s]' % (topid, fn, desc__))
+                                        logger.warning(u'[%s] Skipping [%s "%s"]' % (topid, fn, code__))
     
                                 else:
-                                    logger.warning('[%s] SQL: %s lacks of "-- desc:" on first line' % (topid, name))
+                                    logger.warning('[%s] SQL: %s lacks of "-- code:"' % (topid, name))
                                     
                             finally:
                                 f_sql.close()
-
-        
-#        for u in TODO:
-#            
-#            u = Dict(**u)
-#            if not SapnsUpdates.by_code(u.code):
-#
-#                logger.info(u'[%s] %s (%s)' % (u.code, u.desc or '', u.type.upper()))
-#                
-#                #dbs = Conexion(config.get('sqlalchemy.url')).session
-#                transaction.begin()
-#                try:
-#                    # SQL
-#                    if u.type.lower() == 'sql':
-#                        #logger.info(_('Executing SQL script...'))
-#                        f_sql = _open(os.path.join(current_path, u.filename), 'rb', 
-#                                      encoding='utf-8')
-#                        try:
-#                            sql_text = f_sql.read()
-#                            for script in sql_text.split('--#'):
-#                                if script.strip():
-#                                    dbs.execute(script.strip())
-#                                    dbs.flush()
-#                                
-#                        finally:
-#                            f_sql.close()
-#
-#                    # python
-#                    elif u.type.lower() == 'py':
-#                        #logger.info(_('Executing Python script...'))
-#                        module_name = 'sapns.exc.update.%s' % u.module
-#                        module_update = __import__(module_name, fromlist=['update'])
-#                        
-#                        _update = getattr(module_update, 'update')
-#                        if isinstance(_update, type):
-#                            # class
-#                            _update()()
-#                        
-#                        else:
-#                            # function
-#                            _update()
-#                        
-#                    # save "update"
-#                    new_u = SapnsUpdates()
-#                    new_u.code = u.code
-#                    new_u.description = u.desc
-#                    new_u.exec_date = dt.datetime.now()
-#                
-#                    dbs.add(new_u)
-#                    transaction.commit()
-#                        
-#                except Exception, e:
-#                    transaction.abort()
-#                    logger.error(e)
-#                    
-#            else:
-#                logger.warning(u'Skipping [%s]' % u.code)

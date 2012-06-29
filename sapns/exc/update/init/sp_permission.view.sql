@@ -1,4 +1,4 @@
--- desc: init: sp_permission
+-- code: init: sp_permission
 CREATE OR REPLACE VIEW _view_sp_permission AS 
   SELECT perm.id, perm.name AS "Name", perm.type AS "Type", 
     perm.url AS "URL", cls.name AS "Class"

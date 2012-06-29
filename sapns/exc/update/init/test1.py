@@ -5,7 +5,7 @@ from sapns.model import DBSession as dbs
 
 class Test1(object):
     
-    __desc__ = u'sapns: test1_py'
+    __code__ = u'sapns: test1_py'
     
     def __call__(self):
         
