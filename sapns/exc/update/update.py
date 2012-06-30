@@ -113,14 +113,22 @@ class Update(object):
                             try:
                                 sql_text = f_sql.read()
                                 
-                                m_code = re.search(r'^--\s*code\:(.+)$', sql_text, re.M)
+                                # -- __ignore__
+                                m_ignore = re.search(r'^--\s*__ignore__\s*$', sql_text, re.M)
+                                if m_ignore:
+                                    logger.warning('[%s] SQL: ignoring "%s"' % (topid, fn))
+                                    continue
+                                
+                                # -- __code__ = put here your code
+                                m_code = re.search(r'^--\s*__code__\s+=\s+(.+)$', sql_text, re.M)
                                 if m_code:
                                     code__ = m_code.group(1).strip()
                                     
                                     if not SapnsUpdates.by_code(code__):
                                         
+                                        # -- __desc__ = put here your description
                                         desc__ = None
-                                        m_desc = re.search(r'^--\s*desc\:(.+)$', sql_text, re.M)
+                                        m_desc = re.search(r'^--\s*__desc__\s+=\s+(.+)$', sql_text, re.M)
                                         if m_desc:
                                             desc__ = m_desc.group(1).strip()
                                             logger.info(desc__)
@@ -132,7 +140,7 @@ class Update(object):
                                             for script in sql_text.split('--#'):
                                                 if script.strip():
                                                     
-                                                    logger.info(' > Executing "%s..."' % script.strip()[:50])
+                                                    logger.info(' > Executing "%s..."' % script.strip()[:30])
                                                     
                                                     dbs.execute(script.strip())
                                                     dbs.flush()
@@ -150,7 +158,7 @@ class Update(object):
                                         logger.warning(u'[%s] Skipping [%s "%s"]' % (topid, fn, code__))
     
                                 else:
-                                    logger.warning('[%s] SQL: %s lacks of "-- code:"' % (topid, name))
+                                    logger.warning(u'[%s] Ignoring [%s "%s"]' % (topid, fn, code__))
                                     
                             finally:
                                 f_sql.close()

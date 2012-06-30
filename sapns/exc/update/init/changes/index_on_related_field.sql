@@ -1,4 +1,5 @@
--- 2012-03-29 LD
+-- __ignore__
+-- __desc__   = 2012-03-29 LD
 create or replace function search_index(class_name varchar, idx_name varchar) 
   returns boolean as
 $$

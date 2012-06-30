@@ -1,4 +1,4 @@
--- code: init: sp_docs
+-- __code__ = init: sp_docs
 CREATE OR REPLACE VIEW _view_sp_docs AS 
  SELECT d.id, d.title AS "Title", f.name AS "Format", t.name AS "Type", 
    u.display_name AS "Author", r.name AS "Repo", 

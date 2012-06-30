@@ -1,4 +1,4 @@
--- code: sapns: logs view
+-- __code__ = sapns: logs view
 CREATE OR REPLACE VIEW _view_sp_logs AS 
   SELECT l.id, cast(l.when_ as date) AS "Date", 
     date_trunc('seconds', cast(l.when_ as time)) as "Time",

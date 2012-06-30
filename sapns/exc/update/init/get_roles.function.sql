@@ -1,5 +1,5 @@
--- code: init: get_roles 
--- desc: Definition of "get_roles" function
+-- __code__ = init: get_roles 
+-- __desc__ = Definition of "get_roles" function
 
 CREATE OR REPLACE FUNCTION get_roles(user_id integer)
   RETURNS text AS
