@@ -673,6 +673,7 @@ class SapnsClass(DeclarativeBase):
     #attributes
     privileges = relation('SapnsPrivilege', backref='class_')
     permissions = relation('SapnsPermission', backref='class_')
+    assigned_docs = relation('SapnsAssignedDoc', backref='class_')
     
     CACHE_ID_ATTR = 'class_get_attributes'
     
@@ -1831,6 +1832,10 @@ class SapnsDoc(DeclarativeBase):
         
         dbs.add(ad)
         dbs.flush()
+        
+    @staticmethod
+    def by_file_name(file_name):
+        return dbs.query(SapnsDoc).filter(SapnsDoc.filename == file_name).first()
 
     @staticmethod
     def copy_doc(id_doc, id_repo=None, id_author=None):
@@ -1840,6 +1845,9 @@ class SapnsDoc(DeclarativeBase):
         IN
           id_doc   <int>
           id_repo  <int>
+          
+        OUT
+          <SapnsDoc> (the copy)
         """
         
         # get doc
@@ -1858,8 +1866,8 @@ class SapnsDoc(DeclarativeBase):
         copy_path = dst_repo.get_new_path()
         
         # copy file
-        shutil.copy(doc_path, copy_path)
-        
+        shutil.copy2(doc_path, copy_path)
+
         # copy "doc" object
         copy = SapnsDoc()
         copy.author_id = id_author or doc.author_id
@@ -1963,7 +1971,6 @@ class SapnsDoc(DeclarativeBase):
         if os.access(path_file, os.F_OK):
             os.remove(path_file)
 
-
 class SapnsDocType(DeclarativeBase):
     
     __tablename__ = 'sp_doctypes'
@@ -1986,11 +1993,36 @@ class SapnsDocFormat(DeclarativeBase):
     
     docformat_id = Column('id', Integer, primary_key=True, autoincrement=True)
     name = Column(Unicode(80), nullable=False)
-    extension = Column(Unicode(5), nullable=False)
+    
+    # extension
+    _extension = Column('extension', Unicode(5), nullable=False)
+    
+    def _get_extension(self):
+        ext = None
+        if self._extension:
+            ext = re.sub(r'^\.', '', self._extension.strip()).lower()
+            
+        return ext
+    
+    def _set_extension(self, ext):
+        if ext:
+            ext = re.sub(r'^\.', '', ext.strip()).lower()
+            
+        self._extension = ext
+    
+    extension = synonym('_extension', descriptor=property(_get_extension, _set_extension))
+    
     mime_type = Column(Unicode(30), nullable=False)
     description = Column(Text)
     
     docs = relation('SapnsDoc', backref='docformat')
+    
+    @staticmethod
+    def by_extension(ext):
+        # .PDF --> pdf
+        # .tar.gz --> tar.gz
+        ext = re.sub('^\.', '', ext.strip()).lower()
+        return dbs.query(SapnsDocFormat).filter(SapnsDocFormat.extension == ext).first()
     
 class SapnsAssignedDoc(DeclarativeBase):
     
@@ -2001,6 +2033,7 @@ class SapnsAssignedDoc(DeclarativeBase):
     class_id = Column('id_class', Integer, 
                       ForeignKey('sp_classes.id',
                                  onupdate='CASCADE', ondelete='SET NULL'))
+    # class_
     
     doc_id = Column('id_doc', Integer, 
                     ForeignKey('sp_docs.id',
@@ -2008,6 +2041,21 @@ class SapnsAssignedDoc(DeclarativeBase):
     # doc
     
     object_id = Column(Integer)
+    
+    def get_object(self):
+        try:
+            m = __import__('sapns.model.%s' % config.get('app.root_folder'), fromlist=[''])
+            
+            class_name = self.class_.name.title().replace('_', '')
+            cls = getattr(m, class_name, None)
+            if cls:
+                return dbs.query(cls).get(self.object_id)
+            
+            else:
+                return None
+            
+        except ImportError:
+            return None
     
 class SapnsUpdates(DeclarativeBase):
     
