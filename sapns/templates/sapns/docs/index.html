@@ -6,8 +6,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <link rel="stylesheet" type="text/css" media="screen" 
-        href="{{tg.url('/css/docs.min.css')}}">
+    <link rel="stylesheet" href="{{tg.url('/css/docs.min.css')}}">
 {% endblock %}
 
 {% block middle %}
@@ -17,8 +16,8 @@
     <div id="docs"></div>
     <div id="docs_dialog" style="display: none;"></div>
     
-    <script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
-    <script type="text/javascript">
+    <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+    <script>
         {% include 'sapns/components/sapns.selector.min.js' %}
         {% include 'sapns/components/sapns.uploader.min.js' %}
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
@@ -287,8 +286,7 @@
                     modal: true,
                     resizable: false,
                     title: "{{_('Delete document')}}",
-                    width: 'auto',
-                    height: 'auto',
+                    width: 650,
                     buttons: {
                         "{{_('Ok')}}": function() {
                             var callback_success = function() {

@@ -1743,6 +1743,32 @@ class SapnsRepo(DeclarativeBase):
     def __repr__(self):
         return unicode(self).encode('utf-8')
     
+    def get_new_path(self):
+        """Returns the complete path for a new file name in this repo"""
+        
+        import hashlib as hl
+        import random
+        
+        # calculate random name for the new file
+        def _file_path():
+            
+            # create hash
+            s256 = hl.sha256()
+            
+            random.seed()
+            s256.update('%9.9d' % (random.randint(0, 999999999)))
+            
+            return os.path.join(self.abs_path(), s256.hexdigest())
+        
+        while True:
+            file_path = _file_path()
+            
+            # does it exist???
+            if not os.access(file_path, os.F_OK):
+                break
+            
+        return file_path    
+    
 class SapnsDoc(DeclarativeBase):
     
     __tablename__ = 'sp_docs'
@@ -1805,7 +1831,49 @@ class SapnsDoc(DeclarativeBase):
         
         dbs.add(ad)
         dbs.flush()
-    
+
+    @staticmethod
+    def copy_doc(id_doc, id_repo=None, id_author=None):
+        """
+        Copy the doc (and the file) in this or another repo.
+        
+        IN
+          id_doc   <int>
+          id_repo  <int>
+        """
+        
+        # get doc
+        id_doc = int(id_doc)
+        doc = dbs.query(SapnsDoc).get(id_doc)
+        doc_path = os.path.join(doc.repo.abs_path(), doc.filename)
+        
+        # get destination repo
+        if id_repo:
+            dst_repo = dbs.query(SapnsRepo).get(id_repo)
+            
+        else:
+            dst_repo = doc.repo
+            
+        # get a new path for the copy in this repo
+        copy_path = dst_repo.get_new_path()
+        
+        # copy file
+        shutil.copy(doc_path, copy_path)
+        
+        # copy "doc" object
+        copy = SapnsDoc()
+        copy.author_id = id_author or doc.author_id
+        copy.docformat_id = doc.docformat_id
+        copy.doctype_id = doc.doctype_id
+        copy.title = doc.title
+        copy.filename = copy_path
+        copy.repo_id = dst_repo.repo_id 
+        
+        dbs.add(copy)
+        dbs.flush()
+        
+        return copy
+        
     @staticmethod
     def delete_doc(id_doc):
         """
@@ -1822,7 +1890,7 @@ class SapnsDoc(DeclarativeBase):
         # remove doc
         dbs.query(SapnsDoc).filter(SapnsDoc.doc_id == id_doc).delete()
         dbs.flush()
-    
+        
     @staticmethod
     def upload(f, id_repo):
         """
@@ -1836,40 +1904,19 @@ class SapnsDoc(DeclarativeBase):
            file_size:     <int>}
         """
         
-        import hashlib as hl
-        import random
-        
         # get repo
         repo = dbs.query(SapnsRepo).get(id_repo)
         if not repo:
             raise Exception(_('Repo [%d] was not found') % id_repo)
         
-        repo_path = repo.abs_path()
-        
-        # calculate random name for the new file
-        def _file_path():
-            
-            # create hash
-            s256 = hl.sha256()
-            
-            random.seed()
-            s256.update('%s%6.6d' % (f.filename.encode('utf-8'), random.randint(0, 999999)))
-            
-            file_name = s256.hexdigest()
-            return os.path.join(repo_path, file_name), file_name
-        
-        while True:
-            file_path, file_name = _file_path()
-            # does it exist???
-            if not os.access(file_path, os.F_OK):
-                break
+        file_path = repo.get_new_path()
         
         f.file.seek(0)
         with file(file_path, 'wb') as fu:
             fu.write(f.file.read())
             
         return dict(uploaded_file=f.filename,
-                    file_name=file_name,
+                    file_name=os.path.basename(file_path),
                     file_size=f.file.tell())
         
     @staticmethod
