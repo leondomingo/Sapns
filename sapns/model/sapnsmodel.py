@@ -1970,6 +1970,35 @@ class SapnsDoc(DeclarativeBase):
         path_file = os.path.join(repo.abs_path(), file_name) 
         if os.access(path_file, os.F_OK):
             os.remove(path_file)
+            
+    @staticmethod
+    def get_docs(*args):
+        """
+          SapnsDoc.get_docs(object)
+          SapnsDoc.get_docs(cls, object_id)
+        """
+        if len(args) == 2:
+            cls_name = args[0]
+            object_id = args[1]
+        
+        else:
+            cls_name = args[0].__tablename__
+            object_id = args[0].id_
+            
+        if isinstance(cls_name, str):
+            cls_name = cls_name.decode('utf-8')
+            
+        docs = []
+        for doc in dbs.query(SapnsDoc).\
+                join(SapnsAssignedDoc).\
+                join(SapnsClass).\
+                filter(and_(SapnsClass.name == cls_name,
+                            SapnsAssignedDoc.object_id == object_id
+                            )):
+            
+            docs.append(doc)
+            
+        return docs
 
 class SapnsDocType(DeclarativeBase):
     
