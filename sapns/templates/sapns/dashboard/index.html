@@ -20,7 +20,7 @@
     <!-- parent shortcut -->
     <div style="margin-left: 20px;">
         {% if sc_parent %}
-        <a href="{{tg.url('/dashboard', sc_parent=sc_parent)}}">[{{_('up')}}]</a>
+        <a href="{{tg.url('/dashboard', params=dict(sc_parent=sc_parent))}}">[{{_('up')}}]</a>
         {% else %}
         <a href="">[  ]</a>
         {% endif %}
@@ -40,8 +40,7 @@
     {% if h.authorize.has_any_permission('manage', 'utilities') %}
     <div class="sp_shortcut">
         <div style="padding-left: 10px;">
-        <a href="{{tg.url('/dashboard/util', 
-            params=dict(came_from='/dashboard'))}}">{{_('Utilities')}}</a>
+        <a href="{{tg.url('/dashboard/util', params=dict(came_from='/dashboard'))}}">{{_('Utilities')}}</a>
         </div>
     </div>
     {% endif %}
@@ -51,8 +50,7 @@
     {% if h.authorize.has_any_permission('manage', 'views') %}
     <div class="sp_shortcut">
         <div style="padding-left: 10px;">
-        <a href="{{tg.url('/dashboard/views', 
-            params=dict(came_from='/dashboard'))}}">{{_('Views')}}</a>
+        <a href="{{tg.url('/dashboard/views', params=dict(came_from='/dashboard'))}}">{{_('Views')}}</a>
         </div>
     </div>
     {% endif %}
@@ -62,8 +60,7 @@
     {% if h.authorize.has_any_permission('manage') %}
     <div class="sp_shortcut">
         <div style="padding-left: 10px;">
-        <a href="{{tg.url('/dashboard/users', 
-            params=dict(came_from='/dashboard'))}}">{{_('Users')}}</a>
+        <a href="{{tg.url('/dashboard/users', params=dict(came_from='/dashboard'))}}">{{_('Users')}}</a>
         </div>
     </div>
     {% endif %}

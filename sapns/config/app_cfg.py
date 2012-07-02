@@ -35,6 +35,7 @@ class CustomConfig(AppConfig):
         self.default_renderer = 'jinja'
         self.renderers.append('jinja')
         self.jinja_extensions = ['jinja2.ext.i18n']
+        self.use_dotted_templatenames = False # makes TG 2.1.5 work
         
         #Configure the base SQLALchemy Setup
         self.use_sqlalchemy = True
