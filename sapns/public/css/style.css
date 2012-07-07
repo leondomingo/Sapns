@@ -635,7 +635,10 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
 .on-dragging { height:415px !important }
 a.sp-shortcut { font-weight:normal; color:#666; border-radius:3px; 
 width:102px; height:55px; margin:5px; padding:2px; text-align:center;
-float:left; font:17px arial; word-wrap:break-word; padding-top:25px; border:1px solid #ccc }
+float:left; font:17px arial; word-wrap:break-word; padding-top:25px; border:1px solid #ccc;
+box-shadow:2px 2px }
+a.sp-shortcut:hover { color:#444 !important }
+.sp-shortcut:hover { border-color:#f3ba13; box-shadow:2px 2px #b38809 }
 a.sp-shortcut.group { background:#eee url('/images/sapns/icons/group.png') no-repeat center center }
 a.sp-shortcut.list { background:#eee url('/images/sapns/icons/list.png') no-repeat center center }
 a.sp-shortcut.process { background:#eee url('/images/sapns/icons/process.png') no-repeat center center }
@@ -647,4 +650,4 @@ width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:bre
 #sp-shortcut-options .option.users { background:#eee url('/images/sapns/icons/users.png') no-repeat center center; margin-left:50px }
 #sp-shortcut-options .option.roles { background:#eee url('/images/sapns/icons/roles.png') no-repeat center center }
 #sp-shortcut-options .option.delete { background:#eee url('/images/sapns/icons/delete.png') no-repeat center center }
-#sp-shortcut-options .option.accept { border:1px solid #FFB835 }
+#sp-shortcut-options .option.accept { border:1px solid #f3ba13 }
