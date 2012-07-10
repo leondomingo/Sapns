@@ -1,5 +1,5 @@
 "{% import 'sapns/dashboard/datefield.js' as df %}";
-$(document).ready(function() {
+$(function() {
     
     $('#sp-back').hide();
     
