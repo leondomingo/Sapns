@@ -1972,10 +1972,13 @@ class SapnsDoc(DeclarativeBase):
             os.remove(path_file)
             
     @staticmethod
-    def get_docs(*args):
+    def get_docs(*args, **kwargs):
         """
           SapnsDoc.get_docs(object)
           SapnsDoc.get_docs(cls, object_id)
+          
+          kwargs:
+            doctype <str>, <unicode> / <int>
         """
         if len(args) == 2:
             cls_name = args[0]
@@ -1988,13 +1991,30 @@ class SapnsDoc(DeclarativeBase):
         if isinstance(cls_name, str):
             cls_name = cls_name.decode('utf-8')
             
+        doctype = kwargs.get('doctype')
+        cond_doctype = None
+        if doctype:
+            # "doctype" indicates the 'name' of the doc type
+            if isinstance(doctype, (str, unicode,)):
+                if isinstance(doctype, str):
+                    doctype = doctype.decode('utf-8')
+                    
+                cond_doctype = func.upper(SapnsDocType.name) == func.upper(doctype)
+            
+            # "doctype" indicates the 'id' of the doc type
+            elif isinstance(doctype, int):
+                cond_doctype = SapnsDoc.doctype_id == doctype
+            
         docs = []
         for doc in dbs.query(SapnsDoc).\
+                join(SapnsDocType).\
                 join(SapnsAssignedDoc).\
                 join(SapnsClass).\
                 filter(and_(SapnsClass.name == cls_name,
-                            SapnsAssignedDoc.object_id == object_id
-                            )):
+                            SapnsAssignedDoc.object_id == object_id,
+                            cond_doctype,
+                            )).\
+                order_by(SapnsDoc.doc_id):
             
             docs.append(doc)
             
