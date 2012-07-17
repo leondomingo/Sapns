@@ -53,8 +53,11 @@ class Update(object):
             
         for topid, top in tops:
             for dirpath, _, filenames in os.walk(top):
+                
+                dirname = dirpath.split('/')[-1]
+                
                 if filenames != []:
-                    for fn in filenames:
+                    for fn in sorted(filenames):
                         name, ext = os.path.splitext(fn)
                         if ext.lower() == '.py' and name != '__init__':
                             
@@ -79,12 +82,15 @@ class Update(object):
                                                     
                                                     desc__ = getattr(callable_obj, '__desc__', None)
                                                     
-                                                    logger.warning(u'[%s] Executing [%s.%s "%s"]' % (topid, m.__name__, member[0], code__))
+                                                    logger.warning(u'[%s] Executing [%s__%s.%s "%s"]' % (topid, dirname,  m.__name__, member[0], code__))
                                                     
                                                     if hasattr(callable_obj, '__call__'):
                                                         transaction.begin()
                                                         try:
                                                             callable_obj()
+                                                            
+                                                            # register update
+                                                            add_update(code__, desc__)
                                                             
                                                             transaction.commit()
                                                             
@@ -96,7 +102,7 @@ class Update(object):
                                                         raise Exception('[%s] Class "%s.%s" in not callable' % (topid, m.__name__, member[0]))
                                                     
                                                 else:
-                                                    logger.warning(u'[%s] Skipping [%s.%s "%s"]' % (topid, m.__name__, member[0], code__))
+                                                    logger.warning(u'[%s] Skipping [%s__%s.%s "%s"]' % (topid, dirname, m.__name__, member[0], code__))
                                                 
                                             else:
                                                 logger.warning('[%s] PY: %s.%s lacks of "__code__"' % (topid, m.__name__, member[0]))
@@ -155,10 +161,10 @@ class Update(object):
                                             transaction.abort()
 
                                     else:
-                                        logger.warning(u'[%s] Skipping [%s "%s"]' % (topid, fn, code__))
+                                        logger.warning(u'[%s] Skipping [%s__%s "%s"]' % (topid, dirname, fn, code__))
     
                                 else:
-                                    logger.warning(u'[%s] Ignoring [%s "%s"]' % (topid, fn, code__))
+                                    logger.warning(u'[%s] Ignoring [%s__%s "%s"]' % (topid, dirname, fn, code__))
                                     
                             finally:
                                 f_sql.close()
