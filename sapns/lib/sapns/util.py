@@ -13,7 +13,10 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
 from tg import config, response, request
 from tg.i18n import set_lang, get_lang
 import logging
+import os
 import re
+import subprocess as sp
+import tempfile
 
 ROLE_MANAGERS = u'managers'
 
@@ -423,11 +426,7 @@ def create_data_exploration():
             
             i += 1
 
-def topdf(html_content, **kw):
-    
-    import subprocess as sp
-    import tempfile
-    import os
+def topdf(html_content, check_call=True, **kw):
     
     topdf_path = config.get('htmltopdf.path')
     
@@ -442,20 +441,42 @@ def topdf(html_content, **kw):
         finally:
             f_input.close()
             
-        orientation = kw.get('orientation')
-        if not orientation:
-            orientation = 'Portrait'
+        if not kw.get('orientation'):
+            kw['orientation'] = 'Portrait'
             
-        page_size = kw.get('page_size')
-        if not page_size:
-            page_size = 'A3'
+        if not kw.get('page_size'):
+            kw['page-size'] = 'A3'
+        
+        if not kw.get('q'):
+            kw['q'] = None
+            
+        if not kw.get('disable_pdf_compression'):
+            kw['disable-pdf-compression'] = None
         
         pdf_content = ''
         fd_pdf, pdf_path = tempfile.mkstemp(suffix='.pdf', prefix='sapns_')
         os.close(fd_pdf)
+        
+        call_ = sp.check_call
+        if not check_call:
+            call_ = sp.call
+            
+        extra_params = []
+        for k, v in kw.iteritems:
+            
+            k_ = k.replace('_', '-')
+            
+            if len(k_) > 1:
+                extra_params.append('--%s' % k_)
+                
+            else:
+                extra_params.append('-%s' % k_)
+
+            if v:
+                extra_params.append(str(v))
+                
         try:
-            sp.check_call([topdf_path, '-q', '--orientation', orientation, 
-                           '--page-size', page_size, html_path, pdf_path])
+            call_([topdf_path] + extra_params + [html_path, pdf_path])
             
             # get PDF content
             f_output = open(pdf_path, 'rb')
