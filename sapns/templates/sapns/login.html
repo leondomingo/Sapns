@@ -10,10 +10,11 @@
     {{ util.jquery_ui() }}
     <style>
         #loginform .background-icon { position:absolute; left:15px; top:25px; width:150px; height:150px; opacity:0.4;
-        background:transparent url('{{tg.url("/images/sapns/icons/home.png")}}') center center no-repeat; background-size:contain; z-index:0 }
+        background:transparent url('{{tg.url("/images/sapns/icons/lock.png")}}') center center no-repeat; background-size:contain; z-index:0 }
         #loginform #submit { width:50px; height:50px; border:0; float:right; margin-right:10px; cursor:pointer; 
-        background:transparent url('{{tg.url("/images/sapns/icons/to-right.png")}}') center center no-repeat;
-        background-size:contain }
+        background:transparent url('{{tg.url("/images/sapns/icons/to-right_disabled.png")}}') center center no-repeat;
+        background-size:contain; opacity:0.7 }
+        #loginform #submit:hover { background:transparent url('{{tg.url("/images/sapns/icons/to-right.png")}}') center center no-repeat; } 
     </style>
 {% endblock %}
 
