@@ -462,7 +462,7 @@ def topdf(html_content, check_call=True, **kw):
             call_ = sp.call
             
         extra_params = []
-        for k, v in kw.iteritems:
+        for k, v in kw.iteritems():
             
             k_ = k.replace('_', '-')
             
