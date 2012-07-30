@@ -5,31 +5,16 @@
     {{ super() }}
     {{ util.jquery() }}
     <style>
-        .sp_center {
-            width: 1198px !important;
-            left: 0px !important;
-        }
+        .sp_center { width: 1198px !important; left: 0px !important }
     </style>
     {{ util.jquery_ui() }}
     <style>
-        #forgot_password {
-            text-align: center;
-        }
-        
-        #forgot_password label {
-            font-weight: normal;
-            font-size: 11px;
-            color: #FFB835;
-            cursor: pointer;
-        }
-        
-        #forgot_password label:hover {
-            color: #000;
-        }
-        
-        #username_or_email {
-            width: 100%;
-        }
+        #loginform .background-icon { position:absolute; left:15px; top:25px; width:150px; height:150px; opacity:0.4;
+        background:transparent url('{{tg.url("/images/sapns/icons/lock.png")}}') center center no-repeat; background-size:contain; z-index:0 }
+        #loginform #submit { width:50px; height:50px; border:0; float:right; margin-right:10px; cursor:pointer; 
+        background:transparent url('{{tg.url("/images/sapns/icons/to-right_disabled.png")}}') center center no-repeat;
+        background-size:contain; opacity:0.7 }
+        #loginform #submit:hover { background:transparent url('{{tg.url("/images/sapns/icons/to-right.png")}}') center center no-repeat; } 
     </style>
 {% endblock %}
 
@@ -41,12 +26,29 @@
 </div>
 
 <div id="loginform">
+
+<div class="background-icon">&nbsp;</div>
+
 <form action="{{tg.url('/login_handler', params=dict(came_from_=came_from_.encode('utf-8'), __logins=login_counter.encode('utf-8')))}}" method="post" accept-charset="UTF-8" class="loginfields">
-    <h2><span>Login</span></h2>
-    <label for="loginusername">{{_('Username')}}:</label><input type="text" id="loginusername" name="login" class="text"></input><br/>
-    <label for="loginpassword">{{_('Password')}}:</label><input type="password" id="loginpassword" name="password" class="text"></input>
-    <label id="labelremember" for="loginremember">{{_('remember me')}}</label><input type="checkbox" id="loginremember" name="remember" value="2252000"/>
-    <input type="submit" id="submit" value="Login" />
+    <div class="top-space">&nbsp;</div>
+    <div class="line">
+        <div class="label">{{_('Username')}}</div>
+        <input type="text" id="loginusername" name="login" class="text">
+    </div>
+    
+    <div class="line">
+        <div class="label">{{_('Password')}}</div>
+        <input type="password" id="loginpassword" name="password" class="text">
+    </div>
+    
+    <div class="line rememberme">
+        <div class="label">{{_('remember me')}}</div>
+        <div class="input"><input type="checkbox" id="loginremember" name="remember" value="2252000"></div>
+    </div>
+    
+    <div class="line">
+        <input type="submit" id="submit" value="" title="Login">
+    </div>
 </form>
 </div>
 
