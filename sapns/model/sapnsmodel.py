@@ -15,13 +15,14 @@ from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.orm import relation, synonym
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
-    DateTime, BigInteger
+    DateTime, BigInteger, UnicodeText
 from tg import config
 import datetime as dt
 import logging
 import os
 import re
 import shutil
+import simplejson as sj
 
 __all__ = ['SapnsAssignedDoc', 'SapnsAttrPrivilege', 'SapnsAttribute', 'SapnsClass',
            'SapnsDoc', 'SapnsDocFormat', 'SapnsDocType', 'SapnsMessage', 
@@ -2007,7 +2008,7 @@ class SapnsDoc(DeclarativeBase):
             
         docs = []
         for doc in dbs.query(SapnsDoc).\
-                join(SapnsDocType).\
+                outerjoin(SapnsDocType).\
                 join(SapnsAssignedDoc).\
                 join(SapnsClass).\
                 filter(and_(SapnsClass.name == cls_name,
@@ -2168,3 +2169,74 @@ class SapnsLog(DeclarativeBase):
                 
             dbs.add(log)
             dbs.flush()
+            
+class SapnsScheduledTask(DeclarativeBase):
+    
+    __tablename__ = 'sp_scheduled_tasks'
+    
+    scheduledtask_id = Column('id', Integer, primary_key=True)
+    task_name = Column(Unicode(100))
+    description = Column(UnicodeText)
+    active = Column(Boolean, default=False)
+    in_progress = Column(Boolean, default=False)
+    executed = Column(Boolean, default=False)
+    just_one_time = Column(Boolean, default=False)
+    period = Column(Integer)
+    last_execution = Column(DateTime)
+    task_date = Column(Date)
+    task_time = Column(Time)
+    monday = Column(Boolean, default=False)
+    tuesday = Column(Boolean, default=False)
+    wednesday = Column(Boolean, default=False)
+    thursday = Column(Boolean, default=False)
+    friday = Column(Boolean, default=False)
+    saturday = Column(Boolean, default=False)
+    sunday = Column(Boolean, default=False)
+    attempts = Column(Integer, default=0)
+    max_attempts = Column(Integer)
+    executable = Column(Unicode(100))
+    data = Column(UnicodeText)
+    
+    def reschedule(self, minutes):
+        next_time = dt.datetime.now() + dt.timedelta(minutes=minutes)
+        if self.task_date:
+            self.task_date = next_time.date()
+            
+        t = next_time.time()
+        self.task_time = dt.time(t.hour, t.minute)
+        
+        self.executed = False
+        dbs.add(self)
+        dbs.flush()
+        
+    def execute(self):
+        try:
+            from sapns.exc.executions import EXECUTIONS
+        except ImportError:
+            from sapns.exc.executions_default import EXECUTIONS
+            
+        e = EXECUTIONS.get(self.executable)
+        if e:
+            package = e[0]
+            executable = e[1]
+            
+            data = {}
+            if self.data:
+                data = sj.loads(self.data)
+                
+            data.update(stask_id=self.scheduledtask_id)
+            
+            m = __import__(package, fromlist=[executable])
+            func = getattr(m, executable)
+            if isinstance(func, type):
+                # "func" is a class so arguments are passed to __init__ and then
+                # "func" is executed
+                func(**data)()
+                
+            else:
+                # "func" is a function executed with the passed arguments
+                func(**data)
+                
+        else:
+            raise Exception('It does not exist a script called "%s"' % self.task_name)
+    

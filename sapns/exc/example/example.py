@@ -1,11 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+from sapns.model import DBSession as dbs
 import logging
-from tg import config
-#from sapns.model import DBSession as dbs
-from sapns.exc.conexion import Conexion
-dbs = Conexion(config.get('sqlalchemy.url')).session
 
 def test1(*args, **kwargs):
     logger = logging.getLogger('test1')
@@ -22,6 +19,10 @@ def test2(one, two, three=None):
     
     for cls in dbs.query(SapnsClass).order_by(SapnsClass.name).limit(10):
         print u'%s (%s)' % (cls.title, cls.name)
+        
+def test3(**kw):
+    for k, v in kw.iteritems():
+        print k, v, type(v)
     
 class Test(object):
     
