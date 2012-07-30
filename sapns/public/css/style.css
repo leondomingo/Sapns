@@ -18,7 +18,7 @@ a { color: #797C33; font-weight: bold; text-decoration: none; }
 
 /* Login form*/
 #loginform { position:relative; width:400px; height:215px; border:1px solid #ffcc70; border-radius:5px;
-margin:140px auto 10px auto; box-shadow:3px 3px #ffcc70; background-color:#c5cc60 }
+margin:140px auto 10px auto; box-shadow:3px 3px #ffcc70; background-color:#eee }
 #loginform .top-space { height:60px }
 #loginform .line { clear:left; height:30px; margin-bottom:3px; z-index:10 }
 #loginform .line * { float:left }
