@@ -78,9 +78,10 @@ class MailSender(object):
                 if self.params.get('remove_attachments'):
                     files_remove.append(doc.doc_id)
                     
-            send_mail(from_, to_, self.params['subject'], self.params['message']['text'],
+            send_mail(from_, to_, self.params['subject'].encode('utf-8'),
+                      self.params['message']['text'].encode('utf-8'),
                       server, login, password, files=files, 
-                      html=self.params['message'].get('html'),
+                      html=self.params['message'].get('html').encode('utf-8'),
                       cc=cc, bcc=bcc)
             
             # remove attachments
