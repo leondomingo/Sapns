@@ -7,7 +7,7 @@ create table sp_scheduled_tasks (
     executed boolean default false,
     just_one_time boolean default false,
     period integer, --in minutes
-    last_execution datetime,
+    last_execution timestamp,
     task_date date,
     task_time time,
     monday boolean default false,
