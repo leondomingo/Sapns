@@ -13,23 +13,20 @@ $(function() {
         
         $('.ui-tooltip').remove();
         
-        var params = {
-                id: "{{id}}",
-        };
-        
-        var required_attrs = [];
+        var params = { id: "{{id}}" },
+            required_attrs = [];
         
         // text 
         $('.sp-text-field').each(function() {
-            var name = $(this).parent().parent().attr('name');
-            var required = $(this).parent().parent().attr('required');
-            var value = $(this).val();
-            var ok = $(this).attr('_ok');
+            var name = $(this).parent().parent().attr('name'),
+                required = $(this).parent().parent().hasClass('required'),
+                value = $(this).val(),
+                ok = $(this).attr('_ok');
             if (ok === undefined) {
                 ok = true;
             }
                     
-            if (required == 'true' && value == '' || !ok) {
+            if (required && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -38,12 +35,12 @@ $(function() {
         
         // integer
         $('.sp_integer_field').each(function() {
-            var name = $(this).parent().parent().attr('name');
-            var required = $(this).parent().parent().attr('required');
-            var value = $(this).val();
-            var ok = $(this).attr('_ok');
+            var name = $(this).parent().parent().attr('name'),
+                required = $(this).parent().parent().hasClass('required'),
+                value = $(this).val(),
+                ok = $(this).attr('_ok');
                     
-            if (required == 'true' && value == '' || !ok) {
+            if (required && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -52,12 +49,12 @@ $(function() {
         
         // float
         $('.sp_float_field').each(function() {
-            var name = $(this).parent().parent().attr('name');
-            var required = $(this).parent().parent().attr('required');
-            var value = $(this).val();
-            var ok = $(this).attr('_ok');
+            var name = $(this).parent().parent().attr('name'),
+                required = $(this).parent().parent().hasClass('required'),
+                value = $(this).val(),
+                ok = $(this).attr('_ok');
                     
-            if (required == 'true' && value == '' || !ok) {
+            if (required && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -66,10 +63,10 @@ $(function() {
         
         // url
         $('.url_field_text').each(function() {
-            var parent = $(this).parent().parent().parent();
-            var name = parent.attr('name');
-            var required = parent.attr('required');
-            var value = $(this).val();
+            var parent = $(this).parent().parent().parent(),
+                name = parent.attr('name'),
+                required = parent.hasClass('required'),
+                value = $(this).val();
                     
             if (required == 'true' && value == '') {
                 required_attrs.push($(this));
@@ -88,13 +85,13 @@ $(function() {
         // date 
         $('.sp-date-field').each(function() {
             
-            var date_value = $(this).datepicker('getDate');
-            var name = $(this).parent().parent().attr('name');
+            var date_value = $(this).datepicker('getDate'),
+                name = $(this).parent().parent().attr('name');
             
             if (date_value != null) {
-                var year = date_value.getFullYear()
-                var month = date_value.getMonth() + 1;
-                var day = date_value.getDate();
+                var year = date_value.getFullYear(),
+                    month = date_value.getMonth() + 1,
+                    day = date_value.getDate();
             
                 date_value = year + '-' + month + '-' + day;
             }
@@ -102,9 +99,8 @@ $(function() {
                 date_value = '';
             }
             
-            var required = $(this).parent().parent().attr('required');
-                    
-            if (required == 'true' && date_value == '') {
+            var required = $(this).parent().parent().hasClass('required');
+            if (required && date_value == '') {
                 required_attrs.push($(this));
             }
             
@@ -113,12 +109,12 @@ $(function() {
         
         // time
         $('.sp-time-field').each(function() {
-            var name = $(this).parent().parent().attr('name');
-            var required = $(this).parent().parent().attr('required');
-            var value = $(this).val();
-            var ok = $(this).attr('_ok');
+            var name = $(this).parent().parent().attr('name'),
+                required = $(this).parent().parent().hasClass('required'),
+                value = $(this).val(),
+                ok = $(this).attr('_ok');
                     
-            if (required == 'true' && value == '' || !ok) {
+            if (required && value == '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -128,11 +124,11 @@ $(function() {
         // select fields
         $('.sp-select-field').each(function() {
             
-            var name = $(this).parent().parent().attr('name');
-            var required = $(this).parent().parent().attr('required');
-            var sel_value = $(this).attr('value');
+            var name = $(this).parent().parent().attr('name'),
+                required = $(this).parent().parent().hasClass('required'),
+                sel_value = $(this).attr('value');
                     
-            if (required == 'true' && sel_value == '') {
+            if (required && sel_value == '') {
                 required_attrs.push($(this));
             }
             
@@ -157,7 +153,7 @@ $(function() {
                 style: "ui-tooltip-red ui-tooltip-rounded"
             });
             
-            for (var i=0; i<required_attrs.length; i++) {
+            for (var i=0, l=required_attrs.length; i<l; i++) {
                 required_attrs[i].qtip({
                     content: { text: "{{_('this field is required')}}" },
                     show: {
@@ -205,8 +201,8 @@ $(function() {
     // show related class
     $('#rel-classes-show').click(function() {
         
-        var option = $('#rel-classes-sel option:selected');
-        var action = "/dashboard/list/" + option.attr('cls');
+        var option = $('#rel-classes-sel option:selected'),
+            action = "/dashboard/list/" + option.attr('cls');
         
         var params = '';
         params += '<input type="hidden" name="parent_id" value="{{id}}">\n';
@@ -217,8 +213,8 @@ $(function() {
     
     // execute action 
     $('#action-go').click(function() {
-        var id = $('#actions-sel').attr('row_id');
-        var url = $('#actions-sel option:selected').val();
+        var id = $('#actions-sel').attr('row_id'),
+            url = $('#actions-sel option:selected').val();
         
         if (url[url.length-1] != '/') {
             url += '/';
@@ -232,13 +228,13 @@ $(function() {
     
     var selectors = $('.sp_selector');
     for (var i=0, l=selectors.length; i<l; i++) {
-        var s = $(selectors[i]);
-        var attr_name = s.attr('attr_name');
-        var attr_value = s.attr('attr_value');
-        var attr_title = s.attr('attr_title');
-        var attr_rc = s.attr('attr_rc');
-        var attr_rc_title = s.attr('attr_rc_title');
-        var read_only = s.parent().parent().attr('read_only');
+        var s = $(selectors[i]),
+            attr_name = s.attr('attr_name'),
+            attr_value = s.attr('attr_value'),
+            attr_title = s.attr('attr_title'),
+            attr_rc = s.attr('attr_rc'),
+            attr_rc_title = s.attr('attr_rc_title'),
+            read_only = s.parent().parent().hasClass('readonly');
         
         s.sapnsSelector({
             name: attr_name,
@@ -246,23 +242,11 @@ $(function() {
             title: attr_title,
             rc: attr_rc,
             rc_title: attr_rc_title,
-            read_only: read_only == 'true'
+            read_only: read_only
         });
     }
     
-    $('.sp_integer_field').change(function() {
-        fields.check_regex($(this));
-    });
-    
-    $('.sp_float_field').change(function() {
-        fields.check_regex($(this));
-    });
-    
-    $('.sp-text-field').change(function() {
-        fields.check_regex($(this));
-    });
-    
-    $('.sp-time-field').change(function() {
+    $('.sp_integer_field, .sp_float_field, .sp-text-field, .sp-time-field').change(function() {
         fields.check_regex($(this));
     });
     

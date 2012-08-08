@@ -1,15 +1,9 @@
-.sp-edit-panel {
-    height: 600px;
-}
+.sp-edit-panel { height: 600px }
 
-#rel-classes, #actions {
-    width: 700px;
-    /*border: 1px solid gray;*/
-}
+#rel-classes, #actions { width: 700px }
 
 #rel-classes-title, #actions-title {
     float: left; 
-    /*color: gray;*/ 
     margin-top: 3px;
     margin-right: 5px;
     font-size: 11px;
@@ -29,9 +23,7 @@
     width: 300px;
 }
 
-#rel-classes-show, #action-go {
-    cursor: pointer;
-}
+#rel-classes-show, #action-go { cursor: pointer }
 
 #edit-header {
     position: relative;
@@ -51,21 +43,15 @@
     bottom: 3px;
 }
 
-#edit-back {
-    z-index: 100;
-}
+#edit-back { z-index: 100 }
 
-#back-button, #save-button {
-    cursor: pointer;
-}
+#back-button, #save-button { cursor: pointer }
 
 #back-button:hover, #save-button:hover, #action-go:hover, #rel-classes-show:hover {
     color: white;
 }
 
-.sp-save-button {
-    width: 70px;
-}
+.sp-save-button { width: 70px }
 
 #edit_fields {
     overflow: auto;
@@ -73,8 +59,10 @@
     width: 100%;
 }
 
-.sp-edit-field {
-}
+.sp-edit-field {}
+.sp-edit-field.required .sp-label-field { font-weight:bold }
+.sp-edit-field.readonly .sp-label-field { color:#999 }
+.sp-label-field { margin:4px 0 2px 10px; font:12px arial; color:#605B7C }
 
 .sp-text-field {
     width: 97%;
@@ -84,10 +72,10 @@
     font-family: sans-serif;
 }
 
-.sp-label-field {
+/*.sp-label-field {
     color: #605B7C;
     font-family: sans-serif;
-}
+}*/
 
 .sp-label-field-must {
     font-weight: bold;
