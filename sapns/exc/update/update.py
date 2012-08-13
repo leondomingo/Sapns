@@ -51,6 +51,7 @@ class Update(object):
             dbs.add(new_u)
             dbs.flush()
             
+        todo = []
         for topid, top in tops:
             for dirpath, _, filenames in os.walk(top):
                 
@@ -58,6 +59,7 @@ class Update(object):
                 
                 if filenames != []:
                     for fn in sorted(filenames):
+                        
                         name, ext = os.path.splitext(fn)
                         if ext.lower() == '.py' and name != '__init__':
                             
@@ -81,23 +83,20 @@ class Update(object):
                                                 if not SapnsUpdates.by_code(code__):
                                                     
                                                     desc__ = getattr(callable_obj, '__desc__', None)
-                                                    
-                                                    logger.warning(u'[%s] Executing [%s__%s.%s "%s"]' % (topid, dirname,  m.__name__, member[0], code__))
-                                                    
+
                                                     if hasattr(callable_obj, '__call__'):
-                                                        transaction.begin()
-                                                        try:
-                                                            callable_obj()
-                                                            
-                                                            # register update
-                                                            add_update(code__, desc__)
-                                                            
-                                                            transaction.commit()
-                                                            
-                                                        except Exception, e:
-                                                            logger.error(e)
-                                                            transaction.abort()
-                
+                                                        
+                                                        todo.append(dict(type='py',
+                                                                         path=os.path.join(dirpath, fn),
+                                                                         code=code__,
+                                                                         desc=desc__,
+                                                                         callable=callable_obj,
+                                                                         topid=topid,
+                                                                         dirname=dirname,
+                                                                         module_name=m.__name__,
+                                                                         class_name=member[0],
+                                                                         ))
+                                                        
                                                     else:
                                                         raise Exception('[%s] Class "%s.%s" in not callable' % (topid, m.__name__, member[0]))
                                                     
@@ -115,6 +114,7 @@ class Update(object):
                                 logger.warning(e)
                             
                         elif ext.lower() == '.sql':
+                            
                             f_sql = _open(os.path.join(dirpath, fn), 'rb', encoding='utf-8')
                             try:
                                 sql_text = f_sql.read()
@@ -139,27 +139,15 @@ class Update(object):
                                             desc__ = m_desc.group(1).strip()
                                             logger.info(desc__)
                                             
-                                        logger.info('[%s] %s: __code__ = "%s"' % (topid, fn, code__))
+                                        todo.append(dict(type='sql',
+                                                         path=os.path.join(dirpath, fn),
+                                                         code=code__,
+                                                         desc=desc__,
+                                                         sql_text=sql_text,
+                                                         topid=topid,
+                                                         dirname=dirname,
+                                                         ))
                                         
-                                        transaction.begin()
-                                        try:
-                                            for script in sql_text.split('--#'):
-                                                if script.strip():
-                                                    
-                                                    logger.info(' > Executing "%s..."' % script.strip()[:30])
-                                                    
-                                                    dbs.execute(script.strip())
-                                                    dbs.flush()
-                                                    
-                                            # register update
-                                            add_update(code__, desc__)
-                                        
-                                            transaction.commit()
-                                                        
-                                        except Exception, e:
-                                            logger.error(e)
-                                            transaction.abort()
-
                                     else:
                                         logger.warning(u'[%s] Skipping [%s__%s "%s"]' % (topid, dirname, fn, code__))
     
@@ -168,3 +156,66 @@ class Update(object):
                                     
                             finally:
                                 f_sql.close()
+                                
+        def _cmp(x, y):
+            if 'init/' in x['path'] and 'init/' not in y['path']:
+                return -1
+            
+            elif 'init/' not in x['path'] and 'init/' in y['path']:
+                return 1
+            
+            else:
+                return cmp(x['path'], y['path'])
+            
+        if todo:
+            logger.info('TODO'.center(80, '-'))
+        
+        for update in sorted(todo, cmp=_cmp):
+            if update['type'] == 'py':
+                transaction.begin()
+                try:
+                    logger.warning(u'[%s] Executing [%s__%s.%s "%s"]' % (update['topid'], 
+                                                                         update['dirname'],
+                                                                         update['module_name'], 
+                                                                         update['class_name'], 
+                                                                         update['code']))
+                    
+                    # execute (call)
+                    update['callable']()
+                    
+                    # register update
+                    add_update(update['code'], update['desc'])
+                    
+                    transaction.commit()
+                    
+                except Exception, e:
+                    logger.error(e)
+                    transaction.abort()
+                    
+            elif update['type'] == 'sql':
+                transaction.begin()
+                try:
+                    for script in update['sql_text'].split('--#'):
+                        if script.strip():
+                            
+                            logger.warning(u'[%s] Executing [%s__%s "%s"] "%s..."' % (update['topid'], 
+                                                                                      update['dirname'], 
+                                                                                      os.path.basename(update['path']),
+                                                                                      update['code'],
+                                                                                      script.strip()[:30]
+                                                                                      ))
+                            
+                            dbs.execute(script.strip())
+                            dbs.flush()
+                            
+                    # register update
+                    add_update(update['code'], update['desc'])
+                
+                    transaction.commit()
+                                
+                except Exception, e:
+                    logger.error(e)
+                    transaction.abort()
+                    
+                    
+                    
