@@ -8,8 +8,8 @@ _lower = func.lower
 
 class BaseUpdate(object):
     
-    def __init__(self, dbs):
-        self.dbs = dbs
+    def __init__(self): #, dbs):
+        self.dbs = None #dbs
         
     def _class_by_name(self, cls_name):
         """
