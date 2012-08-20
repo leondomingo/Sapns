@@ -1204,7 +1204,7 @@ class SapnsPrivilege(DeclarativeBase):
         #logger = logging.getLogger('SapnsPrivilege.has_privilege')
 
         if isinstance(cls, (str, unicode)):
-            id_class = SapnsClass.by_name(cls).class_id
+            id_class = SapnsClass.by_name(cls, parent=False).class_id
             
         else:
             id_class = cls
