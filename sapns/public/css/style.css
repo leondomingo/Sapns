@@ -584,6 +584,7 @@ width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:bre
 .sp-field .label.required { font-weight:bold }
 
 /* sapns.uploader */
-.sp-filename div { height:15px; border:1px solid #999; border-right:2px solid #777; border-bottom:2px solid #777; 
-border-radius:3px; padding:2px; font:12px arial }
-.sp-filename button { font:12px arial }
+.sp-filename div { height:16px; border:1px solid #bbb; border-right-color:#777; border-bottom-color:#777; 
+border-radius:3px; padding:2px; font:12px arial; cursor:text }
+.sp-filename div:hover { border-color:orange }
+.sp-filename button { font:10px arial; margin:1px 0 0 3px }

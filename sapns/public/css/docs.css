@@ -92,4 +92,8 @@
     width: 410px;
 }
 
+#doc_to_delete { font:bold 13px arial }
+
 .sp-filename div { width:300px }
+.ui-dialog .ui-dialog-title { font:bold 13px helvetica,arial }
+.sp-select-text { width:300px }
