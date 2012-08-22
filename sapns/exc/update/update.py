@@ -152,7 +152,7 @@ class Update(object):
                                         logger.warning(u'[%s] Skipping [%s__%s "%s"]' % (topid, dirname, fn, code__))
     
                                 else:
-                                    logger.warning(u'[%s] Ignoring [%s__%s "%s"]' % (topid, dirname, fn, code__))
+                                    logger.warning(u'[%s] SQL: Ignoring [%s__%s] cause lacks of "__code__"' % (topid, dirname, fn))
                                     
                             finally:
                                 f_sql.close()
