@@ -575,3 +575,15 @@ width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:bre
 #sp-shortcut-options .option.roles { background:#eee url('/images/sapns/icons/roles.png') no-repeat center center }
 #sp-shortcut-options .option.delete { background:#eee url('/images/sapns/icons/delete.png') no-repeat center center }
 #sp-shortcut-options .option.accept { border:1px solid #f3ba13 }
+
+/* standard fields */
+.sp-field-row { clear:left; height:38px; margin-bottom:5px }
+.sp-field-row .sp-field { float:left; margin-right:5px }
+.sp-field .label { font:12px arial }
+.sp-field .input * { float:left }
+.sp-field .label.required { font-weight:bold }
+
+/* sapns.uploader */
+.sp-filename div { height:15px; border:1px solid #999; border-right:2px solid #777; border-bottom:2px solid #777; 
+border-radius:3px; padding:2px; font:12px arial }
+.sp-filename button { font:12px arial }

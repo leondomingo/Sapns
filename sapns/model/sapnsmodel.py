@@ -1515,7 +1515,7 @@ class SapnsPermission(Permission):
     URL_NEW =    u'/dashboard/new/'
     URL_EDIT =   u'/dashboard/edit/'
     URL_DELETE = u'/dashboard/delete/'
-    URL_DOCS =   u'/dashboard/docs/'
+    URL_DOCS =   u'/docs/'
     URL_LIST =   u'/dashboard/list/%s/'
     
     CACHE_ID = 'user_actions'
@@ -2020,6 +2020,60 @@ class SapnsDoc(DeclarativeBase):
             docs.append(doc)
             
         return docs
+    
+    @staticmethod
+    def get_id_doc(repo, doc):
+        """
+        IN
+            repo    <str>
+            doc     <str>
+            
+            ways of calling:
+                # by doc id (int-like) (repo is unnecessary)
+                get_id_doc('', 1234)
+              
+                # by repo id (int-like) and doc filename
+                get_id_doc('1', 'asdkasduo12mk2jklj32d3d3kjlk3')
+              
+                # by repo id (int-like) and doc title (notice the starting _, spaces are allowed)
+                get_id_doc('1', '_company_icon')
+                get_id_doc('1', '_Company Icon')
+              
+                # by repo name (spaces are allowed) and doc filename
+                get_id_doc('main repo', 'asdkasduo12mk2jklj32d3d3kjlk3')
+              
+                # by repo name (spaces are allowed) and doc title (notice the starting _, spaces are allowed)
+                get_id_doc('main repo', '_company icon')
+        """
+    
+        m_id_doc = re.search('^(\d+)$', doc)
+        if m_id_doc:
+            id_doc = int(m_id_doc.group(1))
+            
+        else:
+            m_title = re.search(r'^_(.+)$', doc)
+            if m_title:
+                cond_doc = func.lower(SapnsDoc.title) == func.lower(m_title.group(1))
+            
+            else:
+                cond_doc = SapnsDoc.filename == doc
+            
+            cond_repo = None
+            m_id_repo = re.search(r'^(\d+)$', repo)
+            if m_id_repo:
+                cond_repo = SapnsRepo.repo_id == int(m_id_repo.group(1))
+                
+            else:
+                cond_repo = func.lower(SapnsRepo.name) == func.lower(repo)
+                
+            doc = dbs.query(SapnsDoc).\
+                join(SapnsRepo).\
+                filter(and_(cond_doc, cond_repo)).\
+                first()
+                
+            id_doc = doc.doc_id
+            
+        return id_doc
 
 class SapnsDocType(DeclarativeBase):
     

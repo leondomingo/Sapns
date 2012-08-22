@@ -13,6 +13,9 @@ from neptuno.postgres.search import Search
 date_fmt = config.get('formats.date', default='%m/%d/%Y')
 _strtodate = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
 
+class EListForbidden(Exception):
+    pass
+
 class List(object):
     
     def __init__(self, cls, **kw):
@@ -45,11 +48,10 @@ class List(object):
         cls_ = SapnsClass.by_name(self.cls)
         ch_cls_ = SapnsClass.by_name(self.cls, parent=False)        
             
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
-            redirect(url('/message', 
-                         kw=dict(message=_('Sorry, you do not have privilege on this class'),
-                                     came_from=self.came_from)))
+        if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
+        not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_LIST) in permissions or \
+             '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions):
+            raise EListForbidden(_('Sorry, you do not have privilege on this class'))
             
         # shift enabled
         shift_enabled_ = u'managers' in roles
@@ -142,8 +144,9 @@ class List(object):
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         permissions = request.identity['permissions']
              
-        if not user.has_privilege(cls_.name) or \
-        not '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions:
+        if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
+        not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_LIST) in permissions or \
+             '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions):
             return dict(status=False, 
                         message=_('Sorry, you do not have privilege on this class'))
         

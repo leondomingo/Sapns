@@ -5,7 +5,6 @@ from neptuno.postgres.search import Search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 from pylons.i18n import ugettext as _
 from repoze.what import predicates as p
-from sapns.controllers.docs import DocsController
 from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController
@@ -16,9 +15,8 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
-from sapns.lib.sapns.lists import List
-from sapns.lib.sapns.util import pagination, add_language, init_lang, \
-    get_languages
+from sapns.lib.sapns.lists import List, EListForbidden
+from sapns.lib.sapns.util import add_language, init_lang, get_languages
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -26,12 +24,11 @@ from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from tg import response, expose, require, url, request, redirect, config
-from tg.i18n import get_lang
 import cStringIO
 import datetime as dt
 import logging
+import random
 import re
-import sapns.config.app_cfg as app_cfg
 import simplejson as sj
 
 # controllers
@@ -55,7 +52,7 @@ class DashboardController(BaseController):
     sc = ShortcutsController()
     messages = MessagesController()
     privileges = PrivilegesController()
-    docs = DocsController()
+    #docs = DocsController()
     logs = LogsController()
     
     @expose('sapns/sidebar.html')
@@ -131,8 +128,13 @@ class DashboardController(BaseController):
         except ImportError:
             pass
         
-        list_ = List(cls, **kw)
-        return list_()
+        try:
+            list_ = List(cls, **kw)
+            return list_()
+        except EListForbidden, e:
+            _logger.error(e)
+            redirect(url('/message', params=dict(message=str(e), came_from=kw.get('came_from'))))
+
     
     @expose('json')
     @require(p.not_anonymous())
@@ -147,34 +149,49 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def grid_actions(self, cls, **kw):
         
-        # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         
-        cls_ = SapnsClass.by_name(cls)
-             
         # actions for this class
-        actions = cls_.sorted_actions(user.user_id)
-        actions = [act for act in actions \
-                   if act['type'] in [SapnsPermission.TYPE_NEW,
-                                      SapnsPermission.TYPE_EDIT,
-                                      SapnsPermission.TYPE_DELETE,
-                                      SapnsPermission.TYPE_DOCS,
-                                      SapnsPermission.TYPE_PROCESS,
-                                     ]]
+        cls_ = SapnsClass.by_name(cls)
         
-        return dict(status=True, actions=actions)
-    
+        actions_ = {}
+        for action in cls_.sorted_actions(user.user_id):
+            if action['type'] in [SapnsPermission.TYPE_NEW,
+                                  SapnsPermission.TYPE_EDIT,
+                                  SapnsPermission.TYPE_DELETE,
+                                  SapnsPermission.TYPE_DOCS,
+                                  SapnsPermission.TYPE_PROCESS,
+                                  ]:
+                
+                actions_[action['name']] = action
+        
+        ch_cls_ = SapnsClass.by_name(cls, parent=False)
+        for action_ch in ch_cls_.sorted_actions(user.user_id):
+            if action_ch['type'] in [SapnsPermission.TYPE_NEW,
+                                     SapnsPermission.TYPE_EDIT,
+                                     SapnsPermission.TYPE_DELETE,
+                                     SapnsPermission.TYPE_DOCS,
+                                     SapnsPermission.TYPE_PROCESS,
+                                     ]:
+                
+                actions_.update({action_ch['name']: action_ch})
+                
+        def cmp_act(x, y):
+            if x.pos == y.pos:
+                return cmp(x.title, y.title)
+            
+            else:
+                return cmp(x.pos, y.pos)
+            
+        return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))    
     @expose('sapns/dashboard/search.html')
     @require(p.not_anonymous())
     def search(self, **kw):
         
         logger = logging.getLogger('DashboardController.search')
         try:
-            import random
             random.seed()
             
-            #params['caption'] = ''
-            #g = self.list(**params)
             kw_ = kw.copy()
             del kw_['cls']
             g = List(kw.get('cls'), **kw_)()
@@ -226,13 +243,10 @@ class DashboardController(BaseController):
     def title(self, cls, id):
         logger = logging.getLogger('DashboardController.title')
         try:
-            logger.info(id)
             try:
                 _title = SapnsClass.object_title(cls, int(id))
                 
-            except Exception, e:
-                logger.error(e)
-                
+            except Exception, e:                
                 ids = sj.loads(id)
                 _title = []
                 ot = SapnsClass.ObjectTitle(cls)
@@ -257,10 +271,8 @@ class DashboardController(BaseController):
             fld_*      ???        Fields to be saved
         """
         
-        logger = logging.getLogger(__name__ + '/save')
+        logger = logging.getLogger('DashboardController.save')
         try:
-            #logger.info(params)
-    
             ch_cls = SapnsClass.by_name(cls, parent=False)
             cls = SapnsClass.by_name(cls)
             id_ = get_paramw(params, 'id', int, opcional=True)
@@ -457,7 +469,7 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def edit(self, cls, id='', **params):
         
-        logger = logging.getLogger(__name__ + '/edit')
+        logger = logging.getLogger('DashboardController.edit')
         
         came_from = get_paramw(params, 'came_from', unicode, opcional=True,
                                por_defecto='/')
@@ -484,14 +496,14 @@ class DashboardController(BaseController):
 
         if id:
             id = int(id)
-            #perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT))
-            perm = '%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT) in permissions
+            perm = '%s#%s' % (ch_class_.name, SapnsPermission.TYPE_EDIT) in permissions or \
+                   '%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT) in permissions
         
         else:
-            #perm = user.has_permission('%s#%s' % (class_.name, SapnsPermission.TYPE_NEW))
-            perm = '%s#%s' % (class_.name, SapnsPermission.TYPE_NEW) in permissions
+            perm = '%s#%s' % (class_.name, SapnsPermission.TYPE_NEW) in permissions or \
+                   '%s#%s' % (class_.name, SapnsPermission.TYPE_NEW) in permissions
         
-        if not user.has_privilege(class_.name) or not perm:
+        if not (user.has_privilege(ch_class_.name) or user.has_privilege(class_.name)) or not perm:
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
@@ -636,18 +648,18 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def delete(self, cls, id_, **kw):
         
-        #came_from = get_paramw(kw, 'came_from', opcional=True, por_defecto='/')
-        
         logger = logging.getLogger('DashboardController.delete')
         rel_tables = []
         try:
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             permissions = request.identity['permissions']
             cls_ = SapnsClass.by_name(cls)
+            ch_cls_ = SapnsClass.by_name(cls, parent=False)
             
             # check privilege on this class
-            if not user.has_privilege(cls_.name) or \
-            not '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions:
+            if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
+            not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or \
+                 '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
             
@@ -834,14 +846,6 @@ class DashboardController(BaseController):
             logger.error(e)
             return dict(status=False)
         
-#        if came_from:
-#            redirect(url(came_from))
-#            
-#        else:
-#            redirect(url('/message', 
-#                         params=dict(message=_('Reference order for "%s" has been successfully updated') % cls_title, 
-#                                     came_from='')))
-            
     @expose('sapns/components/sapns.selector.example.html')
     @require(p.in_group('managers'))
     def test_selector(self):

@@ -14,6 +14,9 @@
 
 {% block middle %}
     {{ super() }}
+    
+    <!--{#<img style="position:absolute; top:25px; right:25px; opacity:0.2;
+        height:600px; width:300px" src="{{tg.url('/docs/get/1/_superman')}}">#}-->
         
     <div id="grid"></div>
     <!--{% if grid.rel_classes %}-->
@@ -28,8 +31,8 @@
     </div>
     <!--{% endif %}-->
 
-    <script type="text/javascript" src="/js/sprintf.min.js"></script>
-    <script type="text/javascript">
+    <script src="/js/sprintf.min.js"></script>
+    <script>
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(function() {
         	$('.sp-search-txt').focus();

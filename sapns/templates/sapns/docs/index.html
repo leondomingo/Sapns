@@ -14,7 +14,7 @@
     {{ super() }}
 
     <div id="docs"></div>
-    <div id="docs_dialog" style="display: none;"></div>
+    <div id="docs_dialog" style="display:none"></div>
     
     <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
     <script>
@@ -54,7 +54,6 @@
                         title: sprintf("{{_('Document of [%s]')}}", obj.title),
                         modal: true,
                         resizable: false,
-                        height: 550,
                         width: 450,
                         closeOnEscape: false,
                         buttons: {
@@ -111,7 +110,7 @@
                                     
                                     // save doc for this object 
                                     $.ajax({
-                                        url: "{{tg.url('/dashboard/docs/save')}}",
+                                        url: "{{tg.url('/docs/save')}}",
                                         data: data_in,
                                         success: function(data) {
                                             if (data.status) {
@@ -166,7 +165,7 @@
                 }
                 
                 $.ajax({
-                    url: "{{tg.url('/dashboard/docs/edit')}}",
+                    url: "{{tg.url('/docs/edit')}}",
                     data: data_in,
                     success: function(doc_form) {
                         
@@ -244,15 +243,13 @@
             };
             
             // Delete 
-            var delete_doc = function(id_doc) {
+            var delete_doc = function(_, id_doc) {
                 
                 var delete_file = function(id_doc, callback) {
                     
                     $.ajax({
-                        url: "{{tg.url('/dashboard/docs/delete')}}",
-                        data: {
-                            id_doc: id_doc
-                        },
+                        url: "{{tg.url('/docs/delete')}}",
+                        data: { id_doc: JSON.stringify(id_doc) },
                         success: function(data) {
                             if (data.status) {
                                 callback();
@@ -273,11 +270,11 @@
                     url: "{{tg.url('/dashboard/title')}}",
                     data: {
                         cls: 'sp_docs',
-                        id: id_doc
+                        id: JSON.stringify(id_doc)
                     },
                     success: function(data) {
                         if (data.status) {
-                            $('#doc_to_delete').html(data.title);
+                            $('#doc_to_delete').html(data.title.join(' | '));
                         }
                     }
                 });
@@ -312,7 +309,7 @@
                 height: 470,
                 actions_inline: false,
                 search_params: {
-                    url: "{{tg.url('/dashboard/docs/search/')}}",
+                    url: "{{tg.url('/docs/search/')}}",
                     data: {
                         cls: "{{grid.cls}}", 
                         id: "{{grid.id_object}}"*1 
@@ -338,10 +335,11 @@
                     title: "{{_('Download')}}",
                     type: {
                         id: "download",
-                        f: function(id_doc) {
-                            var form = '<form method="get" action="{{tg.url("/dashboard/docs/download")}}">' +
-                                '<input type="hidden" name="id_doc" value="' + id_doc + '">'+
-                                '</form>';
+                        f: function(_, id_doc) {
+                            var form = '<form method="get" action="{{tg.url("/docs/download/")}}">\
+                                <input type="hidden" name="id_doc" value="' + JSON.stringify(id_doc) + '">\
+                                </form>';
+                                
                             $(form).appendTo('body').submit().remove();
                         }
                     },

@@ -16,6 +16,7 @@ from tg import expose, require, url, request, redirect, config
 from tg.i18n import set_lang
 import logging
 from sapns.lib.sapns.forgot_password import EUserDoesNotExist
+from sapns.controllers.docs import DocsController
 
 __all__ = ['RootController']
 
@@ -35,6 +36,7 @@ class RootController(BaseController):
     
     error = ErrorController()
     dashboard = DashboardController()
+    docs = DocsController()
     
     @expose('sapns/index.html')
     @add_language

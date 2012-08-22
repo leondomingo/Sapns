@@ -1,9 +1,10 @@
 # -*- coding: utf-8 -*-
 
 """Documents controller"""
+from cStringIO import StringIO
 from neptuno.dict import Dict
 from neptuno.postgres.search import search
-from neptuno.util import get_paramw
+from neptuno.util import get_paramw, datetostr
 from pylons.i18n import ugettext as _
 from repoze.what import authorize, predicates as p
 from sapns.lib.base import BaseController
@@ -11,6 +12,8 @@ from sapns.lib.sapns.util import init_lang
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
 from tg import expose, config, request, require, response
+from zipfile import ZipFile, ZIP_DEFLATED
+import datetime as dt
 import logging
 import simplejson as sj
 
@@ -91,7 +94,7 @@ class DocsController(BaseController):
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
     
     @expose('sapns/docs/edit.html')
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def edit(self, **kw):
         id_doc = get_paramw(kw, 'id_doc', int, opcional=True)
         #id_class = get_paramw(kw, 'id_class', int)
@@ -123,7 +126,7 @@ class DocsController(BaseController):
         return dict(doc=doc)
     
     @expose('json')
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def save(self, **kw):
 
         logger = logging.getLogger('DocsController.save')
@@ -172,12 +175,20 @@ class DocsController(BaseController):
             return dict(status=False, message=str(e).decode('utf-8'))
         
     @expose('json')
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def delete(self, id_doc):
 
         logger = logging.getLogger('DocsController.delete')        
         try:
-            SapnsDoc.delete_doc(int(id_doc))
+            try:
+                id_doc = int(id_doc)
+                SapnsDoc.delete_doc(id_doc)
+            
+            except ValueError:
+                docs = sj.loads(id_doc)
+                for id_doc in docs:
+                    SapnsDoc.delete_doc(id_doc)
+                
             return dict(status=True)
         
         except Exception, e:
@@ -185,7 +196,7 @@ class DocsController(BaseController):
             return dict(status=False, message=str(e).decode('utf-8'))
 
     @expose()
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def upload_file(self, f, **kw):
         
         logger = logging.getLogger('DocsController.upload_file')
@@ -206,16 +217,61 @@ class DocsController(BaseController):
     @expose()
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def download(self, id_doc):
+        """
+        IN
+          id_doc  <int>/<list> [<int>, ...]
+        """
         
-        content, mt, file_name = SapnsDoc.download(int(id_doc))
-        response.headerlist.append(('Content-Type', mt.encode('utf-8')))
-        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+        try:
+            id_doc = int(id_doc)
+            
+            content, mt, file_name = SapnsDoc.download(id_doc)
+            response.headerlist.append(('Content-Type', mt.encode('utf-8')))
+            response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
         
-        return content
+            return content
+            
+        except ValueError:
+            
+            docs = sj.loads(id_doc)
+            
+            if len(docs) == 1:
+                content, mt, file_name = SapnsDoc.download(docs[0])
+                response.headerlist.append(('Content-Type', mt.encode('utf-8')))
+                response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+        
+                return content
+            
+            else:
+                # varios archivos
+                zf = StringIO()
+                with ZipFile(zf, 'w', ZIP_DEFLATED) as zip_file:
+                    for id_doc in docs:
+                        
+                        content, mt, file_name = SapnsDoc.download(int(id_doc))
+                        
+                        f = StringIO()
+                        f.write(content)
+                        
+                        zip_file.writestr(file_name, f.getvalue())
+                        
+                response.headerlist.append(('Content-Type', 'application/zip'))
+                fn = _('docs__%s.zip') % datetostr(dt.date.today(), fmt='%Y%m%d')
+                response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % fn))
+                
+                return zf.getvalue()
         
     @expose('json')
-    @require(authorize.has_any_permission('manage', 'docs'))
+    @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
     def remove_file(self, **kw):
+        """
+        IN
+          file_name <str>
+          id_repo   <int>
+          
+        OUT
+          { status: <bool> }
+        """
         
         logger = logging.getLogger('DocsController.remove_file')
         try:
@@ -229,3 +285,35 @@ class DocsController(BaseController):
         except Exception, e:
             logger.error(e)
             return dict(status=False, message=str(e).decode('utf-8'))
+        
+    @expose()
+    @require(p.not_anonymous())
+    def get(self, repo, doc):
+        """
+        IN
+          repo str/int
+          doc str/int
+          
+          Different ways of calling:
+              # by doc id (repo is unnecessary)
+              /docs/get/_/1234
+              
+              # by repo id and doc filename
+              /docs/get/1/asdkasduo12mk2jklj32d3d3kjlk3
+              
+              # by repo id and doc title (notice the starting _)
+              /docs/get/1/_company_icon
+              
+              # by repo name and doc filename
+              /docs/get/main repo/asdkasduo12mk2jklj32d3d3kjlk3
+              
+              # by repo name and doc title (notice the starting _)
+              /docs/get/main repo/_company_icon
+        """
+        
+        id_doc = SapnsDoc.get_id_doc(repo, doc)
+                
+        content, mt, _file_name = SapnsDoc.download(id_doc)
+        response.headerlist.append(('Content-Type', mt.encode('utf-8')))
+        
+        return content

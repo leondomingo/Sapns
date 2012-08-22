@@ -308,7 +308,7 @@
         
         self._docs_default = {
             name: 'docs',
-            url: '{{tg.url("/dashboard/docs/")}}',
+            url: '{{tg.url("/docs/")}}',
             require_id: 'true',
             type: 'docs'
         };

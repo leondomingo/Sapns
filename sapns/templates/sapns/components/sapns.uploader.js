@@ -26,7 +26,7 @@
         set(this, 'uploaded_file', '');
         this.file_size = 0;
         this.uploaded = false;
-        set(this, 'url', "{{tg.url('/dashboard/docs/upload_file')}}");
+        set(this, 'url', "{{tg.url('/docs/upload_file')}}");
         set(this, 'repo', '');
         set(this, 'show_button', true);
         set(this, 'button_caption', "Upload");
@@ -156,7 +156,7 @@
             
             if (remove_from_disk) {
                 $.ajax({
-                    url: "{{tg.url('/dashboard/docs/remove_file')}}",
+                    url: "{{tg.url('/docs/remove_file')}}",
                     data: {
                         file_name: f,
                         id_repo: self.getRepo()
@@ -188,10 +188,8 @@
             var sufix = sapnsUploader.name;
             
             var content = 
-                '<div id="file_name_' + sufix + '" class="file_name">' +
-                    '<div style="width: 80%; float: left;' + 
-                        ' border: 1px solid lightgray;' + 
-                        ' margin-top: 3px;">...</div>' +
+                '<div id="file_name_' + sufix + '" class="sp-filename">' +
+                    '<div style="float:left">...</div>' +
                     '<button id="btn_delete_file_' + sufix + '">{{_("Delete")}}</button>' +                
                 '</div>';
             
