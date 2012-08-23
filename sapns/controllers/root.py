@@ -72,6 +72,11 @@ class RootController(BaseController):
             return dict(login_counter=login_counter, came_from=came_from or url('/'))
         
     @expose()
+    def login(self, **kw):
+        # simply redirects to index
+        redirect('/', **kw)
+            
+    @expose()
     def init(self):
         redirect(url('/dashboard/util/init'))
         
