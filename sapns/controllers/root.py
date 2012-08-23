@@ -1,22 +1,20 @@
 # -*- coding: utf-8 -*-
 """Main Controller"""
 
-from jinja2.environment import Environment
-from jinja2.loaders import PackageLoader
 from pylons.i18n import ugettext as _
 from repoze.what import predicates
 from sapns.controllers.dashboard import DashboardController
+from sapns.controllers.docs import DocsController
 from sapns.controllers.error import ErrorController
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import add_language, save_language, init_lang
+from sapns.lib.sapns.forgot_password import EUserDoesNotExist
+from sapns.lib.sapns.util import add_language, save_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
-from sqlalchemy.sql.expression import or_, func
 from tg import expose, require, url, request, redirect, config
+from tg.decorators import use_custom_format
 from tg.i18n import set_lang
 import logging
-from sapns.lib.sapns.forgot_password import EUserDoesNotExist
-from sapns.controllers.docs import DocsController
 
 __all__ = ['RootController']
 
@@ -38,25 +36,40 @@ class RootController(BaseController):
     dashboard = DashboardController()
     docs = DocsController()
     
-    @expose('sapns/index.html')
+    @expose('sapns/login.html')
+    @expose('sapns/index.html', custom_format='home')
     @add_language
-    def index(self):
+    def index(self, **kw):
         
-        logger = logging.getLogger('RootController.index')
+        came_from = kw.get('came_from')
         
+        # am I logged?
         if request.identity:
-            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-            ep = user.entry_point()
-            logger.info('entry-point: %s' % ep)
-            if ep and ep != '/':
-                redirect(url(ep))
+            use_custom_format(self.index, 'home')
             
-        # there is no "entry_point" defined
-        home = config.get('app.home')
-        if home and home != '/':
-            redirect(url(home))
+            if came_from:
+                # redirect to the place before logout
+                redirect(came_from)
+                
+            else:
+                # redirect to user's entry-point
+                user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+                ep = user.entry_point()
+                if ep and ep != '/':
+                    redirect(url(ep))
+                    
+                else:
+                    # there is no "entry_point" defined, redirect to default entry-point (app.home)
+                    home = config.get('app.home')
+                    if home and home != '/':
+                        redirect(url(home))
+                
+            return dict()
             
-        return dict()
+        else:
+            login_counter = kw.get('login_counter', '0')
+            
+            return dict(login_counter=login_counter, came_from=came_from or url('/'))
         
     @expose()
     def init(self):
@@ -76,17 +89,6 @@ class RootController(BaseController):
         """This method showcases TG's access to the wsgi environment."""
         return dict(environment=request.environ)
 
-    @expose('sapns/login.html')
-    @add_language
-    def login(self, came_from=url('/')):
-        """Start the user login."""
-        login_counter = request.environ['repoze.who.logins']
-#        if login_counter > 0:
-#            flash(_('Wrong credentials'), 'warning')
-            
-        return dict(page='', login_counter=str(login_counter),
-                    came_from_=came_from)
-
     @expose()
     def post_login(self, came_from='/'):
         """
@@ -95,8 +97,8 @@ class RootController(BaseController):
         """
         if not request.identity:
             login_counter = request.environ['repoze.who.logins'] + 1
-            redirect('/login', came_from=came_from, __logins=login_counter)
-        userid = request.identity['repoze.who.userid']
+            redirect('/', dict(login_counter=login_counter, came_from=came_from))
+            
         redirect(came_from)
 
     @expose()
@@ -105,8 +107,7 @@ class RootController(BaseController):
         Redirect the user to the initially requested page on logout and say
         goodbye as well.
         """
-        #flash(_('We hope to see you soon!'))
-        redirect(came_from)
+        redirect('/', dict(came_from=came_from))
 
     @expose()
     def setlang(self, lang='en'):

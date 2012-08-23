@@ -16,6 +16,11 @@ body {
 
 a { color: #797C33; font-weight: bold; text-decoration: none; }
 
+#wrong-login { position:absolute; left:393px; top:395px; width:410px;
+height:32px; background-color:#fee1ad; border-radius:3px; padding:6px 5px 5px 5px;
+font:14px arial; color:#444; text-align:center }
+#wrong-login span { font-weight:bold }
+
 /* Login form*/
 #loginform { position:relative; width:400px; height:215px; border:1px solid #ffcc70; border-radius:5px;
 margin:140px auto 10px auto; box-shadow:3px 3px #ffcc70; background-color:#eee }
@@ -63,22 +68,26 @@ margin:140px auto 10px auto; box-shadow:3px 3px #ffcc70; background-color:#eee }
     position: relative;
     height: 600px;
     margin-top: 30px;
-    border: 1px solid darkgray;
+    /*border: 1px solid darkgray;*/
 }
 
 .sp_sidebar {
     position: absolute;
-    width: 165px;
+    width: 180px;
     height: 580px;
     overflow: auto;
-    box-shadow: 0 0 11px #888888 inset;
+    /*box-shadow: 0 0 11px #888888 inset;*/
     left: 0px;
     top: 0px;
-    padding: 10px 10px 10px 25px;
+    padding:10px;
     font-size: 16px;
+    background:#ecefcc;
     /*background: url(http://localhost/fondo_header_atenea.jpg);*/
-    border: 1px solid darkGray;
+    /*border: 1px solid darkGray;*/
 }
+
+#sp-sidebar-background { position:absolute; left:-100px; top:0; 
+width:300px; height:600px; background:#ecefcc; z-index:-1 }
 
 .sp_center {
     position: absolute;
@@ -86,8 +95,8 @@ margin:140px auto 10px auto; box-shadow:3px 3px #ffcc70; background-color:#eee }
     height: 600px;
     left: 200px;
     top: 0px;
-    box-shadow: 0 0 11px #888888 inset;
-    border: 1px solid darkGray;
+    /*box-shadow: 0 0 11px #888888 inset;*/
+    /*border: 1px solid darkGray;*/
 }
 
 .sp_app_title {
@@ -145,7 +154,7 @@ margin:140px auto 10px auto; box-shadow:3px 3px #ffcc70; background-color:#eee }
     border: 2px solid gray;
     border-radius: 10px;
     width: 90px;
-    margin-left: 205px;
+    margin-left: 250px;
     font-family: Arial;
     height: 14px;
 }
@@ -484,8 +493,8 @@ margin:3px 1px 0 0; padding:0 2px }
 .icon_sb { width:25px; height:25px; cursor:pointer; float:left }
 .text_sb { font-size:12px; padding-top:3px; margin-left:5px; float:left; width:130px; margin-bottom:3px }
 
-.text_sb, .subaction { padding:3px; cursor:pointer; width:150px;} 
-.text_sb:hover, .subaction:hover { background-color: #b4bd3c; border-radius: 3px; }
+.text_sb, .subaction { padding:3px; cursor:pointer; width:150px } 
+.text_sb:hover, .subaction:hover { background-color:#b4bd3c; border-radius:3px }
 
 .text_sb a { font-weight:bold; color:#333; }
 .text_sb a:hover { color: black; }

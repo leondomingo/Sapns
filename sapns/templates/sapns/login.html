@@ -20,16 +20,20 @@
 
 {% block middle %}
 
-<div id="forgot_password_dlg" style="display: none;">
+<div id="forgot_password_dlg" style="display:none">
     <h3>{{_('Enter your username or e-mail')}}</h3>
     <input id="username_or_email" type="text">
 </div>
+
+<!--{% if login_counter|int > 0 %}-->
+<div id="wrong-login">{{_('<span>Wrong login</span>. Please, verify your username or password')}}</div>
+<!--{% endif %}-->
 
 <div id="loginform">
 
 <div class="background-icon">&nbsp;</div>
 
-<form action="{{tg.url('/login_handler', params=dict(came_from_=came_from_.encode('utf-8'), __logins=login_counter.encode('utf-8')))}}" method="post" accept-charset="UTF-8" class="loginfields">
+<form action="{{tg.url('/login_handler', params=dict(came_from=came_from.encode('utf-8'), __logins=login_counter.encode('utf-8')))}}" method="post" accept-charset="UTF-8" class="loginfields">
     <div class="top-space">&nbsp;</div>
     <div class="line">
         <div class="label">{{_('Username')}}</div>

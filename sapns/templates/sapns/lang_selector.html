@@ -1,14 +1,14 @@
 <div class="sp-user-option">
     <select id="language_selector">
         <option value="">{{_('Select your language')}}</option>
-        {% if not languages %}
+        <!--{% if not languages %}-->
         <option value="en" {% if lang == 'en' %} selected {% endif %}>English</option>
         <option value="es" {% if lang == 'es' %} selected {% endif %}>Español</option>
-        {% else %}
-        {% for l in languages %}
+        <!--{% else %}-->
+        <!--{% for l in languages %}-->
         <option value="{{l.code}}" {% if lang == l.code %} selected {% endif %}>{{l.name}}</option>
-        {% endfor %}
-        {% endif %}
+        <!--{% endfor %}-->
+        <!--{% endif %}-->
         <!-- rest of languages -->
     </select>
 </div>

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2012-08-07 19:00+0200\n"
+"POT-Creation-Date: 2012-08-23 11:16+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,71 +17,76 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r641\n"
 
-#: sapns/controllers/dashboard.py:422
+#: sapns/controllers/dashboard.py:434
 msgid "updating an existing record"
 msgstr "actualizando un registro existente"
 
-#: sapns/controllers/dashboard.py:423
+#: sapns/controllers/dashboard.py:435
 msgid "update"
 msgstr "actualizar"
 
-#: sapns/controllers/dashboard.py:425
+#: sapns/controllers/dashboard.py:437
 msgid "creating a new record"
 msgstr "creando un nuevo registro"
 
-#: sapns/controllers/dashboard.py:426
+#: sapns/controllers/dashboard.py:438
 msgid "create"
 msgstr "crear"
 
-#: sapns/controllers/dashboard.py:472
+#: sapns/controllers/dashboard.py:484
 msgid "edit record"
 msgstr "editar registro"
 
-#: sapns/controllers/dashboard.py:474
+#: sapns/controllers/dashboard.py:486
 msgid "new record"
 msgstr "nuevo registro"
 
-#: sapns/controllers/dashboard.py:496 sapns/controllers/dashboard.py:652
-#: sapns/controllers/dashboard.py:746 sapns/controllers/dashboard.py:803
-#: sapns/controllers/logs.py:53 sapns/lib/sapns/lists.py:51
-#: sapns/lib/sapns/lists.py:148
+#: sapns/controllers/dashboard.py:508 sapns/controllers/dashboard.py:664
+#: sapns/controllers/dashboard.py:758 sapns/controllers/dashboard.py:815
+#: sapns/controllers/logs.py:53 sapns/lib/sapns/lists.py:54
+#: sapns/lib/sapns/lists.py:151
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
-#: sapns/controllers/dashboard.py:509
+#: sapns/controllers/dashboard.py:521
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/dashboard.py:540 sapns/controllers/dashboard.py:668
+#: sapns/controllers/dashboard.py:552 sapns/controllers/dashboard.py:680
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
-#: sapns/controllers/dashboard.py:674
+#: sapns/controllers/dashboard.py:686
 msgid "Some records do not exist"
 msgstr "Algunos registros no existen"
 
-#: sapns/controllers/dashboard.py:712 sapns/controllers/dashboard.py:724
+#: sapns/controllers/dashboard.py:724 sapns/controllers/dashboard.py:736
 msgid "delete"
 msgstr "borrar"
 
-#: sapns/controllers/dashboard.py:790
+#: sapns/controllers/dashboard.py:802
 #, python-format
 msgid "Insertion order for \"%s\" has been successfully updated"
 msgstr "El orden de inserción para \"%s\" se ha actualizado correctamente"
 
-#: sapns/controllers/docs.py:38
+#: sapns/controllers/docs.py:41
 #, python-format
 msgid "Documents of [%s]"
 msgstr "Documentos de [%s]"
 
-#: sapns/controllers/logs.py:84 sapns/lib/sapns/lists.py:101
+#: sapns/controllers/docs.py:259
+#, python-format
+msgid "docs__%s.zip"
+msgstr "documentos__%s.zip"
+
+#: sapns/controllers/logs.py:84 sapns/lib/sapns/lists.py:103
 #: sapns/templates/sapns/privileges/actions.html:13
 #: sapns/templates/sapns/privileges/classes.html:8
 #: sapns/templates/sapns/privileges/index.html:33
 msgid "Yes"
 msgstr "Sí"
 
-#: sapns/controllers/logs.py:85 sapns/lib/sapns/lists.py:102
+#: sapns/controllers/logs.py:85 sapns/lib/sapns/lists.py:104
 #: sapns/templates/sapns/privileges/actions.html:14
 #: sapns/templates/sapns/privileges/classes.html:9
 #: sapns/templates/sapns/privileges/index.html:34
@@ -97,7 +102,7 @@ msgstr "Gestión de privilegios para \"%s\""
 msgid "Role privileges copy"
 msgstr "Copia de privilegios de rol"
 
-#: sapns/controllers/root.py:135
+#: sapns/controllers/root.py:167
 msgid "No user has been found"
 msgstr "No se ha encontrado ningún usuario"
 
@@ -125,12 +130,12 @@ msgstr "La vista ha sido borrada correctamente"
 msgid "(new permission)"
 msgstr "(nuevo permiso)"
 
-#: sapns/lib/sapns/lists.py:68
+#: sapns/lib/sapns/lists.py:70
 #, python-format
 msgid "%s of [%s]"
 msgstr "%s de [%s]"
 
-#: sapns/lib/sapns/lists.py:70
+#: sapns/lib/sapns/lists.py:72
 #, python-format
 msgid "list of %s"
 msgstr "lista de %s"
@@ -149,19 +154,19 @@ msgstr "Nuevo"
 #: sapns/lib/sapns/util.py:201
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:505
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:60
-#: sapns/templates/sapns/docs/index.html:330
+#: sapns/templates/sapns/docs/index.html:327
 msgid "Edit"
 msgstr "Editar"
 
 #: sapns/lib/sapns/util.py:202
-#: sapns/templates/sapns/components/sapns.uploader.js:195
+#: sapns/templates/sapns/components/sapns.uploader.js:193
 #: sapns/templates/sapns/components/sapns.uploader.min.js:21
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:507
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1310
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:60
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:152
 #: sapns/templates/sapns/dashboard/grid.html:84
-#: sapns/templates/sapns/docs/index.html:351
+#: sapns/templates/sapns/docs/index.html:349
 msgid "Delete"
 msgstr "Borrar"
 
@@ -191,7 +196,7 @@ msgstr "Proyecto"
 msgid "NO_TITLE"
 msgstr "SIN_TITULO"
 
-#: sapns/model/sapnsmodel.py:1919 sapns/model/sapnsmodel.py:1969
+#: sapns/model/sapnsmodel.py:1919 sapns/model/sapnsmodel.py:1972
 #, python-format
 msgid "Repo [%d] was not found"
 msgstr "No se encontró el repositorio [%d]"
@@ -217,35 +222,39 @@ msgstr "Selecciona tu idioma"
 msgid "Enter your username or e-mail"
 msgstr "Introduce tu nombre de usuario o e-mail"
 
-#: sapns/templates/sapns/login.html:35
+#: sapns/templates/sapns/login.html:29
+msgid "<span>Wrong login</span>. Please, verify your username or password"
+msgstr "<span>Login incorrecto</span><br>Por favor, comprueba tu nombre de usuario o contraseña"
+
+#: sapns/templates/sapns/login.html:39
 msgid "Username"
 msgstr "Usuario"
 
-#: sapns/templates/sapns/login.html:40 sapns/templates/sapns/users/edit.html:50
+#: sapns/templates/sapns/login.html:44 sapns/templates/sapns/users/edit.html:50
 msgid "Password"
 msgstr "Contraseña"
 
-#: sapns/templates/sapns/login.html:45
+#: sapns/templates/sapns/login.html:49
 msgid "remember me"
 msgstr "recordarme"
 
-#: sapns/templates/sapns/login.html:56
+#: sapns/templates/sapns/login.html:60
 msgid "Forgot my password"
 msgstr "Olvidé mi contraseña"
 
-#: sapns/templates/sapns/login.html:66
+#: sapns/templates/sapns/login.html:70
 msgid "Remember password"
 msgstr "Recordar contraseña"
 
-#: sapns/templates/sapns/login.html:73
+#: sapns/templates/sapns/login.html:77
 msgid "Please, e-mail me a new password"
 msgstr "Por favor, enviarme por e-mail mi nueva contraseña"
 
-#: sapns/templates/sapns/login.html:93
+#: sapns/templates/sapns/login.html:97
 msgid "A new password has been sent to you by e-mail"
 msgstr "Se te ha enviado una nueva contraseña por e-mail"
 
-#: sapns/templates/sapns/login.html:107
+#: sapns/templates/sapns/login.html:111
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:800
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1353
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1364
@@ -254,8 +263,8 @@ msgstr "Se te ha enviado una nueva contraseña por e-mail"
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:159
 #: sapns/templates/sapns/dashboard/grid.html:126
 #: sapns/templates/sapns/dashboard/grid.html:136
-#: sapns/templates/sapns/dashboard/edit/edit.js:292
-#: sapns/templates/sapns/dashboard/edit/edit.min.js:37
+#: sapns/templates/sapns/dashboard/edit/edit.js:276
+#: sapns/templates/sapns/dashboard/edit/edit.min.js:26
 #: sapns/templates/sapns/views/views-min.js:1
 #: sapns/templates/sapns/views/views.js:456
 msgid "Close"
@@ -280,8 +289,8 @@ msgstr "Dar valor"
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:152
 #: sapns/templates/sapns/dashboard/grid.html:86
 #: sapns/templates/sapns/dashboard/grid.html:361
-#: sapns/templates/sapns/docs/index.html:61
-#: sapns/templates/sapns/docs/index.html:291
+#: sapns/templates/sapns/docs/index.html:60
+#: sapns/templates/sapns/docs/index.html:288
 #: sapns/templates/sapns/shortcuts/list.html:150
 #: sapns/templates/sapns/shortcuts/list.html:250
 msgid "Ok"
@@ -293,8 +302,8 @@ msgstr "Aceptar"
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:160
 #: sapns/templates/sapns/dashboard/grid.html:144
 #: sapns/templates/sapns/dashboard/grid.html:383
-#: sapns/templates/sapns/docs/index.html:143
-#: sapns/templates/sapns/docs/index.html:299
+#: sapns/templates/sapns/docs/index.html:142
+#: sapns/templates/sapns/docs/index.html:296
 #: sapns/templates/sapns/privileges/copy.html:34
 #: sapns/templates/sapns/shortcuts/list.html:170
 #: sapns/templates/sapns/shortcuts/list.html:280
@@ -458,13 +467,13 @@ msgid "Actions"
 msgstr "Acciones"
 
 #: sapns/templates/sapns/dashboard/grid.html:599
-#: sapns/templates/sapns/dashboard/listof.html:21
+#: sapns/templates/sapns/dashboard/listof.html:24
 #: sapns/templates/sapns/dashboard/edit/edit.html:51
 msgid "Related info"
 msgstr "Información relacionada"
 
 #: sapns/templates/sapns/dashboard/grid.html:605
-#: sapns/templates/sapns/dashboard/listof.html:27
+#: sapns/templates/sapns/dashboard/listof.html:30
 #: sapns/templates/sapns/dashboard/edit/edit.html:57
 msgid "Show"
 msgstr "Mostrar"
@@ -698,21 +707,21 @@ msgstr "Ir"
 msgid "Save"
 msgstr "Guardar"
 
-#: sapns/templates/sapns/dashboard/edit/edit.html:170
+#: sapns/templates/sapns/dashboard/edit/edit.html:156
 msgid "Go to link"
 msgstr "Ir a enlace"
 
-#: sapns/templates/sapns/dashboard/edit/edit.js:145
-#: sapns/templates/sapns/dashboard/edit/edit.min.js:21
+#: sapns/templates/sapns/dashboard/edit/edit.js:141
+#: sapns/templates/sapns/dashboard/edit/edit.min.js:14
 msgid "Check required fields!"
 msgstr "Comprueba los campos requeridos"
 
-#: sapns/templates/sapns/dashboard/edit/edit.js:162
-#: sapns/templates/sapns/dashboard/edit/edit.min.js:22
+#: sapns/templates/sapns/dashboard/edit/edit.js:158
+#: sapns/templates/sapns/dashboard/edit/edit.min.js:15
 msgid "this field is required"
 msgstr "este campo es requerido"
 
-#: sapns/templates/sapns/docs/edit.html:3
+#: sapns/templates/sapns/docs/edit.html:5
 #: sapns/templates/sapns/views/columns.html:12
 #: sapns/templates/sapns/views/header.html:6
 #: sapns/templates/sapns/views/views-min.js:1
@@ -720,25 +729,25 @@ msgstr "este campo es requerido"
 msgid "Title"
 msgstr "Título"
 
-#: sapns/templates/sapns/docs/edit.html:8
-#: sapns/templates/sapns/docs/index.html:180
+#: sapns/templates/sapns/docs/edit.html:12
+#: sapns/templates/sapns/docs/index.html:179
 msgid "Document type"
 msgstr "Tipo de documento"
 
-#: sapns/templates/sapns/docs/edit.html:13
-#: sapns/templates/sapns/docs/index.html:189
+#: sapns/templates/sapns/docs/edit.html:19
+#: sapns/templates/sapns/docs/index.html:188
 msgid "Document format"
 msgstr "Formato del documento"
 
-#: sapns/templates/sapns/docs/edit.html:18
+#: sapns/templates/sapns/docs/edit.html:26
 msgid "Repository"
 msgstr "Repositorio"
 
-#: sapns/templates/sapns/docs/edit.html:23
+#: sapns/templates/sapns/docs/edit.html:33
 msgid "Author"
 msgstr "Autor"
 
-#: sapns/templates/sapns/docs/edit.html:28
+#: sapns/templates/sapns/docs/edit.html:40
 msgid "File"
 msgstr "Fichero"
 
@@ -747,44 +756,44 @@ msgstr "Fichero"
 msgid "Document of [%s]"
 msgstr "Documento de [%s]"
 
-#: sapns/templates/sapns/docs/index.html:182
+#: sapns/templates/sapns/docs/index.html:181
 msgid "Document types"
 msgstr "Tipos de documento"
 
-#: sapns/templates/sapns/docs/index.html:191
+#: sapns/templates/sapns/docs/index.html:190
 msgid "Document formats"
 msgstr "Formatos de documento"
 
-#: sapns/templates/sapns/docs/index.html:198
+#: sapns/templates/sapns/docs/index.html:197
 msgid "Document repository"
 msgstr "Repositorio del documento"
 
-#: sapns/templates/sapns/docs/index.html:200
+#: sapns/templates/sapns/docs/index.html:199
 msgid "Document repositories"
 msgstr "Repositorios de documentos"
 
-#: sapns/templates/sapns/docs/index.html:211
+#: sapns/templates/sapns/docs/index.html:210
 msgid "Document author"
 msgstr "Autor del documento"
 
-#: sapns/templates/sapns/docs/index.html:213
+#: sapns/templates/sapns/docs/index.html:212
 #: sapns/templates/sapns/privileges/privileges.js:182
 msgid "Users"
 msgstr "Usuarios"
 
-#: sapns/templates/sapns/docs/index.html:267
+#: sapns/templates/sapns/docs/index.html:264
 msgid "Do you want to delete this doc?"
 msgstr "¿Quieres borrar este documento?"
 
-#: sapns/templates/sapns/docs/index.html:288
+#: sapns/templates/sapns/docs/index.html:285
 msgid "Delete document"
 msgstr "Borrar documento"
 
-#: sapns/templates/sapns/docs/index.html:322
+#: sapns/templates/sapns/docs/index.html:319
 msgid "Add"
 msgstr "Añadir"
 
-#: sapns/templates/sapns/docs/index.html:338
+#: sapns/templates/sapns/docs/index.html:335
 msgid "Download"
 msgstr "Descargar"
 
@@ -1110,60 +1119,8 @@ msgstr "Por favor, comprueba la información que has introducido"
 msgid "Warning"
 msgstr "Aviso"
 
-#~ msgid "Reference order for \"%s\" has been successfully updated"
-#~ msgstr "El orden de referencia para \"%s\" se ha actualizado correctamente"
-
-#~ msgid "Wrong credentials"
-#~ msgstr "Credenciales incorrectas"
-
-#~ msgid "Welcome back, %s!"
-#~ msgstr "¡Bienvenido, %s!"
-
-#~ msgid "We hope to see you soon!"
-#~ msgstr "¡Esperamos verte pronto!"
-
-#~ msgid "Click here to edit user data"
-#~ msgstr "Pulsa aquí para editar los datos de usuario"
-
-#~ msgid "Login"
-#~ msgstr "Entrar"
-
-#~ msgid "Set a value for [%s]"
-#~ msgstr "Poner valor a [%s]"
-
-#~ msgid "Remove value of [%s]"
-#~ msgstr "Quitar valor de [%s]"
-
-#~ msgid "Send to dashboard"
-#~ msgstr "Enviar a escritorio"
-
-#~ msgid "Do you want to send this shortcut to the dashboard?"
-#~ msgstr "¿Quieres enviar este favorito al escritorio?"
-
-#~ msgid "Shortcut sharing"
-#~ msgstr "Favoritos"
-
-#~ msgid "What user do you want to share this shortcut with?"
-#~ msgstr "¿Con qué usuario quieres compartir este favorito?"
-
-#~ msgid "(Select operation)"
-#~ msgstr "(Selecciona operación)"
-
-#~ msgid "Insertion order"
-#~ msgstr "Orden de inserción"
-
-#~ msgid "Reference order"
-#~ msgstr "Orden de referencia"
-
-#~ msgid "Remove this shortcut"
-#~ msgstr "Borrar favorito"
-
-#~ msgid "Put this shortcut on the dashboard"
-#~ msgstr "Pon este favorito en el escritorio"
-
-#~ msgid "Share this shortcut with another user"
-#~ msgstr "Compartir este favorito con otro usuario"
-
-#~ msgid "Share"
-#~ msgstr "Compartir"
+#~ msgid "Wrong login. Please, verify your username or password"
+#~ msgstr ""
+#~ "Login incorrecto. Por favor, comprueba "
+#~ "tu nombre de usuario o contraseña"
 

@@ -52,7 +52,6 @@ class DashboardController(BaseController):
     sc = ShortcutsController()
     messages = MessagesController()
     privileges = PrivilegesController()
-    #docs = DocsController()
     logs = LogsController()
     
     @expose('sapns/sidebar.html')

@@ -5,8 +5,7 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    <link rel="stylesheet" type="text/css" media="screen" 
-        href="/css/privileges/privileges.css">
+    <link rel="stylesheet" href="{{tg.url('/css/privileges/privileges.min.css', params=dict(v=1))">
 {% endblock %}
 
 {% block middle %}
