@@ -401,53 +401,6 @@ width:300px; height:600px; background:#ecefcc; z-index:-1 }
 	margin-right: 3px;
 }
 
-/*.sp_shortcut {
-	margin-left: 20px;
-	margin-right: 20px;
-    margin-top: 5px;
-    margin-bottom: 2px;
-    border-radius: 10px;
-}
-
-.sp_shortcut:hover {
-    background-color: orange !important;
-}
-
-.sp-shortcut-title {
-    width: 350px;
-    float: left;
-    margin-top: 2px;
-    padding-left: 20px;
-}
-
-.sp-select-shortcut {
-    width: 200px;
-}
-
-.sp-shortcut-ins-order {
-    float: left; 
-    border: 1px solid #B4BD3C;
-    padding-left: 2px; 
-    padding-right: 2px;
-    margin-top: 2px;
-    margin-left: 5px; 
-    margin-right: 5px;
-    width: 140px;
-    text-align: center;
-}
-
-.sp-shortcut-ref-order {
-    border: 1px solid #B4BD3C;
-    float: left;
-    padding-left: 2px; 
-    padding-right: 2px;
-    margin-top: 2px;
-    margin-left: 5px; 
-    margin-right: 5px;
-    width: 140px;
-    text-align: center;
-}*/
-
 .sp_messages {
 	font-size: 10px;
 	color: navy;
@@ -536,7 +489,7 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
 }
 
 #sp-user-menu {
-    width: 288px;
+    width: 330px;
     display: none;
     margin-top: 5px;
     padding-bottom: 5px;

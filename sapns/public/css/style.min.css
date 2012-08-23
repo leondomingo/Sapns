@@ -51,7 +51,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{position:abso
 input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
 input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:orange}
 .sp-select-text{border:1px solid red;border-radius:3px}.sp-select-button,.sp-empty-button{height:20px;font-size:10px;font-family:arial;font-weight:bold;margin-left:3px}
-.sp-empty-button{color:red}#sp-user-menu{width:288px;display:none;margin-top:5px;padding-bottom:5px}
+.sp-empty-button{color:red}#sp-user-menu{width:330px;display:none;margin-top:5px;padding-bottom:5px}
 .sp-user-option{padding:2px 2px 2px 10px;color:#000;border-radius:3px;cursor:pointer;margin-left:1px;width:99%}
 .sp-user-option:hover{background-color:#ffa900;color:#fff}.caja3d{border:1px solid #999;border-bottom:2px solid #777;border-right:2px solid #777;border-radius:3px}
 #sc_list{height:565px;overflow:auto}#sp-exploration-head{height:20px;padding-left:25px;padding-top:2px;background-color:white;border-radius:3px;margin:4px 10px}

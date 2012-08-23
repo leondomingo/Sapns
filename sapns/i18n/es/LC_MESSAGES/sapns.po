@@ -248,7 +248,7 @@ msgstr "Recordar contraseña"
 
 #: sapns/templates/sapns/login.html:77
 msgid "Please, e-mail me a new password"
-msgstr "Por favor, enviarme por e-mail mi nueva contraseña"
+msgstr "Por favor, enviadme por e-mail mi nueva contraseña"
 
 #: sapns/templates/sapns/login.html:97
 msgid "A new password has been sent to you by e-mail"
