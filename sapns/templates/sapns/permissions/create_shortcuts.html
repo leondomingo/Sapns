@@ -1,0 +1,107 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.qtip2() }}
+    <link rel="stylesheet" href="{{tg.url('/css/permissions/create_shortcuts.css')}}">
+{% endblock %}
+
+{% block middle %}
+    <div id="permissions-container">
+        <select class="user">
+            <!--{% for u in users %}-->
+            <option value="{{ u.id }}" {% if u.selected %} selected {% endif %}>{{ u.display_name }} ({{ u.roles }})</option>
+            <!--{% endfor %}-->
+        </select>
+        <div class="permission-name">{{ permission.title }} <span>({{ permission.name }})</span></div>
+        <div class="message">{{_('Select the groups to include this permission in')}}</div>
+        <ul class="groups-list"></ul>
+        
+        <div class="buttons">
+            <button class="cancel">{{_('Cancel')}}</button>
+            <button class="ok">{{_('Ok')}}</button>
+        </div>
+    </div>
+    
+    <script>
+    $(function() {
+        
+        var en_proceso = false;
+        
+        function go_back() {
+            var goback_form = '<form method="post" action="{{came_from}}"></form>';
+            $(goback_form).appendTo('body').submit().remove();
+        }
+        
+        function load_groups(user_id) {
+            $.ajax({
+                url: "{{tg.url('/dashboard/permissions/user_groups/')}}",
+                data: { user_id: user_id },
+                success: function(content) {
+                    $('#permissions-container .groups-list').html(content);
+                },
+                error: function() {
+                    alert('Error!');
+                }
+            });
+        }
+        
+        $('#permissions-container select.user').change(function() {
+            load_groups($(this).val());
+        });
+        
+        $('#permissions-container .buttons button.ok').click(function() {
+            
+            if (!en_proceso) {
+                en_proceso = true;
+                
+                var selected_groups = [];
+                $('#permissions-container .groups-list .group .checkbox:checked').each(function() {
+                    var shortcut_id = $(this).parent().parent().attr('id_shortcut')*1;
+                    selected_groups.push(shortcut_id);
+                });
+                
+                if (selected_groups.length === 0) {
+                    en_proceso = false;
+                    alert("{{_('There are no groups selected')}}");
+                    return;
+                }
+                else {
+                    $.ajax({
+                        url: "{{tg.url('/dashboard/permissions/create_shortcut_/')}}",
+                        data: {
+                            user_id: $('#permissions-container select.user').val(),
+                            permission_id: "{{ permission.id }}",
+                            groups: JSON.stringify(selected_groups)
+                        },
+                        success: function(res) {
+                            if (res.status) {
+                                go_back();
+                            }
+                            else {
+                                en_proceso = false;
+                                alert('Error!');
+                            }
+                        },
+                        error: function() {
+                            en_proceso = false;
+                            alert('Error!');
+                        }
+                    });
+                }
+            }
+        });
+        
+        $('#permissions-container .buttons button.cancel').click(function() {
+            if (!en_proceso) {
+                go_back();
+            }
+        });
+        
+        load_groups($('#permissions-container select.user option:selected').val());
+    });
+    </script>
+{% endblock %}

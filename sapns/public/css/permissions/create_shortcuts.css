@@ -1,0 +1,14 @@
+#permissions-container { padding:10px }
+#permissions-container ul { list-style-type:none; border:1px solid #999; border-radius:3px; margin:0 3px 3px 0 }
+#permissions-container select.user { font:11px arial; margin-bottom:3px; width:250px }
+#permissions-container .permission-name { font:15px arial; margin-bottom:2px; background-color:#ddd; padding:0 2px}
+#permissions-container .permission-name span { font:10px arial }
+#permissions-container .message { font:13px arial; margin-bottom:5px }
+#permissions-container .groups-list { padding:5px; border:1px solid #999; 
+border-radius:3px; overflow:auto; background:#fff; height:450px }
+#permissions-container .groups-list .group { clear:left; height:18px; margin-bottom:3px }
+#permissions-container .groups-list .group .col { float:left; margin-right:5px; font:13px arial }
+#permissions-container .groups-list .group .col.title { margin-top:4px }
+
+#permissions-container .buttons { margin-top:5px }
+#permissions-container .buttons button { font:11px arial; width:90px; float:right }
