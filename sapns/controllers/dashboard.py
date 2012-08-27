@@ -8,6 +8,7 @@ from repoze.what import predicates as p
 from sapns.controllers.docs import DocsController
 from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
+from sapns.controllers.permissions import PermissionsController
 from sapns.controllers.privileges import PrivilegesController
 from sapns.controllers.roles import RolesController
 from sapns.controllers.shortcuts import ShortcutsController
@@ -55,6 +56,7 @@ class DashboardController(BaseController):
     privileges = PrivilegesController()
     docs = DocsController()
     logs = LogsController()
+    permissions = PermissionsController()
 
     @expose('sapns/dashboard/index.html')
     @require(p.not_anonymous())

@@ -1,0 +1,13 @@
+<!--{% for g in sc_groups recursive %}-->
+<li class="group" id_shortcut="{{ g.id }}">
+    <div class="col"><input class="checkbox" type="checkbox"></div>
+    <div class="col title">{{ g.title }}</div>
+    <!--{% if g.children|length > 0 %}-->
+    <li>
+    <ul class="children">
+        <!--{{ loop(g.children) }}-->
+    </ul>
+    </li>
+    <!--{% endif %}-->
+</li>
+<!--{% endfor %}-->
