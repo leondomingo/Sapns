@@ -83,7 +83,12 @@
                             }
                             else {
                                 en_proceso = false;
-                                alert('Error!');
+                                if (res.msg) {
+                                    alert(res.msg);
+                                }
+                                else {
+                                    alert('Error!');
+                                }
                             }
                         },
                         error: function() {

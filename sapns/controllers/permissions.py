@@ -1,21 +1,21 @@
 # -*- coding: utf-8 -*-
 
-from neptuno.dict import Dict
-from neptuno.util import get_paramw, strtobool
-from pylons import cache
+from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
 from repoze.what import authorize #, predicates
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsRole, \
-    SapnsAttrPrivilege, SapnsPermission, SapnsShortcut
+from sapns.model.sapnsmodel import SapnsUser, SapnsPermission, SapnsShortcut
 from sqlalchemy.sql.expression import and_
 from tg import expose, request
 import logging
 import simplejson as sj
 
 __all__ = ['PermissionsController']
+
+class EPermissions(Exception):
+    pass
 
 class PermissionsController(BaseController):
     
@@ -85,12 +85,12 @@ class PermissionsController(BaseController):
             
             p = dbs.query(SapnsPermission).get(permission_id)
             
+            if p.type not in [SapnsPermission.TYPE_LIST, SapnsPermission.TYPE_PROCESS] or \
+            p.type == SapnsPermission.TYPE_PROCESS and p.requires_id:
+                raise EPermissions(_(u'Shortcuts can only be created from LIST and PROCESS (no required id) type permissions'))
+            
             title = p.display_name
-            if p.type in [SapnsPermission.TYPE_NEW, SapnsPermission.TYPE_EDIT, 
-                          SapnsPermission.TYPE_DOCS, SapnsPermission.TYPE_DOCS]:
-                title = u'%s:%s' % (p.class_.title, p.display_name)
-                
-            elif p.type == SapnsPermission.TYPE_LIST:
+            if p.type == SapnsPermission.TYPE_LIST:
                 title = p.class_.title
             
             for id_group in groups:
@@ -108,6 +108,10 @@ class PermissionsController(BaseController):
             
             return dict(status=True)
         
+        except EPermissions, e:
+            logger.error(e)
+            return dict(status=False, msg=unicode(e))
+            
         except Exception, e:
             logger.error(e)
             return dict(status=False)
