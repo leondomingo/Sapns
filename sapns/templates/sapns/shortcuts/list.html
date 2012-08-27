@@ -12,26 +12,11 @@
 <!-- {# dialogs (now ain't visible) #} -->
 <div id="delete-confirmation" style="display:none" title="{{_('Delete shortcut')}}">
   <p>{{_('Do you want to delete this shortcut?')}}</p>
-  <p id="sp-shortcut-title" style="font-weight: bold;"></p>  
+  <p id="sp-shortcut-title" style="font-weight:bold"></p>  
 </div>
-
-<!--{#
-<div id="bookmark-confirmation" style="display: none;" title="{{_('Send to dashboard')}}">
-  <p>{{_('Do you want to send this shortcut to the dashboard?')}}</p>
-  <p id="sp-shortcut-title" style="font-weight: bold;"></p>
-</div>
-#}-->
-
-<!--{#
-<div id="share-dialog" style="display: none;" title="{{_('Shortcut sharing')}}">
-    <p>{{_('What user do you want to share this shortcut with?')}}</p>
-    <p id="sp-shortcut-title" style="font-weight: bold;"></p>
-    <select id="users-to-share-with"></select>
-</div>
-#}-->
 
 <form id="order-form" action="" method="post" target="_blank">
-    <input type="hidden" name="came_from" />
+    <input type="hidden" name="came_from">
 </form>
 
 <div id="sp-exploration-head" class="caja3d">
@@ -40,10 +25,10 @@
     <!--{% else %}-->
     <div class="sp-shortcut-up">&nbsp;</div>
     <!--{% endif %}-->
-    <div><button>New</button></div>
+    <div><button>{{_('New')}}</button></div>
 </div>
 
-<div id="sp-shortcut-list" class="caja3d">
+<div id="sp-shortcut-list">
     <!--{% for sc in shortcuts %}-->
     <!--{% if sc.action_type == '' %}-->
     <a class="sp-shortcut group" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc.id))}}"

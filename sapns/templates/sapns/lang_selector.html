@@ -1,26 +1,24 @@
-<div class="sp-user-option">
-    <select id="language_selector">
-        <option value="">{{_('Select your language')}}</option>
-        <!--{% if not languages %}-->
-        <option value="en" {% if lang == 'en' %} selected {% endif %}>English</option>
-        <option value="es" {% if lang == 'es' %} selected {% endif %}>Español</option>
-        <!--{% else %}-->
-        <!--{% for l in languages %}-->
-        <option value="{{l.code}}" {% if lang == l.code %} selected {% endif %}>{{l.name}}</option>
-        <!--{% endfor %}-->
-        <!--{% endif %}-->
-        <!-- rest of languages -->
-    </select>
-</div>
+<select id="sp-language-selector">
+    <option value="">{{_('Select your language')}}</option>
+    <!--{% if not languages %}-->
+    <option value="en" {% if lang == 'en' %} selected {% endif %}>English</option>
+    <option value="es" {% if lang == 'es' %} selected {% endif %}>Español</option>
+    <!--{% else %}-->
+    <!--{% for l in languages %}-->
+    <option value="{{l.code}}" {% if lang == l.code %} selected {% endif %}>{{l.name}}</option>
+    <!--{% endfor %}-->
+    <!--{% endif %}-->
+    <!-- rest of languages -->
+</select>
 
 <script>
     $(function() {
-        $('#language_selector').change(function() {
+        $('#sp-language-selector').change(function() {
             var _lang = $(this).val();
             if (_lang) {
                 $.ajax({
                     url: "{{tg.url('/setlang')}}",
-                    data: { lang: $('#language_selector option:selected').val() },
+                    data: { lang: $('#sp-language-selector option:selected').val() },
                     success: function() {
                         window.location.reload();
                     }
