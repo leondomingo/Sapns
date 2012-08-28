@@ -160,7 +160,7 @@ margin:3px 1px 0 0; padding:0 2px }
 .text_sb a { font-weight:bold; color:#333 }
 .text_sb a:hover { color:black }
 .subactions { clear:left; min-height:22px }
-.subactions ul { margin-top:0px; margin-bottom:0px; list-style-type:circle }
+.subactions ul { margin-top:0px; margin-bottom:0px; list-style-type:disc }
 
 .item_sb .subaction { font-weight:normal; color:#999; font-size:11px; height:18px }
 .item_sb .subaction:hover { color:black }
