@@ -74,8 +74,8 @@
             {%else%}{{tg.url('/message', dict(message=_('Update was completed successfully'), came_from=''))}}{%endif%}">
 </form>
 
-<script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
-<script type="text/javascript">
+<script src="{{tg.url('/js/fields.min.js')}}"></script>
+<script>
     $(document).ready(function() {
         
         $('.sp-text-field:first').focus();

@@ -4,7 +4,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/edit.css')}}">
+    <link rel="stylesheet" href="{{tg.url('/css/edit.min.css', params=dict(v=1))}}">
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
@@ -15,16 +15,16 @@
 {% endblock %}
 
 {% block middle %}
-<div id="edit-dialog" style="display: none;"></div>
+<div id="edit-dialog" style="display:none"></div>
 
-{% if came_from %}
+<!--{% if came_from %}-->
 <form id="form_back" method="post" action="{{came_from}}"></form>
-{% else %}
+<!--{% else %}-->
 <form id="form_back" method="post" action="{{tg.url('/message')}}">
     <input type="hidden" name="message" value="{{_('The record has been successfully saved')}}">
     <input type="hidden" name="came_from" value="">
 </form>
-{% endif %}
+<!--{% endif %}-->
 
 <div class="sp-edit-panel">
     <div id="edit-header">
@@ -39,54 +39,54 @@
     <div id="right_desc">
     
     <!-- {# Title of the object #} -->
-    <div style="font-size: 25px; text-align: right;">{{title}}</div>
+    <div class="sp-edit-object-title">{{title}}</div>
 
-    {%- if reference %}
+    <!--{%- if reference %}-->
     <div id="reference">[{{reference}}]</div>
-    {% endif %}
+    <!--{% endif %}-->
     
     <!-- _created / _updated -->
-    {% if id and h.authorize.in_group('managers') %}
+    <!--{% if id and h.authorize.in_group('managers') %}-->
     <div id="created_updated">
-        <div title="{{_('Created')}}" class="created">{{_created or '&nbsp;'}}</div>
         <div title="{{_('Updated')}}" class="created">{{_updated or '&nbsp;'}}</div>
+        <div title="{{_('Created')}}" class="created">{{_created or '&nbsp;'}}</div>
     </div>
-    {% endif %}
+    <!--{% endif %}-->
     
     <div style="height: 5px;"></div>
     
     <!-- related classes -->
-    {% if id and related_classes|length > 0 %}
+    <!--{% if id and related_classes|length > 0 %}-->
     <div id="rel-classes">
         <div id="rel-classes-title">{{_('Related info')}} <span class="related-classes-count">[{{related_classes|length}}]</span></div>
         <select id="rel-classes-sel">
-        {% for rc in related_classes %}
+        <!--{% for rc in related_classes %}-->
         <option ch_attr="{{rc.attr_name}}" cls="{{rc.name}}">{{rc.title}} ({{rc.attr_title}})</option>
-        {% endfor %}
+        <!--{% endfor %}-->
         </select>
-        <button id="rel-classes-show" class="sp-button" style="width: 63px;">{{_('Show')}}</button>
+        <button id="rel-classes-show" class="sp-button">{{_('Show')}}</button>
         <form id="rel-classes-form" method="post" action="" target="_blank">
             <input type="hidden" name="parent_id" value="{{id}}">
         </form>
     </div>
-    {% endif %}
+    <!--{% endif %}-->
     
     <!-- actions -->
-    {% if id and actions|length > 0 %}
+    <!--{% if id and actions|length > 0 %}-->
     <div id="actions">
         <div id="actions-title">{{_('Actions')}} <span class="actions-count">[{{actions|length}}]</span></div>
         <select id="actions-sel" row_id="{{id}}">
         <option selected>({{_('none')}})</option>
-        {% for act in actions %}
+        <!--{% for act in actions %}-->
         <option value="{{act.url}}">{{act.title|escape}}</option>
-        {% endfor %}
+        <!--{% endfor %}-->
         </select>
         <button id="action-go" class="sp-button" style="width: 63px;">{{_('Go')}}</button>
         <form id="action-form" method="post" action="" target="_blank">
             <input type="hidden" name="came_from" value="">
         </form>
     </div>
-    {% endif %}
+    <!--{% endif %}-->
     
     <div class="sp-save-button">
         <button id="save-button" class="sp-button">{{_('Save')}}</button>
@@ -94,17 +94,17 @@
     
     </div>
     
-    {% if came_from %}
+    <!--{% if came_from %}-->
     <div id="edit-back">
         <button id="back-button" class="sp-button">{{_('return')}}</button>
     </div>
-    {% endif %}
+    <!--{% endif %}-->
     
     </div>
     
-    <div style="height: 175px;">&nbsp;</div>
+    <div style="height:175px">&nbsp;</div>
     
-    {%- for attr in attributes %}
+    <!--{%- for attr in attributes %}-->
     <div class="sp-edit-field" name="{{attr.name}}"
         {% if attr.required %}
         required="true"
@@ -131,7 +131,7 @@
         <div>
         
         <!-- {# Integer #} -->
-        {% if attr.type == 'int' and attr.related_class == None %}
+        <!--{% if attr.type == 'int' and attr.related_class == None %}-->
         <input class="sp_integer_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value != None %}
@@ -139,7 +139,7 @@
             {% endif %}>
             
         <!-- {# Float #} -->
-        {% elif attr.type == 'float' %}
+        <!--{% elif attr.type == 'float' %}-->
         <input class="sp_float_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value != None %}
@@ -147,30 +147,30 @@
             {% endif %}>
         
         <!-- {# Boolean #} -->
-        {%- elif attr.type == 'bool' %}
+        <!--{%- elif attr.type == 'bool' %}-->
         <input class="sp-checkbox-field" type="checkbox"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value %} checked {% endif %}>
         
         <!-- {# Date #} -->
-        {%- elif attr.type == 'date' %}
+        <!--{%- elif attr.type == 'date' %}-->
         <input class="sp-date-field" type="text"
             {% if attr.read_only %} disabled {% endif %}
             value="{{attr.value}}">
         
         <!-- {# Time #} -->
-        {%- elif attr.type == 'time' %}
+        <!--{%- elif attr.type == 'time' %}-->
         <input class="sp-time-field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}">            
         
         <!-- {# Memo #} -->
-        {%- elif attr.type == 'memo' %}
+        <!--{%- elif attr.type == 'memo' %}-->
         <textarea class="sp-text-field sp-memo-field"
             {% if attr.read_only %} disabled {% endif %}>{{attr.value|escape}}</textarea>
             
         <!-- {# URL #} -->
-        {%- elif attr.type == 'url' %}
+        <!--{%- elif attr.type == 'url' %}-->
         <div class="url_field">
         <input class="url_field_text" type="text"
             {% if attr.read_only %} disabled {% endif %}
@@ -179,28 +179,29 @@
         <button class="url_field_btn sp-button">{{_('Go to link')}}</button>
         </div>
         
-        {%- elif attr.related_class != None %}
+        <!--{%- elif attr.related_class != None %}-->
         <!-- {# Select #} -->
         <div id="selector-{{attr.name}}" class="sp-select-field sp_selector"
             attr_name="{{attr.name}}" attr_value="{{attr.value}}" 
             attr_title="{{attr.title}}" attr_rc="{{attr.related_class}}" 
             attr_rc_title="{{attr.related_class_title}}"></div>
-        {%- else %}
+        <!--{%- else %}-->
         <!-- {# Everything else #} -->
         <input class="sp-text-field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
             value="{{attr.value|escape}}"
             {% if attr.read_only %} disabled {% endif %}>
-        {% endif %}
+        <!--{% endif %}-->
         </div>
     </div>
-    {% endfor %}
-    <div style="height: 40px;">
+    <!--{% endfor %}-->
+    <div style="height:40px">
     </div>
 </div>
 
-<script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
-<script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
-<script type="text/javascript">
+<script src="{{tg.url('/js/fields.min.js')}}"></script>
+<script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+<script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
     {% include 'sapns/components/sapns.selector.min.js' %}
     {% include 'sapns/dashboard/edit/edit.min.js' %}
 </script>

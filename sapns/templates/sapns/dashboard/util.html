@@ -14,14 +14,14 @@
 
 {% macro jquery(tg=None) %}
 <!-- JQuery -->
-<script type="text/javascript" src="/js/jquery.min.js"></script>
-<!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>#}-->
+<script src="/js/jquery.min.js"></script>
+<!--{#<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.5.2/jquery.min.js"></script>#}-->
 {% endmacro %}
 
 {% macro jquery_ui(tg=None) %}
 <!-- JQuery UI -->
-<script type="text/javascript" src="/js/jquery-ui.min.js"></script>
-<!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>#}-->
+<script src="/js/jquery-ui.min.js"></script>
+<!--{#<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.12/jquery-ui.min.js"></script>#}-->
 
 {# 
    Uncomment the style you like to be applied or get another at
@@ -51,28 +51,28 @@
 {% endmacro %}
 
 {% macro jquery_jstree() %}
-<script type="text/javascript" src="/js/jquery.jstree.js"></script>
+<script src="/js/jquery.jstree.js"></script>
 {% endmacro %}
 
 {% macro dateformat() %}
-<script type="text/javascript" src="/js/dateformat.min.js"></script>
+<script src="/js/dateformat.min.js"></script>
 {% endmacro %}
 
 {% macro wtooltip() %}
-<script type="text/javascript" src="/js/wtooltip.min.js"></script>
+<script src="/js/wtooltip.min.js"></script>
 {% endmacro %}
 
 {% macro qtip() %}
-<script type="text/javascript" src="/js/jquery.qtip.min.js"></script>
+<script src="/js/jquery.qtip.min.js"></script>
 {% endmacro %}
 
 {% macro qtip2() %}
 <link rel="stylesheet" type="text/css" href="/js/qtip2/jquery.qtip.min.css">
-<script type="text/javascript" src="/js/qtip2/jquery.qtip.min.js"></script>
+<script src="/js/qtip2/jquery.qtip.min.js"></script>
 {% endmacro %}
 
 {% macro console_log() %}
-<script type="text/javascript">
+<script>
     if (!console.log) {
         var console = {log: function()};
     }

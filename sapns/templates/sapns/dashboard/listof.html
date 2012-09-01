@@ -10,7 +10,6 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <script type="text/javascript" src="/js/sprintf.min.js"></script>
 {% endblock %}
 
 {#{% block header %}
@@ -20,21 +19,22 @@
     {{ super() }}
         
     <div id="grid"></div>
-    {% if grid.rel_classes %}
+    <!--{% if grid.rel_classes %}-->
     <div id="rel-classes" style="clear: left; padding-left: 20px;">
         <div class="sp-grid-relatedinfo-title">{{_('Related info')}}</div>
         <select id="rel-classes-sel" style="font-size: 11px;">
-        {% for rc in grid.rel_classes %}
+        <!--{% for rc in grid.rel_classes %}-->
         <option cls="{{rc.name}}" ch_attr="{{rc.attr_name}}">{{rc.title}} ({{rc.attr_title}})</option>
-        {% endfor %}
+        <!--{% endfor %}-->
         </select>
         <button id="rel-classes-show" class="sp-button">{{_('Show')}}</button>
     </div>
-    {% endif %}
+    <!--{% endif %}-->
         
-    <script type="text/javascript">
+    <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+    <script>
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
-        $(document).ready(function() {
+        $(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
         	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title));
