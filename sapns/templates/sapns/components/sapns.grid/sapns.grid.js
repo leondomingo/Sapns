@@ -1,18 +1,203 @@
 /* Sapns grid */
-(function($) {
 
+(function($) {
+    
+    function Filter(params) {
+        this.field = $.trim(params.field);
+        this.operator = params.operator;
+        this.value = $.trim(params.value);
+        this.active = params.active !== undefined ? !!params.active : true;
+    }
+    
+    function normalize(s) {
+        s = $.trim(s.toLowerCase());
+        s = s.replace(/[áäà]/g, 'a');
+        s = s.replace(/[éëè]/g, 'e');
+        s = s.replace(/[íïì]/g, 'i');
+        s = s.replace(/[óöò]/g, 'o');
+        s = s.replace(/[úüù]/g, 'u');
+        s = s.replace(/[^a-z]/g, '');
+            
+        return s;
+    }
+    
+    Filter.prototype = {
+            tip: function() {
+                var self = this;
+                return sprintf('&lt;%s&gt; %s "%s"', self.field, self.operator_title().toLowerCase(), self.value);
+            },
+            operator_title: function() {
+                var titles = {
+                        co: 'Contiene',
+                        eq: 'Igual a',
+                        lt: 'Menor que',
+                        gt: 'Mayor que',
+                        let: 'Menor o igual que',
+                        get: 'Mayor o igual que',
+                        nco: 'No contiene',
+                        neq: 'Distinto'
+                };
+                
+                return titles[this.operator];
+            },
+            toggle: function() {
+                if (this.active) {
+                    this.active = false;
+                }
+                else {
+                    this.active = true;
+                }
+            },
+            
+            toString: function() {
+                var self = this;
+                
+                var fld = normalize(self.field);
+                
+                var _operators = {
+                        // co (contain)
+                        co: '=',
+                        // eq (equal to)
+                        eq: '=',
+                        // lt (less than)
+                        lt: '<',
+                        // gt (greater than)
+                        gt: '>',
+                        // let (less or equal)
+                        let: '<=',
+                        // get (greater or equal)
+                        get: '>=',
+                        // nco (not contain)
+                        nco: '<>',
+                        // neq (not equal)
+                        neq: '<>'
+                };
+                
+                var op = _operators[self.operator];
+                var v = self.value;
+                
+                if (self.operator == 'eq' || self.operator == 'neq') {
+                    
+                    if (v) {
+                        v = sprintf('"%s"', v);
+                    }
+                    else {
+                        if (self.operator == 'eq') {
+                            return sprintf('!%s', fld);
+                        }
+                        else if (self.operator == 'neq') {
+                            return sprintf('#%s', fld);
+                        }
+                    }
+                }
+                else if ((self.operator == 'co' || self.operator == 'nco') && !v) {
+                    if (self.operator == 'co') {
+                        return sprintf('!%s', fld);
+                    }
+                    else if (self.operator == 'nco') {
+                        return sprintf('#%s', fld);
+                    }
+                }
+                
+                return sprintf('%s%s%s', fld, op, v);
+            },
+            stringify: function() {
+                return sprintf('%s"%s" %s "%s"', !this.active ? '_' : '', this.field, this.operator, this.value);
+            }
+    };
+    
+    function parseFilters(s) {
+        var terms = s.split(',');
+        var filters = [];
+        for (var i=0, l=terms.length; i<l; i++) {
+            var m = $.trim(terms[i]).match('^(_)?"([^"]+)"\\s([a-z]{2,3})\\s"([^"]*)"$');
+            if (m) {
+                filters.push(new Filter({
+                    field: m[2],
+                    operator: m[3],
+                    value: m[4],
+                    active: !m[1]
+                }));
+            }
+        }
+        
+        return filters;
+    };
+
+    function OrderFilter(params) {
+        this.field = params.field;
+        
+        if (params.type == '+') {
+            this.type = 'asc';
+        }
+        else if (params.type == '-') {
+            this.type = 'desc';
+        }
+        else {
+            this.type = params.type;
+        }
+    }
+    
+    OrderFilter.prototype = {
+            toString: function() {
+                var self = this;
+                var type;
+                if (self.type == 'asc') {
+                    type = '+';
+                }
+                else if (self.type == 'desc') {
+                    type = '-'; 
+                }
+                
+                var fld = normalize(self.field);
+                
+                return sprintf('%s%s', type, fld);
+            },
+            stringify: function() {
+                var self = this;
+                
+                var type;
+                if (self.type == 'asc') {
+                    type = '+';
+                }
+                else if (self.type == 'desc') {
+                    type = '-'; 
+                }
+                
+                return sprintf('%s"%s"', type, self.field);
+            }
+    }
+    
+    function parseOrder(s) {
+        var terms = s.split(',');
+        var order = [];
+        for (var i=0, l=terms.length; i<l; i++) {
+            // (+|-)...........
+            var m = $.trim(terms[i]).match('^(\\+|\\-)"([^"]+)"$');
+            if (m) {
+                order.push(new OrderFilter({
+                    field: m[2],
+                    type: m[1]
+                }));
+            }
+        }
+        
+        return order
+    }
+    
     // SapnsGrid (constructor)
     function SapnsGrid(settings) {
-        var _caption = '';
+        
+        var self = this;
+        
         if (typeof(settings.caption) === 'function') {
-            _caption = settings.caption();
+            settings.caption = settings.caption();
         }
-                 
-        var _actions = null;
-        if (typeof(settings.actions) === 'function') {
-            _actions = settings.actions();
+        
+        if (typeof (settings.actions) === 'function') {
+            settings.actions = settings.actions();
         }
-                 
+
         var exportable_formats = [{
             id: 'csv',
             title: 'CSV',
@@ -23,19 +208,16 @@
             title: 'Excel',
             url: "{{tg.url('/dashboard/toxls/')}}"
         }];
-                 
+        
         var _settings = $.extend(true, {
-            caption: _caption,
-            name: 'grid_' + Math.floor(Math.random()*999999),
+            caption: '',
+            name: 'sapns_grid_' + Math.floor(Math.random() * 999999),
             cls: '',
             with_search: true,
             search_params: {},
             show_ids: false,
             link: '',
             q: '',
-            rp: 10,
-            pag_n: 1,
-            with_pager: true,
             ch_attr: '',
             parent_id: '',
             cols: [],
@@ -43,31 +225,80 @@
             height: 500,
             url_base: '',
             multiselect: false,
+            actions: null,
             actions_inline: false,
             hide_check: false,
-            hide_id: false,
+            hide_id: true,
             dblclick: null,
             select_first: false,
+            shift_enabled: false,
+            exportable: true,
+            exportable_formats: exportable_formats,
+            with_pager: true,
+            pag_n: 1,
+            rp: 10,
             onLoad: null,
             default_: {
                 col_width: 60,
                 col_align: 'center',
                 empty_value: ''
-            },
-            actions: _actions,
-                exportable: true,
-                exportable_formats: exportable_formats,
-                with_pager: true,
-                pag_n: 1,
-                rp: 10,
+            }
         }, settings);
         
-        $.extend(true, this, _settings);
+        $.extend(true, self, _settings);
+
+        self.this_page = 0;
+        self.total_count = 0;
+        self.total_pag = 0;
+        self.ajx_data = JSON.stringify({});
+        self.styles = [];
         
-        this.this_page = 0;
-        this.total_count = 0;
-        this.total_pag = 0;
-        this.ajx_data = '{}';
+        // obtener las tres partes de la query
+        // q$$filters$$order
+        var q_parts = self.q.split('$$');
+        
+        // q
+        self.q = q_parts[0];
+        
+        // filters
+        self.filters = [];
+        if (q_parts.length > 1) {
+            self.filters = parseFilters(q_parts[1]);
+        }
+        
+        // order
+        self.order = [];
+        if (q_parts.length > 2) {
+            self.order = parseOrder(q_parts[2]);
+        }
+        
+        self._new_default = {
+            name: 'new',
+            url: '{{tg.url("/dashboard/new/")}}',
+            require_id: 'false',
+            type: 'new'
+        };
+        
+        self._edit_default = {
+            name: 'edit',
+            url: '{{tg.url("/dashboard/edit/")}}',
+            require_id: 'true',
+            type: 'edit'
+        };
+        
+        self._delete_default = {
+            name: 'delete',
+            url: '{{tg.url("/dashboard/delete/")}}',
+            require_id: 'true',
+            type: 'delete'
+        };
+        
+        self._docs_default = {
+            name: 'docs',
+            url: '{{tg.url("/docs/")}}',
+            require_id: 'true',
+            type: 'docs'
+        };
     }
 
     // getSelectedIds
@@ -76,45 +307,113 @@
         var selected_ids = [];
         $('#' + self.name + ' .sp-grid-row').each(function() {
             var rowid = $(this).find('.sp-grid-rowid');
-            if (rowid.attr('checked') == true) {
-                selected_ids.push(rowid.attr('id_row')*1);
+            if (rowid.prop('checked')) {
+                selected_ids.push(rowid.attr('id_row') * 1);
             }
         });
-        
+
         return selected_ids;
     }
-    
+
+    SapnsGrid.prototype.getAction = function(action_name) {
+        var self = this;
+        for (var i=0, l=self.actions.length; i < l; i++) {
+            var act = self.actions[i];
+            if (typeof(act.type) === 'object') {
+                if (act.type.id === action_name) {
+                    return act;
+                }
+            }
+            else if (act.name === action_name) {
+                return act;
+            }
+        }
+    }
+
     // getRow
     SapnsGrid.prototype.getRow = function(id) {
         var self = this;
         var row = null;
         $('#' + self.name + ' .sp-grid-row').each(function() {
             var rowid = $(this).find('.sp-grid-rowid');
-            if (rowid.attr('id_row') == id) {
+            if (rowid.attr('id_row') === id) {
                 row = rowid.parent();
                 return;
             }
         });
-        
+
         return row;
     }
-    
+
     // loadData
-    SapnsGrid.prototype.loadData = function() {
-        
+    SapnsGrid.prototype.loadData = function(callback) {
+
         var self = this;
         
-        var g_table = 
-            '<table class="sp-grid">' +
-            '<tr><td class="sp-col-title">#</td>';
-        
-        if (self.actions_inline) {
-            g_table += '<td class="sp-col-title">*</td>';
+        var cols = self.cols;
+        if (typeof(cols) === 'function') {
+            cols = cols();
         }
         
-        var cols = self.cols;
-        if (typeof(cols) == 'function') {
-            cols = cols();
+        var g_wd = 23; // min-width: 20px;
+        if (self.hide_check) {
+            g_wd = -6;
+        }
+        
+        // row width
+        var row_wd = cols.length * 42;
+        
+        // hide_check
+        if (!self.hide_check) {
+            row_wd += 23;
+        }
+        
+        // hide_id
+        if (!self.hide_id) {
+            row_wd += 60;
+        }
+        
+        var MIN_ROW = 905;
+        
+        if (row_wd < MIN_ROW) {
+            row_wd = MIN_ROW;
+        }
+
+        var select_fields = '';
+        for (var i=0, l=cols.length; i<l; i++) {
+            var col = cols[i];
+            
+            if (col.title != 'id') {
+                select_fields += '<option value="' + col.title + '">' + col.title + '</option>';
+            }
+            
+            if (self.hide_id && col.title === 'id') {
+                continue;
+            }
+            
+            g_wd += (col.width + 5);
+        }
+        
+        $('#'+self.name + ' .sp-grid-filter-field').html(select_fields);
+        
+        var g_table = '<div class="sp-grid" style="width:' + (g_wd+200) + 'px">';
+        
+        var grid_header = '<div class="sp-grid-row" style="width:' + (g_wd+150) + 'px">';
+        
+        if (!self.hide_check) {
+            grid_header += '<div class="sp-col-title" style="width:23px">\
+                <input class="sp-grid-select-all" type="checkbox"></div>';
+        }
+        
+        if (self.actions_inline) {
+            grid_header += '<div class="sp-col-title" style="%(actions_wd)s">*</div>';
+        }
+        
+        var ordered_cols = {};
+        for (var i=0, l=self.order.length; i<l; i++) {
+            var o = self.order[i];
+            o['index'] = i+1;
+            ordered_cols[self.order[i].field] = o; 
         }
         
         for (var i=0, l=cols.length; i<l; i++) {
@@ -123,110 +422,204 @@
             if (!wd) {
                 wd = self.default_.col_width;
             }
-            
-            if (self.hide_id && col.title == 'id') {
+
+            if (self.hide_id && col.title === 'id') {
                 continue;
             }
             
-            g_table += '<td class="sp-col-title" style="width: ' + wd + 'px;">' + col.title + '</td>';
+            var is_ordered = '';
+            var order_type = '';
+            var order_index = '';
+            if (ordered_cols[col.title]) {
+                var o = ordered_cols[col.title];
+                is_ordered = 'sp-grid-ordered-col';
+                order_type = ' order_type="' + o.type + '"';
+                
+                var ot;
+                if (o.type === 'asc') {
+                    ot = '+';
+                }
+                else {
+                    ot = '-';
+                }
+                
+                order_index = ' (' +  o.index + ot + ')';
+            }
+            
+            grid_header += '<div class="sp-col-title sp-col-title-sortable ' + is_ordered + '"' + order_type + 
+                ' style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
         }
 
-        g_table += '</tr>';
+        grid_header += '</div>';
         
         var data = self.data;
-        if (typeof(data) == 'function') {
+        if (typeof (data) === 'function') {
             data = data();
         }
         
         var ld = data.length;
         if (ld > 0) {
-        for (var i=0; i<ld; i++) {
-            
-            var row = data[i];
-            
-            g_table += 
-                '<tr class="sp-grid-row">' +
-                '<td title="' + (i+1) + '"><input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></td>';
-            
-            if (self.actions_inline) {
-                var _action_style = 'style="padding: 2px; margin-left: 5px; margin-right: 5px; border: 1px solid lightgray;"';
-                g_table +=
-                '<td style="font-size: 10px; width: 35px;">' +
-                '<a class="edit_inline" href="#" title="edit" ' + _action_style + '>E</a>' + 
-                '<a class="delete_inline" href="#" title="delete" ' + _action_style + '>D</a>' + 
-                '<a class="docs_inline" href="#" title="docs" ' + _action_style + '>D</a>' +
-                '</td>';
+            for (var i=0; i<ld; i++) {
+                
+                var row = data[i];
+                
+                var row_style = '';
+                if (self.styles.length && self.styles.length > i) {
+                    row_style = self.styles[i];
+                }
+                
+                var grid_row = '<div class="sp-grid-row" style="width:'+(g_wd+150)+'px">';
+                
+                if (!self.hide_check) {
+                    var border_radius = '';
+                    if (i === ld-1) {
+                        border_radius = 'border-radius:0 0 0 5px';
+                    }
+                    
+                    grid_row += '<div class="sp-grid-cell" title="' + row[0] + '" style="width:23px;' + border_radius + '">' +
+                        '<input class="sp-grid-rowid" type="checkbox" id_row="' + row[0] + '"></div>';
+                }
+                
+                if (self.actions_inline) {
+                    
+                    var actions_wd = 'width:107px';
+                    if (!self.nonstd) {
+                        actions_wd = 'width:82px';
+                    }
+                    
+                    var _actions = 
+                        '<div class="sp-grid-cell" style="%(actions_wd)s">\
+                        <img class="inline_action edit_inline" title="{{_("Edit")}}" \
+                            src="{{tg.url("/images/sapns/icons/edit.png")}}">\
+                        <img class="inline_action delete_inline" title="{{_("Delete")}}" \
+                            src="{{tg.url("/images/sapns/icons/delete.png")}}">\
+                        <img class="inline_action docs_inline" title="{{_("Docs")}}" \
+                            src="{{tg.url("/images/sapns/icons/docs.png")}}">';
+                    
+                    grid_row += sprintf(_actions, {actions_wd: actions_wd}) + self.nonstd + '</div>';
+                }
+                
+                // grid_header
+                if (i === 0) {
+                    g_table += sprintf(grid_header, {actions_wd: actions_wd});
+                }
+                
+                for (var j=0, lr=cols.length; j<lr; j++) {
+                    var col = cols[j];
+                    var al = col.align;
+                    if (!al) {
+                        al = self.default_.col_align;
+                    }
+                    
+                    var wd = col.width;
+                    if (!wd) {
+                        wd = self.default_.col_width;
+                    }
+                    
+                    var cell = row[j];
+                    if (!cell) {
+                        cell = self.default_.empty_value;
+                    }
+                    
+                    if (self.hide_id && col.title == 'id') {
+                        continue;
+                    }
+                    
+                    var width = '';
+                    if (wd > 0) {
+                        width = ' width:' + wd + 'px;';
+                    }
+                    
+                    var border_radius = '';
+                    if ((self.hide_check && i == ld-1) && 
+                            (!self.hide_id && j == 0 || self.hide_id && j == 1)) {
+                        border_radius = 'border-radius:0 0 0 5px;';
+                    }
+                    
+                    if (i == ld-1 && j == lr-1) {
+                        border_radius = 'border-radius:0 0 5px 0;';
+                    }
+                    
+                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip clickable ' + row_style + '" \
+                        style="text-align:' + al + ';' + width + border_radius + '"';
+                    
+                    if (cell) {
+                        grid_row += sprintf('title="%s"', cell.replace(/"/gi, "''"));
+                    }
+                    else {
+                        grid_row += 'title="({{_("empty")}})"';
+                    }
+                    
+                    grid_row += '>' + cell + '</div>';
+                }
+                
+                grid_row += '</div>';
+                
+                g_table += grid_row;
             }
-            
-            for (var j=0, lr=cols.length; j<lr; j++) {
-                var col = cols[j];
-                var al = col.align;
-                if (!al) {
-                    al = self.default_.col_align;
-                }
-                
-                var wd = col.width;
-                if (!wd) {
-                    wd = self.default_.col_width;
-                }
-                
-                var cell = row[j];
-                if (!cell) {
-                    cell = self.default_.empty_value;
-                }
-                
-                if (self.hide_id && col.title == 'id') {
-                    continue;
-                }
-                
-                var width = '';
-                if (wd > 0) {
-                    width = ' width: ' + wd + 'px;';
-                }
-                
-                g_table += '<td><div class="sp-grid-cell" style="text-align: ' + al + ';' + width + '"';
-                
-                if (cell) {
-                    g_table += 'title="' + cell + '"';
-                }
-                else {
-                    g_table += 'title="({{_("empty")}})"';
-                }
-                
-                g_table += 'clickable="true">';
-                
-                /*if (cell.length > 30) {
-                    g_table += (cell+'').substr(0, 30) + '...';
-                }
-                else {
-                    g_table += cell;
-                }*/
-                g_table += cell;
-                
-                g_table += '</div></td>';
-            }
-            
-            g_table += '</tr>';
-        }
         }
         else {
             var n = 1;
+            var wd_ = g_wd;
             if (self.actions_inline) {
                 n = 3;
+                wd_ += 25;
             }
+
             g_table += 
-                '<tr class="sp-grid-row" style="width: 100%;">' +
-                    '<td class="sp-grid-cell sp-grid-noresults"' + 
-                        ' colspan="' + (cols.length+n) + '">{{_("No results")}}</td>' +
-                '</tr>';
+                sprintf(grid_header, {actions_wd: actions_wd}) +
+                '<div class="sp-grid-row"><div class="sp-grid-cell sp-grid-noresults" title="{{_("No results")}}" ' +
+                    'style="width:' + wd_ + 'px" >{{_("No results")}}</div></div>';
         }
         
+        g_table += '</div>';
+        
         $('#' + self.name).find('.sp-grid-parent').html(g_table);
+        $('.sp-col-title-sortable').disableSelection();
         if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
-            $('#'+self.name + ' .sp-grid-row input[type=checkbox]:first').attr('checked', true);
+            $('#' + self.name + ' .sp-grid-rowid:first').prop('checked', true);
+        }
+        
+        if (callback) {
+            callback();
         }
     }
     
+    SapnsGrid.prototype.query = function() {
+        
+        var self = this;
+        
+        var q = self.q;
+        
+        // filters
+        var active_filters = $.map(self.filters, function(f) {
+            if (f.active) {
+                return f;
+            }
+        });
+        
+        if (active_filters.length) {
+            if (q) {
+                q = q + ', ' + active_filters.join(', ');
+            }
+            else {
+                q = active_filters.join(', ');
+            }
+        }
+        
+        // order
+        if (self.order.length) {
+            if (q) {
+                q = q + ', ' + self.order.join(', ');
+            }
+            else {
+                q = self.order.join(', ');
+            }
+        }
+        
+        return q;
+    }
+
     // search
     SapnsGrid.prototype.search = function(q, force, on_load) {
         var self = this;
@@ -234,27 +627,31 @@
         if (force === undefined) {
             force = false;
         }
-        
+
         if (q === undefined) {
             q = self.q;
         }
-        
+
         if (self.q != q || force) {
             self.pag_n = 1;
         }
-        
+
         self.q = q;
         
-        var loading = '<div style="padding: 10px; font-size: 15px; ' + 
-            'font-weight: bold; color: gray;">{{_("Loading")}}...</div>';
+        self.filters_tip();
+        
+        var q = self.query();
+        
+        var loading = sprintf('<div class="sp-grid-loading" style="height:%(hg)dpx">{{_("Loading")}}...</div>', {hg: self.height-50});
+        
         $('#' + self.name).find('.sp-grid-parent').html(loading);
         
         var ajx = $.extend(true, {
             url: "{{tg.url('/dashboard/grid/')}}",
             data: {
-                cls: self.cls, 
-                q: self.q, 
-                rp: self.rp, 
+                cls: self.cls,
+                q: q,
+                rp: self.rp,
                 pag_n: self.pag_n,
                 ch_attr: self.ch_attr,
                 parent_id: self.parent_id
@@ -266,11 +663,12 @@
                     if (response.this_page) {
                         self.this_page = response.this_page;
                     }
-                    
+                            
                     // total_count
                     if (response.total_count) {
                         self.total_count = response.total_count;
                     }
+                    
                     
                     // total_pag
                     if (response.total_pag) {
@@ -287,67 +685,67 @@
                         self.actions = response.actions;
                     }
                     
-                    // update pager
-                    var pos = (self.pag_n-1) * self.rp*1;
-
-                    var params = {
-                            curr_page: self.pag_n*1,
-                            total_page: self.total_pag*1,
-                            pos0: pos+1,
-                            pos1: pos+self.this_page
-                    };
+                    // styles
+                    if (response.styles) {
+                        self.styles = response.styles;
+                    }
                     
+                    // update pager
+                    var pos = (self.pag_n - 1) * self.rp * 1;
+                            
+                    var params = {
+                            curr_page: self.pag_n * 1,
+                            total_page: self.total_pag * 1,
+                            pos0: pos + 1,
+                            pos1: pos + self.this_page
+                    };
+                            
                     var pag_desc = sprintf("{{_('Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d')}}", params);
                     
-                    $('#' + self.name + ' .first-page').attr('title', "{{_('page 1')}}");
+                    $('#' + self.name + ' .sp-grid-first-page').attr('title', "{{_('page 1')}}");
                     
                     // page-back
                     if (params.curr_page > 1) {
-                        var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page-1});
-                        $('#' + self.name + ' .page-back').
-                            attr('title', prev_page).
-                            attr('disabled', false);
-                    }
+                        var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page - 1});
+                        $('#' + self.name + ' .sp-grid-page-back').attr('title', prev_page).attr('disabled', false);
+                    } 
                     else {
-                        $('#' + self.name + ' .page-back').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-back').attr('disabled', true);
                     }
                     
                     // page-forth
                     if (params.curr_page < params.total_page) {
-                        var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page+1}); 
-                        $('#' + self.name + ' .page-forth').
-                            attr('title', next_page).
-                            attr('disabled', false);
-                    }
+                        var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page + 1});
+                        $('#' + self.name + ' .sp-grid-page-forth').attr('title', next_page).attr('disabled', false);
+                    } 
                     else {
-                        $('#' + self.name + ' .page-forth').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-forth').attr('disabled', true);
                     }
+                    
+                    // set focus on the search box
+                    $('#' + self.name + ' .sp-search-txt').focus();
                     
                     // last-page
                     var last_page = sprintf("{{_('page %(p)d')}}", {p: params.total_page});
-                    $('#' + self.name + ' .last-page').attr('title', last_page);
+                            
+                    $('#' + self.name + ' .sp-grid-last-page').attr('title', last_page);
                     
-                    $('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
+                    //$('#' + self.name + ' .sp-grid-pager-desc').html(pag_desc);
                     $('#' + self.name + ' .sp-grid-current-page').val(self.pag_n);
-                    
-                    try {
-                        $('.sp-grid-cell').qtip({
+
+                    self.data = response.data;
+                    self.loadData(function() {
+                        $('.sp-grid-cell-tip, .edit_inline, .delete_inline, .docs_inline, .new_inline').qtip({
                             content: {
                                 text: true
                             },
                             position: {
-                                my: "left top",
-                                at: "bottom center"
+                                my: 'top left',
+                                at: 'bottom center'
                             },
-                            style: "ui-tooltip-dark ui-tooltip-rounded"
+                            style: 'ui-tooltip-rounded'
                         });
-                    } catch (e) {
-                        // console.log(e);
-                        // qtip2 is not loaded
-                    }
-
-                    self.data = response.data;
-                    self.loadData();
+                    });
                     
                     // onLoad
                     if (on_load) {
@@ -360,370 +758,471 @@
                 }
             }
         }, self.search_params);
-        
+
         var curr_ajx_data = JSON.stringify(ajx.data);
         if (self.ajx_data) {
             if (self.ajx_data === curr_ajx_data && !force) {
                 self.loadData();
-            }
-            else {
+            } else {
                 $.ajax(ajx);
             }
         }
-        
+
         self.ajx_data = curr_ajx_data;
     }
-    
+
     SapnsGrid.prototype.warningSelectedId = function() {
         var self = this;
-        
-        $('#grid-dialog_' + self.name).
-        html("<p style='text-align: center; font-style: italic;'>{{_('You must select a row before click on this action')}}</p>"). 
-        dialog({
-            title: self.caption,
-            resizable: false,
-            height: 155,
-            width: 450,
-            modal: true,
-            draggable: false,
-            buttons: {
-                "{{_('Close')}}": function() {
-                    $('#grid-dialog_' + self.name).dialog('close');
+
+        $('#grid-dialog_' + self.name).html("<p style='text-align:center;font-style:italic'>{{_('You must select a row before click on this action')}}</p>")
+            .dialog({
+                title: self.caption,
+                resizable: false,
+                height: 155,
+                width: 450,
+                modal: true,
+                draggable: false,
+                buttons: {
+                    "{{_('Close')}}": function() {
+                        $('#grid-dialog_' + self.name).dialog('close');
+                    }
                 }
-            }
-        });
-        
+            });
+
         $('.ui-icon-closethick').hide();
     }
-    
+
     SapnsGrid.prototype._loadActions = function(actions) {
-        
+
         var self = this;
         var g_actions = '';
         
+        self.nonstd = '';
+        
+        var button_ = '<button id="%(id)s" class="sp-grid-button-action">%(title)s</button>';
+        var option_ = '<option value="%(id)s">%(title)s</option>';
+
         if (actions.length > 0) {
-            //g_actions += '<div class="sp-grid-actions-title">{{_("Actions")}}:</div>';
+            
             g_actions = '';
-            for (var i=0, l=actions.length; i<l; i++) {
+            for (var i=0, l=actions.length; i < l; i++) {
                 
                 var act = actions[i];
-                
+
                 var req_id = act.require_id;
                 if (req_id === undefined) {
                     req_id = true;
                 }
-                
-                if (typeof(act.type) === 'string') {
-                    var a = '<div style="float: left;">';
-                    a += '<button class="sp-button sp-grid-action standard_action" ' +
-                        ' id="' + self.name + '_' + act.name + '"' +
-                        ' title="' + act.url + '" url="' + act.url + '" action-type="' + act.type + '"' +
-                        ' require_id="' + req_id + '" >' + act.title + '</button></div>';
+
+                if (typeof(act.type) === 'string' && act.type === 'new') {
+                    var new_btn = '<img class="inline_action new_inline" ' +
+                        'title="{{_("New")}}" src="{{tg.url("/images/sapns/icons/new.png")}}">';
+                    $('#'+self.name + ' .sp-grid-search-box').append(new_btn);
+                }
+                else if (!self.actions_inline) {
+                    $('#'+self.name + ' .sp-grid-button-actions').show();
                     
-                    if (act.type === 'new') {
-                        $('#search_box').append(a);
+                    var button_data;
+                    
+                    if (typeof(act.type) == 'object') {
+                        button_data = {id: act.type.id, title: act.title};
                     }
                     else {
-                        g_actions += a;
+                        button_data = {id: act.name, title: act.title}; 
+                    }
+                    
+                    $('#'+self.name + ' .sp-grid-button-actions').append(sprintf(button_, button_data));
+                }
+                else if (self.actions_inline) {
+                    if (typeof(act.type) === 'string' && (act.type == 'edit' || act.type == 'delete' || act.type == 'docs')) {
+                        continue;
+                    }
+                    else {
+                        var option_data;
+                        
+                        if (typeof(act.type) == 'object') {
+                            option_data = {id: act.type.id, title: act.title};
+                        } 
+                        else {
+                            option_data = {id: act.name, title: act.title}
+                        }
+                        
+                        self.nonstd += sprintf(option_, option_data);
                     }
                 }
-                else {
-                    g_actions += 
-                        '<div style="float: left;">' +
-                            '<button id="' + act.type.id + '" class="sp-button sp-grid-action" ' +
-                                ' require_id="' + req_id + '" >' + act.title + '</button>' +
-                        '</div>';
-                }
+            }
+            
+            if (self.nonstd) {
+                self.nonstd = '<select class="nonstd_actions"><option value=""></option>' 
+                    + self.nonstd 
+                    + '</select>';
             }
         }
-        
+
         // export
         if (self.exportable) {
-            
+
             var formats = self.exportable_formats;
-            
+
             if (typeof(self.exportable) == 'object') {
-                formats = self.exportable.formats; 
+                formats = self.exportable.formats;
             }
-            
+
             var l = formats.length;
             if (l > 0) {
                 var options = '';
-                for (var i=0; i<l; i++) {
-                    options += '<option value="' + formats[i].id + '">' + formats[i].title + '</option>';
+                for (var i=0; i < l; i++) {
+                    options += '<option value="' + formats[i].id + '">'
+                            + formats[i].title + '</option>';
                 }
+
+                var s_export = '<div class="export" style="height:25px;float:left">' +
+                    '<select class="sp-button sp-grid-action" style="height:20px">' +
+                    '<option value="">({{_("Export")}})</option>' + 
+                    options + '</select></div>';
                 
-                g_actions += 
-                    '<div id="grid-export_' + self.name + '" style="position: absolute; background-color: none; height: 25px; right: 0px;">' +
-                    '<select id="select-export" class="sp-button sp-grid-action" style="height: 20px;">' +
-                        '<option value="">({{_("Export")}})</option>' +
-                        options +
-                    '</select></div>';
+                $('#'+self.name + ' .sp-grid-search-box').append(s_export);
             }
         }
 
         return g_actions;
     }
     
-    SapnsGrid.prototype.loadActions = function() {
+    SapnsGrid.prototype.complete_actions = function() {
         
         var self = this;
-        var g_actions = '';
         
+        for (var i=0, l=self.actions.length; i<l; i++) {
+            var act = self.actions[i];
+            if (typeof(act.type) === 'string') {
+                // new
+                if (act.type === 'new') {
+                    self.actions[i] = $.extend(self._new_default, act);
+                }
+                // edit
+                else if (act.type === 'edit') {
+                    self.actions[i] = $.extend(self._edit_default, act);
+                }
+                // delete
+                else if (act.type === 'delete') {
+                    self.actions[i] = $.extend(self._delete_default, act);
+                }
+                // docs
+                else if (act.type === 'docs') {
+                    self.actions[i] = $.extend(self._docs_default, act);
+                }
+            }
+        }
+    }
+
+    SapnsGrid.prototype.loadActions = function(callback) {
+
+        var self = this;
+        var g_actions = '';
+        var actions_selector = sprintf('#%s .actions', self.name);
+
         if (self.actions != null) {
             if (self.actions.length === undefined) {
                 // it's an object
                 var ajx = $.extend(true, {
                     url: "{{tg.url('/dashboard/grid_actions/')}}",
-                    type: 'post',
+                    //type: "post",
+                    cache: false,
                     data: { cls: self.cls },
                     success: function(response) {
                         if (response.status) {
                             self.actions = response.actions;
                         }
                         
-                        $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
-                        
+                        //self.complete_actions();
+                        $(actions_selector).html(self._loadActions(self.actions));
+                        if (callback) {
+                            callback();
+                        }
                     }
-                }, 
-                self.actions);
-                
+                }, self.actions);
+
                 $.ajax(ajx);
+            } else {
+                //self.complete_actions();
+                $(actions_selector).html(self._loadActions(self.actions));
+                if (callback) {
+                    callback();
+                }
             }
-            else {
-                $('#' + self.name + ' .actions').html(self._loadActions(self.actions));
-                
-                if (self.actions.length == 0 && !self.exportable) {
-                    $('#' + self.name + ' .actions').css('min-height', '0px');
-                }
-                
-                // assign functions to actions
-                for (var i=0, l=self.actions.length; i<l; i++) {
-                    
-                    var act = self.actions[i];
-                    
-                    if (typeof(act.type) == 'object') {
-                        $('#' + act.type.id).data('_func', act.type.f);
-                        
-                        $('#' + act.type.id).live('click', function() {
-                            if ($(this).attr('require_id') == 'true') {
-                                var selected_ids = self.getSelectedIds();
-                                if (selected_ids.length > 0) {
-                                    $(this).data('_func')(selected_ids[0], selected_ids);
-                                }
-                                else {
-                                    self.warningSelectedId();
-                                }
-                            }
-                            else {
-                                var selected_ids = self.getSelectedIds();
-                                if (selected_ids.length > 0) {
-                                    $(this).data('_func')(selected_ids[0], selected_ids);
-                                }
-                                else {
-                                    $(this).data('_func')();
-                                }
-                            }
-                        });
-                    }
-                }
+        }
+        else {
+            if (callback) {
+                callback();
             }
         }
         
         // if the row is selected, then mark the checkbox
-        $('#'+self.name + ' .sp-grid-cell').live('click', function(event) {
-            //console.log('click');
-            if ($(this).attr('clickable') == 'true') {
-                var row_id = $(this).parent().parent().find('.sp-grid-rowid');
+        var cell_selector = sprintf('#%s .sp-grid-cell.clickable', self.name);
+        $(document).off('click', cell_selector).on('click', cell_selector, function(event) {
+            
+            var ctrl = event.ctrlKey || event.metaKey;
+            
+            var row_id = $(this).parent().find('.sp-grid-rowid');
+            if (!row_id.prop('checked') || ctrl || self.multiselect) {
+                
+                $('#'+self.name + ' .sp-grid-select-all').prop('checked', false);
+                
                 $('#'+self.name + ' .sp-grid-rowid').each(function() {
-                    var ctrl = event.ctrlKey || event.metaKey;
                     if ($(this) != row_id && !self.multiselect && !ctrl) {
-                        $(this).attr('checked', false);
+                        $(this).prop('checked', false);
+                        $(this).parent().parent().removeClass('sp-grid-row-selected');
                     }
                 });
                 
-                if (row_id.attr('checked') == true) {
-                    row_id.attr('checked', false);
+                if (row_id.prop('checked')) {
+                    row_id.prop('checked', false);
+                    $(this).parent().removeClass('sp-grid-row-selected');
                 }
                 else {
-                    row_id.attr('checked', true);
-                }
-            }
-        });
-        
-        /*
-        if (self.dblclick) {
-            $('#'+self.name + ' .sp-grid-cell').live('dblclick', function(event) {
-                //console.log('dbl-click');
-                if ($(this).attr('clickable') == 'true') {
-                    var row_id = $(this).parent().find('.sp-grid-rowid');
-                    $('#'+self.name + ' .sp-grid-rowid').each(function() {
-                        if ($(this) != row_id && !self.multiselect && !event.ctrlKey) {
-                            $(this).attr('checked', false);
-                        }
-                    });
-                    
-                    if (row_id.attr('checked') == true) {
-                        row_id.attr('checked', false);
-                    }
-                    else {
-                        row_id.attr('checked', true);
-                    }
-                    
-                    if (typeof(self.dblclick) == 'function') {
-                        self.dblclick(row_id.attr('id_row')*1);
-                    }
-                    else {
-                        $('#'+self.name + '_' + self.dblclick).click();
-                    }
-                }
-            });
-        }
-        */
-        
-        // standard actions
-        $('#'+self.name + ' .standard_action').live('click', function(event) {
-            
-            function form(action, target) {
-                var came_from = '';
-                if (target != '_blank') {
-                    var came_from = self.url_base + '?q=' + encodeURI(self.q).
-                    replace('-', '%2D', 'g').replace('"', '%22', 'g').
-                    replace('+', '%2B', 'g').replace('#', '%23', 'g') + 
-                        '&rp=' + self.rp + '&pag_n=' + self.pag_n +
-                        '&ch_attr=' + self.ch_attr + '&parent_id=' + self.parent_id;
-                }
-                
-                var f = 
-                    '<form type="post" action="' + action + '" target="' + target + '">' +
-                        '<input type="hidden" name="came_from" value="' + came_from + '">';
-                
-                if (self.ch_attr) {
-                    f += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
-                }
-                    
-                f += '</form>';
-                
-                return f;
-            }
-            
-            // child attribute 
-            var ch_attr = self.ch_attr;
-            
-            // if CTRL or CMD (Mac) is pressed open in a new tab 
-            var target = '';
-            if (event.ctrlKey || event.metaKey) {
-                target = '_blank';
-            }
-            
-            var url = $(this).attr('url');
-            var action_type = $(this).attr('action-type')
-            var _func = $(this).attr('_func');
-            //console.log(action_type + ': ' + url + ' ' + _func);
-            if (!_func) {
-                
-                var a = $(this).attr('url');
-                if (a[a.length-1] != '/') {
-                    a += '/';
-                }
-                
-                var selected_ids = self.getSelectedIds();
-                
-                // with selection
-                if ($(this).attr('require_id') == 'true') {
-                                        
-                    if (selected_ids.length > 0) {
-                        // delete (std)
-                        if (action_type == 'delete') {
-                            self.std_delete(selected_ids, url);
-                        }
-                        // non-standard actions
-                        else if (action_type == 'process') {
-                            if (selected_ids.length == 1) {
-                                a += selected_ids[0];
-                                $(form(a, target)).appendTo('body').submit().remove();
-                            }
-                            else {
-                                // multiselect
-                                var a0 = a;
-                                for(var i=0, l=selected_ids.length; i<l; i++) {
-                                    $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                                }
-                            }
-                        }
-                        // standard actions
-                        else {
-                            // edit, docs, ...
-                            if (selected_ids.length == 1) {
-                                a += sprintf('%s/%s', self.cls, selected_ids[0]+'');
-                                $(form(a, target)).appendTo('body').submit().remove();
-                            }
-                            else {
-                                // multiselect
-                                a += sprintf('%s/', self.cls);
-                                var a0 = a;
-                                for(var i=0, l=selected_ids.length; i<l; i++) {
-                                    $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                                } 
-                            }
-                        }
-                    }
-                    else {
-                        self.warningSelectedId();
-                    }
-                }
-                // selection is not required
-                else {
-                    // new (standard)
-                    if (action_type == 'new') {
-                        a += sprintf('%s/', self.cls);
-                        $(form(a, target)).appendTo('body').submit().remove();
-                    }
-                    // non-standard actions
-                    else if (action_type == 'process') {
-                        if (selected_ids.length == 1) {
-                            a += sprintf('%s/', selected_ids[0]+'');
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        }
-                        else if (selected_ids.length > 1) {
-                            // multiselect
-                            var a0 = a;
-                            for(var i=0, l=selected_ids.length; i<l; i++) {
-                                $(form(a0 + selected_ids[i], '_blank')).appendTo('body').submit().remove();
-                            }
-                        }
-                        else {
-                            // no selection at all
-                            $(form(a, target)).appendTo('body').submit().remove();
-                        }
-                    }
+                    row_id.prop('checked', true);
+                    $(this).parent().addClass('sp-grid-row-selected');
                 }
             }
             else {
-                _func();
+                if (self.dblclick) {
+                    // run 'dblclick' action
+                    run_action(row_id.attr('id_row')*1, self.dblclick, event.ctrlKey || event.metaKey, event.shiftKey);
+                }
             }
         });
+
+        function form(action, target) {
+            
+            var qry = self.q + '$$';
+            
+            // filters
+            for (var i=0, l=self.filters.length; i<l; i++) {
+                if (i > 0) {
+                    qry += ', ';
+                }
+                
+                qry += self.filters[i].stringify();
+            }
+            
+            // order
+            qry += '$$';
+            for (var i=0, l=self.order.length; i<l; i++) {
+                if (i > 0) {
+                    qry += ', ';
+                }
+                
+                qry += self.order[i].stringify();
+            }
+            
+            qry = encodeURI(qry).replace('-', '%2D', 'g').
+                replace('"', '%22', 'g').replace('+', '%2B', 'g').
+                replace('#', '%23', 'g');
+            
+            var came_from = '';
+            if (target != '_blank') {
+                var came_from = self.url_base + '?q=' + qry + 
+                    '&rp=' + self.rp + '&pag_n=' + self.pag_n +
+                    '&ch_attr=' + self.ch_attr + '&parent_id=' + self.parent_id;
+            }
+
+            var f = '<form type="post" action="' + action + '" target="' + target + '">' +
+                '<input type="hidden" name="came_from" value="' + came_from + '">';
+
+            if (self.ch_attr) {
+                f += '<input type="hidden" name="_' + self.ch_attr + '" value="' + self.parent_id + '">';
+            }
+
+            f += '</form>';
+
+            return f;
+        }
         
-        // export button 
-        $('#grid-export_' + self.name).live('change', function() {
-            var fmt = $('#grid-export_' + self.name + ' option:selected').val();
+        function _run_action(id, ids, act, ctrl, shift) {
+            
+            if (typeof(act.type) === 'string') {
+                
+                if (shift && self.shift_enabled) {
+                    
+                    // new
+                    if (act.type === 'new') {
+                        act = self._new_default;
+                    }
+                    // edit
+                    else if (act.type === 'edit') {
+                        act = self._edit_default;
+                    }
+                    // delete
+                    else if (act.type === 'delete') {
+                        act = self._delete_default;
+                    }
+                    // docs
+                    else if (act.type === 'docs') {
+                        act = self._docs_default;
+                    }
+                }
+                
+                var a = act.url;
+                if (a[a.length - 1] != '/') {
+                    a += '/';
+                }
+                
+                var target = '';
+                if (ctrl) {
+                    target = '_blank';
+                }
+                
+                if (act.type === 'process') {
+                    if (act.require_id) {
+                        if (id) {
+                            a += id;
+                        }
+                        else {
+                            self.warningSelectedId();
+                            return;
+                        }
+                    } else {
+                        if (id) {
+                            a += id;
+                        }
+                    }
+                }
+                else if (act.type === 'new') {
+                    a += sprintf('%s/', self.cls);
+                }
+                else if (act.type === 'delete') {
+                    self.std_delete(ids, act.url);
+                    return;
+                }
+                else {
+                    if (act.require_id) {
+                        if (id) {
+                            a += sprintf('%s/%s', self.cls, id);
+                        }
+                        else {
+                            self.warningSelectedId();
+                            return;
+                        }
+                    } else {
+                        if (id) {
+                            a += sprintf('%s/%s', self.cls, id);
+                        } 
+                        else {
+                            a += sprintf('%s/', self.cls);
+                        }
+                    }
+                }
+
+                $(form(a, target)).appendTo('body').submit().remove();
+            }
+            else {
+                // typeof(act.type) === 'object'
+                var selected_ids = ids;
+                if (act.require_id) {
+                    if (selected_ids.length > 0) {
+                        act.type.f(selected_ids[0], selected_ids);
+                    } 
+                    else {
+                        self.warningSelectedId();
+                        return;
+                    }
+                } else {
+                    if (selected_ids.length > 0) {
+                        act.type.f(selected_ids[0], selected_ids);
+                    } 
+                    else {
+                        act.type.f();
+                    }
+                }
+            }
+        }
+
+        function run_action(item, action_name, ctrl, shift) {
+            var act = self.getAction(action_name);
+            
+            if (typeof(item) !== 'number') {
+                var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
+            }
+            else {
+                var id = item;
+            }
+            
+            _run_action(id, [], act, ctrl, shift);
+        }
+
+        // new
+        var new_selector = sprintf('#%s .new_inline', self.name)
+        $(document).off('click', new_selector).on('click', new_selector, function(event) {
+            run_action($(this), 'new', event.ctrlKey || event.metaKey, event.shiftKey);
+        });
+
+        if (self.actions_inline) {
+            
+            // edit
+            var edit_selector = sprintf('#%s .edit_inline', self.name);
+            $(document).off('click', edit_selector).on('click', edit_selector, function(event) {
+                run_action($(this), 'edit', event.ctrlKey || event.metaKey, event.shiftKey);
+            });
+    
+            // delete
+            var delete_selector = sprintf('#%s .delete_inline', self.name);
+            $(document).off('click', delete_selector).on('click', delete_selector, function(event) {
+                var ids = self.getSelectedIds();
+                if (ids.length == 0) {
+                    var id = $(this).parent().parent().find('.sp-grid-rowid').attr('id_row');
+                    ids = [id];
+                }
+                
+                var act = self.getAction('delete');
+                self.std_delete(ids, act.url);
+            });
+    
+            // docs
+            var docs_selector = sprintf('#%s .docs_inline', self.name);
+            $(document).off('click', docs_selector).on('click', docs_selector, function(event) {
+                run_action($(this), 'docs', false, event.shiftKey);
+            });
+    
+            // non-standard actions
+            var nonstd_selector = sprintf('#%s .nonstd_actions', self.name);
+            $(document).off('change', nonstd_selector).on('change', nonstd_selector, function(event) {
+                var action_id = $(this).val();
+                if (action_id) {
+                    run_action($(this), action_id);
+                }
+            });
+        }
+        // !actions_inline
+        else {
+            var action_sel = sprintf('#%s .sp-grid-button-action', self.name);
+            $(document).off('click', action_sel).on('click', action_sel, function(event) {
+                var act = self.getAction($(this).attr('id'));
+                var selected_ids = self.getSelectedIds();
+                _run_action(selected_ids[0], selected_ids, act, event.ctrlKey || event.metaKey, event.shiftKey);
+            });
+        }
+
+        // export button
+        var export_sel = sprintf('#%s .export select', self.name);
+        $(document).off('change', 'export_sel').on('change', export_sel, function() {
+            var fmt = $(export_sel).val();
             
             if (fmt == '') {
-                // nothing selected 
+                // nothing selected
                 return;
             }
             
-            var formats = self.exportable_formats;             
+            var formats = self.exportable_formats;
             
             var extra_params = '';
-            if (typeof(self.exportable) == 'object') {
+            if (typeof (self.exportable) === 'object') {
                 
                 formats = self.exportable.formats;
-                
+
                 if (self.exportable.data) {
                     for (k in self.exportable.data) {
                         var v = self.exportable.data[k];
-                        if (typeof(v) == 'function') {
+                        if (typeof(v) === 'function') {
                             v = v();
                         }
                         
@@ -731,95 +1230,64 @@
                     }
                 }
             }
-            
+
             var url = '';
-            for (var i=0, l=formats.length; i<l; i++) {
+            for (var i=0, l=formats.length; i < l; i++) {
                 if (formats[i].id == fmt) {
                     url = formats[i].url;
                     break;
                 }
             }
             
-            var form_export =
-                '<form action="' + url + '" method="get" >' +
-                    '<input type="hidden" name="cls" value="' + self.cls + '">' +
-                    '<input type="hidden" name="q" value="' + self.q + '">' +
-                    '<input type="hidden" name="ch_attr" value="' + self.ch_attr + '">' +
-                    '<input type="hidden" name="parent_id" value="' + self.parent_id + '">' +
-                    extra_params +
-                '</form>';
-            
+            var form_export = '<form action="' + url + '" method="get">\
+                <input type="hidden" name="cls" value="' + self.cls + '">\
+                <input type="hidden" name="q" value="' + self.query() + '">\
+                <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
+                <input type="hidden" name="parent_id" value="' + self.parent_id + '">' + 
+                extra_params + '</form>';
+
             $(form_export).appendTo('body').submit().remove();
-            
-            // reset the select 
-            $(this).find('option:first').attr('selected', true);
-        });        
+
+            // reset the select
+            $(this).find('option:first').prop('selected', true);
+        });
     }
-    
-    // std_new
-    /*
-    SapnsGrid.prototype.std_new = function() {
-        //console.log('std_new');
-        var self = this;
-        return;
-    }
-    */
-    
-    // std_edit
-    /*
-    SapnsGrid.prototype.std_edit = function(id) {
-        //console.log('std_edit');
-        var self = this;
-        
-        console.log(id);
-        
-        return;
-    }
-    */
-    
+
     // std_delete
     SapnsGrid.prototype.std_delete = function(ids, url) {
-        
+
         var self = this;
         var cls = self.cls;
-        
+
         var id = JSON.stringify(ids);
-        
-        var delete_html = 
-            "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
-            "<p id='object-title'></p>";
-            
-        var error_html =
-            "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
-            "<div id='delete-error-message'></div>";
-        
+
+        var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
+                "<p id='object-title'></p>";
+
+        var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
+                "<div id='delete-error-message'></div>";
+
         $('#grid-dialog_' + self.name).html(delete_html);
-            
-        // get object's title 
+
+        // get object's title
         var title = '';
         $.ajax({
-            url: "/dashboard/title",
-            type: "get",
-            dataType: "json",
-            data: {
-                cls: cls,
-                id: id
-            },
+            url: "{{tg.url('/dashboard/title/')}}",
+            data: { cls: cls, id: id },
             success: function(res) {
                 if (res.status) {
                     var title;
-                    if (typeof(res.title) == 'string') {
+                    if (typeof (res.title) === 'string') {
                         title = res.title;
-                    }
-                    else {
+                    } else {
                         title = res.title.join(' | ');
                     }
-                    
+
                     $('#grid-dialog_' + self.name + ' #object-title').html(title);
                 }
             },
             error: function() {
-                // alert('error!'); 
+                // alert('error!');
             }
         });
 
@@ -833,55 +1301,57 @@
                 "{{_('Ok')}}": function() {
                     $.ajax({
                         url: url,
-                        type: "get",
-                        dataType: "json",
-                        data: {
-                            cls: cls,
-                            id_: id
-                        },
+                        data: { cls: cls, id_: id },
+                        dataType: 'json',
                         success: function(res) {
                             if (res.status) {
                                 self.search(self.q, true);
                                 $('#grid-dialog_' + self.name).dialog('close');
-                            }
+                            } 
                             else {
                                 $('#grid-dialog_' + self.name).dialog('close');
-                                
-                                var message = "<p style='color: gray;'>" + res.message + "</p>";
+
+                                var message = "<p style='color:gray'>" + res.message + "</p>";
 
                                 if (res.rel_tables != undefined && res.rel_tables.length > 0) {
                                     message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
                                     message += "<ul>";
-                                    
-                                    for (var i=0; i<res.rel_tables.length; i++) {
+
+                                    for (var i = 0; i < res.rel_tables.length; i++) {
                                         var title = res.rel_tables[i].class_title;
                                         var attr_title = res.rel_tables[i].attr_title;
-                                        message += '<li><span style="font-weight: bold;">' + title + '</span>' + 
-                                          ' (<span style="color: gray;">' + attr_title + '</span>)</li>';
+                                        message += '<li><span style="font-weight:bold">'
+                                                + title
+                                                + '</span> (<span style="color:#777">'
+                                                + attr_title + '</span>)</li>';
                                     }
-                                    
+
                                     message += "</ul>";
                                 }
-                                
-                                // {# load message #} 
-                                $('#grid-dialog_' + self.name).html(error_html).find('#delete-error-message').html(message);
-                                
-                                // {# show error dialog #} 
-                                $('#grid-dialog_' + self.name).dialog({
+
+                                // load message
+                                $('#grid-dialog_'+ self.name).html(error_html)
+                                    .find('#delete-error-message')
+                                    .html(message);
+
+                                // show error dialog
+                                $('#grid-dialog_'+ self.name).dialog({
                                     width: 700,
                                     height: 250,
-                                    buttons: {"{{_('Close')}}": function() {
-                                        $('#grid-dialog_' + self.name).dialog('close');
-                                    }}
+                                    buttons: {
+                                        "{{_('Close')}}": function() {
+                                            $('#grid-dialog_'+ self.name).dialog('close');
+                                        }
+                                    }
                                 });
                             }
                         },
                         error: function() {
-                            $('#grid-dialog_' + self.name).dialog('close');
-                            $('#grid-dialog_' + self.name).html(error_html).dialog({
+                            $('#grid-dialog_'+ self.name).dialog('close');
+                            $('#grid-dialog_'+ self.name).html(error_html).dialog({
                                 buttons: {
                                     "{{_('Close')}}": function() {
-                                        $('#grid-dialog_' + self.name).dialog('close');
+                                        $('#grid-dialog_'+ self.name).dialog('close');
                                     }
                                 }
                             });
@@ -894,36 +1364,268 @@
             }
         });
     }
+    
+    SapnsGrid.prototype.selectAll = function(chk) {
+        var self = this;
+        if (chk === undefined) {
+            chk = true;
+        }
+        
+        $('#'+self.name + ' .sp-grid-rowid').prop('checked', chk);
+    }
+    
+    SapnsGrid.prototype.filters_tip = function() {
+        var self = this;
+        
+        $('#' + self.name + ' .sp-search-btn').qtip({
+            content: {
+                text: function() {
+                    var s = '';
+                    if (self.filters.length) {
+                        for (var i=0, l=self.filters.length; i<l; i++) {
+                            
+                            if (!self.filters[i].active) {
+                                s += '<font style="text-decoration:line-through">' + self.filters[i].tip() + '</font><br>';
+                            }
+                            else {
+                                s += self.filters[i].tip() + '<br>';
+                            }
+                        }
+                    }
+                    else {
+                        s = 'No hay filtros';
+                    }
+                    
+                    return s;
+                }
+            },
+            position: {
+                at: 'top right',
+                my: 'bottom left'
+            },
+            style: 'ui-tooltip-rounded'
+        });
+        
+        if (self.filters.length) {
+            $('#' + self.name + ' .sp-search-btn').css('border-color', 'orange');
+        }
+        else {
+            $('#' + self.name + ' .sp-search-btn').css('border-color', '');
+        }
+    }
 
     $.fn.sapnsGrid = function(arg1, arg2, arg3) {
-        
+
         if (typeof(arg1) == "object") {
             
             var g = new SapnsGrid(arg1);
             this.data('sapnsGrid', g);
-            
-            this.append('<div id="grid-dialog_' + g.name + '" style="display: none;"></div>');
-            
-            var g_content = '';            
-            g_content += '<div class="sp-grid-container" id="' + g.name + '" cls="' + g.cls + '">';
-            
+            var g_id = '#'+g.name;
+
+            this.append(sprintf('<div id="grid-dialog_%(name)s" style="display:none"></div>', {name: g.name}));
+
+            var g_content = '';
+            g_content += sprintf('<div class="sp-grid-container" id="%(name)s" cls="%(cls)s">', {name: g.name, cls: g.cls});
+
             if (g.caption) {
-                g_content += '<div class="sp-grid-caption">' + g.caption + '</div>';
+                g_content += sprintf('<div class="sp-grid-caption">%(caption)s</div>', {caption: g.caption});
             }
-            
+
             if (g.with_search) {
+
+                g_content += '<div><div class="sp-grid-search-box">' + 
+                        '<input class="sp-search-txt" style="float:left" name="q" type="text" value="">' +
+                        '<img class="inline_action sp-search-btn" ' +
+                            'src="{{tg.url("/images/sapns/icons/search.png")}}" titlee="{{_("Search...")}}"></div>';
                 
-                g_content += 
-                    '<div><div id="search_box" style="float: left;">' +
-                        //'<input class="sp-search-txt" name="q" type="text" value="' + g.q + '">' +
-                        '<input class="sp-search-txt" style="float: left;" name="q" type="text" value="">' +
-                        '<button class="sp-button sp-search-btn" style="float: left;">{{_("Search...")}}</button></div>';                     
-                        
-                $('#' + g.name + ' .sp-search-btn').live('click', function() {
-                    g.search($('#' + g.name + ' .sp-search-txt').val());
+                g_content += '<div class="sp-grid-filters" style="display:none"></div>';
+                g_content += '<div class="sp-grid-edit-filter" style="display:none">\
+                    <div style="float:left;height:40px;margin-right:5px">\
+                        <div>Campo</div>\
+                        <div><select class="sp-grid-filter-field"></select></div>\
+                    </div>\
+                    <div style="float:left;height:40px;margin-right:5px">\
+                        \<div>Operador</div>\
+                        <div><select class="sp-grid-filter-operator">\
+                            <option value="co">Contiene</option>\
+                            <option value="eq">Igual</option>\
+                            <option value="lt">Menor que</option>\
+                            <option value="gt">Mayor que</option>\
+                            <option value="let">Menor o igual que</option>\
+                            <option value="get">Mayor o igual que</option>\
+                            <option value="nco">No contiene</option>\
+                            <option value="neq">Distinto</option>\
+                        </select></div>\
+                    </div>\
+                    <div style="float:left;height:40px">\
+                        <div>Valor</div>\
+                        <input class="sp-grid-filter-value" type="text">\
+                    </div></div>';
+                
+                var ad_sel = '.sp-grid-activate-filter, .sp-grid-deactivate-filter';
+                
+                $(document).off('click', ad_sel).on('click', ad_sel, function() {
+                    var i = $(this).parent().attr('filter_order');
+                    var f = g.filters[i];
+                    
+                    if (f.active) {
+                        $(this).removeClass('sp-grid-deactivate-filter').addClass('sp-grid-activate-filter');
+                        $(this).text('Activar');
+                    }
+                    else {
+                        $(this).addClass('sp-grid-deactivate-filter').removeClass('sp-grid-activate-filter');
+                        $(this).text('Desactivar');
+                    }
+                    
+                    $(this).addClass('sp-grid-filter-changed');
+                    
+                    f.toggle();
                 });
                 
-                $('#' + g.name + ' .sp-search-txt').live('keypress', function(event) {
+                var search_sel = g_id + ' .sp-search-btn';
+                $(document).off('click', search_sel).on('click', search_sel, function() {
+                    
+                    function load_filters() {
+                        var s = '',
+                            l = g.filters.length;
+                        
+                        if (l) {
+                            for (var i=0; i<l; i++) {
+                                var f = g.filters[i];
+                                
+                                var activate_filter = '';
+                                if (f.active) {
+                                    activate_filter = '<button class="sp-grid-deactivate-filter">Desactivar</button>';
+                                }
+                                else {
+                                    activate_filter = '<button class="sp-grid-activate-filter">Activar</button>';
+                                }
+                                
+                                s += '<div class="sp-grid-row-filter" style="clear:left" filter_order="' + i + '">\
+                                    <div style="float:left;margin-right:10px"><input class="sp-grid-check-filter" type="checkbox"></div>\
+                                    <div class="sp-grid-filter-description">&lt;' + f.field + '&gt; ' + 
+                                    f.operator_title().toLowerCase() + 
+                                    ' <span style="font-style:italic">"' + f.value + '"</span></div>' +
+                                    activate_filter + '</div>';
+                            }
+                        }
+                        else {
+                            s = '<p class="sp-grid-no-filters">No hay filtros</p>';
+                        }
+                        
+                        $(g_id + ' .sp-grid-filters').html(s);
+                    }
+                    
+                    load_filters();
+                    
+                    function edit_filter(filter, callback) {
+                        
+                        $('<div/>').html($(g_id + ' .sp-grid-edit-filter').html()).dialog({
+                            title: "Editar filtro",
+                            modal: true,
+                            resizable: false,
+                            width: 700,
+                            height: 150,
+                            open: function() {
+                                if (filter) {
+                                    $(this).find('.sp-grid-filter-field').val(filter.field);
+                                    $(this).find('.sp-grid-filter-operator').val(filter.operator);
+                                    $(this).find('.sp-grid-filter-value').val(filter.value);
+                                }
+                            },
+                            buttons: {
+                                "{{_('Ok')}}": function() {
+                                    var self = this;
+                                    if (!filter) {
+                                        filter = new Filter({
+                                            field: $(this).find('.sp-grid-filter-field').val(),
+                                            operator: $(this).find('.sp-grid-filter-operator').val(),
+                                            value:  $(this).find('.sp-grid-filter-value').val()
+                                        });
+                                        
+                                        g.filters.push(filter);
+                                    }
+                                    else {
+                                        filter.field = $(this).find('.sp-grid-filter-field').val();
+                                        filter.operator = $(this).find('.sp-grid-filter-operator').val();
+                                        filter.value = $(this).find('.sp-grid-filter-value').val();
+                                    }
+                                    
+                                    g.search($(g_id + ' .sp-search-txt').val(), true);
+                                    $(this).dialog('close');
+                                    if (callback) {
+                                        callback();
+                                    }
+                                },
+                                "{{_('Cancel')}}": function() {
+                                    $(this).dialog('close');
+                                }
+                            }
+                        });
+                    }
+                    
+                    // filters management
+                    $('<div/>').html($(g_id + ' .sp-grid-filters').html()).dialog({
+                        title: "Filtros",
+                        modal: true,
+                        resizable: false,
+                        width: 600,
+                        height: 300,
+                        closeOnEscape: false,
+                        open: function() {
+                            var dlg = $(this);
+                            edit_filter(null, function() {
+                                dlg.dialog('close');
+                            });
+                        },
+                        buttons: {
+                            "Añadir": function() {
+                                var dlg = $(this);
+                                edit_filter(null, function() {
+                                    dlg.dialog('close');
+                                });
+                            },
+                            "Editar": function() {
+                                var i = $(this).find('.sp-grid-row-filter input[type=checkbox]:visible:checked:first').parent().parent().attr('filter_order');
+                                var dlg = $(this);
+                                edit_filter(g.filters[i], function() {
+                                    dlg.dialog('close');
+                                });
+                                g.search($(g_id + ' .sp-search-txt').val(), true);
+                            },
+                            "Borrar": function() {
+                                var filters = [];
+                                $(this).find('.sp-grid-row-filter input[type=checkbox]:visible:checked').each(function() {
+                                    filters.push($(this).parent().parent().attr('filter_order')*1);
+                                });
+                                
+                                filters = filters.reverse()
+                                for (var i=0, l=filters.length; i<l; i++) {
+                                    g.filters.splice(filters[i], 1);
+                                }
+                                
+                                g.search($(g_id + ' .sp-search-txt').val(), true);
+                                $(this).dialog('close');
+                            },
+                            "Borrar todos": function() {
+                                g.filters = [];
+                                g.search($(g_id + ' .sp-search-txt').val(), true);
+                                $(this).dialog('close');
+                            },
+                            "{{_('Close')}}": function() {
+                                if ($('.sp-grid-filter-changed').length) {
+                                    $('.sp-grid-filter-changed').removeClass('sp-grid-filter-changed');
+                                    g.search($(g_id + ' .sp-search-txt').val(), true);
+                                }
+                                
+                                $(this).dialog('close');
+                            }
+                        }
+                    });
+                });
+
+                var search_txt = g_id + ' .sp-search-txt';
+                $(document).off('keypress', search_txt).on('keypress', search_txt, function(event) {
                     // "Intro" key pressed
                     if (event.which == 13) {
                         g.search($(this).val());
@@ -931,110 +1633,187 @@
                 });
 
                 if (g.link) {
-                    g_content += 
-                        '<div style="padding-left: 20px;">' +
-                        "<button id='link-shortcut' class='sp-button' style='float: left;'>{{_('Create a shortcut')}}</button>" +
-                        '<div style="font-size: 9px; margin-top: 7px; width: 100px; float: left;">' +
-                            "<a id='this-search' href='" + g.link + "' target='_blank'>[{{_('this search')}}]</a>" +
-                        '</div>' +
-                        '<div id="link-shortcut-dialog" style="display: none;">' +
-                            "<p>{{_('Do you want to create a shortcut for this search?')}}</p>" +
-                            "<label>{{_('Shortcut title')}}:</label>" +
-                            "<input id='link-shortcut-title' type='text' value='({{_('title')}})'>" +
-                        '</div></div>';
+                    g_content += '<div style="padding-left:20px">\
+                            <button id="link-shortcut" class="sp-button" style="float:left">{{_("Create a shortcut")}}</button>\
+                            <div style="font-size:9px;margin-top:7px; width:100px;float:left">\
+                            <a id="this-search" href="' + g.link + '" \
+                            target="_blank">[{{_("this search")}}]</a>\
+                            </div>\
+                            <div id="link-shortcut-dialog" style="display:none">\
+                            <p>{{_("Do you want to create a shortcut for this search?")}}</p>\
+                            <label>{{_("Shortcut title")}}:</label>\
+                            <input id="link-shortcut-title" type="text" value="({{_("title")}})">\
+                            </div></div>';
                 }
                 g_content += '</div>';
             }
             
             var g_table = 
-                '<div class="sp-grid-parent" style="overflow: auto; clear: left; ' + 
-                    'height: ' + g.height + 'px; background-color: transparent;"></div>';
+                '<div class="sp-grid-parent" style="overflow:auto;clear:left;height:' + 
+                    (g.height+5) + 'px;background-color:transparent"></div>';
             
             // pager
             var g_pager = '';
             if (g.with_pager) {
-                g_pager += '<div class="sp-grid-pager">';
-                g_pager += '<div class="sp-grid-pager-desc"></div>';
-                
+                g_pager += '<div class="sp-grid-pager">\
+                    <div class="sp-grid-pager-desc"></div>';
+
                 var sel_10 = '', sel_50 = '', sel_100 = '', sel_all = '';
                 var sel = ' selected';
                 var another_value = '';
                 if (g.rp == 10) {
                     sel_10 = sel;
-                }
-                else if (g.rp == 50) {
+                } else if (g.rp == 50) {
                     sel_50 = sel;
-                }
-                else if (g.rp == 100) {
+                } else if (g.rp == 100) {
                     sel_100 = sel;
-                }
-                else if (g.rp == 0) {
+                } else if (g.rp == 0) {
                     sel_all = sel;
-                }
-                else {
+                } else {
                     another_value = '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
                 }
-                
-                g_pager += 
-                    '<select class="sp-button sp-grid-rp">' +
-                    another_value +
-                    '<option value="10"' + sel_10 + '>10</option>' +
-                    '<option value="50"' + sel_50 + '>50</option>' +
-                    '<option value="100"' + sel_100 + '>100</option>' +
-                    '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
-                    '</select>' +
-                    '<button class="sp-button first-page" style="float: left;">|&lt;&lt;</button>' +
-                    '<button class="sp-button page-back" style="float: left;">&lt;&lt;</button>' +
-                    '<div>' +
-                    '<input class="sp-grid-current-page" type="text" style="text-align: center;" readonly>' +
-                    '</div>' +
-                    '<button class="sp-button page-forth" style="float: left;">&gt;&gt</button>' +
-                    '<button class="sp-button last-page" style="float: left;">&gt;&gt|</button>';
-                
+
+                g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px">' +
+                        '<select class="sp-button sp-grid-rp">' +
+                        another_value +
+                        '<option value="10"' + sel_10 + '>10</option>' +
+                        '<option value="50"' + sel_50 + '>50</option>' +
+                        '<option value="100"' + sel_100 + '>100</option>' +
+                        '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
+                        '</select>' +
+                        '<button class="sp-button sp-grid-first-page" style="float:left">|&lt;&lt;</button>' +
+                        '<button class="sp-button sp-grid-page-back" style="float:left">&lt;&lt;</button>' +
+                        '<input class="sp-grid-current-page" type="text" style="text-align:center;font-size:11px;margin-top:3px" readonly>' +
+                        '<button class="sp-button sp-grid-page-forth" style="float:left">&gt;&gt</button>';
+                        //<button class="sp-button sp-grid-last-page" style="float:left">&gt;&gt|</button></div>';
+
                 g_pager += '</div>';
                 
-                $('#' + g.name + ' .sp-grid-rp').live('change', function() {
+                var select_all = g_id + ' .sp-grid-select-all',
+                    rp = g_id + ' .sp-grid-rp',
+                    first_page = g_id + ' .sp-grid-first-page',
+                    page_back = g_id + ' .sp-grid-page-back',
+                    page_forth = g_id + ' .sp-grid-page-forth',
+                    last_page = g_id + ' .sp-grid-last-page';
+                    
+                $(document).off('click', select_all).on('click', select_all, function() {
+                    var chk = $(this).prop('checked');
+                    g.selectAll(chk);
+                });
+
+                $(document).off('change', rp).on('change', rp, function() {
                     g.rp = $(this).val();
                     g.pag_n = 1;
                     g.search(g.q);
                 });
-                
-                $('#' + g.name + ' .first-page').live('click', function() {
+
+                $(document).off('click', first_page).on('click', first_page, function() {
                     g.pag_n = 1;
                     g.search(g.q);
                 });
-                
-                $('#' + g.name + ' .page-back').live('click', function() {
+
+                $(document).off('click', page_back).on('click', page_back, function() {
                     if (g.pag_n > 1) {
                         g.pag_n -= 1;
                         g.search(g.q);
                     }
                 });
-                
-                $('#' + g.name + ' .page-forth').live('click', function() {
+
+                $(document).off('click', page_forth).on('click', page_forth, function() {
                     if (g.pag_n < g.total_pag) {
                         g.pag_n *= 1
                         g.pag_n += 1;
                         g.search(g.q);
                     }
                 });
-                
-                $('#' + g.name + ' .last-page').live('click', function() {
+
+                $(document).off('click', last_page).on('click', last_page, function() {
                     g.pag_n = g.total_pag;
                     g.search(g.q);
                 });
             }
             
-            this.append(g_content+'<div class="actions" style="clear: left; position: relative; min-height: 20px;"></div>'+g_table+g_pager+'</div>');
+            var col_sortable = g_id + ' .sp-col-title-sortable';
             
-            g.loadActions();
-            $('#'+g.name + ' .sp-search-txt').val(g.q);
-            g.search(g.q)
-        }
+            $(document).off('click', col_sortable).on('click', col_sortable, function(event) {
+                
+                var field = $(this).attr('col_title');
+                var shift = event.shiftKey;
+                var ctrl = event.ctrlKey || event.metaKey;
+                
+                // order type (asc, desc)
+                if ($(this).hasClass('sp-grid-ordered-col')) {
+                    var type;
+                    if ($(this).attr('order_type') == 'asc') {
+                        type = 'desc';
+                    }
+                    else {
+                        type = 'asc';
+                    }
+                    
+                    if (shift) {
+                        // modify an existing order
+                        for (var i=0, l=g.order.length; i<l; i++) {
+                            if (g.order[i].field === field) {
+                                break;
+                            }
+                        }
+                        
+                        g.order[i].type = type
+                    }
+                    else {
+                        if (!ctrl) {
+                            // reseting multiple order
+                            if (g.order.length > 1) {
+                                type = 'asc';
+                            }
+                            
+                            var o = new OrderFilter({ field: field, type: type});
+                            g.order = [o];
+                        }
+                        else {
+                            // delete order
+                            for (var i=0, l=g.order.length; i<l; i++) {
+                                if (g.order[i].field === field) {
+                                    break;
+                                }
+                            }
+                            
+                            g.order.splice(i, 1);
+                            $(this).removeClass('sp-grid-ordered-col');
+                        }
+                    }
+                }
+                else {
+                    // add a new order
+                    var o = new OrderFilter({field: field, type: 'asc'});
+                    
+                    if (shift) {
+                        g.order.push(o);
+                    }
+                    else {
+                        g.order = [o];
+                    }
+                }
+                
+                // refresh
+                g.search(undefined, true);
+            });
+            
+            var g_actions = '<div class="sp-grid-button-actions" style="display:none"></div>';
+
+            this.append(g_content + g_actions + g_table + g_pager + '</div>');
+            
+            g.loadActions(function() {
+                $(g_id + ' .sp-search-txt').val(g.q);
+                g.search(g.q);
+            });            
+        } 
         else if (typeof(arg1) == "string") {
-            
+
             var self = this.data('sapnsGrid');
-            
+            var g_id = '#' + self.name;
+
             // loadData
             if (arg1 == "loadData") {
                 self.loadData();
@@ -1046,18 +1825,17 @@
             // a function is executed after data is loaded (before "general" onLoad)
             // sapnsGrid('search', true, function() {})
             // sapnsGrid('search', 'john doe', function() {})
-            else if (arg1 === "search") {
+            else if (arg1 == "search") {
                 var q = '';
-                
-                if (typeof(arg2) === 'boolean') {
+
+                if (typeof(arg2) == 'boolean') {
                     q = self.q;
-                }
-                else if (arg2) {
+                } else if (arg2) {
                     q = arg2;
                 }
-                
+
                 if (self.with_search) {
-                    $('#'+self.name + ' .sp-search-txt').val(q);
+                    $(g_id + ' .sp-search-txt').val(q);
                 }
                 
                 self.search(q, true, arg3);
@@ -1069,11 +1847,15 @@
             // setRp
             else if (arg1 == "setRp") {
                 self.rp = arg2;
-                $('#'+self.name + ' .sp-grid-rp [value='+arg2+']').attr('selected', true);
+                $(g_id + ' .sp-grid-rp [value='+arg2+']').prop('selected', true);
+            }
+            // selectAll
+            else if (arg1 == "selectAll") {
+                self.selectAll();
             }
             // TODO: other sapnsGrid methods
         }
-        
+
         return this;
     };
-}) (jQuery);
+})(jQuery);

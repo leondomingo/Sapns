@@ -7,10 +7,10 @@
 .url_field_text{width:85%;max-width:85%;min-width:85%;margin-left:1%;font-family:Courier;font-weight:bold;border:1px solid #777}
 .url_field_text:focus{border:1px solid orange}.sp-select-field{width:97%;margin-left:1%}
 .sp-select-text{width:90%;border:1px solid #777}.sp-select-text:focus{border:1px solid orange}
-.sp-select-button,.sp-empty-button{height:25px!important}.sp-checkbox-field{margin-left:1%}
-.sp-date-field{margin-left:1%}.sp_integer_field,.sp_float_field{margin-left:1%}.sp-time-field{margin-left:1%;width:70px}
-.sp-memo-field{min-height:40px;height:100px;font-size:14px}.sp-search-text{width:650px;border:1px solid gray}
-.sp-search-text:focus{border:1px solid orange}#app_title{position:absolute;width:350px;height:145px;top:5px;z-index:-1;background-color:transparent}
+.sp-checkbox-field{margin-left:1%}.sp-date-field{margin-left:1%}.sp_integer_field,.sp_float_field{margin-left:1%}
+.sp-time-field{margin-left:1%;width:70px}.sp-memo-field{min-height:40px;height:100px;font-size:14px}
+.sp-search-text{width:650px;border:1px solid gray}.sp-search-text:focus{border:1px solid orange}
+#app_title{position:absolute;width:350px;height:145px;top:5px;z-index:-1;background-color:transparent}
 #right_desc{position:absolute;left:360px;top:12px;padding-right:10px;width:617px;background-color:transparent}
 #reference{margin-left:0;font-size:15px;color:black;background-color:none;text-align:right;height:22px;overflow:hidden}
 #created_updated{height:9px;font-size:9px;cursor:pointer}.created{width:115px;border:1px solid lightgray;float:right;margin-right:5px;text-align:center}

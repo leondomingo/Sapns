@@ -22,7 +22,7 @@ class DocsController(BaseController):
     allow_only = authorize.not_anonymous()
     
     @expose('sapns/docs/index.html')
-    def default(self, cls, id, **kw):
+    def _default(self, cls, id, **kw):
         
         # TODO: comprobar permisos
         

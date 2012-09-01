@@ -4,24 +4,25 @@
 
     // SapnsSelector (constructor)
     function SapnsSelector(settings) {
+        
         var _settings = $.extend(true, {
-            name: 'sel_' + Math.floor(Math.random()*999999),
-            value: null,
+            name: 'sapns_selector_' + Math.floor(Math.random()*999999),
+            value: '',
             title: '',
             rc: '',
-            rc_title: '',
+            rc_title: settings.rc.toUpperCase(),
             read_only: false,
             title_url: "{{tg.url('/dashboard/title/')}}",
             edit_url: "{{tg.url('/dashboard/edit/')}}",
             onChange: null,
+            onClick: null,
             dialog: {
-                width: 950,
-                height: 550
+                width: 1100,
+                height: 600,
             },
             grid: {
                 cls: settings.rc,
                 rp: 25,
-                q: '',
                 pag_n: 1,
                 with_pager: false,
                 height: 380,
@@ -33,7 +34,7 @@
                 }
             }
         }, settings);
-
+        
         $.extend(true, this, _settings);
     }
     
@@ -43,8 +44,8 @@
         var self = this;
         
         if (!self.read_only) {
-            var change = self.value != value;
-            var old_value = self.value;
+            var change = self.value != value,
+                old_value = self.value;
     
             self.value = value;
             if (change && self.onChange && !no_callback) {
@@ -61,9 +62,9 @@
     // setTitle
     SapnsSelector.prototype.setTitle = function() {
         
-        var self = this;
-        var id = "#st_" + self.name
-        var value = self.value;
+        var self = this,
+            id = "#st_" + self.name,
+            value = self.value;
         
         if (value && self.rc) {
             $.ajax({
@@ -116,44 +117,47 @@
         $('#rb_' + self.name).attr('disabled', value);
         self.read_only = value;
     }
-
+    
+    SapnsSelector.prototype.dialog_name = function() {
+        var self = this;
+        return '#sp-selector-dialog-' + self.name;
+    }
+    
     $.fn.sapnsSelector = function(arg1, arg2, arg3) {
         
-        if (typeof(arg1) == "object") {
+        if (typeof(arg1) === "object") {
             
-            var sapnsSelector = new SapnsSelector(arg1);
+            var self = this,
+                sapnsSelector = new SapnsSelector(arg1),
+                // select text
+                select_text = '<input id="st_' + sapnsSelector.name + '" class="sp-select-text" type="text" readonly value=""';
             
-            // select text
-            var select_text = 
-                '<input id="st_' + sapnsSelector.name + '"' + 
-                ' class="sp-select-text"' + 
-                ' type="text" readonly' + 
-                ' value=""';
-            
-            if (this.attr('readonly') || this.attr('disabled')) {
+            if (self.attr('readonly') || self.attr('disabled')) {
                 sapnsSelector.read_only = true;
-            }
-            
-            if (sapnsSelector.read_only) {
                 select_text += ' disabled';
             }
             
             select_text += '>';
             
-            this.append(select_text);
+            self.append(select_text);
             
             // double-click to edit the selected object (if there's any)
-            this.find('#st_' + sapnsSelector.name).dblclick(function() {
+            self.find('#st_' + sapnsSelector.name).dblclick(function() {
                 
                 if (!sapnsSelector.isReadonly) {
-                    var cls = sapnsSelector.getClass();
-                    var id = sapnsSelector.getValue();
+                    var cls = sapnsSelector.getClass(),
+                        id = sapnsSelector.getValue();
                     if (id != '') {
                         var url_edit = sapnsSelector.edit_url;
+                        
+                        if (url_edit[url_edit.length-1] != '/') {
+                            url_edit += '/';
+                        }
+                        
+                        url_edit += sprintf('%s/%s', cls, id);
+                        
                         var form_edit =
                             '<form action="' + url_edit + '" method="post" target="_blank">\
-                                <input type="hidden" name="cls" value="' + cls + '">\
-                                <input type="hidden" name="id" value="' + id + '">\
                                 <input type="hidden" name="came_from" value="">\
                             </form>';
                             
@@ -163,12 +167,8 @@
             });
             
             // select_button
-            var title = sprintf('{{_("Set a value for [%s]")}}', sapnsSelector.title);
-            var select_button = 
-                '<button id="sb_' + sapnsSelector.name + '"' +
-                ' class="sp-button sp-select-button" ' +
-                ' title="' + title + '" ' +
-                ' style="font-weight:bold"';
+            var title = "{{_('Set value')}}",
+                select_button = '<button id="sb_' + sapnsSelector.name + '" class="sp-select-button" title="' + title + '"';
             
             if (sapnsSelector.read_only) {
                 select_button += ' disabled';
@@ -176,69 +176,68 @@
             
             select_button += '>...</button>';
             
-            this.append(select_button);
+            self.append(select_button);
 
-            this.find('#sb_' + sapnsSelector.name).click(function() {
+            self.find('#sb_' + sapnsSelector.name).click(function() {
                 
                 if (!sapnsSelector.isReadonly) {
                     
-                    // dialog title
-                    var dialog_title = sapnsSelector.rc_title;
-                    if (typeof(sapnsSelector.rc_title) == 'function') {
-                        dialog_title = sapnsSelector.rc_title();
+                    if (sapnsSelector.onClick) {
+                        sapnsSelector.onClick(sapnsSelector.value);
                     }
-                    
-                    var dialog_name = 'dialog_' + sapnsSelector.name,
-                        dialog_id = '#' + dialog_name;
-                    
-                    $(dialog_id).remove();
-                    $('<div id="' + dialog_name + '"><div class="sapnsGrid"></div></div>').appendTo('body');
-                    $(dialog_id + ' .sapnsGrid').sapnsGrid(sapnsSelector.grid);
-                    
-                    // show search dialog
-                    $(dialog_id).dialog({
-                        title: dialog_title,
-                        width: sapnsSelector.dialog.width,
-                        height: sapnsSelector.dialog.height,
-                        resizable: false,
-                        modal: true,
-                        close: function() {
-                            $('#'+dialog_name).remove();
-                        },
-                        buttons: {
-                            "{{_('Ok')}}": function() {
-                                // get the id of the selected row
-                                
-                                var id_selected = $('#'+dialog_name + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0];
-                                
-                                sapnsSelector.setValue(id_selected);
-                                sapnsSelector.setTitle();
-                                
-                                $(dialog_id).dialog('destroy').remove();
-                            },
-                            "{{_('Cancel')}}": function() {
-                                $(dialog_id).dialog('destroy').remove();
-                            }
+                    else {
+                        // dialog title
+                        var dialog_title = sapnsSelector.rc_title;
+                        if (typeof(sapnsSelector.rc_title) === 'function') {
+                            dialog_title = sapnsSelector.rc_title();
                         }
-                    });
+                        
+                        var dialog_name_ = sapnsSelector.dialog_name().replace('#', '');
+                        
+                        $(sapnsSelector.dialog_name()).remove();
+                        $('<div id="' + dialog_name_ + '"><div class="sapnsGrid"></div></div>').appendTo('body');
+                        $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid(sapnsSelector.grid);
+                        
+                        // show search dialog
+                        $(sapnsSelector.dialog_name()).dialog({
+                            title: dialog_title,
+                            width: sapnsSelector.dialog.width,
+                            height: sapnsSelector.dialog.height,
+                            resizable: false,
+                            modal: true,
+                            buttons: {
+                                "{{_('Ok')}}": function() {
+                                    // get the id of the selected row
+                                    var new_value = $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0],
+                                        current_value = sapnsSelector.getValue();
+                                    
+                                    sapnsSelector.setValue(new_value);
+                                    if (current_value != new_value) {
+                                        sapnsSelector.setTitle();
+                                    }
+                                    
+                                    $(sapnsSelector.dialog_name()).dialog('destroy').remove();
+                                },
+                                "{{_('Cancel')}}": function() {
+                                    $(sapnsSelector.dialog_name()).dialog('destroy').remove();
+                                }
+                            }
+                        });
+                    }
                 }
             });
             
             sapnsSelector.setTitle();
             
             // remove button
-            var remove_button =
-                '<button id="rb_' + sapnsSelector.name + '"' +
-                ' class="sp-button sp-empty-button"';
+            var remove_button = '<button id="rb_' + sapnsSelector.name + '" class="sp-empty-button"',
+                title = "{{_('Remove value')}}";
             
             if (sapnsSelector.read_only) {
                 remove_button += ' disabled ';
             }
             
-            var title = sprintf("{{_('Remove value of [%s]')}}", sapnsSelector.title);
-            remove_button += 
-                ' title="' + title + '" ' +
-                ' style="font-weight: bold; color: red;">x</button>';
+            remove_button += ' title="' + title + '">x</button>';
 
             this.append(remove_button);
             
@@ -251,33 +250,36 @@
             //this.sapnsSelector = sapnsSelector;
             this.data('sapnsSelector', sapnsSelector);
         }
-        else if (typeof(arg1) == "string") {
+        else if (typeof(arg1) === "string") {
             
             var sapnsSelector = this.data('sapnsSelector');
             
             // setValue(arg2)
             // $(element).sapnsSelector("setValue", 123);
             // $(element).sapnsSelector("setValue", null);
-            if (arg1 == "setValue") {
+            if (arg1 === "setValue") {
+                var current_value = sapnsSelector.getValue();
                 sapnsSelector.setValue(arg2, arg3);
-                sapnsSelector.setTitle();
+                if (current_value != arg2) {
+                    sapnsSelector.setTitle();
+                }
             }
             // getValue()
-            else if (arg1 == "getValue") {
+            else if (arg1 === "getValue") {
                 return sapnsSelector.value;
             }
             // getTitle()
-            else if (arg1 == "getTitle") {
+            else if (arg1 === "getTitle") {
                 return sapnsSelector.title;
             }
             // getClass()
-            else if (arg1 == "getClass") {
+            else if (arg1 === "getClass") {
                 return sapnsSelector.rc;
             }
-            else if (arg1 == "setReadonly") {
+            else if (arg1 === "setReadonly") {
                 sapnsSelector.setReadonly(arg2);
             }
-            else if (arg1 == "isReadonly") {
+            else if (arg1 === "isReadonly") {
                 return sapnsSelector.read_only;
             }
             // TODO: other sapnsSelector methods

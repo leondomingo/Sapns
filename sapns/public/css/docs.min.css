@@ -5,3 +5,5 @@
 .col_format{width:120px;float:left}.col_type{width:110px;float:left}.col_author{width:150px;float:left}
 .col_repo{width:120px;float:left}#doclist_actions{padding-left:10px}.doc_action{width:110px}
 .doc_field{width:90%;margin-bottom:5px}.doc_field_required{font-weight:bold}#doc_title{width:410px}
+#doc_to_delete{font:bold 13px arial}.sp-filename div{width:300px}.ui-dialog .ui-dialog-title{font:bold 13px helvetica,arial}
+.sp-select-text{width:300px}
