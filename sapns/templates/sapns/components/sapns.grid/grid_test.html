@@ -9,14 +9,14 @@
 {{ u.jquery_ui() }}
 {#{{ u.qtip2() }}#}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
-<script type="text/javascript">
+<script>
     {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
 </script>
 
 </head>
 <body>
     <div id="g"></div>
-    <script type="text/javascript">
+    <script>
         $(document).ready(function() {
             
             $('#g').sapnsGrid({

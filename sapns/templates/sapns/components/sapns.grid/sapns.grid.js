@@ -1,111 +1,72 @@
 /* Sapns grid */
-
-function load_script(src) {
-    //console.log('Loading from: ' + src);
-    var fileref = document.createElement('script');
-    fileref.setAttribute("type", "text/javascript");
-    fileref.setAttribute("src", src);
-    document.getElementsByTagName("head")[0].appendChild(fileref)
-}
-
-function load_css(href) {
-    var fileref = document.createElement("link");
-    fileref.setAttribute("rel", "stylesheet");
-    fileref.setAttribute("type", "text/css");
-    fileref.setAttribute("href", href);
-}
-
-try {
-    sprintf;
-}
-catch (e) {
-    load_script("{{tg.url('/js/sprintf.min.js')}}");
-}
-
-/*try {
-    qtip;
-}
-catch(e) {
-    load_css("{{tg.url('/js/qtip2/jquery.qtip.min.css')}}");
-    load_script("{{tg.url('/js/qtip2/jquery.qtip.min.js')}}");
-}*/
-
 (function($) {
 
     // SapnsGrid (constructor)
     function SapnsGrid(settings) {
-        
-        function set(this_object, key, value, obj) {
-            
-            if (obj == undefined) {
-                obj = settings;
-            }
-
-            if (obj[key] == undefined) {
-                this_object[key] = value;
-            }
-            else {
-                this_object[key] = obj[key];
-            }
-            
-            return;
+        var _caption = '';
+        if (typeof(settings.caption) === 'function') {
+            _caption = settings.caption();
         }
-        
-        set(this, 'caption', '');
-        if (typeof(this.caption) == 'function') {
-            this.caption = this.caption();
+                 
+        var _actions = null;
+        if (typeof(settings.actions) === 'function') {
+            _actions = settings.actions();
         }
-        set(this, 'name', 'grid_' + Math.floor(Math.random()*999999));
-        set(this, 'cls', '');
-        set(this, 'with_search', true);
-        set(this, 'search_params', {});
-        set(this, 'show_ids', false);
-        set(this, 'link', '');
-        set(this, 'q', '');
-        set(this, 'ch_attr', '');
-        set(this, 'parent_id', '');
-        set(this, 'cols', []);
-        set(this, 'data', {});
-        set(this, 'height', 500); //470);
-        set(this, 'url_base', '');
-        set(this, 'multiselect', false);
-        set(this, 'actions_inline', false);
-        set(this, 'hide_id', false);
-        set(this, 'dblclick', null);
-        set(this, 'select_first', false);
-        set(this, 'onLoad', null);
-        
-        set(this, 'default_', {});
-        set(this.default_, 'col_width', 60, this.default_);
-        set(this.default_, 'col_align', 'center', this.default_);
-        set(this.default_, 'empty_value', '', this.default_);
-        
-        set(this, 'actions', null);
-        if (typeof(this.actions) == 'function') {
-            this.actions = this.actions();
-        }
-        
-        set(this, 'exportable', true);
-         
-        var formats = [{
+                 
+        var exportable_formats = [{
             id: 'csv',
             title: 'CSV',
-            url: '/dashboard/tocsv'
+            url: "{{tg.url('/dashboard/tocsv/')}}"
         },
         {
             id: 'excel',
             title: 'Excel',
-            url: '/dashboard/toxls'
+            url: "{{tg.url('/dashboard/toxls/')}}"
         }];
-        set(this, 'exportable_formats', formats);
+                 
+        var _settings = $.extend(true, {
+            caption: _caption,
+            name: 'grid_' + Math.floor(Math.random()*999999),
+            cls: '',
+            with_search: true,
+            search_params: {},
+            show_ids: false,
+            link: '',
+            q: '',
+            rp: 10,
+            pag_n: 1,
+            with_pager: true,
+            ch_attr: '',
+            parent_id: '',
+            cols: [],
+            data: {},
+            height: 500,
+            url_base: '',
+            multiselect: false,
+            actions_inline: false,
+            hide_check: false,
+            hide_id: false,
+            dblclick: null,
+            select_first: false,
+            onLoad: null,
+            default_: {
+                col_width: 60,
+                col_align: 'center',
+                empty_value: ''
+            },
+            actions: _actions,
+                exportable: true,
+                exportable_formats: exportable_formats,
+                with_pager: true,
+                pag_n: 1,
+                rp: 10,
+        }, settings);
         
+        $.extend(true, this, _settings);
         
-        set(this, 'with_pager', true);
-        set(this, 'pag_n', 1);
-        set(this, 'rp', 10);
-        set(this, 'this_page', 0);
-        set(this, 'total_count', 0);
-        set(this, 'total_pag', 0);
+        this.this_page = 0;
+        this.total_count = 0;
+        this.total_pag = 0;
         this.ajx_data = '{}';
     }
 
@@ -270,11 +231,11 @@ catch(e) {
     SapnsGrid.prototype.search = function(q, force, on_load) {
         var self = this;
         
-        if (force == undefined) {
+        if (force === undefined) {
             force = false;
         }
         
-        if (q == undefined) {
+        if (q === undefined) {
             q = self.q;
         }
         
@@ -514,10 +475,8 @@ catch(e) {
                 // it's an object
                 var ajx = $.extend(true, {
                     url: "{{tg.url('/dashboard/grid_actions/')}}",
-                    type: "post",
-                    data: {
-                        cls: self.cls
-                    },
+                    type: 'post',
+                    data: { cls: self.cls },
                     success: function(response) {
                         if (response.status) {
                             self.actions = response.actions;
@@ -1087,10 +1046,10 @@ catch(e) {
             // a function is executed after data is loaded (before "general" onLoad)
             // sapnsGrid('search', true, function() {})
             // sapnsGrid('search', 'john doe', function() {})
-            else if (arg1 == "search") {
+            else if (arg1 === "search") {
                 var q = '';
                 
-                if (typeof(arg2) == 'boolean') {
+                if (typeof(arg2) === 'boolean') {
                     q = self.q;
                 }
                 else if (arg2) {

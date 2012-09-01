@@ -1,4 +1,4 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
 <head>
 {% block head %}
@@ -6,12 +6,11 @@
 <title>{{tg.config.get('app.name', 'Sapns')}} - 
     {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
 {% endblock %}
-<link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.min.css')}}">
-{% if tg.config.get('app.root_folder') %}
-  {% set root_folder = tg.config.get('app.root_folder') %}
-  <link rel="stylesheet" type="text/css" media="screen" 
-      href="{{tg.url('/css/%s/sapns.css' % root_folder)}}">
-{% endif %}
+<link rel="stylesheet" href="{{tg.url('/css/style.min.css')}}">
+<!--{% if tg.config.get('app.root_folder') %}-->
+  <!--{% set root_folder = tg.config.get('app.root_folder') %}-->
+  <link rel="stylesheet" href="{{tg.url('/css/%s/sapns.css' % root_folder)}}">
+<!--{% endif %}-->
 </head>
 <body>
     {% block header %}
@@ -21,13 +20,13 @@
     {% endblock %}
     
     <div class="sp_middle">
-    {% if page %}
-    <div id="you-are-in"><a style="font-size: 15px;" href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
-    {% endif %}
+    <!--{% if page %}-->
+    <div id="you-are-in"><a style="font-size:15px" href="/">home</a>: {{_('You are in')}} <span style="font-weight: bold;">{{page}}</span></div>
+    <!--{% endif %}-->
     
-    {% if came_from %}
-    <div id="sp-back" style="margin-left: 5px; font-size: 9px;"><a href="{{came_from}}">{{_('return')}}</a></div>
-    {% endif %}
+    <!--{% if came_from %}-->
+    <div id="sp-back" style="margin-left:5px;font-size:9px"><a href="{{came_from}}">{{_('return')}}</a></div>
+    <!--{% endif %}-->
     {% block middle %}
     {% endblock middle %}
     </div>
@@ -37,6 +36,5 @@
         {% include 'sapns/footer.html' %}
     </div>
     {% endblock %}
-    
 </body>
 </html>

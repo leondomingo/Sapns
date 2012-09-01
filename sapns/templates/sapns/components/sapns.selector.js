@@ -1,58 +1,40 @@
 /* Sapns selector */
 
-function load_script(src) {
-    //console.log('Loading from: ' + src);
-    var fileref = document.createElement('script');
-    fileref.setAttribute("type", "text/javascript");
-    fileref.setAttribute("src", src);
-    document.getElementsByTagName("head")[0].appendChild(fileref)
-}
-
-try {
-    sprintf;
-}
-catch (e) {
-    load_script("{{tg.url('/js/sprintf.min.js')}}");
-}
-
 (function($) {
 
     // SapnsSelector (constructor)
     function SapnsSelector(settings) {
-        
-        function set(this_object, key, value, obj) {
-            
-            if (obj == undefined) {
-                obj = settings;
+        var _settings = $.extend(true, {
+            name: 'sel_' + Math.floor(Math.random()*999999),
+            value: null,
+            title: '',
+            rc: '',
+            rc_title: '',
+            read_only: false,
+            title_url: "{{tg.url('/dashboard/title/')}}",
+            edit_url: "{{tg.url('/dashboard/edit/')}}",
+            onChange: null,
+            dialog: {
+                width: 950,
+                height: 550
+            },
+            grid: {
+                cls: settings.rc,
+                rp: 25,
+                q: '',
+                pag_n: 1,
+                with_pager: false,
+                height: 380,
+                exportable: false,
+                select_first: true,
+                search_params: {
+                    url: settings.search_url,
+                    data: settings.search_data
+                }
             }
+        }, settings);
 
-            if (obj[key] == undefined) {
-                this_object[key] = value;
-            }
-            else {
-                this_object[key] = obj[key];
-            }
-            
-            return;
-        }
-        
-        set(this, 'name', 'sel_' + Math.floor(Math.random()*999999));
-        set(this, 'value', '');
-        set(this, 'title', '');
-        set(this, 'rc', '');
-        set(this, 'rc_title', '');
-        set(this, 'read_only', false);
-        set(this, 'title_url', "{{tg.url('/dashboard/title/')}}");
-        set(this, 'search_url', "{{tg.url('/dashboard/search/')}}");
-        set(this, 'search_params', null);
-        set(this, 'edit_url', "{{tg.url('/dashboard/edit/')}}");
-        set(this, 'onChange', null);
-        
-        set(this, 'dialog', {});
-        
-        set(this.dialog, 'width', 950, this.dialog);
-        set(this.dialog, 'height', 550, this.dialog);
-        set(this.dialog, 'results', 25, this.dialog);
+        $.extend(true, this, _settings);
     }
     
     // setValue
@@ -114,55 +96,6 @@ catch (e) {
         return this.rc;
     }
     
-    // search
-    SapnsSelector.prototype.search = function(q) {
-        
-        var self = this;
-        var dialog_name = "#dialog_" + self.name;
-        
-        if (q == undefined) {
-            q = $(dialog_name + ' .sp-search-text').val();
-        }
-        
-        // search params
-        var params = {
-                cls: self.rc,
-                q: q,
-                rp: self.dialog.results
-        };
-        
-        if (self.search_params != null) {
-            if (typeof(self.search_params) == 'object') {
-                params = $.extend(true, params, self.search_params);
-            }
-            else if (typeof(self.search_params) == 'function') {
-                params.search_params = self.search_params;
-                params.search_params();
-            }
-        }
-
-        // search
-        $.ajax({
-            url: this.search_url,
-            dataType: 'html',
-            data: params,
-            success: function(content) {
-                $(dialog_name).html(content);
-            },
-            error: function(f, status, error) {
-                alert('error!');
-                sapnsSelector.search();
-            }
-        });
-    }
-
-    // search_kp
-    SapnsSelector.prototype.search_kp = function(event) {
-        if (event.which == 13) {
-            this.search();
-        }
-    }
-
     // remove
     SapnsSelector.prototype.remove = function() {
         this.setValue('');
@@ -218,11 +151,11 @@ catch (e) {
                     if (id != '') {
                         var url_edit = sapnsSelector.edit_url;
                         var form_edit =
-                            '<form action="' + url_edit + '" method="post" target="_blank">' +
-                                '<input type="hidden" name="cls" value="' + cls + '">' +   
-                                '<input type="hidden" name="id" value="' + id + '">' +
-                                '<input type="hidden" name="came_from" value="">' +
-                            '</form>';
+                            '<form action="' + url_edit + '" method="post" target="_blank">\
+                                <input type="hidden" name="cls" value="' + cls + '">\
+                                <input type="hidden" name="id" value="' + id + '">\
+                                <input type="hidden" name="came_from" value="">\
+                            </form>';
                             
                         $(form_edit).appendTo('body').submit().remove();
                     }
@@ -235,7 +168,7 @@ catch (e) {
                 '<button id="sb_' + sapnsSelector.name + '"' +
                 ' class="sp-button sp-select-button" ' +
                 ' title="' + title + '" ' +
-                ' style="font-weight: bold;"';
+                ' style="font-weight:bold"';
             
             if (sapnsSelector.read_only) {
                 select_button += ' disabled';
@@ -255,38 +188,39 @@ catch (e) {
                         dialog_title = sapnsSelector.rc_title();
                     }
                     
-                    var dialog_name = 'dialog_' + sapnsSelector.name;
-                    $('#'+dialog_name).remove();
-                    $('<div id="' + dialog_name + '"></div>').appendTo('body');
+                    var dialog_name = 'dialog_' + sapnsSelector.name,
+                        dialog_id = '#' + dialog_name;
+                    
+                    $(dialog_id).remove();
+                    $('<div id="' + dialog_name + '"><div class="sapnsGrid"></div></div>').appendTo('body');
+                    $(dialog_id + ' .sapnsGrid').sapnsGrid(sapnsSelector.grid);
                     
                     // show search dialog
-                    $('#'+dialog_name).dialog({
+                    $(dialog_id).dialog({
                         title: dialog_title,
                         width: sapnsSelector.dialog.width,
                         height: sapnsSelector.dialog.height,
                         resizable: false,
                         modal: true,
                         close: function() {
-                            $('#' + dialog_name).remove();
+                            $('#'+dialog_name).remove();
                         },
                         buttons: {
                             "{{_('Ok')}}": function() {
                                 // get the id of the selected row
                                 
-                                var id_selected = $('#'+dialog_name + ' .sapns_grid').sapnsGrid('getSelectedIds')[0];
+                                var id_selected = $('#'+dialog_name + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0];
                                 
                                 sapnsSelector.setValue(id_selected);
                                 sapnsSelector.setTitle();
                                 
-                                $('#' + dialog_name).dialog('destroy').remove();
+                                $(dialog_id).dialog('destroy').remove();
                             },
                             "{{_('Cancel')}}": function() {
-                                $('#' + dialog_name).dialog('destroy').remove();
+                                $(dialog_id).dialog('destroy').remove();
                             }
                         }
                     });
-                    
-                    sapnsSelector.search('');
                 }
             });
             
