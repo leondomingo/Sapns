@@ -27,7 +27,6 @@ from tg import response, expose, require, url, request, redirect, config
 import cStringIO
 import datetime as dt
 import logging
-import random
 import re
 import simplejson as sj
 
@@ -182,28 +181,7 @@ class DashboardController(BaseController):
             else:
                 return cmp(x.pos, y.pos)
             
-        return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))    
-    @expose('sapns/dashboard/search.html')
-    @require(p.not_anonymous())
-    def search(self, **kw):
-        
-        logger = logging.getLogger('DashboardController.search')
-        try:
-            random.seed()
-            
-            kw_ = kw.copy()
-            del kw_['cls']
-            g = List(kw.get('cls'), **kw_)()
-            
-            g['grid']['name'] = '_%6.6d' % random.randint(0, 999999)
-            g['grid']['q'] = get_paramw(kw, 'q', unicode, opcional=True)
-            g['grid']['filters'] = kw.get('filters')
-            
-            return g
-    
-        except Exception, e:
-            logger.error(e)
-            raise
+        return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))
     
     @expose(content_type='text/csv')
     @require(p.not_anonymous())

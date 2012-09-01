@@ -189,81 +189,68 @@
     function SapnsGrid(settings) {
         
         var self = this;
-
-        function set(this_object, key, value, obj) {
-
-            if (obj === undefined) {
-                obj = settings;
-            }
-
-            if (obj[key] === undefined) {
-                this_object[key] = value;
-            } else {
-                this_object[key] = obj[key];
-            }
-
-            return;
-        }
-
-        set(self, 'caption', '');
-        if (typeof (self.caption) == 'function') {
-            self.caption = self.caption();
-        }
-        set(self, 'name', 'grid_' + Math.floor(Math.random() * 999999));
-        set(self, 'cls', '');
-        set(self, 'with_search', true);
-        set(self, 'search_params', {});
-        set(self, 'show_ids', false);
-        set(self, 'link', '');
-        set(self, 'q', '');
-        set(self, 'ch_attr', '');
-        set(self, 'parent_id', '');
-        set(self, 'cols', []);
-        set(self, 'data', {});
-        set(self, 'height', 500);
-        set(self, 'url_base', '');
-        set(self, 'multiselect', false);
-        set(self, 'actions_inline', false);
-        set(self, 'hide_check', false);
-        set(self, 'hide_id', true);
-        set(self, 'dblclick', null);
-        set(self, 'select_first', false);
-        set(self, 'onLoad', null);
         
-        set(self, 'default_', {});
-        set(self.default_, 'col_width', 60, this.default_);
-        set(self.default_, 'col_align', 'center', this.default_);
-        set(self.default_, 'empty_value', '', this.default_);
-
-        set(self, 'actions', null);
-        if (typeof (self.actions) === 'function') {
-            self.actions = self.actions();
+        if (typeof(settings.caption) === 'function') {
+            settings.caption = settings.caption();
         }
         
-        set(self, 'shift_enabled', false);
-        
-        set(self, 'exportable', true);
+        if (typeof (settings.actions) === 'function') {
+            settings.actions = settings.actions();
+        }
 
-        var formats = [{
+        var exportable_formats = [{
             id: 'csv',
             title: 'CSV',
-            url: "{{tg.url('/dashboard/tocsv')}}"
+            url: "{{tg.url('/dashboard/tocsv/')}}"
         },
         {
             id: 'excel',
             title: 'Excel',
-            url: "{{tg.url('/dashboard/toxls')}}"
+            url: "{{tg.url('/dashboard/toxls/')}}"
         }];
         
-        set(self, 'exportable_formats', formats);
+        var _settings = $.extend(true, {
+            caption: '',
+            name: 'sapns_grid_' + Math.floor(Math.random() * 999999),
+            cls: '',
+            with_search: true,
+            search_params: {},
+            show_ids: false,
+            link: '',
+            q: '',
+            ch_attr: '',
+            parent_id: '',
+            cols: [],
+            data: {},
+            height: 500,
+            url_base: '',
+            multiselect: false,
+            actions: null,
+            actions_inline: false,
+            hide_check: false,
+            hide_id: true,
+            dblclick: null,
+            select_first: false,
+            shift_enabled: false,
+            exportable: true,
+            exportable_formats: exportable_formats,
+            with_pager: true,
+            pag_n: 1,
+            rp: 10,
+            onLoad: null,
+            default_: {
+                col_width: 60,
+                col_align: 'center',
+                empty_value: ''
+            }
+        }, settings);
+        
+        $.extend(true, self, _settings);
 
-        set(self, 'with_pager', true);
-        set(self, 'pag_n', 1);
-        set(self, 'rp', 10);
-        set(self, 'this_page', 0);
-        set(self, 'total_count', 0);
-        set(self, 'total_pag', 0);
-        self.ajx_data = '{}';
+        self.this_page = 0;
+        self.total_count = 0;
+        self.total_pag = 0;
+        self.ajx_data = JSON.stringify({});
         self.styles = [];
         
         // obtener las tres partes de la query
@@ -553,7 +540,7 @@
                         border_radius = 'border-radius:0 0 5px 0;';
                     }
                     
-                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip ' + row_style + '" \
+                    grid_row += '<div class="sp-grid-cell sp-grid-cell-tip clickable ' + row_style + '" \
                         style="text-align:' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
@@ -563,7 +550,7 @@
                         grid_row += 'title="({{_("empty")}})"';
                     }
                     
-                    grid_row += 'clickable="true">' + cell + '</div>';
+                    grid_row += '>' + cell + '</div>';
                 }
                 
                 grid_row += '</div>';
@@ -655,8 +642,7 @@
         
         var q = self.query();
         
-        var loading = '<div style="padding:10px;font-size:15px; ' +
-            sprintf('font-weight:bold;color:gray;height:%(hg)dpx">{{_("Loading")}}...</div>', {hg: self.height-50});
+        var loading = sprintf('<div class="sp-grid-loading" style="height:%(hg)dpx">{{_("Loading")}}...</div>', {hg: self.height-50});
         
         $('#' + self.name).find('.sp-grid-parent').html(loading);
         
@@ -965,40 +951,43 @@
                 }
             }
         }
+        else {
+            if (callback) {
+                callback();
+            }
+        }
         
         // if the row is selected, then mark the checkbox
-        var cell_selector = sprintf('#%s .sp-grid-cell', self.name);
+        var cell_selector = sprintf('#%s .sp-grid-cell.clickable', self.name);
         $(document).off('click', cell_selector).on('click', cell_selector, function(event) {
             
-            if ($(this).attr('clickable') === 'true') {
-                var ctrl = event.ctrlKey || event.metaKey;
+            var ctrl = event.ctrlKey || event.metaKey;
+            
+            var row_id = $(this).parent().find('.sp-grid-rowid');
+            if (!row_id.prop('checked') || ctrl || self.multiselect) {
                 
-                var row_id = $(this).parent().find('.sp-grid-rowid');
-                if (!row_id.prop('checked') || ctrl || self.multiselect) {
-                    
-                    $('#'+self.name + ' .sp-grid-select-all').prop('checked', false);
-                    
-                    $('#'+self.name + ' .sp-grid-rowid').each(function() {
-                        if ($(this) != row_id && !self.multiselect && !ctrl) {
-                            $(this).prop('checked', false);
-                            $(this).parent().parent().removeClass('sp-grid-row-selected');
-                        }
-                    });
-                    
-                    if (row_id.prop('checked')) {
-                        row_id.prop('checked', false);
-                        $(this).parent().removeClass('sp-grid-row-selected');
+                $('#'+self.name + ' .sp-grid-select-all').prop('checked', false);
+                
+                $('#'+self.name + ' .sp-grid-rowid').each(function() {
+                    if ($(this) != row_id && !self.multiselect && !ctrl) {
+                        $(this).prop('checked', false);
+                        $(this).parent().parent().removeClass('sp-grid-row-selected');
                     }
-                    else {
-                        row_id.prop('checked', true);
-                        $(this).parent().addClass('sp-grid-row-selected');
-                    }
+                });
+                
+                if (row_id.prop('checked')) {
+                    row_id.prop('checked', false);
+                    $(this).parent().removeClass('sp-grid-row-selected');
                 }
                 else {
-                    if (self.dblclick) {
-                        // run 'dblclick' action
-                        run_action(row_id.attr('id_row')*1, self.dblclick, event.ctrlKey || event.metaKey, event.shiftKey);
-                    }
+                    row_id.prop('checked', true);
+                    $(this).parent().addClass('sp-grid-row-selected');
+                }
+            }
+            else {
+                if (self.dblclick) {
+                    // run 'dblclick' action
+                    run_action(row_id.attr('id_row')*1, self.dblclick, event.ctrlKey || event.metaKey, event.shiftKey);
                 }
             }
         });
@@ -1545,7 +1534,7 @@
                                 }
                             },
                             buttons: {
-                                "Aceptar": function() {
+                                "{{_('Ok')}}": function() {
                                     var self = this;
                                     if (!filter) {
                                         filter = new Filter({
@@ -1568,7 +1557,7 @@
                                         callback();
                                     }
                                 },
-                                "Cancelar": function() {
+                                "{{_('Cancel')}}": function() {
                                     $(this).dialog('close');
                                 }
                             }
@@ -1623,7 +1612,7 @@
                                 g.search($(g_id + ' .sp-search-txt').val(), true);
                                 $(this).dialog('close');
                             },
-                            "Cerrar": function() {
+                            "{{_('Close')}}": function() {
                                 if ($('.sp-grid-filter-changed').length) {
                                     $('.sp-grid-filter-changed').removeClass('sp-grid-filter-changed');
                                     g.search($(g_id + ' .sp-search-txt').val(), true);
@@ -1814,7 +1803,7 @@
             var g_actions = '<div class="sp-grid-button-actions" style="display:none"></div>';
 
             this.append(g_content + g_actions + g_table + g_pager + '</div>');
-
+            
             g.loadActions(function() {
                 $(g_id + ' .sp-search-txt').val(g.q);
                 g.search(g.q);

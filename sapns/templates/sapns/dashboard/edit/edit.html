@@ -175,10 +175,11 @@
     </div>
 </div>
 
-<script type="text/javascript" src="{{tg.url('/js/fields.min.js')}}"></script>
-<script type="text/javascript" src="{{tg.url('/js/sprintf.min.js')}}"></script>
-<script type="text/javascript">
+<script src="{{tg.url('/js/fields.min.js')}}"></script>
+<script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+<script>
     {% include 'sapns/components/sapns.selector.min.js' %}
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
     {% include 'sapns/dashboard/edit/edit.min.js' %}
 </script>
 {% endblock %}

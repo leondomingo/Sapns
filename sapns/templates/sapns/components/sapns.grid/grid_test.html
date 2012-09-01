@@ -7,7 +7,7 @@
 
 {{ u.jquery() }}
 {{ u.jquery_ui() }}
-{#{{ u.qtip2() }}#}
+{{ u.qtip2() }}
 <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/style.css')}}">
 <script type="text/javascript" src="/js/sprintf.min.js"></script>
 <script type="text/javascript">
@@ -18,14 +18,15 @@
 <body>
     <div id="g"></div>
     <script type="text/javascript">
-        $(document).ready(function() {
+        $(function() {
             
             $('#g').sapnsGrid({
                 cls: 'productos',
                 //caption: 'Grid test',
-                caption: function() {
+                caption_: function() {
                     return 'Grid test (func)';
                 },
+                caption: 'Hola!',
                 q: '',
                 rp: 30,
                 height: 500,

@@ -77,11 +77,13 @@ height:14px }
 .sp-grid-search-box { float:left; margin-bottom:5px }
 .sp-grid .sp-col-title:first-child { border-radius:5px 0 0 0 }
 .sp-grid .sp-col-title:last-child { border-radius:0 5px 0 0 }
-.sp-grid-caption { color:#666; font-size:22px; font-weight:bold; height:31px;
+.sp-grid-caption { color:#666; font:bold 22px helvetica,arial; height:31px;
 margin-left:0; margin-top:7px; overflow:hidden; width:100% }
 
 .sp-search-txt { border:1px solid #777; width:450px }
 .sp-search-btn { float:none; width:80px; margin-left:5px }
+
+.sp-grid-loading { padding:10px;font-size:15px; font:bold 15px arial; color:#777 }
 
 .sp-col-title { color:#F9F9F9; background-color:#B4BD3C; font-weight:bold;
 text-align:center; font-family:arial; font-size:11px; height:29px;

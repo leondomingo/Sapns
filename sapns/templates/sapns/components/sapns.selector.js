@@ -1,59 +1,41 @@
 /* Sapns selector */
 
-function load_script(src) {
-    //console.log('Loading from: ' + src);
-    var fileref = document.createElement('script');
-    fileref.setAttribute("type", "text/javascript");
-    fileref.setAttribute("src", src);
-    document.getElementsByTagName("head")[0].appendChild(fileref)
-}
-
-try {
-    sprintf;
-}
-catch (e) {
-    load_script("{{tg.url('/js/sprintf.min.js')}}");
-}
-
 (function($) {
 
     // SapnsSelector (constructor)
     function SapnsSelector(settings) {
         
-        function set(this_object, key, value, obj) {
-            
-            if (obj === undefined) {
-                obj = settings;
+        var _settings = $.extend(true, {
+            name: 'sapns_selector_' + Math.floor(Math.random()*999999),
+            value: '',
+            title: '',
+            rc: '',
+            rc_title: settings.rc.toUpperCase(),
+            read_only: false,
+            title_url: "{{tg.url('/dashboard/title/')}}",
+            edit_url: "{{tg.url('/dashboard/edit/')}}",
+            onChange: null,
+            onClick: null,
+            dialog: {
+                width: 1100,
+                height: 600,
+            },
+            grid: {
+                cls: settings.rc,
+                rp: 25,
+                pag_n: 1,
+                with_pager: false,
+                height: 380,
+                exportable: false,
+                select_first: true,
+                search_params: {
+                    url: settings.search_url,
+                    data: settings.search_data
+                }
             }
-
-            if (obj[key] === undefined) {
-                this_object[key] = value;
-            }
-            else {
-                this_object[key] = obj[key];
-            }
-            
-            return;
-        }
+        }, settings);
         
-        set(this, 'name', 'sel_' + Math.floor(Math.random()*999999));
-        set(this, 'value', '');
-        set(this, 'title', '');
-        set(this, 'rc', '');
-        set(this, 'rc_title', '');
-        set(this, 'read_only', false);
-        set(this, 'title_url', "{{tg.url('/dashboard/title/')}}");
-        set(this, 'search_url', "{{tg.url('/dashboard/search/')}}");
-        set(this, 'search_params', null);
-        set(this, 'edit_url', "{{tg.url('/dashboard/edit/')}}");
-        set(this, 'onChange', null);
-        set(this, 'onClick', null);
-        
-        set(this, 'dialog', {});
-        
-        set(this.dialog, 'width', 1100, this.dialog);
-        set(this.dialog, 'height', 600, this.dialog);
-        set(this.dialog, 'results', 25, this.dialog);
+        $.extend(true, this, _settings);
     }
     
     // setValue
@@ -115,54 +97,6 @@ catch (e) {
         return this.rc;
     }
     
-    // search
-    SapnsSelector.prototype.search = function(q) {
-        
-        var self = this;
-        
-        if (q === undefined) {
-            q = $(self.dialog_name() + ' .sp-search-text').val();
-        }
-        
-        // search params
-        var params = {
-                cls: self.rc,
-                q: q,
-                rp: self.dialog.results
-        };
-        
-        if (self.search_params != null) {
-            if (typeof(self.search_params) === 'object') {
-                params = $.extend(true, params, self.search_params);
-            }
-            else if (typeof(self.search_params) === 'function') {
-                params.search_params = self.search_params;
-                params.search_params();
-            }
-        }
-
-        // search
-        $.ajax({
-            url: this.search_url,
-            dataType: 'html',
-            data: params,
-            success: function(res) {
-                $(self.dialog_name()).html(res);
-            },
-            error: function(f, status, error) {
-                alert('error!');
-                sapnsSelector.search();
-            }
-        });
-    }
-
-    // search_kp
-    SapnsSelector.prototype.search_kp = function(event) {
-        if (event.which === 13) {
-            this.search();
-        }
-    }
-
     // remove
     SapnsSelector.prototype.remove = function() {
         this.setValue('');
@@ -259,8 +193,10 @@ catch (e) {
                         }
                         
                         var dialog_name_ = sapnsSelector.dialog_name().replace('#', '');
+                        
                         $(sapnsSelector.dialog_name()).remove();
-                        $('<div id="' + dialog_name_ + '"></div>').appendTo('body');
+                        $('<div id="' + dialog_name_ + '"><div class="sapnsGrid"></div></div>').appendTo('body');
+                        $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid(sapnsSelector.grid);
                         
                         // show search dialog
                         $(sapnsSelector.dialog_name()).dialog({
@@ -272,7 +208,7 @@ catch (e) {
                             buttons: {
                                 "{{_('Ok')}}": function() {
                                     // get the id of the selected row
-                                    var new_value = $(sapnsSelector.dialog_name() + ' .sapns_grid').sapnsGrid('getSelectedIds')[0],
+                                    var new_value = $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0],
                                         current_value = sapnsSelector.getValue();
                                     
                                     sapnsSelector.setValue(new_value);
@@ -287,8 +223,6 @@ catch (e) {
                                 }
                             }
                         });
-                        
-                        sapnsSelector.search('');
                     }
                 }
             });

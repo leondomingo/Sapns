@@ -3,7 +3,6 @@
 
 {% block head %}
     {{ super() }}
-    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <!-- "Sapns - Web Information System: Students" (with caption) -->
     <!-- "Sapns - Web Information System" (without caption) -->
     <!--<title>Sapns - Web Information System{%if grid.caption %}: {{grid.caption}}{%endif%}</title>-->
@@ -15,9 +14,6 @@
 {% block middle %}
     {{ super() }}
     
-    <!--{#<img style="position:absolute; top:25px; right:25px; opacity:0.2;
-        height:600px; width:300px" src="{{tg.url('/docs/get/1/_superman')}}">#}-->
-        
     <div id="grid"></div>
     <!--{% if grid.rel_classes %}-->
     <div id="rel-classes" style="clear: left; padding-left: 20px;">
@@ -31,7 +27,7 @@
     </div>
     <!--{% endif %}-->
 
-    <script src="/js/sprintf.min.js"></script>
+    <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
     <script>
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(function() {
@@ -48,7 +44,7 @@
         	    ch_attr: "{{grid.ch_attr or ''}}",
         	    parent_id: "{{grid.parent_id or ''}}",
         	    actions: {},
-        	    url_base: "/dashboard/list/{{grid.cls}}",
+        	    url_base: "{{tg.url('/dashboard/list/%s' % grid.cls')}}",
         	    // {% if grid.shift_enabled %} 
         	    shift_enabled: true,
         	    // {% endif %} 
@@ -66,7 +62,7 @@
         	        var opt = $('#rel-classes-sel option:selected');
         	        var cls = opt.attr('cls');
         	        var ch_attr = opt.attr('ch_attr');
-        	        var action = "/dashboard/list/" + cls;
+        	        var action = "{{tg.url('/dashboard/list/')}}" + cls;
         	        
         	        var form_ = 
         	            '<form id="rel-classes-form" method="get" action="' + action + '" target="_blank">\
