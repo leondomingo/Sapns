@@ -82,8 +82,8 @@
                 id: $(this).attr('id_attr'),
                 title: $(this).find('.sp-text-field').val(),
                 order: $(this).attr('pos'),
-                required: $(this).find('.attr-required').attr('checked'),
-                visible: $(this).find('.attr-visible').attr('checked')
+                required: $(this).find('.attr-required').prop('checked'),
+                visible: $(this).find('.attr-visible').prop('checked')
             });
         });
         
@@ -94,7 +94,7 @@
 
     // {# when the "visible" check is unchecked, the attribute title's background turns gray #}
     function color_visible(check) {
-        if (check.attr('checked')) {
+        if (check.prop('checked')) {
             check.parent().parent().find('.attr-title').
               find('.sp-text-field').css('background-color', 'white');
         }
@@ -106,7 +106,7 @@
 
     // {# when the "required" check is checked, the attribute title's font turns bolder #}
     function font_required(check) {
-    	if (check.attr('checked')) {
+    	if (check.prop('checked')) {
             check.parent().parent().find('.attr-title').
               find('.sp-text-field').css('font-weight', 'bold');
         }

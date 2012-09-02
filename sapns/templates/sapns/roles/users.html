@@ -93,7 +93,7 @@
             $('.user_cb').click(function() {
                 var cb = this;
                 var id_user = $(this).attr('id_user');
-                var selected = $(this).attr('checked');
+                var selected = $(this).prop('checked');
                 
                 $.ajax({
                     url: "{{tg.url('/dashboard/users/update_role')}}",
@@ -104,7 +104,7 @@
                     },
                     success: function(data) {
                         if (!data.status) {
-                            $(cb).attr('checked', !selected);
+                            $(cb).prop('checked', !selected);
                         }
                     }
                 });

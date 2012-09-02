@@ -15,7 +15,7 @@
             $('.attr_included').each(function() {
             	
             	var pos = null;
-            	if ($(this).attr('checked')) {
+            	if ($(this).prop('checked')) {
             		pos = $(this).parent().parent().parent().attr('pos');
             	}
             	

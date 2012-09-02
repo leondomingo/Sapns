@@ -82,7 +82,7 @@ $(document).ready(function() {
         $('.sp-checkbox-field').each(function() {
             var name = $(this).parent().parent().attr('name');
             
-            params['fld_'+name] = $(this).attr('checked');
+            params['fld_'+name] = $(this).prop('checked');
         });
 
         // date 
