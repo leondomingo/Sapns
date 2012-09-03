@@ -48,7 +48,7 @@
         	    ch_attr: "{{grid.ch_attr or ''}}",
         	    parent_id: "{{grid.parent_id or ''}}",
         	    actions: {},
-        	    url_base: "/dashboard/list/{{grid.cls}}",
+        	    url_base: "{{tg.url('/dashboard/list/%s' % grid.cls)}}",
         	    height: 350,
         	    actions_inline: false, // temporal hasta que funcionen las acciones "inline" 
         	    dblclick: 'edit'
@@ -65,10 +65,10 @@
         	        var action = "/dashboard/list/" + cls;
         	        
         	        var form_ = 
-        	            '<form id="rel-classes-form" method="get" action="' + action + '" target="_blank">' +
-        	                '<input type="hidden" name="ch_attr" value="' + ch_attr + '">' +
-        	                '<input type="hidden" name="parent_id" value="' + ids[0] + '">' +
-        	            '</form>';
+        	            '<form id="rel-classes-form" method="get" action="' + action + '" target="_blank">\
+        	                <input type="hidden" name="ch_attr" value="' + ch_attr + '">\
+        	                <input type="hidden" name="parent_id" value="' + ids[0] + '">\
+        	            </form>';
         	            
         	        $(form_).appendTo('body').submit().remove();
         	    }
