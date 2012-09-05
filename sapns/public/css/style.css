@@ -559,7 +559,20 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus {
     border-color: orange;
 }
 
+/* standard fields */
+.sp-field-row { clear:left; height:38px; margin-bottom:5px }
+.sp-field-row .sp-field { float:left; margin-right:5px }
+.sp-field .label { font:12px arial }
+.sp-field .input * { float:left }
+.sp-field .label.required { font-weight:bold }
+
 /* sapns.selector */
 .sp-select-text { border:1px solid red; border-radius:3px }
 .sp-select-button, .sp-empty-button { height:20px; font:bold 10px arial; margin-left:3px }
 .sp-empty-button { color:red }
+
+/* sapns.uploader */
+.sp-filename div { height:16px; border:1px solid #bbb; border-right-color:#777; border-bottom-color:#777; 
+border-radius:3px; padding:2px; font:12px arial; cursor:text }
+.sp-filename div:hover { border-color:orange }
+.sp-filename button { font:10px arial; margin:1px 0 0 3px }

@@ -6,8 +6,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <link rel="stylesheet" type="text/css" media="screen" 
-        href="{{tg.url('/css/docs.min.css')}}">
+    <link rel="stylesheet" href="{{tg.url('/css/docs.min.css', params=dict(v=2))}}">
 {% endblock %}
 
 {% block middle %}
@@ -15,14 +14,14 @@
     {{ super() }}
 
     <div id="docs"></div>
-    <div id="docs_dialog" style="display: none;"></div>
+    <div id="docs_dialog" style="display:none"></div>
     
     <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
     <script>
         {% include 'sapns/components/sapns.selector.min.js' %}
         {% include 'sapns/components/sapns.uploader.min.js' %}
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
-        $(document).ready(function() {
+        $(function() {
             
             // the object assigned to these documents 
             var obj = {
@@ -55,7 +54,7 @@
                         title: sprintf("{{_('Document of [%s]')}}", obj.title),
                         modal: true,
                         resizable: false,
-                        height: 550,
+                        //height: 550,
                         width: 450,
                         closeOnEscape: false,
                         buttons: {
@@ -287,8 +286,7 @@
                     modal: true,
                     resizable: false,
                     title: "{{_('Delete document')}}",
-                    width: 'auto',
-                    height: 'auto',
+                    width: 600,
                     buttons: {
                         "{{_('Ok')}}": function() {
                             var callback_success = function() {
