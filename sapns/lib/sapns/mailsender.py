@@ -29,8 +29,8 @@ class MailSender(object):
         from_address = config.get(self.APP_MAILSENDER__MAIL)
         from_name = config.get(self.APP_MAILSENDER__NAME)
         if self.params.get('from'):
-            from_ = (self.params['from'].get(['address'], from_address).encode('utf-8'),
-                     self.params['from'].get(['name'], from_name).encode('utf-8'),)
+            from_ = (self.params['from'].get('address', from_address).encode('utf-8'),
+                     self.params['from'].get('name', from_name).encode('utf-8'),)
             
             # smtp
             server = self.params['from'].get('smtp', config.get(self.APP_MAILSENDER__SMTP))
