@@ -69,6 +69,10 @@ app.languages = en#English,es#Español
 
 htmltopdf.path = /complete/path/to/wkhtmltopdf/
 
+# scheduler
+app.scheduler.limit_task = 10
+app.scheduler.lock_path = /tmp/sapns_scheduler.lock
+
 # mailsender
 app.mailsender.mail = sapns@domain.com
 app.mailsender.name = Sapns
