@@ -245,7 +245,8 @@ class DocsController(BaseController):
             else:
                 # varios archivos
                 zf = StringIO()
-                with ZipFile(zf, 'w', ZIP_DEFLATED) as zip_file:
+                zip_file = ZipFile(zf, 'w', ZIP_DEFLATED)
+                try:
                     for id_doc in docs:
                         
                         content, mt, file_name = SapnsDoc.download(int(id_doc))
@@ -254,6 +255,9 @@ class DocsController(BaseController):
                         f.write(content)
                         
                         zip_file.writestr(file_name, f.getvalue())
+                        
+                finally:
+                    zip_file.close()
                         
                 response.headerlist.append(('Content-Type', 'application/zip'))
                 fn = _('docs__%s.zip') % datetostr(dt.date.today(), fmt='%Y%m%d')
