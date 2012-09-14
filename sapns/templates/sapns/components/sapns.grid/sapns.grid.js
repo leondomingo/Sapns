@@ -1441,40 +1441,47 @@
                 g_content += '<div class="sp-grid-filters" style="display:none"></div>';
                 g_content += '<div class="sp-grid-edit-filter" style="display:none">\
                     <div style="float:left;height:40px;margin-right:5px">\
-                        <div>Campo</div>\
+                        <div class="sp-grid-filter-label">{{_("Field")}}</div>\
                         <div><select class="sp-grid-filter-field"></select></div>\
                     </div>\
                     <div style="float:left;height:40px;margin-right:5px">\
-                        \<div>Operador</div>\
+                        \<div class="sp-grid-filter-label">{{_("Operator")}}</div>\
                         <div><select class="sp-grid-filter-operator">\
-                            <option value="co">Contiene</option>\
-                            <option value="eq">Igual</option>\
-                            <option value="lt">Menor que</option>\
-                            <option value="gt">Mayor que</option>\
-                            <option value="let">Menor o igual que</option>\
-                            <option value="get">Mayor o igual que</option>\
-                            <option value="nco">No contiene</option>\
-                            <option value="neq">Distinto</option>\
+                            <option value="co">{{_("Contains")}}</option>\
+                            <option value="eq">{{_("Equals to")}}</option>\
+                            <option value="lt">{{_("Less than")}}</option>\
+                            <option value="gt">{{_("Greater than")}}</option>\
+                            <option value="let">{{_("Less or equals to")}}</option>\
+                            <option value="get">{{_("Greater or equals to")}}</option>\
+                            <option value="nco">{{_("Does not contain")}}</option>\
+                            <option value="neq">{{_("Not equals to")}}</option>\
                         </select></div>\
                     </div>\
                     <div style="float:left;height:40px">\
-                        <div>Valor</div>\
+                        <div class="sp-grid-filter-label">{{_("Value")}}</div>\
                         <input class="sp-grid-filter-value" type="text">\
                     </div></div>';
                 
                 var ad_sel = '.sp-grid-activate-filter, .sp-grid-deactivate-filter';
                 
-                $(document).off('click', ad_sel).on('click', ad_sel, function() {
+                $(document).off('keypress', '.sp-grid-filter-value').on('keypress', '.sp-grid-filter-value', function(e) {
+                    if (e.which === 13) {
+                        // INTRO
+                        $(this).parents('.ui-dialog').find('.ui-dialog-buttonset button:first').click();
+                    }
+                });
+                
+                $(document).off('click', '.sp-grid-row-filter button').on('click', '.sp-grid-row-filter button', function() {
                     var i = $(this).parent().attr('filter_order');
                     var f = g.filters[i];
                     
                     if (f.active) {
-                        $(this).removeClass('sp-grid-deactivate-filter').addClass('sp-grid-activate-filter');
-                        $(this).text('Activar');
+                        $(this).parent().removeClass('active').addClass('inactive');
+                        $(this).text("{{_('Activate')}}");
                     }
                     else {
-                        $(this).addClass('sp-grid-deactivate-filter').removeClass('sp-grid-activate-filter');
-                        $(this).text('Desactivar');
+                        $(this).parent().removeClass('inactive').addClass('active');
+                        $(this).text("{{_('Deactivate')}}");
                     }
                     
                     $(this).addClass('sp-grid-filter-changed');
@@ -1493,24 +1500,26 @@
                             for (var i=0; i<l; i++) {
                                 var f = g.filters[i];
                                 
-                                var activate_filter = '';
+                                var activate_filter = '',
+                                    activate_class = 'active';
                                 if (f.active) {
-                                    activate_filter = '<button class="sp-grid-deactivate-filter">Desactivar</button>';
+                                    activate_filter = '<button>{{_("Deactivate")}}</button>';
                                 }
                                 else {
-                                    activate_filter = '<button class="sp-grid-activate-filter">Activar</button>';
+                                    activate_class = 'inactive';
+                                    activate_filter = '<button>{{_("Activate")}}</button>';
                                 }
                                 
-                                s += '<div class="sp-grid-row-filter" style="clear:left" filter_order="' + i + '">\
+                                s += '<div class="sp-grid-row-filter ' + activate_class + '" style="clear:left" filter_order="' + i + '">\
                                     <div style="float:left;margin-right:10px"><input class="sp-grid-check-filter" type="checkbox"></div>\
-                                    <div class="sp-grid-filter-description">&lt;' + f.field + '&gt; ' + 
-                                    f.operator_title().toLowerCase() + 
-                                    ' <span style="font-style:italic">"' + f.value + '"</span></div>' +
+                                    <div class="sp-grid-filter-description"><span class="col">&lt;' + f.field + '&gt;</span> \
+                                    <span class="operator">' + f.operator_title().toLowerCase() + '</span>\
+                                    <span class="value">"' + f.value + '"</span></div>' +
                                     activate_filter + '</div>';
                             }
                         }
                         else {
-                            s = '<p class="sp-grid-no-filters">No hay filtros</p>';
+                            s = '<p class="sp-grid-no-filters">{{_("There are no filters")}}</p>';
                         }
                         
                         $(g_id + ' .sp-grid-filters').html(s);
@@ -1521,7 +1530,7 @@
                     function edit_filter(filter, callback) {
                         
                         $('<div/>').html($(g_id + ' .sp-grid-edit-filter').html()).dialog({
-                            title: "Editar filtro",
+                            title: "{{_('Edit filter')}}",
                             modal: true,
                             resizable: false,
                             width: 700,
@@ -1552,13 +1561,13 @@
                                     }
                                     
                                     g.search($(g_id + ' .sp-search-txt').val(), true);
-                                    $(this).dialog('close');
+                                    $(this).dialog('destroy').remove();
                                     if (callback) {
                                         callback();
                                     }
                                 },
                                 "{{_('Cancel')}}": function() {
-                                    $(this).dialog('close');
+                                    $(this).dialog('destroy').remove();
                                 }
                             }
                         });
@@ -1575,25 +1584,26 @@
                         open: function() {
                             var dlg = $(this);
                             edit_filter(null, function() {
-                                dlg.dialog('close');
+                                dlg.dialog('destroy').remove();
                             });
                         },
                         buttons: {
-                            "Añadir": function() {
+                            "{{_('Add')}}": function() {
                                 var dlg = $(this);
                                 edit_filter(null, function() {
-                                    dlg.dialog('close');
+                                    dlg.dialog('destroy').remove();
                                 });
                             },
-                            "Editar": function() {
+                            "{{_('Edit')}}": function() {
                                 var i = $(this).find('.sp-grid-row-filter input[type=checkbox]:visible:checked:first').parent().parent().attr('filter_order');
                                 var dlg = $(this);
                                 edit_filter(g.filters[i], function() {
-                                    dlg.dialog('close');
+                                    dlg.dialog('destroy').remove();
                                 });
+                                
                                 g.search($(g_id + ' .sp-search-txt').val(), true);
                             },
-                            "Borrar": function() {
+                            "{{_('Remove')}}": function() {
                                 var filters = [];
                                 $(this).find('.sp-grid-row-filter input[type=checkbox]:visible:checked').each(function() {
                                     filters.push($(this).parent().parent().attr('filter_order')*1);
@@ -1605,12 +1615,12 @@
                                 }
                                 
                                 g.search($(g_id + ' .sp-search-txt').val(), true);
-                                $(this).dialog('close');
+                                $(this).dialog('destroy').remove();
                             },
-                            "Borrar todos": function() {
+                            "{{_('Remove all')}}": function() {
                                 g.filters = [];
                                 g.search($(g_id + ' .sp-search-txt').val(), true);
-                                $(this).dialog('close');
+                                $(this).dialog('destroy').remove();
                             },
                             "{{_('Close')}}": function() {
                                 if ($('.sp-grid-filter-changed').length) {
@@ -1618,7 +1628,7 @@
                                     g.search($(g_id + ' .sp-search-txt').val(), true);
                                 }
                                 
-                                $(this).dialog('close');
+                                $(this).dialog('destroy').remove();
                             }
                         }
                     });
@@ -1627,15 +1637,15 @@
                 var search_txt = g_id + ' .sp-search-txt';
                 $(document).off('keypress', search_txt).on('keypress', search_txt, function(event) {
                     // "Intro" key pressed
-                    if (event.which == 13) {
+                    if (event.which === 13) {
                         g.search($(this).val());
                     }
                 });
 
-                if (g.link) {
+                /*if (g.link) {
                     g_content += '<div style="padding-left:20px">\
                             <button id="link-shortcut" class="sp-button" style="float:left">{{_("Create a shortcut")}}</button>\
-                            <div style="font-size:9px;margin-top:7px; width:100px;float:left">\
+                            <div style="font-size:9px;margin-top:7px;width:100px;float:left">\
                             <a id="this-search" href="' + g.link + '" \
                             target="_blank">[{{_("this search")}}]</a>\
                             </div>\
@@ -1644,7 +1654,8 @@
                             <label>{{_("Shortcut title")}}:</label>\
                             <input id="link-shortcut-title" type="text" value="({{_("title")}})">\
                             </div></div>';
-                }
+                }*/
+                
                 g_content += '</div>';
             }
             

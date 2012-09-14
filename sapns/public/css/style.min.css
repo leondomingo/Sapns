@@ -24,10 +24,14 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{position:abso
 .sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px;margin-left:5px}
 .sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;padding:2px;overflow:hidden}
 .sp-col-title-sortable{cursor:pointer}.sp-col-title-sortable:hover{background-color:#444}
-.sp-grid-filter-field{width:200px}.sp-grid-filter-operator{width:200px}.sp-grid-activate-filter,.sp-grid-deactivate-filter{font-size:9px}
-.sp-grid-no-filters{font-size:15px;font-weight:bold}.sp-grid-filter-description{float:left;margin-right:10px;width:450px}
-.sp-grid-button-actions{clear:left;height:20px;padding:2px}.sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px}
-.sp-grid-row{clear:left;height:31px;margin-bottom:-1px}.sp-grid-cell{background-color:white;border:1px solid lightgray;font:11px arial;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
+.sp-grid-filter-label{font:12px arial}.sp-grid-filter-field,.sp-grid-filter-operator{width:200px;border:0;border-radius:4px;font:15px arial;padding-top:1px;height:21px;background-color:#e6e6e6}
+.sp-grid-filter-value{font:15px arial}.sp-grid-row-filter button{font-size:9px;width:90px}
+.sp-grid-row-filter.inactive .sp-grid-filter-description{text-decoration:line-through}
+.sp-grid-no-filters{font:bold 15px arial;text-align:center;color:#b4bd3c}.sp-grid-filter-description{float:left;margin-right:10px;width:430px;font:13px arial;margin-top:3px}
+.sp-grid-filter-description span.col{color:#b4bd3c}.sp-grid-filter-description span.operator{color:#005590}
+.sp-grid-filter-description span.value{color:#b4bd3c;font-style:italic}.sp-grid-button-actions{clear:left;height:20px;padding:2px}
+.sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px}.sp-grid-row{clear:left;height:31px;margin-bottom:-1px}
+.sp-grid-cell{background-color:white;border:1px solid lightgray;font:11px arial;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
 .sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px;border-radius:0 0 5px 5px}
 .sp-grid-pager{border-color:#ddd #777 #777 #ddd;border-radius:3px 3px 3px 3px;border-style:solid;border-width:1px;height:30px}
 .sp-grid-pager-desc{color:#777;font-family:arial;width:350px;text-align:center;float:left;height:30px;vertical-align:middle;margin-top:5px;height:25px}
