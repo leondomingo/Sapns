@@ -93,11 +93,18 @@ padding:2px; overflow:hidden }
 .sp-col-title-sortable { cursor:pointer }
 .sp-col-title-sortable:hover { background-color:#444 }
 
-.sp-grid-filter-field { width:200px }
-.sp-grid-filter-operator { width:200px }
-.sp-grid-activate-filter, .sp-grid-deactivate-filter { font-size:9px }
-.sp-grid-no-filters { font-size:15px; font-weight:bold }
-.sp-grid-filter-description { float:left; margin-right:10px; width:450px }
+.sp-grid-filter-label { font:12px arial }
+.sp-grid-filter-field, .sp-grid-filter-operator { width:200px; border:0; border-radius:4px;
+font:15px arial; padding-top:1px; height:21px; background-color:#e6e6e6 }
+.sp-grid-filter-value { font:15px arial }
+.sp-grid-row-filter button { font-size:9px; width:90px }
+.sp-grid-row-filter.inactive .sp-grid-filter-description { text-decoration:line-through }
+.sp-grid-no-filters { font:bold 15px arial; text-align:center; color:#FFB835 }
+.sp-grid-filter-description { float:left; margin-right:10px; width:420px;
+font:13px arial; margin-top:3px }
+.sp-grid-filter-description span.col { color:#B4BD3C }
+.sp-grid-filter-description span.operator { color:#FFB835 }
+.sp-grid-filter-description span.value { color:#B4BD3C; font-style:italic }
 
 .sp-grid-button-actions { clear:left; height:20px; padding:2px }
 .sp-grid-button-action { min-width:80px; font-size:9px; margin-right:3px }
