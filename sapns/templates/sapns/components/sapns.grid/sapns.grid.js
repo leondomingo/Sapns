@@ -28,14 +28,14 @@
             },
             operator_title: function() {
                 var titles = {
-                        co: 'Contiene',
-                        eq: 'Igual a',
-                        lt: 'Menor que',
-                        gt: 'Mayor que',
-                        let: 'Menor o igual que',
-                        get: 'Mayor o igual que',
-                        nco: 'No contiene',
-                        neq: 'Distinto'
+                        co: "{{_('Contains')}}",
+                        eq: "{{_('Equals to')}}",
+                        lt: "{{_('Less than')}}",
+                        gt: "{{_('Greater than')}}",
+                        let: "{{_('Less than or equals to')}}",
+                        get: "{{_('Greater than or equals to')}}",
+                        nco: "{{_('Does not contain')}}",
+                        neq: "{{_('Not equals to')}}"
                 };
                 
                 return titles[this.operator];
@@ -1451,8 +1451,8 @@
                             <option value="eq">{{_("Equals to")}}</option>\
                             <option value="lt">{{_("Less than")}}</option>\
                             <option value="gt">{{_("Greater than")}}</option>\
-                            <option value="let">{{_("Less or equals to")}}</option>\
-                            <option value="get">{{_("Greater or equals to")}}</option>\
+                            <option value="let">{{_("Less than or equals to")}}</option>\
+                            <option value="get">{{_("Greater than or equals to")}}</option>\
                             <option value="nco">{{_("Does not contain")}}</option>\
                             <option value="neq">{{_("Not equals to")}}</option>\
                         </select></div>\

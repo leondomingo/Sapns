@@ -99,11 +99,11 @@ font:15px arial; padding-top:1px; height:21px; background-color:#e6e6e6 }
 .sp-grid-filter-value { font:15px arial }
 .sp-grid-row-filter button { font-size:9px; width:90px }
 .sp-grid-row-filter.inactive .sp-grid-filter-description { text-decoration:line-through }
-.sp-grid-no-filters { font:bold 15px arial; text-align:center; color:#B4BD3C }
-.sp-grid-filter-description { float:left; margin-right:10px; width:430px;
+.sp-grid-no-filters { font:bold 15px arial; text-align:center; color:#FFB835 }
+.sp-grid-filter-description { float:left; margin-right:10px; width:420px;
 font:13px arial; margin-top:3px }
 .sp-grid-filter-description span.col { color:#B4BD3C }
-.sp-grid-filter-description span.operator { color:#005590 }
+.sp-grid-filter-description span.operator { color:#FFB835 }
 .sp-grid-filter-description span.value { color:#B4BD3C; font-style:italic }
 
 .sp-grid-button-actions { clear:left; height:20px; padding:2px }
