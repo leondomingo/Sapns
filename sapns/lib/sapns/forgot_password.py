@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from jinja2 import Environment, PackageLoader
-from neptuno.enviaremail import enviar_email
+from neptuno.sendmail import send_mail
 from sapns.lib.sapns.util import init_lang
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
@@ -9,8 +9,6 @@ from sqlalchemy import or_, func
 from tg import config
 import hashlib as hl
 import random
-#import logging
-#from pylons.i18n import ugettext as _
 
 class EUserDoesNotExist(Exception):
     pass
@@ -49,7 +47,7 @@ class ForgotPassword(object):
         self.dst = [(self.u.email_address.encode('utf-8'), self.u.user_name.encode('utf-8'),)]
             
         # e-mail settings
-        self.remitente = (config.get('avisos.e_mail'), config.get('avisos.nombre'),)
+        self.remitente = (config.get('app.mailsender.e_mail'), config.get('app.mailsender.name'),)
         
         # get e-mail templates
         self.env = Environment(loader=PackageLoader('sapns', 'templates'))
@@ -61,7 +59,7 @@ class ForgotPassword(object):
         vars_ = dict(display_name=self.u.display_name,
                      user_name=self.u.user_name,
                      new_password=self.new_password,
-                     app_title=config.get('avisos.nombre').decode('utf-8'),
+                     app_title=config.get('app.mailsender.name').decode('utf-8'),
                      )
         
         asunto = self.env.get_template('sapns/users/forgot_password/%s/subject.txt' % lang)
@@ -73,10 +71,10 @@ class ForgotPassword(object):
         mensaje_html = self.env.get_template('sapns/users/forgot_password/%s/message.html' % lang)
         mensaje_html = mensaje_html.render(**vars_).encode('utf-8')
         
-        email_login = config.get('avisos.login')
-        email_password = config.get('avisos.password')
+        email_login = config.get('app.mailsender.login')
+        email_password = config.get('app.mailsender.password')
         
         # send e-mail
-        enviar_email(self.remitente, self.dst, asunto, mensaje, 
-                     config.get('avisos.smtp'), email_login, email_password, 
-                     html=mensaje_html, charset='utf-8')
+        send_mail(self.remitente, self.dst, asunto, mensaje,
+                  config.get('app.mailsender.smtp'), email_login, email_password, 
+                  html=mensaje_html)
