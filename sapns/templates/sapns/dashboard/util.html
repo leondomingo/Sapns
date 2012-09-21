@@ -1,12 +1,12 @@
 {% macro jquery() %}
 <!-- JQuery -->
-<script type="text/javascript" src="/js/jquery.min.js?v=1.8.1"></script>
-<!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.1/jquery.min.js"></script>#}-->
+<script src="/js/jquery.min.js?v=1.8.2"></script>
+<!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>#}-->
 {% endmacro %}
 
 {% macro jquery_ui() %}
 <!-- JQuery UI -->
-<script type="text/javascript" src="/js/jquery-ui.min.js?v=1.8.23"></script>
+<script src="/js/jquery-ui.min.js?v=1.8.23"></script>
 <!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>#}-->
 
 {# 
@@ -15,7 +15,7 @@
 #}
 
 {# <!-- smoothness --> #}
-<link rel="stylesheet" type="text/css" media="screen" href="/css/smoothness/jquery-ui.min.css">
+<link rel="stylesheet" href="/css/smoothness/jquery-ui.min.css?v=1.8.23">
 
 {# sunny #}
 {#-
@@ -36,30 +36,22 @@
 {% endmacro %}
 
 {% macro jquery_jstree() %}
-<script type="text/javascript" src="/js/jquery.jstree.js"></script>
+<script src="/js/jquery.jstree.js"></script>
 {% endmacro %}
 
 {% macro dateformat() %}
-<script type="text/javascript" src="/js/dateformat.min.js"></script>
+<script src="/js/dateformat.min.js"></script>
 {% endmacro %}
 
 {% macro wtooltip() %}
-<script type="text/javascript" src="/js/wtooltip.min.js"></script>
+<script src="/js/wtooltip.min.js"></script>
 {% endmacro %}
 
 {% macro qtip() %}
-<script type="text/javascript" src="/js/jquery.qtip.min.js"></script>
+<script src="/js/jquery.qtip.min.js"></script>
 {% endmacro %}
 
 {% macro qtip2() %}
-<link rel="stylesheet" type="text/css" href="/js/qtip2/jquery.qtip.min.css">
-<script type="text/javascript" src="/js/qtip2/jquery.qtip.min.js"></script>
-{% endmacro %}
-
-{% macro console_log() %}
-<script type="text/javascript">
-    if (!console.log) {
-        var console = {log: function()};
-    }
-</script>
+<link rel="stylesheet" href="/js/qtip2/jquery.qtip.min.css">
+<script src="/js/qtip2/jquery.qtip.min.js"></script>
 {% endmacro %}
