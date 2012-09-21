@@ -138,7 +138,7 @@ class DocsController(BaseController):
             id_class = get_paramw(kw, 'id_class', int)
             
             title = get_paramw(kw, 'title', unicode)
-            id_type = get_paramw(kw, 'id_type', int)
+            id_type = get_paramw(kw, 'id_type', int, opcional=True)
             id_format = get_paramw(kw, 'id_format', int)
             id_repo = get_paramw(kw, 'id_repo', int)
             file_name = get_paramw(kw, 'file_name', unicode)

@@ -4,11 +4,12 @@
 {% block head %}
     <title>A {{code}} Error has occurred </title>
     {{ util.jquery() }}
+    {{ util.jquery_ui() }}
 {% endblock %}
 
 {% block middle %}
-    <div style="padding: 10px;">
+    <div style="padding:10px">
         <h1>Error {{code}}</h1>
-        <span style="color: navy;">{{message}}</span>
+        <span style="color:navy">{{message}}</span>
     </div>
 {% endblock %}
