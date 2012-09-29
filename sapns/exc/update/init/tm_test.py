@@ -6,7 +6,7 @@ import logging
 
 class TM_Test(object):
     
-    __code__ = u'init: tm_test'
+    #__code__ = u'init: tm_test'
     
     def __call__(self):
         
