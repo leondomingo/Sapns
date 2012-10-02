@@ -82,4 +82,14 @@ if __name__ == '__main__':
             e.execute(_pkg_name, _func_name, *a, **kw)
         
     else:
-        sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)
+        exc_id_splitted = _args.exc_id.split('.')
+        _pkg_name = '.'.join(exc_id_splitted[:-1])
+        _func_name = exc_id_splitted[-1]
+        
+        try:
+            e = Executor(args=_args)
+            with transaction.manager:
+                e.execute(_pkg_name, _func_name, *a, **kw)
+                
+        except Exception:
+            sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)
