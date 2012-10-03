@@ -202,7 +202,7 @@ class Update(object):
                                                                                       update['dirname'], 
                                                                                       os.path.basename(update['path']),
                                                                                       update['code'],
-                                                                                      script.strip()[:30]
+                                                                                      script.strip()[:30].replace('\n', ' '),
                                                                                       ))
                             
                             dbs.execute(script.strip())
