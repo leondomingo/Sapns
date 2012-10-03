@@ -1,38 +1,21 @@
 {% macro jquery() %}
 <!-- JQuery -->
 <script src="/js/jquery.min.js?v=1.8.2"></script>
-<!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>#}-->
+<!--{#<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>#}-->
 {% endmacro %}
 
 {% macro jquery_ui() %}
 <!-- JQuery UI -->
-<script src="/js/jquery-ui.min.js?v=1.8.23"></script>
-<!--{#<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.23/jquery-ui.min.js"></script>#}-->
+<script src="/js/jquery-ui.min.js?v=1.8.24"></script>
+<!--{#<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.24/jquery-ui.min.js"></script>#}-->
 
-{# 
+<!--{#
    Uncomment the style you like to be applied or get another at
    http://jqueryui.com/themeroller/
-#}
+#}-->
 
-{# <!-- smoothness --> #}
-<link rel="stylesheet" href="/css/smoothness/jquery-ui.min.css?v=1.8.23">
-
-{# sunny #}
-{#-
-<!--
-<link rel="stylesheet" type="text/css" media="screen" 
-    href="/css/sunny/jquery-ui.css">
--->
-#}    
-  
-{# <!-- overcast --> #}
-{#-
-<!--
-<link rel="stylesheet" type="text/css" media="screen" 
-    href="/css/overcast/jquery-ui.css">
--->
-#}
-
+<!-- smoothness -->
+<link rel="stylesheet" href="/css/smoothness/jquery-ui.min.css?v=1.8.24">
 {% endmacro %}
 
 {% macro jquery_jstree() %}
@@ -43,15 +26,11 @@
 <script src="/js/dateformat.min.js"></script>
 {% endmacro %}
 
-{% macro wtooltip() %}
-<script src="/js/wtooltip.min.js"></script>
-{% endmacro %}
-
 {% macro qtip() %}
 <script src="/js/jquery.qtip.min.js"></script>
 {% endmacro %}
 
 {% macro qtip2() %}
-<link rel="stylesheet" href="/js/qtip2/jquery.qtip.min.css">
+<link rel="stylesheet" type="text/css" href="/js/qtip2/jquery.qtip.min.css">
 <script src="/js/qtip2/jquery.qtip.min.js"></script>
 {% endmacro %}
