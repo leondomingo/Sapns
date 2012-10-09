@@ -146,7 +146,7 @@
             
             if (remove_from_disk) {
                 $.ajax({
-                    url: "{{tg.url('/docs/remove_file')}}",
+                    url: "{{tg.url('/dashboard/docs/remove_file')}}",
                     data: {
                         file_name: f,
                         id_repo: self.getRepo()
