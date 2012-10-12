@@ -209,8 +209,8 @@ class DocsController(BaseController):
     def download(self, id_doc):
         
         content, mt, file_name = SapnsDoc.download(int(id_doc))
-        response.headerlist.append(('Content-Type', mt.encode('utf-8')))
-        response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+        response.content_type = mt.encode('latin1')
+        response.headers['Content-Disposition'] = 'attachment;filename=%s' % file_name
         
         return content
         
