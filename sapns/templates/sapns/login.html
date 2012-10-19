@@ -64,7 +64,7 @@
                 buttons: {
                     "{{_('Please, e-mail me a new password')}}": function() {
                         
-                        $('.ui-button').attr('disabled', true).css('cursor', 'wait');
+                        $('.ui-button').prop('disabled', true).css('cursor', 'wait');
                         $('#username_or_email').attr('readonly', true);
                         
                         var username_or_email = $('#username_or_email').val();
@@ -79,7 +79,7 @@
                                 username_or_email: username_or_email
                             },
                             success: function(res) {
-                                $('.ui-button').attr('disabled', false).css('cursor', 'default');
+                                $('.ui-button').prop('disabled', false).css('cursor', 'default');
                                 $('#username_or_email').attr('readonly', false);
                                 if (res.status) {
                                     alert("{{_('A new password has been sent to you by e-mail')}}");
