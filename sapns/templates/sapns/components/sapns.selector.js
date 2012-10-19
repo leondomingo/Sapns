@@ -112,9 +112,9 @@
             value = true;
         }
         
-        $('#st_' + self.name).attr('disabled', value);
-        $('#sb_' + self.name).attr('disabled', value);
-        $('#rb_' + self.name).attr('disabled', value);
+        $('#st_' + self.name).prop('disabled', value);
+        $('#sb_' + self.name).prop('disabled', value);
+        $('#rb_' + self.name).prop('disabled', value);
         self.read_only = value;
     }
     
@@ -132,7 +132,7 @@
                 // select text
                 select_text = '<input id="st_' + sapnsSelector.name + '" class="sp-select-text" type="text" readonly value=""';
             
-            if (self.attr('readonly') || self.attr('disabled')) {
+            if (self.is('[readonly]') || self.is('[disabled]')) {
                 sapnsSelector.read_only = true;
                 select_text += ' disabled';
             }

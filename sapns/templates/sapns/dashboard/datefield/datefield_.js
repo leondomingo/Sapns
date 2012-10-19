@@ -9,7 +9,7 @@ $("{{selector}}").each(function() {
     // "format date library" setting 
     var date_fmt1 = "{{tg.config.get('js.date_format2', 'mm/dd/yyyy')}}";
     
-    if (!$(this).attr('disabled')) {
+    if (!$(this).is('[disabled]')) {
         $(this).datepicker({
             firstDay: first_day,
             changeMonth: true,

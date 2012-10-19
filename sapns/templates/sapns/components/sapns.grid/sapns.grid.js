@@ -707,19 +707,19 @@
                     // page-back
                     if (params.curr_page > 1) {
                         var prev_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page - 1});
-                        $('#' + self.name + ' .sp-grid-page-back').attr('title', prev_page).attr('disabled', false);
+                        $('#' + self.name + ' .sp-grid-page-back').attr('title', prev_page).prop('disabled', false);
                     } 
                     else {
-                        $('#' + self.name + ' .sp-grid-page-back').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-back').prop('disabled', true);
                     }
                     
                     // page-forth
                     if (params.curr_page < params.total_page) {
                         var next_page = sprintf("{{_('page %(p)d')}}", {p: params.curr_page + 1});
-                        $('#' + self.name + ' .sp-grid-page-forth').attr('title', next_page).attr('disabled', false);
+                        $('#' + self.name + ' .sp-grid-page-forth').attr('title', next_page).prop('disabled', false);
                     } 
                     else {
-                        $('#' + self.name + ' .sp-grid-page-forth').attr('disabled', true);
+                        $('#' + self.name + ' .sp-grid-page-forth').prop('disabled', true);
                     }
                     
                     // set focus on the search box
