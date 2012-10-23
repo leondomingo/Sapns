@@ -4,7 +4,6 @@
 from neptuno.postgres.search import Search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
 from pylons.i18n import ugettext as _
-from repoze.what import predicates as p
 from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController
@@ -23,7 +22,7 @@ from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
-from tg import response, expose, require, url, request, redirect, config
+from tg import response, expose, require, url, request, redirect, config, predicates as p
 import cStringIO
 import datetime as dt
 import logging

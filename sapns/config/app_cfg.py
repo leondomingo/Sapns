@@ -16,8 +16,23 @@ convert them into boolean, for example, you should use the
 from sapns import model
 from sapns.lib import app_globals, helpers
 from tg.configuration import AppConfig
+from tg.configuration.auth import TGAuthMetadata
 import neptuno.util as np_util
 import sapns
+
+#This tells to TurboGears how to retrieve the data for your user
+class ApplicationAuthMetadata(TGAuthMetadata):
+    def __init__(self, sa_auth):
+        self.sa_auth = sa_auth
+        
+    def get_user(self, identity, userid):
+        return self.sa_auth.dbsession.query(self.sa_auth.user_class).filter_by(user_name=userid).first()
+    
+    def get_groups(self, identity, userid):
+        return [g.group_name for g in identity['user'].groups]
+    
+    def get_permissions(self, identity, userid):
+        return [p.permission_name for p in identity['user'].permissions]
 
 class CustomConfig(AppConfig):
     
@@ -46,8 +61,9 @@ class CustomConfig(AppConfig):
         self.auth_backend = 'sqlalchemy'
         self.sa_auth.dbsession = model.DBSession
         self.sa_auth.user_class = model.User
-        self.sa_auth.group_class = model.Group
-        self.sa_auth.permission_class = model.Permission
+        #self.sa_auth.group_class = model.Group
+        #self.sa_auth.permission_class = model.Permission
+        self.sa_auth.authmetadata = ApplicationAuthMetadata(self.sa_auth)
         
         # override this if you would like to provide a different who plugin for
         # managing login and logout of your application

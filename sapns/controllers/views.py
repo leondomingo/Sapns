@@ -1,19 +1,11 @@
 # -*- coding: utf-8 -*-
 """Views management controller"""
 
-# turbogears imports
-import simplejson as sj
-from tg import expose, redirect, url
-
-# third party imports
+from formencode import schema
 from pylons.i18n import ugettext as _
-from repoze.what import authorize
-
-# project specific imports
 from sapns.lib.base import BaseController
-from formencode import schema #, validators
-#from pylons import tmpl_context
-#from sapns.model import DBSession, metadata
+from tg import expose, redirect, url, predicates
+import simplejson as sj
 
 __all__ = ['ViewsController']
 
@@ -22,7 +14,7 @@ class ViewSchema(schema.Schema):
 
 class ViewsController(BaseController):
     
-    allow_only = authorize.has_any_permission('manage', 'views')
+    allow_only = predicates.has_any_permission('manage', 'views')
     
     @expose('sapns/views/index.html')
     def index(self, came_from='/'):

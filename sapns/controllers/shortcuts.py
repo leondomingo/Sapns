@@ -1,23 +1,22 @@
 # -*- coding: utf-8 -*-
 """Shortcuts management controller"""
 
+from neptuno.util import get_paramw
 from pylons import cache
 from pylons.i18n import ugettext as _
-from repoze.what import authorize, predicates as p_
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass,\
+from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsPermission
-from tg import expose, url, redirect, request, require
+from tg import expose, url, redirect, request, require, predicates as p_
 import logging
-from neptuno.util import get_paramw
 import simplejson as sj
 
 __all__ = ['ShortcutsController']
 
 class ShortcutsController(BaseController):
     
-    allow_only = authorize.not_anonymous()
+    allow_only = p_.not_anonymous()
     
     @expose('sapns/shortcuts/edit.html')
     @require(p_.not_anonymous())

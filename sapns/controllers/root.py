@@ -2,7 +2,6 @@
 """Main Controller"""
 
 from pylons.i18n import ugettext as _
-from repoze.what import predicates
 from sapns.controllers.dashboard import DashboardController
 from sapns.controllers.docs import DocsController
 from sapns.controllers.error import ErrorController
@@ -11,7 +10,7 @@ from sapns.lib.sapns.forgot_password import EUserDoesNotExist
 from sapns.lib.sapns.util import add_language, save_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
-from tg import expose, require, url, request, redirect, config
+from tg import expose, require, url, request, redirect, config, predicates
 from tg.decorators import use_custom_format
 from tg.i18n import set_lang
 import logging

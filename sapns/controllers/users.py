@@ -4,13 +4,12 @@
 from neptuno.util import get_paramw, strtobool
 from pylons import cache
 from pylons.i18n import ugettext as _
-from repoze.what import authorize, predicates
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
 from sqlalchemy.sql.expression import and_
-from tg import expose, url, redirect, require, request
+from tg import expose, url, redirect, require, request, predicates
 import logging
 import simplejson as sj
 
@@ -21,7 +20,7 @@ class EUser(Exception):
 
 class UsersController(BaseController):
     
-    allow_only = authorize.not_anonymous()
+    allow_only = predicates.not_anonymous()
     
     @expose('sapns/users/edit.html')
     @require(predicates.not_anonymous())

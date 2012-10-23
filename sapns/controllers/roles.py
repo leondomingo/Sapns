@@ -1,12 +1,11 @@
 # -*- coding: utf-8 -*-
 """Users management controller"""
 
-from repoze.what import authorize, predicates as p
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
 from sqlalchemy.sql.expression import and_
-from tg import expose, require
+from tg import expose, require, predicates as p
 import logging
 from sapns.lib.sapns.util import add_language
 
@@ -14,7 +13,7 @@ __all__ = ['RolesControllers']
 
 class RolesController(BaseController):
     
-    allow_only = authorize.not_anonymous()
+    allow_only = p.not_anonymous()
 
     @expose('sapns/roles/users.html')
     @require(p.in_group(u'managers'))
