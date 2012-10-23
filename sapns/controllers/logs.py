@@ -3,16 +3,15 @@
 from neptuno.postgres.search import Search
 from neptuno.util import get_paramw, strtodate
 from pylons.i18n import ugettext as _
-from repoze.what import predicates as p
 from sapns.config import app_cfg
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import pagination
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsPermission
-from tg import expose, require, request, config
-import logging
 from sqlalchemy import MetaData, Table
 from sqlalchemy.sql.expression import and_, desc
+from tg import expose, require, request, config, predicates as p
+import logging
 
 __all__ = ['LogsControllers']
 

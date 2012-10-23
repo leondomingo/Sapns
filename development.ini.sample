@@ -37,6 +37,8 @@ beaker.cache.type = memory
 #beaker.cache.data_dir = %(here)s/data/cache
 #beaker.session.data_dir = %(here)s/data/sessions
 
+#auto_reload_templates = false
+
 # Sapns settings
 pg_path = /usr/bin
 views_prefix = _view_

@@ -15,23 +15,23 @@ setup(
     author_email='',
     #url='',
     install_requires=[
-        "TurboGears2 >= 2.1",
+        "TurboGears2 >= 2.2.0",
+        "Genshi",
+        "Jinja2",
         "zope.sqlalchemy >= 0.4",
         "repoze.tm2 >= 1.0a5",
-        "repoze.what-quickstart",
-        "repoze.what >= 1.0.8",
-        "repoze.what-quickstart",
-        "repoze.who-friendlyform >=1.0.4",
-        "repoze.what-pylons >= 1.0rc3",
-        "repoze.what.plugins.sql",
-        "repoze.who ==1.0.18",
-        "tgext.admin>=0.3.9",
-        "tw.forms",
+        "sqlalchemy",
+        "sqlalchemy-migrate",
+        "repoze.who",
+        "repoze.who-friendlyform >= 1.0.4",
+        "tgext.admin >= 0.5.1",
+        "repoze.who.plugins.sa",
+        "tw2.forms",
         "Neptuno2",
         "argparse",
-        ],
-    setup_requires=["PasteScript >= 1.7"],
-    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2'],
+    ],
+    setup_requires=['PasteScript >= 1.7'],
+    paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
     packages=find_packages(exclude=['ez_setup']),
     include_package_data=True,
     test_suite='nose.collector',
@@ -39,14 +39,12 @@ setup(
                    'nosetests',
                    'coverage',
                    'wsgiref'
-                   'repoze.who-testutil >= 1.0',
                    ],
     package_data={'sapns': ['i18n/*/LC_MESSAGES/*.mo',
                             'templates/*/*',
                             'public/*/*']},
     message_extractors={'sapns': [
             ('**.py', 'python', None),
-            #('templates/**.mako', 'mako', None),
             ('templates/**.html', 'jinja2', None),
             ('templates/**.js', 'jinja2', None),
             ('public/**', 'ignore', None)]},
@@ -58,4 +56,8 @@ setup(
     [paste.app_install]
     main = pylons.util:PylonsInstaller
     """,
+    dependency_links=[
+        "http://tg.gy/220"
+        ],
+    zip_safe=False
 )

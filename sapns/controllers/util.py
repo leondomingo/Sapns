@@ -3,9 +3,8 @@
 
 from pylons.i18n import ugettext as _
 from pylons.templating import render_jinja2
-from repoze.what import authorize
 from sapns.lib.base import BaseController
-from tg import expose, url, response
+from tg import expose, url, response, predicates
 import re
 import sapns.lib.sapns.util as libutil
 
@@ -13,7 +12,7 @@ __all__ = ['UtilController']
 
 class UtilController(BaseController):
     
-    allow_only = authorize.has_any_permission('manage', 'utilities')
+    allow_only = predicates.has_any_permission('manage', 'utilities')
     
     @expose('sapns/util/init.html')
     def init(self):

@@ -5,14 +5,13 @@ from neptuno.dict import Dict
 from neptuno.util import get_paramw, strtobool
 from pylons import cache
 from pylons.i18n import ugettext as _
-from repoze.what import authorize #, predicates
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsRole, \
     SapnsAttrPrivilege, SapnsPermission
 from sqlalchemy.sql.expression import and_
-from tg import expose, url, redirect
+from tg import expose, url, redirect, predicates
 import logging
 import simplejson as sj
 
@@ -20,7 +19,7 @@ __all__ = ['PrivilegesController']
 
 class PrivilegesController(BaseController):
     
-    allow_only = authorize.in_group('managers')
+    allow_only = predicates.in_group('managers')
     
     @expose('sapns/privileges/index.html')
     @add_language

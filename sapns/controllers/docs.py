@@ -6,12 +6,11 @@ from neptuno.dict import Dict
 from neptuno.postgres.search import search
 from neptuno.util import get_paramw, datetostr
 from pylons.i18n import ugettext as _
-from repoze.what import authorize, predicates as p
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import init_lang
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
-from tg import expose, config, request, require, response
+from tg import expose, config, request, require, response, predicates as p
 from zipfile import ZipFile, ZIP_DEFLATED
 import datetime as dt
 import logging
@@ -21,7 +20,7 @@ __all__ = ['DocsController']
 
 class DocsController(BaseController):
     
-    allow_only = authorize.not_anonymous()
+    allow_only = p.not_anonymous()
     
     @expose('sapns/docs/index.html')
     def _default(self, cls, id_, **kw):
