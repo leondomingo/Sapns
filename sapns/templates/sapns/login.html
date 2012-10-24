@@ -4,11 +4,9 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
-    <style>
-        .sp_center { width: 1198px !important; left: 0px !important }
-    </style>
     {{ util.jquery_ui() }}
     <style>
+        .sp_center { width: 1198px !important; left: 0px !important }
         #loginform .background-icon { position:absolute; left:15px; top:25px; width:150px; height:150px; opacity:0.4;
         background:transparent url('{{tg.url("/images/sapns/icons/lock.png")}}') center center no-repeat; background-size:contain; z-index:0 }
         #loginform #submit { width:50px; height:50px; border:0; float:right; margin-right:10px; cursor:pointer; 
@@ -60,6 +58,7 @@
     <label>{{_('Forgot my password')}}</label>
 </div>
 
+<script src="{{tg.url('/js/sidebar-messages.min.js')}}"></script>
 <script>
     $(function() {
         $('#loginusername').focus();

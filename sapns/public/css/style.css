@@ -232,3 +232,8 @@ width:100px; height:80px; margin:10px 50px 0 0; text-align:center; word-wrap:bre
 border-radius:3px; padding:2px; font:12px arial; cursor:text }
 .sp-filename div:hover { border-color:orange }
 .sp-filename button { font:10px arial; margin:1px 0 0 3px }
+
+/* sidebar-messages */
+.sidebar-messages { position:fixed; right:10px; top:20px; width:200px; padding:5px; z-index:1000 }
+.sidebar-messages .sbm-message { position:relative; padding:5px; border-radius:5px; min-height:50px; opacity:0.7; margin-bottom:5px }
+.sbm-message-std { background-color:coral; font:bold 13px arial }
