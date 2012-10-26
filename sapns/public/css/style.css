@@ -161,6 +161,7 @@ margin:3px 1px 0 0; padding:0 2px }
 .item_sb a { font-weight:normal }
 
 .icon_sb { width:25px; height:25px; cursor:pointer; float:left }
+.return_sb { margin-left:5px }
 .text_sb { font-size:12px; padding-top:3px; margin-left:5px; float:left; width:130px; margin-bottom:3px }
 
 .text_sb, .subaction { padding:3px; cursor:pointer; width:150px } 

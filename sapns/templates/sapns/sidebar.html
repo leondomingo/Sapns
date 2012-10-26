@@ -1,10 +1,10 @@
-<!--{% if came_from %}-->
-<div><a href="{{came_from}}">{{_('return')}}</a></div>
-<!--{% endif %}-->
-
 <div class="item_sb item_home">
     <a href="{{tg.url('/')}}"><img class="icon_sb" src="{{tg.url('/images/sapns/icons/home.png')}}" title="Home"></a>
-    <!--{#<a href="{{tg.url('/')}}"><label class="text_sb">Home</label></a>#}-->
+    <!--{% if came_from %}-->
+    <a href="{{came_from}}">
+        <img class="icon_sb return_sb" src="{{tg.url('/images/sapns/icons/return.png')}}" title="{{_('Volver')}}">
+    </a>
+    <!--{% endif %}-->
 </div>
 
 <!--{% for sc in shortcuts %}-->
