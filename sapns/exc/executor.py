@@ -12,6 +12,9 @@ from paste.deploy import appconfig
 from sapns.config.environment import load_environment
 import transaction
 
+class EExecutor(Exception):
+    pass
+
 class Executor(object):
     
     def __init__(self, args=None):
@@ -36,7 +39,11 @@ class Executor(object):
             
         self.load_config(conf_file)
         
-        m = __import__(pkg_name, fromlist=[func_name])
+        try:
+            m = __import__(pkg_name, fromlist=[func_name])
+        except Exception, e:
+            raise EExecutor(str(e))
+            
         func = getattr(m, func_name)
         if isinstance(func, type):
             # "func" is a class so arguments are passed to __init__ and then
@@ -91,5 +98,5 @@ if __name__ == '__main__':
             with transaction.manager:
                 e.execute(_pkg_name, _func_name, *a, **kw)
                 
-        except Exception:
+        except EExecutor:
             sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)
