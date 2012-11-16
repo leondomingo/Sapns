@@ -39,10 +39,7 @@ class Executor(object):
             
         self.load_config(conf_file)
         
-        try:
-            m = __import__(pkg_name, fromlist=[func_name])
-        except Exception, e:
-            raise EExecutor(str(e))
+        m = __import__(pkg_name, fromlist=[func_name])
             
         func = getattr(m, func_name)
         if isinstance(func, type):
@@ -84,19 +81,11 @@ if __name__ == '__main__':
             if len(EXECUTIONS[_args.exc_id]) > 3:
                 kw = EXECUTIONS[_args.exc_id][3]
         
-        e = Executor(args=_args)
-        with transaction.manager:
-            e.execute(_pkg_name, _func_name, *a, **kw)
-        
     else:
         exc_id_splitted = _args.exc_id.split('.')
         _pkg_name = '.'.join(exc_id_splitted[:-1])
         _func_name = exc_id_splitted[-1]
         
-        try:
-            e = Executor(args=_args)
-            with transaction.manager:
-                e.execute(_pkg_name, _func_name, *a, **kw)
-                
-        except EExecutor:
-            sys.stderr.write('ERROR: It does not exist the execution with id "%s"\n' % _args.exc_id)
+    e = Executor(args=_args)
+    with transaction.manager:
+        e.execute(_pkg_name, _func_name, *a, **kw)

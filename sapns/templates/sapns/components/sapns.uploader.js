@@ -5,40 +5,31 @@
     // SapnsUploader (constructor)
     function SapnsUploader(settings) {
         
-        function set(this_object, key, value, obj) {
-            
-            if (obj == undefined) {
-                obj = settings;
-            }
-
-            if (obj[key] == undefined) {
-                this_object[key] = value;
-            }
-            else {
-                this_object[key] = obj[key];
-            }
-            
-            return;
-        }
+        var _settings = $.extend(true, {
+            name: 'upl_' + Math.floor(Math.random()*999999),
+            file_name: '',
+            uploaded_file: '',
+            upload_url: "{{tg.url('/docs/upload_file')}}",
+            remove_url: "{{tg.url('/docs/remove_file')}}",
+            repo: '',
+            show_button: true,
+            button_caption: "{{_('Upload')}}",
+            auto_upload: true,
+            qtip: {
+                style: 'ui-tooltip-red ui-tooltip-rounded',
+                position: { my: 'left center', at: 'right center' }
+            },
+            onUpload: null,
+            onDelete: null,
+            onError: null,
+            removeOnDelete: false,
+        },
+        settings);
         
-        set(this, 'name', 'upl_' + Math.floor(Math.random()*999999));
-        set(this, 'file_name', '');
-        set(this, 'uploaded_file', '');
+        $.extend(true, this, _settings);
+        
         this.file_size = 0;
         this.uploaded = false;
-        set(this, 'url', "{{tg.url('/docs/upload_file')}}");
-        set(this, 'repo', '');
-        set(this, 'show_button', true);
-        set(this, 'button_caption', "Upload");
-        set(this, 'auto_upload', true);
-        set(this, 'onUpload', null);
-        set(this, 'onDelete', null);
-        set(this, 'onError', null);
-        set(this, 'removeOnDelete', false);
-        
-        set(this, 'qtip', {});
-        set(this.qtip, 'style', 'ui-tooltip-red ui-tooltip-rounded', this.qtip);
-        set(this.qtip, 'position', {my: 'left center', at: 'right center'}, this.qtip);
     }
 
     // getFilename
@@ -156,7 +147,7 @@
             
             if (remove_from_disk) {
                 $.ajax({
-                    url: "{{tg.url('/docs/remove_file')}}",
+                    url: self.remove_url,
                     data: {
                         file_name: f,
                         id_repo: self.getRepo()
@@ -180,11 +171,11 @@
             arg1 = {};
         }
         
-        if (typeof(arg1) == "object") {
+        if (typeof(arg1) === "object") {
             
             var sapnsUploader = new SapnsUploader(arg1); 
             
-            var url = sapnsUploader.url;
+            var url = sapnsUploader.upload_url;
             var sufix = sapnsUploader.name;
             
             var content = 
@@ -274,40 +265,40 @@
                 sapnsUploader.upload();
             });
             
-            this.data('sapnsUploader', sapnsUploader);
+            this.data('sapnsUploader', sapnsUploader).addClass('sp-uploader');
         }
-        else if (typeof(arg1) == "string") {
+        else if (typeof(arg1) === "string") {
             
             var sapnsUploader = this.data('sapnsUploader');
             
             // getFileName()
             // var file_name = $(element).sapnsUploader("getFilename");
-            if (arg1 == "getFilename") {
+            if (arg1 === "getFilename") {
                 return sapnsUploader.getFilename();
             }
             // getUploadedfile()
-            else if (arg1 == "getUploadedfile") {
+            else if (arg1 === "getUploadedfile") {
                 return sapnsUploader.getUploadedfile();
             }
             // setRepo(arg2)
             // $(element).sapnsUploader('setRepo', 1);
-            else if (arg1 == "setRepo") {
+            else if (arg1 === "setRepo") {
                 sapnsUploader.setRepo(arg2);
             }
             // getRepo
-            else if (arg1 == "getRepo") {
+            else if (arg1 === "getRepo") {
                 return sapnsUploader.getRepo();
             }
             // deleteFile
-            else if (arg1 == "deleteFile") {
+            else if (arg1 === "deleteFile") {
                 sapnsUploader.deleteFile(arg2);
             }
             // isUploaded
-            else if (arg1 == "isUploaded") {
+            else if (arg1 === "isUploaded") {
                 return sapnsUploader.isUploaded();
             }
             // getFilesize
-            else if (arg1 == "getFilesize") {
+            else if (arg1 === "getFilesize") {
                 return sapnsUploader.getFilesize();
             }
             // TODO: other sapnsUploader methods
