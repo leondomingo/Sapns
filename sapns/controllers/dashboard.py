@@ -61,7 +61,7 @@ class DashboardController(BaseController):
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=None)
         
-        return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''))
+        return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''), home=url(user.entry_point() or '/dashboard'))
     
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
@@ -104,7 +104,7 @@ class DashboardController(BaseController):
         shortcuts = user.get_shortcuts(id_parent=db.shortcut_id)
         
         return dict(page='dashboard', came_from=kw.get('came_from'), 
-                    shortcuts=shortcuts, _came_from=url('/dashboard/'))
+                    shortcuts=shortcuts, _came_from=url(user.entry_point() or '/dashboard/'))
       
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
