@@ -14,6 +14,7 @@ var SapnsFields = {
         check_regex: function(settings) {
             
             var default_settings = {
+                    regex: '',
                     regex_attr: 'regex',
                     class_error: 'sp-field-error',
                     class_ok: 'sp-field-ok'
@@ -21,6 +22,10 @@ var SapnsFields = {
             
             var settings_ = $.extend(true, default_settings, settings),
                 regex = settings_.field.attr(settings_.regex_attr);
+            
+            if (!regex) {
+                regex = settings_.regex;
+            }
             
             var text = settings_.field.val();
             if (regex && text) {
