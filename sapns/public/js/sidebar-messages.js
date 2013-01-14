@@ -15,6 +15,10 @@ var SidebarMessages = function(args) {
     if ($('.sidebar-messages').length === 0) {
         var sb = '<div class="sidebar-messages" style="width:' + self.width + 'px;"></div>';
         $(sb).appendTo('body');
+        
+        $('<div id="sidebar-messages-modal" style="display:none; position:fixed; \
+                left:0; top:0; width:100%; height:100%; opacity:0.4; \
+                background-color:#666; z-index:999"></div>').appendTo('body');
     }
     
     // show
@@ -22,7 +26,8 @@ var SidebarMessages = function(args) {
         var args_ = $.extend(true, {
             id: 'sbm-message_' + Math.floor(Math.random()*99999),
             hide_after: 5000,
-            styles: 'sbm-message-std'
+            styles: 'sbm-message-std',
+            modal: false
         }, args);
         
         self.messages[args_.id] = true;
@@ -31,6 +36,10 @@ var SidebarMessages = function(args) {
         $('.sidebar-messages').append(message);
         if (self.after_show_message) {
             self.after_show_message(args_.id);
+        }
+        
+        if (args_.modal) {
+            $('#sidebar-messages-modal').show();
         }
         
         if (typeof(args_.hide_after) === 'number' && args_.hide_after > 0) {
@@ -44,7 +53,9 @@ var SidebarMessages = function(args) {
     
     // hide
     self.hide = function(args) {
-        var args_ = $.extend(true, {}, args);
+        var args_ = $.extend(true, {
+            velocity: 'slow'
+        }, args);
         
         var resultado = $('#' + args_.id).length > 0;
         
@@ -54,8 +65,9 @@ var SidebarMessages = function(args) {
             }
         }
         
-        $('#' + args_.id).fadeOut('slow', function() {
+        $('#' + args_.id).fadeOut(args_.velocity, function() {
             $('#' + args_.id).remove();
+            $('#sidebar-messages-modal').hide();
             
             delete self.messages[args_.id];
             
