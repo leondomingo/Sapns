@@ -65,9 +65,9 @@ var SidebarMessages = function(args) {
             }
         }
         
+        $('#sidebar-messages-modal').hide();
         $('#' + args_.id).fadeOut(args_.velocity, function() {
             $('#' + args_.id).remove();
-            $('#sidebar-messages-modal').hide();
             
             delete self.messages[args_.id];
             
