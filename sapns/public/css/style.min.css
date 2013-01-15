@@ -22,7 +22,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{position:abso
 .sp-grid-search-box{float:left;margin-bottom:5px}.sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}
 .sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}.sp-grid-caption{color:#666;font:bold 22px helvetica,arial;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
 .sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px;margin-left:5px}
-.sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;padding:2px;overflow:hidden}
+.sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;margin-bottom:-1px;padding:2px;overflow:hidden}
 .sp-col-title-sortable{cursor:pointer}.sp-col-title-sortable:hover{background-color:#444}
 .sp-grid-filter-label{font:12px arial}.sp-grid-filter-field,.sp-grid-filter-operator{width:200px;border:0;border-radius:4px;font:15px arial;padding-top:1px;height:21px;background-color:#e6e6e6}
 .sp-grid-filter-value{font:15px arial}.sp-grid-row-filter button{font-size:9px;width:90px}

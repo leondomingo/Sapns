@@ -87,7 +87,7 @@ margin-left:0; margin-top:7px; overflow:hidden; width:100% }
 
 .sp-col-title { color:#F9F9F9; background-color:#B4BD3C; font-weight:bold;
 text-align:center; font-family:arial; font-size:11px; height:29px;
-min-width:20px; border:1px solid lightgray; float:left; margin-right:-1px;
+min-width:20px; border:1px solid lightgray; float:left; margin-right:-1px; margin-bottom:-1px;
 padding:2px; overflow:hidden }
 
 .sp-col-title-sortable { cursor:pointer }
