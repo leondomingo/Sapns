@@ -445,7 +445,7 @@ def topdf(html_content, check_call=True, **kw):
             kw['orientation'] = 'Portrait'
             
         if not kw.get('page_size'):
-            kw['page-size'] = 'A3'
+            kw['page_size'] = 'A3'
         
         if not kw.get('q'):
             kw['q'] = None
@@ -464,6 +464,8 @@ def topdf(html_content, check_call=True, **kw):
         extra_params = []
         for k, v in kw.iteritems():
             
+            # page_size               --> page-size
+            # disable_pdf_compression --> disable-pdf-compression
             k_ = k.replace('_', '-')
             
             if len(k_) > 1:
