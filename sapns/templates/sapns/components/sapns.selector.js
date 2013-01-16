@@ -18,13 +18,29 @@
             onClick: null,
             dialog: {
                 width: 1100,
-                height: 600,
+                height: 'auto',
             },
             grid: {
                 cls: settings.rc,
                 rp: 25,
                 pag_n: 1,
-                with_pager: false,
+                with_pager: true,
+                pager_options: [{
+                    val: 25,
+                    desc: '25',
+                    sel: true
+                },
+                {
+                    val: 100,
+                    desc: '100',
+                    sel: false
+                },
+                {
+                    val: 500,
+                    desc: '500',
+                    sel: false
+                }],
+                allow_multiselect: false,
                 height: 380,
                 exportable: false,
                 select_first: true,

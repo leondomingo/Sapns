@@ -209,6 +209,31 @@
             url: "{{tg.url('/dashboard/toxls/')}}"
         }];
         
+        // default "pager_options"
+        var pager_options = settings.pager_options;
+        if (!pager_options) {
+            pager_options = [{
+                val: 10,
+                desc: '10',
+                sel: true
+            },
+            {
+                val: 50,
+                desc: '50',
+                sel: false
+            },
+            {
+                val: 100,
+                desc: '100',
+                sel: false
+            },
+            {
+                val: 0,
+                desc: "{{_('All')}}",
+                sel: false
+            }];
+        }
+        
         var _settings = $.extend(true, {
             caption: '',
             name: 'sapns_grid_' + Math.floor(Math.random() * 999999),
@@ -225,6 +250,7 @@
             height: 500,
             url_base: '',
             multiselect: false,
+            allow_multiselect: true,
             actions: null,
             actions_inline: false,
             hide_check: false,
@@ -247,6 +273,7 @@
         
         $.extend(true, self, _settings);
 
+        self.pager_options = pager_options;
         self.this_page = 0;
         self.total_count = 0;
         self.total_pag = 0;
@@ -401,8 +428,14 @@
         var grid_header = '<div class="sp-grid-row" style="width:' + (g_wd+150) + 'px">';
         
         if (!self.hide_check) {
+            
+            var disabled = '';
+            if (!self.allow_multiselect) {
+                disabled = 'disabled';
+            }
+            
             grid_header += '<div class="sp-col-title" style="width:23px">\
-                <input class="sp-grid-select-all" type="checkbox"></div>';
+                <input class="sp-grid-select-all" type="checkbox" ' + disabled + '></div>';
         }
         
         if (self.actions_inline) {
@@ -958,13 +991,14 @@
         }
         
         // if the row is selected, then mark the checkbox
-        var cell_selector = sprintf('#%s .sp-grid-cell.clickable', self.name);
+        var cell_selector = sprintf('#%s .sp-grid-cell.clickable', self.name),
+            cb_selector_checked = sprintf('#%s .sp-grid-cell .sp-grid-rowid:checked', self.name);
         $(document).off('click', cell_selector).on('click', cell_selector, function(event) {
             
-            var ctrl = event.ctrlKey || event.metaKey;
+            var ctrl = (event.ctrlKey || event.metaKey) && self.allow_multiselect;
             
             var row_id = $(this).parent().find('.sp-grid-rowid');
-            if (!row_id.prop('checked') || ctrl || self.multiselect) {
+            if (!row_id.prop('checked') || ctrl || (self.multiselect && self.allow_multiselect)) {
                 
                 $('#'+self.name + ' .sp-grid-select-all').prop('checked', false);
                 
@@ -989,6 +1023,16 @@
                     // run 'dblclick' action
                     run_action(row_id.attr('id_row')*1, self.dblclick, event.ctrlKey || event.metaKey, event.shiftKey);
                 }
+            }
+        });
+        
+        var cb_selector = sprintf('#%s .sp-grid-cell .sp-grid-rowid', self.name);
+        $(document).off('click', cb_selector).on('click', cb_selector, function() {
+            var chk = $(this).prop('checked');
+            
+            if (!self.allow_multiselect) {
+                $(cb_selector).prop('checked', false);
+                $(this).prop('checked', chk);
             }
         });
 
@@ -1668,35 +1712,35 @@
             if (g.with_pager) {
                 g_pager += '<div class="sp-grid-pager">\
                     <div class="sp-grid-pager-desc"></div>';
-
-                var sel_10 = '', sel_50 = '', sel_100 = '', sel_all = '';
-                var sel = ' selected';
-                var another_value = '';
-                if (g.rp == 10) {
-                    sel_10 = sel;
-                } else if (g.rp == 50) {
-                    sel_50 = sel;
-                } else if (g.rp == 100) {
-                    sel_100 = sel;
-                } else if (g.rp == 0) {
-                    sel_all = sel;
-                } else {
-                    another_value = '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
+                
+                // pager_options
+                var pager_options = '',
+                    values = [];
+                for (var i=0, l=g.pager_options.length; i<l; i++) {
+                    var option = g.pager_options[i];
+                    
+                    var selected = '';
+                    if (option.sel) {
+                        selected = ' selected ';
+                    }
+                    
+                    pager_options += '<option value="' + option.val + '"' + selected + '>' + option.desc + '</option>';
+                    values.push(option.val);
+                }
+                
+                // add "rp" as another value in the "pager_options"
+                if ($.inArray(g.rp, values) === -1) {
+                    pager_options += '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
                 }
 
                 g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px">' +
                         '<select class="sp-button sp-grid-rp">' +
-                        another_value +
-                        '<option value="10"' + sel_10 + '>10</option>' +
-                        '<option value="50"' + sel_50 + '>50</option>' +
-                        '<option value="100"' + sel_100 + '>100</option>' +
-                        '<option value="0"' + sel_all + '>{{_("All")}}</option>' +
+                        pager_options +
                         '</select>' +
                         '<button class="sp-button sp-grid-first-page" style="float:left">|&lt;&lt;</button>' +
                         '<button class="sp-button sp-grid-page-back" style="float:left">&lt;&lt;</button>' +
                         '<input class="sp-grid-current-page" type="text" style="text-align:center;font-size:11px;margin-top:3px" readonly>' +
                         '<button class="sp-button sp-grid-page-forth" style="float:left">&gt;&gt</button>';
-                        //<button class="sp-button sp-grid-last-page" style="float:left">&gt;&gt|</button></div>';
 
                 g_pager += '</div>';
                 
