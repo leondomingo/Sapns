@@ -68,7 +68,7 @@ class SapnsRole(Group):
         if no_cache:
             _cache.remove_value(key=_key)
                 
-        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=1)
             
     def attr_privilege(self, id_attribute):
         return SapnsAttrPrivilege.get_privilege(id_attribute, id_role=self.group_id)
@@ -251,7 +251,7 @@ class SapnsUser(User):
         
         _cache = cache.get_cache('user_get_shortcuts')
         _key = '%d_%d' % (self.user_id, id_parent)
-        return _cache.get_value(key=_key, createfunc=_get_shortcuts, expiretime=3600)
+        return _cache.get_value(key=_key, createfunc=_get_shortcuts, expiretime=1)
     
     def copy_from(self, other_id):
         
@@ -361,7 +361,7 @@ class SapnsUser(User):
         if no_cache:
             _cache.remove_value(key=_key)
             
-        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=1)
     
     def add_privilege(self, id_class):
         return SapnsPrivilege.add_privilege(id_class, id_user=self.user_id)
