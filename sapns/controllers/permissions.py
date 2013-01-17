@@ -8,7 +8,7 @@ from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsPermission, SapnsShortcut
 from sqlalchemy.sql.expression import and_
-from tg import expose, request
+from tg import expose, request, cache
 import logging
 import simplejson as sj
 
@@ -105,6 +105,9 @@ class PermissionsController(BaseController):
                 sc.order = group.next_order()
                 dbs.add(sc)
                 dbs.flush()
+                
+                _key = '%d_%d' % (user_id, id_group)
+                cache.get_cache('user_get_shortcuts').remove_value(key=_key)
             
             return dict(status=True)
         

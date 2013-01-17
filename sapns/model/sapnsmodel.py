@@ -4,7 +4,6 @@
 
 from neptuno.dict import Dict
 from neptuno.util import datetostr
-from pylons import cache
 from pylons.i18n import ugettext as _
 from sapns.model import DeclarativeBase, DBSession as dbs
 from sapns.model.auth import User, user_group_table, Group, Permission, \
@@ -16,7 +15,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
     DateTime, BigInteger
-from tg import config
+from tg import config, cache
 import datetime as dt
 import logging
 import os
