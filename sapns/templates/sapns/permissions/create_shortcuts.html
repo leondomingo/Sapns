@@ -6,16 +6,17 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <link rel="stylesheet" href="{{tg.url('/css/permissions/create_shortcuts.css')}}">
+    <link rel="stylesheet" href="{{tg.url('/css/permissions/create_shortcuts.css', params=dict(v=1))}}">
 {% endblock %}
 
 {% block middle %}
     <div id="permissions-container">
-        <select class="user">
-            <!--{% for u in users %}-->
-            <option value="{{ u.id }}" {% if u.selected %} selected {% endif %}>{{ u.display_name }} ({{ u.roles }})</option>
-            <!--{% endfor %}-->
-        </select>
+        <div class="sp-field-row">
+            <div class="sp-field">
+                <div class="label">{{_('User')}}</div>
+                <div id="user"></div>
+            </div>
+        </div>
         <div class="permission-name">{{ permission.title }} <span>({{ permission.name }})</span></div>
         <div class="message">{{_('Select the groups to include this permission in')}}</div>
         <ul class="groups-list"></ul>
@@ -26,8 +27,24 @@
         </div>
     </div>
     
+    <script src="{{tg.url('/js/sprintf.min.js', params=dict(v=1))}}"></script>
     <script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.selector.min.js' %}
     $(function() {
+        
+        $('#user').sapnsSelector({
+            rc: 'sp_users', rc_title: "{{_('Users')}}",
+            value: "{{tg.request.identity['user'].user_id}}",
+            onChange: function(user_id) {
+                if (user_id) {
+                                    load_groups(user_id);
+                }
+                else {
+                    $('#permissions-container .groups-list').html('');
+                }
+            }
+        });
         
         var en_proceso = false;
         
@@ -37,6 +54,7 @@
         }
         
         function load_groups(user_id) {
+            $('#permissions-container .groups-list').html("<p>{{_('Loading')}}...</p>");
             $.ajax({
                 url: "{{tg.url('/dashboard/permissions/user_groups/')}}",
                 data: { user_id: user_id },
@@ -49,10 +67,6 @@
             });
         }
         
-        $('#permissions-container select.user').change(function() {
-            load_groups($(this).val());
-        });
-        
         $('#permissions-container .buttons button.ok').click(function() {
             
             if (!en_proceso) {
@@ -64,6 +78,12 @@
                     selected_groups.push(shortcut_id);
                 });
                 
+                if (!$('#user').sapnsSelector('getValue')) {
+                    en_proceso = false;
+                    alert("{{_('A user must be specified')}}");
+                    return;
+                }
+                
                 if (selected_groups.length === 0) {
                     en_proceso = false;
                     alert("{{_('There are no groups selected')}}");
@@ -73,7 +93,7 @@
                     $.ajax({
                         url: "{{tg.url('/dashboard/permissions/create_shortcut_/')}}",
                         data: {
-                            user_id: $('#permissions-container select.user').val(),
+                            user_id: $('#user').sapnsSelector('getValue'),
                             permission_id: "{{ permission.id }}",
                             groups: JSON.stringify(selected_groups)
                         },
@@ -106,7 +126,7 @@
             }
         });
         
-        load_groups($('#permissions-container select.user option:selected').val());
+        load_groups($('#user').sapnsSelector('getValue'));
     });
     </script>
 {% endblock %}
