@@ -69,16 +69,20 @@ class DashboardController(BaseController):
         
         sc_parent = this_shortcut = get_paramw(kw, 'sc_parent', int, opcional=True)
         
+        if this_shortcut:
+            ts = dbs.query(SapnsShortcut).get(this_shortcut)
+            this_shortcut = dict(id=ts.shortcut_id, title=ts.title)
+            
+        else:
+            this_shortcut = dict(id=None, title='')
+        
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
-#        root = user.get_dashboard().shortcut_id
-        data_e = user.get_dataexploration().shortcut_id
+        root = user.get_dashboard().shortcut_id
+        if this_shortcut['id'] == root:
+            redirect(url('/dashboard/'))
         
-#        id_parent = sc_parent
-#        if not sc_parent or sc_parent == root:
-#            id_parent = data_e
-#        
-#        shortcuts = user.get_shortcuts(id_parent=id_parent)
+        data_e = user.get_dataexploration().shortcut_id
         
         params = {}
         if sc_parent:
@@ -102,7 +106,7 @@ class DashboardController(BaseController):
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         return dict(page='dashboard', came_from=kw.get('came_from'), 
-                    #shortcuts=shortcuts, 
+                    this_shortcut={}, 
                     _came_from=url(user.entry_point() or '/dashboard/'))
       
     @expose('sapns/dashboard/listof.html')

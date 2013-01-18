@@ -19,7 +19,11 @@
     <input type="hidden" name="came_from">
 </form>
 
-<div id="sp-exploration-head"> <!-- class="caja3d">-->
+<div id="sp-exploration-head">
+    <!--{% if this_shortcut.id %}-->
+    <span class="title">{{this_shortcut.title}}</span>
+    <!--{% endif %}-->
+    
     <!--{% if sc_parent %}-->
     <a class="sp-shortcut-up button" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent))}}">[{{_('up')}}]</a>
     <!--{% endif %}-->
@@ -51,7 +55,7 @@
                 url: "{{tg.url('/dashboard/sc/list_/')}}",
                 data: {
                     id_user: "{{tg.request.identity['user'].user_id}}",
-                    sc_parent: "{{this_shortcut or ''}}"
+                    sc_parent: "{{this_shortcut.id or ''}}"
                 },
                 success: function(content) {
                     $('#sp-shortcut-list').html(content);
@@ -260,7 +264,7 @@
             
             $.ajax({
                 url: "{{tg.url('/dashboard/sc/edit/')}}",
-                data: { id_shortcut:id_shortcut, id_parent: "{{this_shortcut or ''}}" },
+                data: { id_shortcut: id_shortcut, id_parent: "{{this_shortcut.id or ''}}" },
                 success: function(content) {
                     sbm.hide({ id: id_mensaje, velocity: 1500 });
                     
