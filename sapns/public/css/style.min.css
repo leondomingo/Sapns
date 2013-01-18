@@ -59,23 +59,29 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:or
 .sp-empty-button{color:red}#sp-user-menu{width:330px;display:none;margin-top:5px;padding-bottom:5px}
 .sp-user-option{padding:2px 2px 2px 10px;color:#000;border-radius:3px;cursor:pointer;margin-left:1px;width:99%}
 .sp-user-option:hover{background-color:#ffa900;color:#fff}.caja3d{border:1px solid #999;border-bottom:2px solid #777;border-right:2px solid #777;border-radius:3px}
-#sc_list{height:565px;overflow:auto}#sp-exploration-head{height:20px;padding-left:25px;padding-top:2px;background-color:white;border-radius:3px;margin:4px 10px}
-#sp-exploration-head *{float:left}#sp-exploration-head button{font-size:9px}.sp-shortcut-up{font-weight:normal;width:90%}
-#sp-shortcut-list{margin:0 10px 10px 10px;padding:5px;background-color:#fff;height:540px;overflow:auto}
+#sc_list{height:565px;overflow:auto}#sp-exploration-head{height:35px;padding:6px 25px 0 25px;background-color:#ecefcc;border-radius:3px;margin:4px 10px}
+#sp-exploration-head .button{float:left;border:1px solid #f2f2f2;border-color:#f2f2f2 #999 #999 #f2f2f2;cursor:pointer;border-radius:5px 3px 3px 0;padding:5px 2px 2px;width:120px;height:20px;background-color:#b4bd3c;font:13px arial;color:#444;text-align:center;margin-right:5px}
+#sp-exploration-head .button:hover{background-color:#666;color:#f2f2f2}#sp-exploration-head button{font-size:9px}
+.sp-shortcut-up{font-weight:normal;width:90%}#sp-shortcut-list{margin:0 10px 10px 10px;padding:5px;background-color:#fff;height:540px;overflow:auto}
 .on-dragging{height:415px!important}a.sp-shortcut{font-weight:normal;color:#666;border-radius:3px;width:102px;height:55px;margin:5px;padding:2px;text-align:center;float:left;font:17px arial;word-wrap:break-word;padding-top:25px;border:1px solid #ccc;box-shadow:2px 2px}
 a.sp-shortcut:hover{color:#444!important}.sp-shortcut:hover{border-color:#f3ba13;box-shadow:2px 2px #b38809}
 a.sp-shortcut.group{background:#eee url('/images/sapns/icons/group.png') no-repeat center center}
-a.sp-shortcut.list{background:#eee url('/images/sapns/icons/list.png') no-repeat center center}
+a.sp-shortcut.group.activo{background-color:#c2c2c2}a.sp-shortcut.list{background:#eee url('/images/sapns/icons/list.png') no-repeat center center}
 a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-repeat center center}
-.sp_sidebar.activo{border:2px solid red}#sp-shortcut-options{height:100px;margin:0 10px 10px 10px;padding:5px;background-color:#fff}
+.sp_sidebar.activo{border:2px solid red}#sp-shortcut-options{height:100px;margin:0 10px 10px 10px;padding:5px 5px 5px 100px;background-color:#fff}
 #sp-shortcut-options .option{float:left;border-radius:3px;font-weight:normal;width:100px;height:80px;margin:10px 50px 0 0;text-align:center;word-wrap:break-word;border:1px solid #ccc}
-#sp-shortcut-options .option.users{background:#eee url('/images/sapns/icons/users.png') no-repeat center center;margin-left:50px}
+#sp-shortcut-options .option.edit{background:#eee url('/images/sapns/icons/edit.png') no-repeat center center}
+#sp-shortcut-options .option.users{background:#eee url('/images/sapns/icons/users.png') no-repeat center center}
 #sp-shortcut-options .option.roles{background:#eee url('/images/sapns/icons/roles.png') no-repeat center center}
+#sp-shortcut-options .option.up{background:#eee url('/images/sapns/icons/north.png') no-repeat center center}
+#sp-shortcut-options .option.up-disabled{background:#eee url('/images/sapns/icons/north_disabled.png') no-repeat center center}
 #sp-shortcut-options .option.delete{background:#eee url('/images/sapns/icons/delete.png') no-repeat center center}
-#sp-shortcut-options .option.accept{border:1px solid #f3ba13}.sp-field-row{clear:left;height:38px;margin-bottom:5px}
-.sp-field-row .sp-field{float:left;margin-right:5px}.sp-field .label{font:12px arial}
-.sp-field .input *{float:left}.sp-field .label.required{font-weight:bold}.sp-filename div{height:16px;border:1px solid #bbb;border-right-color:#777;border-bottom-color:#777;border-radius:3px;padding:2px;font:12px arial;cursor:text}
+#sp-shortcut-options .option.accept{border:1px solid #f3ba13}#newsp-title{width:450px}
+.sp-field-row{clear:left;height:38px;margin-bottom:5px}.sp-field-row .sp-field{float:left;margin-right:5px}
+.sp-field .label{font:12px arial}.sp-field .input *{float:left}.sp-field .label.required{font-weight:bold}
+.sp-filename div{height:16px;border:1px solid #bbb;border-right-color:#777;border-bottom-color:#777;border-radius:3px;padding:2px;font:12px arial;cursor:text}
 .sp-filename div:hover{border-color:orange}.sp-filename button{font:10px arial;margin:1px 0 0 3px}
 .sidebar-messages{position:fixed;right:10px;top:20px;width:200px;padding:5px;z-index:1000}
 .sidebar-messages .sbm-message{position:relative;padding:5px;border-radius:5px;min-height:50px;opacity:.7;margin-bottom:5px}
 .sbm-message-std{background-color:coral;font:bold 13px arial}.sp-field-error{color:red}
+.ui-widget-header{background:#b4bd3c}
