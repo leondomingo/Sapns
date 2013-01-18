@@ -7,14 +7,13 @@ from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
-    SapnsPermission
-from tg import expose, url, redirect, request, require, predicates as p_
+    SapnsPermission, SapnsPrivilege
+from tg import expose, url, request, require, predicates as p_
 import logging
 import simplejson as sj
+from sqlalchemy.sql.expression import and_, or_
 
 __all__ = ['ShortcutsController']
-
-SCTYPE_GROUP = 'group'
 
 class ShortcutsController(BaseController):
     
@@ -83,8 +82,6 @@ class ShortcutsController(BaseController):
             
             _key = '%d_%d' % (user.user_id, dboard.shortcut_id)
             cache.get_cache('user_get_shortcuts').remove_value(key=_key)
-            
-            sc = SapnsShortcut()
             
             return dict(status=True, shortcut=dict(id=sc.shortcut_id,
                                                    title=sc.title,
@@ -233,52 +230,131 @@ class ShortcutsController(BaseController):
     @require(p_.not_anonymous())
     def edit(self, **kw):
         
+        roles = request.identity['groups']
+        user_id = request.identity['user'].user_id
+        user = dbs.query(SapnsUser).get(user_id)
+        
         id_shortcut = get_paramw(kw, 'id_shortcut', int, opcional=True)
         id_parent = get_paramw(kw, 'id_parent', int, opcional=True)
         if not id_parent:
-            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             id_parent = user.get_dashboard().shortcut_id
         
         shortcut = dict(id_shortcut=id_shortcut,
                         id_parent=id_parent,
-                        id_user=request.identity['user'].user_id)
+                        id_user=user_id)
+        
+        classes = []
+        
         if id_shortcut:
+            # edit
             sc = dbs.query(SapnsShortcut).get(id_shortcut)
             shortcut.update(title=sc.title)
+            
+        else:
+            # new
+            for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
+                
+                if u'managers' not in roles and not SapnsPrivilege.has_privilege(user_id, cls.class_id):
+                    continue
+                
+                cls_ = dict(id=cls.class_id,
+                            title=cls.title,
+                            name=cls.name)
+                                
+                classes.append(cls_)
         
-        return dict(shortcut=shortcut)
+        return dict(shortcut=shortcut, classes=classes)
+    
+    @expose('sapns/shortcuts/permissions.html')
+    @require(p_.not_anonymous())
+    def class_permissions(self, **kw):
+        
+        class_id = get_paramw(kw, 'class_id', int)
+        
+        roles = request.identity['groups']
+        user_id = request.identity['user'].user_id
+        user = dbs.query(SapnsUser).get(user_id)
+        
+        permissions = []
+        for p in dbs.query(SapnsPermission).\
+                filter(and_(SapnsPermission.class_id == class_id,
+                            or_(SapnsPermission.type == SapnsPermission.TYPE_LIST,
+                                and_(SapnsPermission.type == SapnsPermission.TYPE_PROCESS,
+                                     SapnsPermission.requires_id == False,
+                                     )
+                                )
+                            )):
+            
+            if u'managers' not in roles and not user.has_permission(p.permission_name):
+                continue
+            
+            permissions.append(dict(id=p.permission_id,
+                                    title=p.display_name,
+                                    name=p.permission_name,
+                                    ))
+                
+        return dict(permissions=permissions)
     
     @expose('json')
     @require(p_.not_anonymous())
     def save(self, **kw):
-        logger = logging.getLogger('ShortcutsController.new_')
+        logger = logging.getLogger('ShortcutsController.save')
         try:
             id_shortcut = get_paramw(kw, 'id_shortcut', int, opcional=True)
             title = get_paramw(kw, 'title', unicode)
             id_user = get_paramw(kw, 'id_user', int)
             id_parent = get_paramw(kw, 'id_parent', int, opcional=True)
-            id_permission = get_paramw(kw, 'id_permission', int, opcional=True)
+            permissions = get_paramw(kw, 'permissions', sj.loads)
+            
+            user = dbs.query(SapnsUser).get(id_user)
             
             if not id_parent:
-                user = dbs.query(SapnsUser).get(id_user)
+                # dashboard
                 id_parent = user.get_dashboard().shortcut_id
             
             if not id_shortcut:
-                sc = SapnsShortcut()
+                sc_parent = dbs.query(SapnsShortcut).get(id_parent)
+                
+                if len(permissions) > 0:
+                    # create several shortcuts
+                    for permission_id in permissions:
+                        
+                        permission = dbs.query(SapnsPermission).get(permission_id)
+                        
+                        sc = SapnsShortcut()
+                        sc.parent_id = id_parent
+                        sc.user_id = id_user
+                        sc.permission_id = permission_id
+                        
+                        # title
+                        if permission.type == SapnsPermission.TYPE_PROCESS:
+                            sc.title = permission.display_name
+                            
+                        elif permission.type == SapnsPermission.TYPE_LIST:
+                            sc.title = permission.class_.title
+                        
+                        dbs.add(sc)
+                        dbs.flush()
+                        
+                        sc_parent.add_child(sc.shortcut_id, copy=False)
+                
+                else:
+                    # create a group
+                    sc = SapnsShortcut()
+                    sc.parent_id = id_parent
+                    sc.user_id = id_user
+                    sc.title = title
+                    dbs.add(sc)
+                    dbs.flush()
+                    
+                    sc_parent.add_child(sc.shortcut_id, copy=False)
+                    
             else:
                 sc = dbs.query(SapnsShortcut).get(id_shortcut)
+                sc.title = title
+                dbs.add(sc)
+                dbs.flush()
                 
-            sc.title = title
-            sc.parent_id = id_parent
-            sc.user_id = id_user
-            sc.permission_id = id_permission
-            
-            dbs.add(sc)
-            dbs.flush()
-            
-            sc_parent = dbs.query(SapnsShortcut).get(id_parent)
-            sc_parent.add_child(sc.shortcut_id, copy=False)
-            
             # reset cache
             key_ = '%d_%d' % (id_user, id_parent)
             cache.get_cache('user_get_shortcuts').remove_value(key=key_)

@@ -1,19 +1,35 @@
 <div class="sp-field-row">
     <div class="sp-field">
-        <div class="label required">{{_('Título')}}</div>
+        <div class="label">{{_('Título')}}</div>
         <input id="newsp-title" type="text" value="{{shortcut.title or ''}}">
     </div>
 </div>
+
+<!--{% if (shortcut.id_shortcut or '') == '' %}-->
+<div id="newsp-class-list">
+<!--{% for cls in classes %}-->
+<div class="newsp-class" class_id="{{cls.id}}">{{cls.title}} <span>({{cls.name}})</span></div>
+<div class="newsp-permissions" class_id="{{cls.id}}" style="display:none"></div>
+<!--{% endfor %}-->
+</div>
+<!--{% endif %}-->
 
 <script>
 function sp_shortcut_new(callback, callback_error) {
     
     var title = $('#newsp-title').val();
-    if (!title) {
+    
+    var permissions = [];
+    $('.permission div.check input:checked').each(function() {
+        var permission_id = $(this).parents('.permission').attr('permission_id')*1;
+        permissions.push(permission_id);
+    });
+    
+    /*if (permissions.length == 0 && !title) {
         alert("{{_('A title must be specified')}}");
         $('#newsp-title').focus();
         return;
-    }
+    }*/
     
     $.ajax({
         url: "{{tg.url('/dashboard/sc/save/')}}",
@@ -22,7 +38,7 @@ function sp_shortcut_new(callback, callback_error) {
             title: title,
             id_user: "{{shortcut.id_user}}",
             id_parent: "{{shortcut.id_parent or ''}}",
-            id_permission: undefined
+            permissions: JSON.stringify(permissions)
         },
         success: function(res) {
             if (res.status) {
@@ -39,4 +55,56 @@ function sp_shortcut_new(callback, callback_error) {
         }
     });
 }
+
+$(function() {
+    $('.newsp-class').click(function() {
+        
+        var class_id0 = $('.newsp-class.open').attr('class_id');
+        var class_id = $(this).attr('class_id');
+        $('.newsp-class').removeClass('open');
+        
+        if (class_id !== class_id0) {
+            
+            var cls = $(this);
+            
+            function show_permissions() {
+                $('.newsp-permissions').slideUp();
+                $('.newsp-permissions[class_id=' + class_id + ']').slideDown();
+                cls.addClass('open');
+            }
+            
+            if (!cls.hasClass('loaded')) {
+                
+                $.ajax({
+                    url: "{{tg.url('/dashboard/sc/class_permissions/')}}",
+                    data: { class_id: class_id },
+                    success: function(content) {
+                        cls.addClass('loaded');
+                        $('.newsp-permissions[class_id=' + class_id + ']').html(content);
+                        
+                        show_permissions();
+                    }
+                });
+            }
+            else {
+                show_permissions();
+            }
+        }
+        else {
+            $('.newsp-permissions[class_id=' + class_id + ']').slideUp();
+        }
+    });
+    
+    var s_ = '.permission div.check input';
+    $(document).off('click', s_).on('click', s_, function() {
+        var class_id = $(this).parents('.newsp-permissions').attr('class_id');
+        var l = $('.newsp-permissions[class_id='+class_id+'] div.check input:checked').length;
+        if (l > 0) {
+            $('.newsp-class[class_id='+class_id+']').addClass('checked');
+        }
+        else {
+            $('.newsp-class[class_id='+class_id+']').removeClass('checked');
+        }
+    });
+});
 </script>
