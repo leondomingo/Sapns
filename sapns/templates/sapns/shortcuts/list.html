@@ -81,8 +81,7 @@
                                 url: "{{tg.url('/dashboard/sc/bookmark/')}}",
                                 data: { id_shortcut: ui.draggable.attr('shortcut_id') },
                                 success: function(res) {
-                                    if (res) {
-                                        
+                                    if (res.status) {
                                         var new_shortcut = '<div class="item_sb item_sb_sortable" shortcut_id="' + res.shortcut.id + '">\
                                             <a href="' + res.shortcut.url + '">\
                                             <span class="text_sb" title="' + res.shortcut.title + '">' + res.shortcut.title + '</span>\
@@ -274,7 +273,7 @@
                         title: "{{_('New shortcut')}}",
                         modal: true,
                         resizable: false,
-                        width: 500,
+                        width: 700,
                         height: 'auto',
                         buttons: {
                             "{{_('Ok')}}": function() {

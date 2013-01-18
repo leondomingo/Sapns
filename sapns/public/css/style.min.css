@@ -78,9 +78,13 @@ a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-
 #sp-shortcut-options .option.up-disabled{background:#eee url('/images/sapns/icons/north_disabled.png') no-repeat center center}
 #sp-shortcut-options .option.delete{background:#eee url('/images/sapns/icons/delete.png') no-repeat center center}
 #sp-shortcut-options .option.accept{border:1px solid #f3ba13}#newsp-title{width:450px}
-.sp-field-row{clear:left;height:38px;margin-bottom:5px}.sp-field-row .sp-field{float:left;margin-right:5px}
-.sp-field .label{font:12px arial}.sp-field .input *{float:left}.sp-field .label.required{font-weight:bold}
-.sp-filename div{height:16px;border:1px solid #bbb;border-right-color:#777;border-bottom-color:#777;border-radius:3px;padding:2px;font:12px arial;cursor:text}
+#newsp-class-list{height:300px;overflow:auto}.newsp-class{background-color:#fcd890;border-radius:3px 3px 3px 3px;clear:left;font:13px arial;height:22px;margin-bottom:2px;padding:3px 0 0 10px;width:640px;cursor:pointer}
+.newsp-class:hover{background-color:#ffc151}.newsp-class span{font:11px arial}.newsp-class.checked{font-weight:bold}
+.newsp-permissions .permission{clear:left;height:18px;margin-bottom:1px;font:12px arial;background-color:#f2f2f2;border-radius:2px;margin-left:10px;padding-left:20px;width:300px}
+.newsp-permissions .permission div{float:left;margin-right:3px}.newsp-permissions .permission div.title,.newsp-permissions .permission div.name{margin-top:3px;font-size:11px}
+.newsp-permissions .permission div.check{margin-top:-2px}.sp-field-row{clear:left;height:38px;margin-bottom:5px}
+.sp-field-row .sp-field{float:left;margin-right:5px}.sp-field .label{font:12px arial}
+.sp-field .input *{float:left}.sp-field .label.required{font-weight:bold}.sp-filename div{height:16px;border:1px solid #bbb;border-right-color:#777;border-bottom-color:#777;border-radius:3px;padding:2px;font:12px arial;cursor:text}
 .sp-filename div:hover{border-color:orange}.sp-filename button{font:10px arial;margin:1px 0 0 3px}
 .sidebar-messages{position:fixed;right:10px;top:20px;width:200px;padding:5px;z-index:1000}
 .sidebar-messages .sbm-message{position:relative;padding:5px;border-radius:5px;min-height:50px;opacity:.7;margin-bottom:5px}
