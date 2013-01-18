@@ -3,7 +3,7 @@
 
 from neptuno.util import get_paramw
 from pylons import cache
-from pylons.i18n import ugettext as _
+from pylons.i18n import lazy_ugettext as l_, ugettext as _
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
@@ -35,11 +35,11 @@ class ShortcutsController(BaseController):
 
         shortcuts = user.get_shortcuts(id_parent=id_parent)
         
-        params = {}
-        if sc_parent:
-            params = dict(sc_parent=id_parent)
+#        params = {}
+#        if sc_parent:
+#            params = dict(sc_parent=id_parent)
             
-        came_from = url('/dashboard/data_exploration/', params=params)        
+        came_from = url('/dashboard/data_exploration/', params=dict(sc_parent=id_parent))        
         
         return dict(shortcuts=shortcuts, sc_parent=id_parent, came_from=came_from)
     
@@ -288,8 +288,15 @@ class ShortcutsController(BaseController):
             if u'managers' not in roles and not user.has_permission(p.permission_name):
                 continue
             
+            title = p.display_name
+            if p.type == SapnsPermission.TYPE_LIST:
+                title = u'[%s]' % l_(u'Table')
+            
+            elif p.type == SapnsPermission.TYPE_PROCESS:
+                pass
+            
             permissions.append(dict(id=p.permission_id,
-                                    title=p.display_name,
+                                    title=title,
                                     name=p.permission_name,
                                     ))
                 
