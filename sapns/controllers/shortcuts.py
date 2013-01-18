@@ -36,7 +36,13 @@ class ShortcutsController(BaseController):
 
         shortcuts = user.get_shortcuts(id_parent=id_parent)
         
-        return dict(shortcuts=shortcuts, sc_parent=id_parent)
+        params = {}
+        if sc_parent:
+            params = dict(sc_parent=id_parent)
+            
+        came_from = url('/dashboard/data_exploration/', params=params)        
+        
+        return dict(shortcuts=shortcuts, sc_parent=id_parent, came_from=came_from)
     
     @expose('json')
     @require(p_.not_anonymous())
