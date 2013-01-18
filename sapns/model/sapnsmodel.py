@@ -581,6 +581,8 @@ class SapnsShortcut(DeclarativeBase):
         
     def add_child(self, id_shortcut, copy=True):
         
+        _logger = logging.getLogger('SapnsShortcut.add_child')
+        
         if copy:
             # the shortcut to be copied
             sc = dbs.query(SapnsShortcut).get(id_shortcut)
@@ -602,6 +604,15 @@ class SapnsShortcut(DeclarativeBase):
         
         dbs.add(new_sc)
         dbs.flush()
+        
+        # it's a group
+        if copy and sc.permission_id is None:
+            # TODO: copy all the children of this shortcut too
+            for child in dbs.query(SapnsShortcut).\
+                    filter(SapnsShortcut.parent_id == id_shortcut):
+                
+                _logger.info(child.title)
+                new_sc.add_child(child.shortcut_id)
         
         return new_sc
         

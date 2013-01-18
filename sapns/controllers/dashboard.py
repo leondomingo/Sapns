@@ -67,18 +67,18 @@ class DashboardController(BaseController):
     @require(p.not_anonymous())
     def data_exploration(self, **kw):
         
-        sc_parent = get_paramw(kw, 'sc_parent', int, opcional=True)
+        sc_parent = this_shortcut = get_paramw(kw, 'sc_parent', int, opcional=True)
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
-        root = user.get_dashboard().shortcut_id
+#        root = user.get_dashboard().shortcut_id
         data_e = user.get_dataexploration().shortcut_id
         
-        id_parent = sc_parent
-        if not sc_parent or sc_parent == root:
-            id_parent = data_e
-        
-        shortcuts = user.get_shortcuts(id_parent=id_parent)
+#        id_parent = sc_parent
+#        if not sc_parent or sc_parent == root:
+#            id_parent = data_e
+#        
+#        shortcuts = user.get_shortcuts(id_parent=id_parent)
         
         params = {}
         if sc_parent:
@@ -92,19 +92,18 @@ class DashboardController(BaseController):
         else:
             sc_parent = None
             
-        return dict(page=u'Data exploration', shortcuts=shortcuts,
-                    sc_parent=sc_parent, _came_from=came_from)
+        return dict(page=u'Data exploration', _came_from=came_from,
+                    this_shortcut=this_shortcut, sc_parent=sc_parent)
 
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
     @add_language
     def index(self, **kw):
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        db = user.get_dashboard()
-        shortcuts = user.get_shortcuts(id_parent=db.shortcut_id)
         
         return dict(page='dashboard', came_from=kw.get('came_from'), 
-                    shortcuts=shortcuts, _came_from=url(user.entry_point() or '/dashboard/'))
+                    #shortcuts=shortcuts, 
+                    _came_from=url(user.entry_point() or '/dashboard/'))
       
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())

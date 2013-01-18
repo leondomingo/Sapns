@@ -1,0 +1,42 @@
+<div class="sp-field-row">
+    <div class="sp-field">
+        <div class="label required">{{_('Título')}}</div>
+        <input id="newsp-title" type="text" value="{{shortcut.title or ''}}">
+    </div>
+</div>
+
+<script>
+function sp_shortcut_new(callback, callback_error) {
+    
+    var title = $('#newsp-title').val();
+    if (!title) {
+        alert("{{_('A title must be specified')}}");
+        $('#newsp-title').focus();
+        return;
+    }
+    
+    $.ajax({
+        url: "{{tg.url('/dashboard/sc/save/')}}",
+        data: {
+            id_shortcut: "{{shortcut.id_shortcut or ''}}",
+            title: title,
+            id_user: "{{shortcut.id_user}}",
+            id_parent: "{{shortcut.id_parent or ''}}",
+            id_permission: undefined
+        },
+        success: function(res) {
+            if (res.status) {
+                callback();
+            }
+            else {
+                alert('Error!');
+                callback_error();
+            }
+        },
+        error: function() {
+            alert('Error!');
+            callback_error();
+        }
+    });
+}
+</script>

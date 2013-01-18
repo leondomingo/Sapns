@@ -14,23 +14,29 @@ import simplejson as sj
 
 __all__ = ['ShortcutsController']
 
+SCTYPE_GROUP = 'group'
+
 class ShortcutsController(BaseController):
     
     allow_only = p_.not_anonymous()
     
-    @expose('sapns/shortcuts/edit.html')
+    @expose('sapns/shortcuts/inner_list.html')
     @require(p_.not_anonymous())
-    def edit(self, id=None, **params):
-        came_from = params.get('came_from', '/')
-        page = _('Shorcuts editing')
+    def list_(self, **kw):
+        id_user = get_paramw(kw, 'id_user', int)
+        user = dbs.query(SapnsUser).get(id_user)
         
-        return dict(page=page, came_from=came_from)
-    
-    @expose()
-    @require(p_.not_anonymous())
-    def save(self, id=None, **params):
-        came_from = params.get('came_from', '/')
-        redirect(url(came_from))
+        sc_parent = get_paramw(kw, 'sc_parent', int, opcional=True)
+
+        dashboard_ = user.get_dashboard().shortcut_id
+        
+        id_parent = sc_parent
+        if not sc_parent or sc_parent == dashboard_:
+            id_parent = dashboard_
+
+        shortcuts = user.get_shortcuts(id_parent=id_parent)
+        
+        return dict(shortcuts=shortcuts, sc_parent=id_parent)
     
     @expose('json')
     @require(p_.not_anonymous())
@@ -61,7 +67,7 @@ class ShortcutsController(BaseController):
     @expose('json')
     @require(p_.not_anonymous())
     def bookmark(self, id_shortcut, **params):
-        logger = logging.getLogger(__name__ + '/bookmark')
+        logger = logging.getLogger('ShortcutsController.bookmark')
         try:
             logger.info('Bookmarking shortcut [%s]' % id_shortcut)
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -72,11 +78,11 @@ class ShortcutsController(BaseController):
             _key = '%d_%d' % (user.user_id, dboard.shortcut_id)
             cache.get_cache('user_get_shortcuts').remove_value(key=_key)
             
-            logger.info(sc.permission.permission_name)
-
+            sc = SapnsShortcut()
+            
             return dict(status=True, shortcut=dict(id=sc.shortcut_id,
                                                    title=sc.title,
-                                                   url=sc.permission.url,
+                                                   url=sc.permission.url if sc.permission_id else '',
                                                    ))
             
             return dict(status=True)
@@ -84,6 +90,35 @@ class ShortcutsController(BaseController):
         except Exception, e:
             logger.error(e)
             return dict(status=False) #, message=str(e).decode('utf-8'))
+        
+    @expose('json')
+    @require(p_.not_anonymous())
+    def move(self, **kw):
+        logger = logging.getLogger('ShortcutsController.move')
+        try:
+            id_shortcut = get_paramw(kw, 'id_shortcut', int)
+            id_group = get_paramw(kw, 'id_group', int)
+            
+            logger.info(u'Moving shortcut [%s] to [%d]' % (id_shortcut, id_group))
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            
+            group = dbs.query(SapnsShortcut).get(id_group)
+            
+            sc = dbs.query(SapnsShortcut).get(id_shortcut)
+            #sc = SapnsShortcut()
+            sc.parent_id = id_group
+            sc.order = group.next_order()
+            dbs.add(sc)
+            dbs.flush()
+            
+            _key = '%d_%d' % (user.user_id, id_group)
+            cache.get_cache('user_get_shortcuts').remove_value(key=_key)
+            
+            return dict(status=True)
+            
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False) #, message=str(e).decode('utf-8'))        
         
     @expose('json')
     @require(p_.not_anonymous())
@@ -184,6 +219,66 @@ class ShortcutsController(BaseController):
                                                    url=url('/dashboard/list/%s?came_from=' % cls),
                                                    ))
             
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+        
+    @expose('sapns/shortcuts/new.html')
+    @require(p_.not_anonymous())
+    def edit(self, **kw):
+        
+        id_shortcut = get_paramw(kw, 'id_shortcut', int, opcional=True)
+        id_parent = get_paramw(kw, 'id_parent', int, opcional=True)
+        if not id_parent:
+            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            id_parent = user.get_dashboard().shortcut_id
+        
+        shortcut = dict(id_shortcut=id_shortcut,
+                        id_parent=id_parent,
+                        id_user=request.identity['user'].user_id)
+        if id_shortcut:
+            sc = dbs.query(SapnsShortcut).get(id_shortcut)
+            shortcut.update(title=sc.title)
+        
+        return dict(shortcut=shortcut)
+    
+    @expose('json')
+    @require(p_.not_anonymous())
+    def save(self, **kw):
+        logger = logging.getLogger('ShortcutsController.new_')
+        try:
+            id_shortcut = get_paramw(kw, 'id_shortcut', int, opcional=True)
+            title = get_paramw(kw, 'title', unicode)
+            id_user = get_paramw(kw, 'id_user', int)
+            id_parent = get_paramw(kw, 'id_parent', int, opcional=True)
+            id_permission = get_paramw(kw, 'id_permission', int, opcional=True)
+            
+            if not id_parent:
+                user = dbs.query(SapnsUser).get(id_user)
+                id_parent = user.get_dashboard().shortcut_id
+            
+            if not id_shortcut:
+                sc = SapnsShortcut()
+            else:
+                sc = dbs.query(SapnsShortcut).get(id_shortcut)
+                
+            sc.title = title
+            sc.parent_id = id_parent
+            sc.user_id = id_user
+            sc.permission_id = id_permission
+            
+            dbs.add(sc)
+            dbs.flush()
+            
+            sc_parent = dbs.query(SapnsShortcut).get(id_parent)
+            sc_parent.add_child(sc.shortcut_id, copy=False)
+            
+            # reset cache
+            key_ = '%d_%d' % (id_user, id_parent)
+            cache.get_cache('user_get_shortcuts').remove_value(key=key_)
+            
+            return dict(status=True)
+        
         except Exception, e:
             logger.error(e)
             return dict(status=False)

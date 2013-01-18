@@ -1,0 +1,12 @@
+<!--{% for sc in shortcuts %}-->
+    <!--{% if sc.action_type == '' %}-->
+    <a class="sp-shortcut group" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc.id, came_from=_came_from))}}"
+        shortcut_id="{{sc.id}}" action_type="" title="{{sc.title}}">{{sc.title}}</a>
+    <!--{% elif sc.action_type == 'list' %}-->
+    <a class="sp-shortcut list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=_came_from))}}"
+        shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" cls="{{sc.cls}}" title="{{sc.title}}">{{sc.title|escape}}</a>
+    <!--{% elif sc.action_type == 'process' %}-->
+    <a class="sp-shortcut process" href="{{tg.url(sc.url, params=dict(came_from=_came_from))}}"
+        shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" title="{{sc.title}}">{{sc.title|escape}}</a>
+    <!--{% endif %}-->
+<!--{% endfor %}-->
