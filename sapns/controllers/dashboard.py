@@ -3,7 +3,7 @@
 
 from neptuno.postgres.search import Search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
-from pylons.i18n import ugettext as _
+from pylons.i18n import lazy_ugettext as l_,  ugettext as _
 from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController
@@ -65,13 +65,14 @@ class DashboardController(BaseController):
     
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
+    @add_language
     def data_exploration(self, **kw):
         
         sc_parent = this_shortcut = get_paramw(kw, 'sc_parent', int, opcional=True)
         
         if this_shortcut:
             ts = dbs.query(SapnsShortcut).get(this_shortcut)
-            this_shortcut = dict(id=ts.shortcut_id, title=ts.title)
+            this_shortcut = dict(id=ts.shortcut_id, title=l_(ts.title))
             
         else:
             this_shortcut = dict(id=None, title='')
@@ -82,21 +83,17 @@ class DashboardController(BaseController):
         if this_shortcut['id'] == root:
             redirect(url('/dashboard/'))
         
-        data_e = user.get_dataexploration().shortcut_id
+#        data_e = user.get_dataexploration().shortcut_id
         
-        params = {}
-        if sc_parent:
-            params = dict(sc_parent=sc_parent)
+#        params = {}
+#        if sc_parent:
+#            params = dict(sc_parent=sc_parent)
             
-        came_from = url('/dashboard/data_exploration/', params=params)
+        #came_from = url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent or ''))
         
-        if sc_parent and sc_parent != data_e:
-            sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
+        sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
             
-        else:
-            sc_parent = None
-            
-        return dict(page=u'Data exploration', _came_from=came_from,
+        return dict(page=l_(u'Data exploration'), #came_from=came_from,
                     this_shortcut=this_shortcut, sc_parent=sc_parent)
 
     @expose('sapns/shortcuts/list.html')
