@@ -80,6 +80,8 @@ height:14px }
 .sp-grid-caption { color:#666; font:bold 22px helvetica,arial; height:31px;
 margin-left:0; margin-top:7px; overflow:hidden; width:100% }
 
+.sp-grid-dialog .wait-message { font:12px arial; color:#cc0000 }
+
 .sp-search-txt { border:1px solid #777; width:450px }
 .sp-search-btn { float:none; width:80px; margin-left:5px }
 
@@ -270,4 +272,8 @@ border-radius:3px; padding:2px; font:12px arial; cursor:text }
 .sp-field-error { color:red }
 
 /* jQuery UI re-styling */
-.ui-widget-header { background:#B4BD3C }
+.ui-widget-header,
+.ui-dialog .ui-dialog-buttonpane button { background:#B4BD3C }
+
+button, select { border:0; border-radius:2px; background-color:#B4BD3C }
+button:hover { background-color:#666; color:#fff }

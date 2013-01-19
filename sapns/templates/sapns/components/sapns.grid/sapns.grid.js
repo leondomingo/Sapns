@@ -1300,13 +1300,14 @@
     // std_delete
     SapnsGrid.prototype.std_delete = function(ids, url) {
 
-        var self = this;
-        var cls = self.cls;
-
+        var self = this,
+            cls = self.cls,
+            in_progress = false;
+        
         var id = JSON.stringify(ids);
 
         var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
-                "<p id='object-title'></p>";
+                "<p id='object-title'></p><div class='wait-message' style='display:none'>{{_('Wait, please')}}...</div>";
 
         var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
                 "<div id='delete-error-message'></div>";
@@ -1336,52 +1337,73 @@
         });
 
         $('#grid-dialog_' + self.name).dialog({
+            title: "{{_('Delete')}}",
+            modal: true,
+            resizable: false,
+            closeOnEscape: false,
             width: 650,
             height: 210,
-            resizable: false,
-            modal: true,
-            title: "{{_('Delete')}}",
             buttons: {
                 "{{_('Ok')}}": function() {
-                    $.ajax({
-                        url: url,
-                        data: { cls: cls, id_: id },
-                        dataType: 'json',
-                        success: function(res) {
-                            if (res.status) {
-                                self.search(self.q, true);
-                                $('#grid-dialog_' + self.name).dialog('close');
-                            } 
-                            else {
-                                $('#grid-dialog_' + self.name).dialog('close');
-
-                                var message = "<p style='color:gray'>" + res.message + "</p>";
-
-                                if (res.rel_tables != undefined && res.rel_tables.length > 0) {
-                                    message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
-                                    message += "<ul>";
-
-                                    for (var i = 0; i < res.rel_tables.length; i++) {
-                                        var title = res.rel_tables[i].class_title;
-                                        var attr_title = res.rel_tables[i].attr_title;
-                                        message += '<li><span style="font-weight:bold">'
-                                                + title
-                                                + '</span> (<span style="color:#777">'
-                                                + attr_title + '</span>)</li>';
+                    if (!in_progress) {
+                        
+                        in_progress = true;
+                        $('#grid-dialog_' + self.name + ' .wait-message').fadeIn();
+                        
+                        $.ajax({
+                            url: url,
+                            data: { cls: cls, id_: id },
+                            dataType: 'json',
+                            success: function(res) {
+                                in_progress = false;
+                                $('#grid-dialog_' + self.name + ' .wait-message').fadeOut();
+                                
+                                if (res.status) {
+                                    self.search(self.q, true);
+                                    $('#grid-dialog_' + self.name).dialog('close');
+                                } 
+                                else {
+                                    $('#grid-dialog_' + self.name).dialog('close');
+    
+                                    var message = "<p style='color:#777'>" + res.message + "</p>";
+    
+                                    if (res.rel_tables != undefined && res.rel_tables.length > 0) {
+                                        message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
+                                        message += "<ul>";
+    
+                                        for (var i = 0; i < res.rel_tables.length; i++) {
+                                            var title = res.rel_tables[i].class_title;
+                                            var attr_title = res.rel_tables[i].attr_title;
+                                            message += '<li><span style="font-weight:bold">'
+                                                    + title
+                                                    + '</span> (<span style="color:#777">'
+                                                    + attr_title + '</span>)</li>';
+                                        }
+    
+                                        message += "</ul>";
                                     }
-
-                                    message += "</ul>";
+    
+                                    // load message
+                                    $('#grid-dialog_'+ self.name).html(error_html)
+                                        .find('#delete-error-message')
+                                        .html(message);
+    
+                                    // show error dialog
+                                    $('#grid-dialog_'+ self.name).dialog({
+                                        width: 700,
+                                        height: 250,
+                                        buttons: {
+                                            "{{_('Close')}}": function() {
+                                                $('#grid-dialog_'+ self.name).dialog('close');
+                                            }
+                                        }
+                                    });
                                 }
-
-                                // load message
-                                $('#grid-dialog_'+ self.name).html(error_html)
-                                    .find('#delete-error-message')
-                                    .html(message);
-
-                                // show error dialog
-                                $('#grid-dialog_'+ self.name).dialog({
-                                    width: 700,
-                                    height: 250,
+                            },
+                            error: function() {
+                                in_progress = false;
+                                $('#grid-dialog_'+ self.name).dialog('close');
+                                $('#grid-dialog_'+ self.name).html(error_html).dialog({
                                     buttons: {
                                         "{{_('Close')}}": function() {
                                             $('#grid-dialog_'+ self.name).dialog('close');
@@ -1389,21 +1411,13 @@
                                     }
                                 });
                             }
-                        },
-                        error: function() {
-                            $('#grid-dialog_'+ self.name).dialog('close');
-                            $('#grid-dialog_'+ self.name).html(error_html).dialog({
-                                buttons: {
-                                    "{{_('Close')}}": function() {
-                                        $('#grid-dialog_'+ self.name).dialog('close');
-                                    }
-                                }
-                            });
-                        }
-                    });
+                        });
+                    }
                 },
                 "{{_('Cancel')}}": function() {
-                    $('#grid-dialog_' + self.name).dialog('close');
+                    if (!in_progress) {
+                        $('#grid-dialog_' + self.name).dialog('close');
+                    }
                 }
             }
         });
@@ -1466,7 +1480,7 @@
             this.data('sapnsGrid', g);
             var g_id = '#'+g.name;
 
-            this.append(sprintf('<div id="grid-dialog_%(name)s" style="display:none"></div>', {name: g.name}));
+            this.append(sprintf('<div id="grid-dialog_%(name)s" class="sp-grid-dialog" style="display:none"></div>', {name: g.name}));
 
             var g_content = '';
             g_content += sprintf('<div class="sp-grid-container" id="%(name)s" cls="%(cls)s">', {name: g.name, cls: g.cls});
