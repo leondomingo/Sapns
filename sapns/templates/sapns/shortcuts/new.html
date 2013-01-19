@@ -1,6 +1,6 @@
 <div class="sp-field-row">
     <div class="sp-field">
-        <div class="label">{{_('Título')}}</div>
+        <div class="label">{{_('Title')}}</div>
         <input id="newsp-title" type="text" value="{{shortcut.title or ''}}">
     </div>
 </div>
@@ -75,14 +75,20 @@ $(function() {
             
             if (!cls.hasClass('loaded')) {
                 
+                $('.newsp-class[class_id=' + class_id + ']').append('<img src="{{tg.url("/images/sapns/loading.gif")}}">');
                 $.ajax({
                     url: "{{tg.url('/dashboard/sc/class_permissions/')}}",
                     data: { class_id: class_id },
                     success: function(content) {
+                        $('.newsp-class[class_id=' + class_id + '] img').remove();
+                        
                         cls.addClass('loaded');
                         $('.newsp-permissions[class_id=' + class_id + ']').html(content);
                         
                         show_permissions();
+                    },
+                    error: function() {
+                        $('.newsp-class[class_id=' + class_id + '] img').remove();
                     }
                 });
             }
