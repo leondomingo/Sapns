@@ -1,55 +1,40 @@
-{% extends 'sapns/base.html' %}
-{% import 'sapns/dashboard/util.html' as util %}
+<div id="reference" style="margin-top:30px">
 
-{% block head %}
-    {{ super() }}
-    {{ util.jquery() }}
-    {{ util.jquery_ui() }}
-{% endblock %}
-
-{% block middle %}
-    <div id="reference" style="margin-top: 30px;">
-    
-    <div id="ref_list" style="height: 500px; overflow: auto;">
-    {% for attr in reference %}
-    <div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
-        <div style="border-bottom: 1px dotted gray;">
-            <div style="float: left; width: 40px; text-align: center;">
-                <input class="attr_included" type="checkbox" 
-                    {% if attr.included %}checked="checked"{% endif %}/>
-            </div>
-            
-            <div title="{{attr.name}}" style="width: 80%; font-weight: bold; 
-                float: left;
-                {% if not attr.visible %}color: red;{% endif %}">{{attr.title}}</div>
-            
-            <!-- up -->
-            <div style="float: left;">
-                <input class="sp-button reforder_up"
-                    type="button" value="{{_('Up')}}"/>
-            </div>
-            
-            <!-- down -->
-            <div>
-                <input class="sp-button reforder_down" type="button" 
-                    value="{{_('Down')}}"/>
-            </div>
+<div id="ref_list" style="height: 500px; overflow: auto;">
+<!--{% for attr in reference %}-->
+<div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
+    <div style="border-bottom: 1px dotted gray;">
+        <div style="float: left; width: 40px; text-align: center;">
+            <input class="attr_included" type="checkbox" 
+                {% if attr.included %}checked="checked"{% endif %}/>
+        </div>
+        
+        <div title="{{attr.name}}" style="width: 80%; font-weight: bold; 
+            float: left;
+            {% if not attr.visible %}color: red;{% endif %}">{{attr.title}}</div>
+        
+        <!-- up -->
+        <div style="float: left;">
+            <input class="sp-button reforder_up"
+                type="button" value="{{_('Up')}}"/>
+        </div>
+        
+        <!-- down -->
+        <div>
+            <input class="sp-button reforder_down" type="button" 
+                value="{{_('Down')}}"/>
         </div>
     </div>
-    {% endfor %}
-    </div>
-    </div>
-    
-    <div style="height: 50px; margin-left: 10px;">
-        <input id="save_ref_order" class="sp-button" style="margin-top: 20px;" 
-            type="button" value="{{_('Save')}}"/>
-    </div>
-    
-    <form id="form_ref_order" method="post" action="{{came_from}}"></form>
-    <script type="text/javascript" src="{{tg.url('/js/ref_order.min.js')}}"></script>
-    <script type="text/javascript">
-    $(document).ready(function() {
-        ref_order("{{tg.url('/dashboard/ref_order_save/')}}");
-    });    
-    </script>
-{% endblock %}
+</div>
+<!--{% endfor %}-->
+</div>
+</div>
+
+{#
+<script src="{{tg.url('/js/ref_order.min.js')}}"></script>
+<script>
+$(function() {
+    ref_order("{{tg.url('/dashboard/ref_order_save/')}}");
+});    
+</script>
+#}

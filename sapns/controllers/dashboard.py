@@ -113,6 +113,50 @@ class DashboardController(BaseController):
         
         _logger = logging.getLogger('DashboardController.list')
         
+        admin_bar = []
+        
+        # delete all
+        admin_bar.append(dict(title=_(u'Delete all'),
+                              required_id='',
+                              type='delete_all',
+                              url=''))
+        
+        # cascade delete
+        admin_bar.append(dict(title=_(u'Cascade delete'),
+                              required_id='',
+                              type='cascade_delete',
+                              url=''))
+        
+#        # (separator)
+#        admin_bar.append(dict(separator=True))
+        
+        # edit view
+        admin_bar.append(dict(title=_(u'Edit view'),
+                              required_id='',
+                              type='edit_view',
+                              url=''))
+        
+        # merge
+        admin_bar.append(dict(title=_(u'Merge'),
+                              required_id='',
+                              type='merge',
+                              url=''))
+        
+#        # (separator)
+#        admin_bar.append(dict(separator=True))
+        
+        # reference order
+        admin_bar.append(dict(title=_(u'Reference order'),
+                              required_id='',
+                              type='reference_order',
+                              url=''))
+        
+        # insertion order
+        admin_bar.append(dict(title=_(u'Insertion order'),
+                              required_id='',
+                              type='insertion_order',
+                              url=''))
+        
         try:
             proj_name = config.get('app.root_folder')
             if proj_name:
@@ -127,11 +171,14 @@ class DashboardController(BaseController):
         
         try:
             list_ = List(cls, **kw)
-            return list_()
+            r = list_()
+            r.update(admin_bar=admin_bar)
+            
+            return r
+        
         except EListForbidden, e:
             _logger.error(e)
             redirect(url('/message', params=dict(message=str(e), came_from=kw.get('came_from'))))
-
     
     @expose('json')
     @require(p.not_anonymous())
@@ -721,23 +768,23 @@ class DashboardController(BaseController):
             logger.error(e)
             return dict(status=False, message=str(e), rel_tables=rel_tables)
         
-    @expose('sapns/order/insert.html')
+    @expose('sapns/order/insertion.html')
     @require(p.in_group(u'managers'))
     @add_language
-    def ins_order(self, cls, came_from='/'):
+    def insertion_order(self, **kw):
         
+        cls = get_paramw(kw, 'cls', unicode)
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # check privilege on this class
         if not user.has_privilege(cls):
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
-                                     came_from=came_from)))
+                                     came_from=kw.get('came_from', user.entry_point()))))
             
         class_ = SapnsClass.by_name(cls)
         
-        return dict(page='insertion order', insertion=class_.insertion(),
-                    title=class_.title, came_from=url(came_from))
+        return dict(insertion=class_.insertion(), title=class_.title)
 
     @expose()
     @require(p.in_group(u'managers'))
@@ -781,20 +828,20 @@ class DashboardController(BaseController):
     @expose('sapns/order/reference.html')
     @require(p.in_group(u'managers'))
     @add_language
-    def ref_order(self, cls, came_from='/'):
+    def reference_order(self, **kw):
         
+        cls = get_paramw(kw, 'cls', unicode)
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         
         # check privilege on this class
         if not user.has_privilege(cls):
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
-                                     came_from=came_from)))
+                                     came_from=kw.get('came_from', user.entry_point()))))
             
         class_ = SapnsClass.by_name(cls)
         
-        return dict(page='reference order', reference=class_.reference(all=True), 
-                    came_from=came_from)
+        return dict(reference=class_.reference(all=True))
     
     @expose('json')
     @require(p.in_group(u'managers'))

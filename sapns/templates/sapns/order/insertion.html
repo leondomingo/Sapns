@@ -1,27 +1,17 @@
-{% extends 'sapns/base.html' %}
-{% import 'sapns/dashboard/util.html' as util %}
-
-{% block head %}
-    {{ super() }}
-    {{ util.jquery() }}
-    {{ util.jquery_ui() }}
-{% endblock %}
-
-{% block middle %}
 <div id="insertion" style="margin-top: 10px;">
 
 <div class="class-title">
-    <div style="margin-top: 3px; margin-left: 15px;">
-        <div class="" style="width: 78%; margin-bottom: 15px;">
-            <input id="title-class" class="sp-text-field" style="width: 99%;
-                font-weight: bold; font-size: 18px;"
+    <div style="margin-top:3px; margin-left:15px">
+        <div class="" style="width:78%; margin-bottom:15px;">
+            <input id="title-class" class="sp-text-field" style="width:99%;
+                font-weight:bold; font-size:18px"
                 type="text" value="{{title}}"/>
         </div>
     </div>
 </div>
 
-<div id="ins_list" style="height: 500px; overflow: auto;">    
-{% for attr in insertion %}
+<div id="ins_list" style="height:500px; overflow:auto">    
+<!--{% for attr in insertion %}-->
 <div class="ins-attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false"
     style="height: 30px; padding-top: 5px;">
     <div style="margin-top: 0px; margin-left: 5px;">
@@ -60,25 +50,15 @@
         </div>
     </div>
 </div>
-{% endfor %}
+<!--{% endfor %}-->
 </div>
 </div>
 
-<div style="height: 50px; clear: left;">
-    <input id="save-ins-order" class="sp-button" style="margin-top: 20px;" 
-        type="button" value="{{_('Save')}}"/>
-</div>
-
-<form id="form-ins-order" method="post" action="{{tg.url('/dashboard/ins_order_save')}}">
-    <input type="hidden" name="came_from" value="{{came_from}}"/>
-    <input type="hidden" name="attributes" value=""/>
-    <input type="hidden" name="title" value=""/>
-</form>
-    
-<script type="text/javascript" src="{{tg.url('/js/ins_order.min.js')}}"></script>
-<script type="text/javascript">
+{#
+<script src="{{tg.url('/js/ins_order.min.js')}}"></script>
+<script>
     $(document).ready(function() {
         ins_order();
     });
 </script>
-{% endblock %}
+#}
