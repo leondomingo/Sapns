@@ -37,9 +37,9 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{position:abso
 .sp-grid-pager{border-color:#ddd #777 #777 #ddd;border-radius:3px 3px 3px 3px;border-style:solid;border-width:1px;height:30px}
 .sp-grid-pager-desc{color:#777;font-family:arial;width:350px;text-align:center;float:left;height:30px;vertical-align:middle;margin-top:5px;height:25px}
 .sp-grid-current-page{width:40px;color:#777;font-weight:bold;float:left;border:1px solid #666!important}
-.sp-grid-pager button{font-size:10px;font-family:arial;height:18px}.sp-grid-rp{float:left;height:18px}
-.sp-grid-pag-back{float:left}.sp-grid-actions{clear:left;background-color:#cccfa5;height:25px}
-.sp-grid-actions-title{width:150px;text-align:center;float:left;clear:left;margin-top:5px;color:gray;font-weight:bold;font-size:10px}
+.sp-grid-pager button{font-size:10px;font-family:arial;height:18px;background-color:#faca6a}
+.sp-grid-rp{float:left;height:18px;background-color:#faca6a}.sp-grid-pag-back{float:left}
+.sp-grid-actions{clear:left;background-color:#cccfa5;height:25px}.sp-grid-actions-title{width:150px;text-align:center;float:left;clear:left;margin-top:5px;color:gray;font-weight:bold;font-size:10px}
 .sp-grid-action{min-width:80px;margin:2px}.sp-grid-relatedinfo-title{float:left;color:gray;margin-top:3px;width:150px;font-size:10px;font-weight:bold;text-align:center;margin-top:5px}
 .sp_field_error{background-color:red;color:white}.sp_message{font-size:25px;color:#605b7c;margin-top:20px;padding-left:20px}
 .count-message{padding-left:20px;font-size:10px;color:#777}#sc-container{border:1px solid white;border-radius:10px;height:430px;overflow:auto;margin-top:10px;margin-left:3px;margin-right:3px}
@@ -47,13 +47,14 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{position:abso
 #delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
 .inline_action{border-radius:3px;cursor:pointer;float:left;width:20px;height:20px;margin:3px 1px 0 0;padding:0 2px}
-.inline_action:hover{background-color:#fff}.nonstd_actions{width:22px;height:20px;float:left;font-size:10px;margin-top:3px}
+.inline_action:hover{background-color:#fff}.nonstd_actions{width:22px;height:20px;float:left;font-size:10px;margin-top:3px;background-color:#faca6a}
 .item_sb{clear:left;min-height:22px;margin-top:2px;padding:2px}.item_sb_dragging{border:1px solid #b4bd3c;border-radius:3px;height:25px}
-.item_sb a{font-weight:normal}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}
+.item_sb a{font-weight:normal}.item_sb_sortable img{width:18px;height:18px}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}
 .return_sb{margin-left:5px}.text_sb{font-size:12px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
 .text_sb,.subaction{padding:3px;cursor:pointer;width:150px}.text_sb:hover,.subaction:hover{background-color:#b4bd3c;border-radius:3px}
-.text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px}
-.subactions ul{margin-top:0;margin-bottom:0;list-style-type:disc}.item_sb .subaction{font-weight:normal;color:#999;font-size:11px;height:18px}
+.text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px;background-color:#f1f4dc;padding:2px;border-radius:2px}
+.subactions .item{margin-left:15px}.subactions .item img{width:15px;height:15px}
+.subactions ul{margin-top:0;margin-bottom:0;list-style-type:none}.item_sb .subaction{font-weight:normal;color:#999;font:11px arial;height:18px}
 .item_sb .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}
 input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
 input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:orange}
@@ -61,7 +62,9 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:or
 .sp-empty-button{color:red}#sp-user-menu{width:330px;display:none;margin-top:5px;padding-bottom:5px}
 .sp-user-option{padding:2px 2px 2px 10px;color:#000;border-radius:3px;cursor:pointer;margin-left:1px;width:99%}
 .sp-user-option:hover{background-color:#ffa900;color:#fff}.caja3d{border:1px solid #999;border-bottom:2px solid #777;border-right:2px solid #777;border-radius:3px}
-#sc_list{height:565px;overflow:auto}#sp-exploration-head{height:35px;padding:6px 25px 0 25px;background-color:#ecefcc;border-radius:3px;margin:4px 10px}
+#sc_list{height:565px;overflow:auto}.sp-no-shortcuts{font:20px arial;color:#999;text-align:left}
+.sp-no-shortcuts span.subtitle{font:15px arial}.sp-no-shortcuts span.here{font-weight:bold;cursor:pointer}
+#sp-exploration-head{height:35px;padding:6px 25px 0 25px;background-color:#ecefcc;border-radius:3px;margin:4px 10px}
 #sp-exploration-head .title{float:left;font:15px "lucida grande",verdana,arial;color:#9ea634;margin:5px 30px 0 0}
 #sp-exploration-head .button{float:right;border:1px solid #f2f2f2;border-color:#f2f2f2 #999 #999 #f2f2f2;cursor:pointer;border-radius:5px 3px 3px 0;padding:5px 2px 2px;width:30px;height:20px;background-color:#b4bd3c;font:13px arial;color:#444;text-align:center;margin-right:5px}
 #sp-exploration-head .button:hover{background-color:#666;color:#f2f2f2}#sp-shortcut-new img,.sp-shortcut-up img{width:20px;height:20px}
@@ -91,5 +94,5 @@ a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-
 .sidebar-messages{position:fixed;right:10px;top:20px;width:200px;padding:5px;z-index:1000}
 .sidebar-messages .sbm-message{position:relative;padding:5px;border-radius:5px;min-height:50px;opacity:.7;margin-bottom:5px}
 .sbm-message-std{background-color:coral;font:bold 13px arial}.sp-field-error{color:red}
-.ui-widget-header,.ui-dialog .ui-dialog-buttonpane button{background:#b4bd3c}button,select{border:0;border-radius:2px;background-color:#b4bd3c}
+.ui-widget-header,.ui-dialog .ui-dialog-buttonpane button{background:#b4bd3c}button,select{border:0;border-radius:2px;background-color:#faca6a}
 button:hover{background-color:#666;color:#fff}
