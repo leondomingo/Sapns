@@ -1,0 +1,79 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.qtip2() }}
+    <link rel="stylesheet" href="{{tg.url('/css/user.css', params=dict(v=1))}}">
+{% endblock %}
+
+{% block middle %}
+<div id="user-dialog"></div>
+<input type="hidden" name="id" value="{{user.user_id}}">
+<input type="hidden" name="came_from" value="{{came_from or ''}}">
+<div id="edit-user">
+    <div class="sp-field-row">
+        <div class="sp-field">
+            <div class="label required">{{_('Display name')}}</div>
+            <input type="text" id="display_name" value="{{user.display_name or ''}}">
+        </div>
+    </div>
+    
+    <div class="sp-field-row"> 
+        <div class="sp-field">
+            <div class="label required">{{_('User name')}}</div>
+            <input id="user_name" type="text" value="{{user.user_name}}" 
+                regex="^[\w\-\.@]{4,50}$">
+        </div>
+    </div>
+
+    <div class="sp-field-row"> 
+        <div class="sp-field">
+            <div class="label required">{{_('E-mail address')}}</div>
+            <input id="email_address" type="text" value="{{user.email_address}}"
+                regex="^[\w\-\.]+@[\w\-\.]+$">
+        </div>
+    </div>
+    
+    <div class="sp-field-row">
+        <div class="sp-field">
+            <div class="label required">{{_('Password')}}</div>
+            <input id="password" type="password" regex="^[\w\-\.@]{4,}$" value="">
+        </div>
+    </div>
+
+    <div class="sp-field-row">    
+        <div class="sp-field">
+            <div class="label required">{{_('Re-type password')}}</div>
+            <input id="password2" type="password" value="">
+        </div>
+    </div>
+    
+    <!--{% if not user.user_id %}-->
+    <div class="sp-field-row">
+        <div class="sp-field">
+            <div class="label required">{{_('Copy from')}}</div>
+            <div id="copy_from"></div>
+        </div>
+    </div>
+    <!--{% endif %}-->
+    
+    <div>
+        <button id="save_user_btn">{{_('Ok')}}</button>
+    </div>
+</div>
+<form id="form_exit" method="post" 
+    action="{% if came_from %}{{came_from}}
+            {%else%}{{tg.url('/message', dict(message=_('Update was completed successfully'), came_from=''))}}{%endif%}">
+</form>
+
+<script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+<script src="{{tg.url('/js/fields2.min.js')}}"></script>
+<script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.selector.min.js' %}
+    {% include 'sapns/users/edit/edit.js' %}
+</script>
+{% endblock %}

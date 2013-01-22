@@ -22,7 +22,7 @@ class UsersController(BaseController):
     
     allow_only = predicates.not_anonymous()
     
-    @expose('sapns/users/edit.html')
+    @expose('sapns/users/edit/edit.html')
     @require(predicates.not_anonymous())
     @add_language
     def edit(self, cls, id_, **params):
@@ -38,7 +38,7 @@ class UsersController(BaseController):
         user = dbs.query(SapnsUser).get(id_user)
         return dict(user=user, came_from=params.get('came_from'))
     
-    @expose('sapns/users/edit.html')
+    @expose('sapns/users/edit/edit.html')
     @require(predicates.has_any_permission('manage', 'users'))
     def new(self, cls, **params):
         came_from = params.get('came_from', '/dashboard/users')
@@ -50,8 +50,6 @@ class UsersController(BaseController):
         
         logger = logging.getLogger('UsersController.save')
         try:
-            #logger.info(params)
-            
             id_ = get_paramw(params, 'id', int, opcional=True)
             display_name = get_paramw(params, 'display_name', unicode)
             user_name = get_paramw(params, 'user_name', unicode)
