@@ -8,7 +8,11 @@
 <!--{% if (shortcut.id_shortcut or '') == '' %}-->
 <div id="newsp-class-list">
 <!--{% for cls in classes %}-->
-<div class="newsp-class" class_id="{{cls.id}}">{{cls.title}} <span>({{cls.name}})</span></div>
+<div class="newsp-class" class_id="{{cls.id}}">{{cls.title}}
+<!--{% if (cls.name or '') != '' %}-->
+<span>({{cls.name}})</span>
+<!--{% endif %}-->
+</div>
 <div class="newsp-permissions" class_id="{{cls.id}}" style="display:none"></div>
 <!--{% endfor %}-->
 </div>
