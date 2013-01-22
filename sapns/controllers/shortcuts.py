@@ -262,14 +262,24 @@ class ShortcutsController(BaseController):
                             name=cls.name)
                                 
                 classes.append(cls_)
+                
+            # permissions with no associated class
+            classes.append(dict(id=-1,
+                                title='*',
+                                name=None,
+                                ))
         
         return dict(shortcut=shortcut, classes=classes)
     
     @expose('sapns/shortcuts/permissions.html')
     @require(p_.not_anonymous())
     def class_permissions(self, **kw):
-        
         class_id = get_paramw(kw, 'class_id', int)
+        if class_id == -1:
+            cond_class = SapnsPermission.class_id == None
+            
+        else:
+            cond_class = SapnsPermission.class_id == class_id
         
         roles = request.identity['groups']
         user_id = request.identity['user'].user_id
@@ -277,9 +287,10 @@ class ShortcutsController(BaseController):
         
         permissions = []
         for p in dbs.query(SapnsPermission).\
-                filter(and_(SapnsPermission.class_id == class_id,
+                filter(and_(cond_class,
                             or_(SapnsPermission.type == SapnsPermission.TYPE_LIST,
                                 and_(SapnsPermission.type == SapnsPermission.TYPE_PROCESS,
+                                     SapnsPermission.url != None,
                                      SapnsPermission.requires_id == False,
                                      )
                                 )
