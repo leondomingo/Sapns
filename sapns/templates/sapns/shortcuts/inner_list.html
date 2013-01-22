@@ -9,4 +9,7 @@
     <a class="sp-shortcut process" href="{{tg.url(sc.url, params=dict(came_from=came_from))}}"
         shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" title="{{sc.title}}">{{sc.title|escape}}</a>
     <!--{% endif %}-->
+<!--{% else %}-->
+<div class="sp-no-shortcuts">{{_('There are not shortcuts here')}}<br>
+    <span class="subtitle">{{_('For adding new shortcuts <span class="here">click here</span>')}}</span></div>
 <!--{% endfor %}-->

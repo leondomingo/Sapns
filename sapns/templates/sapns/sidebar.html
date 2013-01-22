@@ -12,23 +12,26 @@
 <!--{% if sc.action_type == 'list' %}-->
 <div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">
-        <span class="text_sb" title="{{sc.title}}">{{sc.title}}</span></a>
+        <span class="text_sb" title="{{sc.title}}"><img src="{{tg.url('/images/sapns/icons/list.png')}}"> {{sc.title}}</span></a>
     
     <!--{% if sc.actions %}-->
     <div class="subactions">
-    <ul>
     <!--{% for subaction in sc.actions %}-->
-    <li><a class="subaction" href="{{subaction.url}}"
-        {% if subaction.desc %}title="{{subaction.desc}}"{% endif %}>{{subaction.title}}</a></li>
+    <div class="item"><a class="subaction" href="{{subaction.url}}"
+        {% if subaction.desc %}title="{{subaction.desc}}"{% endif %}>
+            <img src="{{tg.url('/images/sapns/icons/process.png')}}"> {{subaction.title}}
+    </a></div>
     <!--{% endfor %}-->
-    </ul>
     </div>
     <!--{% endif %}-->
 </div>
 <!--{% elif sc.action_type == 'process' %}-->
 <div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">
-        <label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
+        <label class="text_sb" title="{{sc.title}}">
+        <img src="{{tg.url('/images/sapns/icons/process.png')}}">
+        {{sc.title}}
+        </label></a>
 </div>
 <!--{% elif sc.action_type == 'object' %}-->
 <div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
@@ -37,8 +40,12 @@
 <!--{% endif %}-->
 <!--{% else %}-->
 <div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
-    <a href="{{tg.url('/dashboard/data_exploration/?sc_parent=%d' % sc.id)}}"><label class="text_sb" title="{{sc.title}}">{{sc.title}}</label></a>
+    <a href="{{tg.url('/dashboard/data_exploration/?sc_parent=%d' % sc.id)}}">
+        <label class="text_sb" title="{{sc.title}}">
+            <img src="{{tg.url('/images/sapns/icons/group.png')}}">
+            {{sc.title}}
+        </label>
+    </a>
 </div>
 <!--{% endif %}-->
-
 <!--{% endfor %}-->

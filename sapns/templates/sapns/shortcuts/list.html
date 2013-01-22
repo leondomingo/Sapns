@@ -15,10 +15,6 @@
   <p id="sp-shortcut-title" style="font-weight:bold"></p>  
 </div>
 
-<form id="order-form" action="" method="post" target="_blank">
-    <input type="hidden" name="came_from">
-</form>
-
 <div id="sp-exploration-head">
     <!--{% if this_shortcut.id %}-->
     <span class="title">{{this_shortcut.title}}</span>
@@ -309,17 +305,12 @@
         $('#sp-shortcut-new').click(function() {
             edit_shortcut();
         });
-    	
-    	function ins_order(sc) {
-    		var cls = sc.attr('cls');
-    		$('#order-form').attr('action', "/dashboard/ins_order/" + cls).submit();
-    	}
-    	
-    	function ref_order(sc) {
-    		var cls = sc.attr('cls');
-    		$('#order-form').attr('action', "/dashboard/ref_order/" + cls).submit();
-    	}
         
+        var s_ = '.sp-no-shortcuts span.here'; 
+        $(document).off('click', s_).on('click', s_, function() {
+            edit_shortcut();
+        });
+    	
         // {# share #} 
         function share_shortcut(sc) {
         	
