@@ -36,6 +36,7 @@ class MailSender(object):
             server = self.params['from'].get('smtp', config.get(self.APP_MAILSENDER__SMTP))
             login = self.params['from'].get('login', config.get(self.APP_MAILSENDER__LOGIN))
             password = self.params['from'].get('password', config.get(self.APP_MAILSENDER__PASSWORD))
+            reply_to = self.params['from'].get('reply_to')
             
         else:
             from_ = (from_address, from_name,)
@@ -82,7 +83,7 @@ class MailSender(object):
                       self.params['message']['text'].encode('utf-8'),
                       server, login, password, files=files, 
                       html=self.params['message'].get('html').encode('utf-8'),
-                      cc=cc, bcc=bcc)
+                      cc=cc, bcc=bcc, reply_to=reply_to)
             
             # remove attachments
             for id_doc in files_remove:
