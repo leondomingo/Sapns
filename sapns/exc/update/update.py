@@ -37,9 +37,9 @@ class Update(object):
         
         tops = [('sapns', os.path.join(current_path, 'init'),)]
         
-        root_folder = config.get('app.root_folder')
-        if root_folder:
-            tops.append((root_folder, os.path.join(current_path, root_folder),))
+        update_folder = config.get('app.update_folder', config.get('app.root_folder'))
+        if update_folder:
+            tops.append((update_folder, os.path.join(current_path, update_folder),))
             
         def add_update(code, description):
             # save "update"
