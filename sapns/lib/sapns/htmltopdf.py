@@ -15,8 +15,10 @@ class HtmlToPdfMiddleware(object):
             orientation = environ.get('pdf_orientation')
             page_size = environ.get('page_size')
             response.content_type = 'application/pdf'
-            response.headerlist.append(("content-disposition",
-                                        "attachment; filename=%s" % request.environ['to_pdf']))
+            
+            if environ.get('attachment', True):
+                response.headers['content-disposition'] = "attachment; filename=%s" % environ.get('to_pdf', 'out.pdf')
+                
             response.body = topdf(response.body, 
                                   orientation=orientation,
                                   page_size=page_size)
