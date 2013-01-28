@@ -28,6 +28,7 @@ import datetime as dt
 import logging
 import re
 import simplejson as sj
+import transaction
 
 # controllers
 __all__ = ['DashboardController']
@@ -841,31 +842,39 @@ class DashboardController(BaseController):
             
         class_ = SapnsClass.by_name(cls)
         
-        return dict(reference=class_.reference(all=True))
+        return dict(cls=cls, reference=class_.reference(all=True))
     
     @expose('json')
     @require(p.in_group(u'managers'))
-    def ref_order_save(self, **kw):
+    def reference_order_save(self, **kw):
         
-        logger = logging.getLogger('DashboardController.ref_order_save')
+        logger = logging.getLogger('DashboardController.reference_order_save')
+        transaction.begin()
         try:
+            cls = get_paramw(kw, 'cls', unicode)
+            klass = SapnsClass.by_name(cls)
+            
+            dbs.query(SapnsAttribute).\
+                filter(SapnsAttribute.class_id == klass.class_id).\
+                update(dict(reference_order=None))
+                
+            dbs.flush()
+            
             # save reference order
             attributes = get_paramw(kw, 'attributes', sj.loads)
             
-            cls_title = None
-            for attr in attributes:
-                attribute = dbs.query(SapnsAttribute).get(attr['id'])
+            for i, attr_id in enumerate(attributes):
+                attribute = dbs.query(SapnsAttribute).get(attr_id)
                 
-                if not cls_title:
-                    cls_title = attribute.class_.title
-                
-                attribute.reference_order = attr['order']
+                attribute.reference_order = i
                 dbs.add(attribute)
                 dbs.flush()
                 
+            transaction.commit()
             return dict(status=True)
             
         except Exception, e:
+            transaction.abort()
             logger.error(e)
             return dict(status=False)
         

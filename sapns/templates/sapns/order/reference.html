@@ -1,40 +1,57 @@
-<div id="reference" style="margin-top:30px">
+<style>
+#ref_list { height:300px; overflow:auto }
+#ref_list .ref_attr { clear:left; height:20px; background-color:#f2f2f2; margin-bottom:3px;
+border-bottom:1px solid #777; font:13px arial; margin-right:5px; border-radius:2px;
+cursor:pointer }
+#ref_list .ref_attr .col { float:left; margin-right:10px }
+#ref_list .ref_attr .col.title { margin-top:3px }
+</style>
 
-<div id="ref_list" style="height: 500px; overflow: auto;">
-<!--{% for attr in reference %}-->
-<div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
-    <div style="border-bottom: 1px dotted gray;">
-        <div style="float: left; width: 40px; text-align: center;">
-            <input class="attr_included" type="checkbox" 
-                {% if attr.included %}checked="checked"{% endif %}/>
+<div id="reference">
+    <div id="ref_list">
+        <!--{% for attr in reference %}-->
+        <div class="ref_attr" id_attr="{{attr.id}}">
+            <div class="col">
+                <input class="checkbox" type="checkbox" 
+                    {% if attr.included %}checked="checked"{% endif %}/>
+            </div>
+            
+            <div class="col title" title="{{attr.name}}">{{attr.title}}</div>
         </div>
-        
-        <div title="{{attr.name}}" style="width: 80%; font-weight: bold; 
-            float: left;
-            {% if not attr.visible %}color: red;{% endif %}">{{attr.title}}</div>
-        
-        <!-- up -->
-        <div style="float: left;">
-            <input class="sp-button reforder_up"
-                type="button" value="{{_('Up')}}"/>
-        </div>
-        
-        <!-- down -->
-        <div>
-            <input class="sp-button reforder_down" type="button" 
-                value="{{_('Down')}}"/>
-        </div>
+        <!--{% endfor %}-->
     </div>
 </div>
-<!--{% endfor %}-->
-</div>
-</div>
 
-{#
-<script src="{{tg.url('/js/ref_order.min.js')}}"></script>
 <script>
+function reference_order(callback, callback_error) {
+    var atributos = [];
+    $('#ref_list .ref_attr input.checkbox:checked').each(function() {
+        atributos.push($(this).parents('.ref_attr').attr('id_attr')*1);
+    });
+    
+    $.ajax({
+        url: "{{tg.url('/dashboard/reference_order_save/')}}", 
+        data: {
+            cls: "{{cls}}",
+            attributes: JSON.stringify(atributos)
+        },
+        success: function(res) {
+            if (res.status) {
+                callback();
+            }
+            else {
+                callback_error();
+            }
+        },
+        error: function() {
+            callback_error();
+        }
+    });
+}
+
 $(function() {
-    ref_order("{{tg.url('/dashboard/ref_order_save/')}}");
+    $('#ref_list').sortable({
+        axis: 'y'
+    });
 });    
 </script>
-#}

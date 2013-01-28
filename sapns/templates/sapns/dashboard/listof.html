@@ -108,7 +108,8 @@
         	    var ids = $('#grid').sapnsGrid('getSelectedIds'),
         	        option_type = $(this).attr('option-type'),
         	        option_url = $(this).attr('option-url'),
-        	        option_title = $(this).text();
+        	        option_title = $(this).text(),
+        	        dialog_width = 900;
         	    
         	    if ($(this).hasClass('required_id') === '1' && ids.length == 0) {
         	        alert('Error!');
@@ -117,11 +118,14 @@
         	        $('#sp-admin-bar').fadeToggle(function() {
         	            if (option_type === 'reference_order') {
         	                if (!option_url) {
+        	                    function_name = 'reference_order';
+        	                    dialog_width = 600;
         	                    option_url = "{{tg.url('/dashboard/reference_order/')}}";
         	                }
         	            }
         	            else if (option_type === 'insertion_order') {
         	                if (!option_url) {
+        	                    dialog_width = 600;
         	                    option_url = "{{tg.url('/dashboard/insertion_order/')}}";
         	                }
         	            }
@@ -143,20 +147,27 @@
             	                    var on_process = false;
             	                    
             	                    $('#option-dialog').html(content).dialog({
-            	                        title: sprintf('%s::%s', "{{grid.caption}}", option_title),
+            	                        title: sprintf('[%s] %s', "{{grid.caption}}", option_title),
             	                        modal: true,
             	                        resizable: false,
-            	                        width: 900,
+            	                        width: dialog_width,
+            	                        height: 'auto',
             	                        buttons: {
             	                            "{{_('Ok')}}": function() {
             	                                if (!on_process) {
             	                                    on_process = true;
-            	                                    $('#option-dialog').dialog('destroy').remove();
+            	                                    window[function_name](function() {
+            	                                        $('#option-dialog').dialog('close');
+            	                                    },
+            	                                    function() {
+            	                                        on_process = false;
+            	                                        alert('Error!');
+            	                                    });
             	                                }
             	                            },
             	                            "{{_('Cancel')}}": function() {
             	                                if (!on_process) {
-            	                                    $('#option-dialog').dialog('destroy').remove();
+            	                                    $('#option-dialog').dialog('close');
             	                                }
                                             }
             	                        }
