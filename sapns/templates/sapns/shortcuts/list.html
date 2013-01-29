@@ -5,7 +5,7 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    {{ util.jquery_jstree() }}
+    {{ util.qtip2() }}
 {% endblock %}
 
 {% block middle %}
@@ -137,12 +137,7 @@
                             drop: function(e, ui) {
                                 var action_type = ui.draggable.attr('action_type');
                                 var cls;
-                                if (action_type === 'list') {
-                                    console.log(action_type + ' ' + cls);
-                                }
-                                else {
-                                    console.log(action_type);
-                                }
+                                share_shortcut(ui.draggable.attr('shortcut_id'));
                             }
                         });
                         
@@ -224,31 +219,6 @@
                                     }
                                 });
                             }
-                        });
-                        
-                        $('.sp-select-shortcut').change(function() {
-                            var opc = $(this).find('option:selected').val();
-                            var sc = $(this).parent();
-                            if (opc == 'delete') {
-                                delete_shortcut(sc);
-                            }
-                            else if (opc == 'to-dashboard') {
-                                sendto_dashboard(sc);
-                            }
-                            else if (opc == 'share') {
-                                share_shortcut(sc);
-                            }
-                            else if (opc == 'ins-order') {
-                                ins_order(sc);
-                            }
-                            else if (opc == 'ref-order') {
-                                ref_order(sc);
-                            }
-                            else if (opc == 'up' || opc == 'down') {
-                                move_shortcut(sc, opc);
-                            }
-                            
-                            $(this).find('option:first').prop('selected', true);
                         });
                     }
                     else {
@@ -340,76 +310,51 @@
         });
     	
         // share 
-        function share_shortcut(sc) {
-        	
-        	// load list of users 
+        function share_shortcut(shortcut_id) {
+            
+            var message_id = sbm.show({ message: "{{_('Wait, please')}}...", hide_after: 0 });
+
             $.ajax({
-                url: "{{tg.url('/dashboard/users/all_')}}",
-                type: 'get',
-                dataType: 'json',
-                success: function(res) {
-                    var users = res.users;
-                    var options = '';
-                    for (var i=0; i<users.length; i++) {
-                        options += '<option value="' + users[i].id +'">' + 
-                            users[i].display_name + ' [' + users[i].user_name + ']</option>';
-                    }
+                url: "{{tg.url('/dashboard/sc/share_users/')}}",
+                data: { shortcut_id: shortcut_id },
+                success: function(content) {
                     
-                    $('#users-to-share-with').html(options);
+                    sbm.hide({ id: message_id });
                     
-                    // {# "#share-dialog" should be loaded here 
-                    // but this way works well also #}  
+                    var on_progress = false;
+                    
+                    $('#sp-shortcut-share-users-dialog').remove();
+                    $('<div id="sp-shortcut-share-users-dialog" style="display:none"></div>').appendTo('body');
+                    
+                    $('#sp-shortcut-share-users-dialog').html(content).dialog({
+                        title: "{{_('Share with users')}}",
+                        modal: true,
+                        resizable: false,
+                        width: 600,
+                        height: 'auto',
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    
+                                    share_users(function() {
+                                        $('#sp-shortcut-share-users-dialog').dialog('close');
+                                    },
+                                    function() {
+                                        on_progress = false;
+                                    });
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-shortcut-share-users-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });                    
                 },
                 error: function() {
-                    alert('Error!');
-                }
-            });        	
-        	
-            var sc_id = sc.attr('sc_id');
-            var sc_title = sc.find('a').html();
-            
-            $('#share-dialog > #sp-shortcut-title').html(sc_title);
-        
-            $('#share-dialog').dialog({
-                resizable: false,
-                height: 230,
-                width: 450,
-                modal: true,
-                buttons: {
-                    "{{_('Ok')}}": function() {
-                    	
-                    	var user_id = $('#users-to-share-with').val();
-                    	
-                        $.ajax({
-                            url: "{{tg.url('/dashboard/sc/share')}}",
-                            type: 'post',
-                            dataType: 'json',
-                            data: {
-                                id_sc: sc_id,
-                                id_user: user_id
-                            },
-                            success: function(res) {
-                                if (res.status) {
-                                    sc.effect('highlight', {color: 'red'}, 400);
-                                }
-                                else {
-                                    alert('Error!');
-                                }
-                                
-                                $('#users-to-share-with option:first').prop('selected', true);
-                                $('#share-dialog').dialog('close');
-                            },
-                            error: function() {
-                                alert('Error!');
-                                $('#users-to-share-with option:first').prop('selected', true);
-                                $('#share-dialog').dialog('close');
-                            }
-                        });
-                    },
-                    "{{_('Cancel')}}": function() {
-                    	$('#users-to-share-with').find('option:first').prop('selected', true);
-                        $('#share-dialog').dialog('close');
-                    }
+                    sbm.hide({ id: message_id });
                 }
             });
         }
