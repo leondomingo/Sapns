@@ -138,19 +138,34 @@ class ShortcutsController(BaseController):
             logger.error(e)
             return dict(status=False, message=unicode(e))
         
+    @expose('sapns/shortcuts/share/users.html')
+    @require(p_.not_anonymous())
+    def share_users(self, **kw):
+        
+        shortcut_id = get_paramw(kw, 'shortcut_id', int)
+        shortcut = dbs.query(SapnsShortcut).get(shortcut_id)
+        
+        return dict(shortcut=dict(id=shortcut.shortcut_id,
+                                  title=shortcut.title,
+                                  ))
+        
     @expose('json')
     @require(p_.not_anonymous())
-    def share(self, id_sc=None, id_user=None, **params):
-        
-        logger = logging.getLogger(__name__ + '/share')
+    def share(self, **kw):
+        logger = logging.getLogger('ShortcutsController.share')
         try:
-            logger.info('Sharing shortcut [%s]' % id)
+            users = get_paramw(kw, 'users', sj.loads)
+            shortcut_id = get_paramw(kw, 'shortcut_id', int)
             
-            user = dbs.query(SapnsUser).get(id_user)
-            if not user:
-                raise Exception('User [%s] does not exist' % id_user)
+            logger.info('Sharing shortcut [%s]' % shortcut_id)
             
-            user.get_dashboard().add_child(id_sc)            
+            for user_id in users:
+                try:
+                    user = dbs.query(SapnsUser).get(user_id)
+                    user.get_dashboard().add_child(shortcut_id)
+                    
+                except Exception, e:
+                    logger.error(e)
             
             return dict(status=True)
         
@@ -169,7 +184,6 @@ class ShortcutsController(BaseController):
             i = 0
             for id_shortcut in order:
                 sc = dbs.query(SapnsShortcut).get(id_shortcut)
-                #sc = SapnsShortcut()
                 sc.order = i
                 dbs.add(sc)
                 dbs.flush()
