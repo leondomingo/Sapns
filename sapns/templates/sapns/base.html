@@ -47,16 +47,15 @@
                     stop: function() {
                         var order = [];
                         $('.item_sb_sortable').each(function() {
-                            order.push($(this).attr('shortcut_id'));
+                            order.push($(this).attr('shortcut_id')*1);
                         });
                         
                         $.ajax({
                             url: "{{tg.url('/dashboard/sc/reorder/')}}",
                             data: { order: JSON.stringify(order) },
                             success: function(res) {
-                                if (!res) {
+                                if (!res.status) {
                                     $('.sp_sidebar').html(content).sortable('cancel');
-                                    
                                 }
                             },
                             error: function() {
