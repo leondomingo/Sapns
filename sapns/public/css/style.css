@@ -209,10 +209,11 @@ border-radius:5px 3px 3px 0; padding:5px 2px 2px; width:30px; height:20px; backg
 text-align:center; margin-right:5px }
 #sp-exploration-head .button:hover { background-color:#666; color:#f2f2f2 }
 
-#sp-shortcut-new img, .sp-shortcut-up img { width:20px; height:20px }
+#sp-shortcut-new img, #sp-shortcut-order img, .sp-shortcut-up img { width:20px; height:20px }
 .sp-shortcut-up { font-weight:normal; width:90% }
 
 #sp-shortcut-list { margin:0 10px 10px 10px; padding:5px; background-color:#fff; height:540px; overflow:auto }
+#sp-shortcut-list.order-mode { border:2px solid coral; border-radius:2px }
 .on-dragging { height:415px !important }
 a.sp-shortcut { font-weight:normal; color:#666; border-radius:3px; 
 width:102px; height:55px; margin:5px; padding:2px; text-align:center;

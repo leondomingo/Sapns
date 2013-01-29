@@ -20,10 +20,9 @@
     <span class="title">{{this_shortcut.title}}</span>
     <!--{% endif %}-->
     
-    {#<div id="sp-shortcut-new" class="button">{{_('New')}}</div>#}
+    <div id="sp-shortcut-order" class="button" title="{{_('Order')}}"><img src="{{tg.url('/images/sapns/icons/order.png')}}"></div>
     <div id="sp-shortcut-new" class="button" title="{{_('New')}}"><img src="{{tg.url('/images/sapns/icons/new.png')}}"></div>
     <!--{% if (sc_parent or '') != '' %}-->
-    {#<a class="sp-shortcut-up button" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent))}}">[{{_('up')}}]</a>#}
     <a class="sp-shortcut-up button" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent))}}" title="{{_('up')}}">
         <img src="{{tg.url('/images/sapns/icons/north.png')}}">
     </a>
@@ -48,7 +47,8 @@
 <script>
     $(function() {
         
-        var sbm = new SidebarMessages();
+        var sbm = new SidebarMessages(),
+            order_mode = false;
         
         function load_shortcuts() {
             $.ajax({
@@ -58,199 +58,222 @@
                     sc_parent: "{{this_shortcut.id or ''}}"
                 },
                 success: function(content) {
-                    $('#sp-shortcut-list').html(content);
+                    $('#sp-shortcut-list').html(content).removeClass('order-mode');
                     
-                    $('.sp-shortcut').draggable({
-                        helper: 'clone',
-                        start: function() {
-                            $('#sp-shortcut-list').addClass('on-dragging');
-                            $('#sp-shortcut-options').slideDown();
-                        },
-                        stop: function() {
-                            $('#sp-shortcut-options').slideUp(function() {
-                                $('#sp-shortcut-list').removeClass('on-dragging');
-                            });
-                        }
-                    });
-                    
-                    $('.sp_sidebar').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'activo',
-                        drop: function(e, ui) {
-                            $.ajax({
-                                url: "{{tg.url('/dashboard/sc/bookmark/')}}",
-                                data: { id_shortcut: ui.draggable.attr('shortcut_id') },
-                                success: function(res) {
-                                    if (res.status) {
-                                        var new_shortcut = '<div class="item_sb item_sb_sortable" shortcut_id="' + res.shortcut.id + '">\
-                                            <a href="' + res.shortcut.url + '">\
-                                            <span class="text_sb" title="' + res.shortcut.title + '">' + res.shortcut.title + '</span>\
-                                            </a></div>' 
-                                        
-                                        $('.sp_sidebar').append(new_shortcut);
-                                    }
-                                },
-                                error: function() {
-                                }
-                            });
-                        }
-                    });
-                    
-                    $('.sp-shortcut.group').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'activo',
-                        drop: function(e, ui) {
-                            var id_group = $(this).attr('shortcut_id');
-                            $.ajax({
-                                url: "{{tg.url('/dashboard/sc/move/')}}",
-                                data: {
-                                    id_shortcut: ui.draggable.attr('shortcut_id'),
-                                    id_group: id_group
-                                },
-                                success: function(res) {
-                                    if (res.status) {
-                                        ui.draggable.fadeOut(function() {
-                                            ui.draggable.remove();
-                                        });
-                                    }
-                                    else {
-                                        // Error 
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    
-                    $('#sp-shortcut-options .edit').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'accept',
-                        drop: function(e, ui) {
-                            var shortcut_id = ui.draggable.attr('shortcut_id');
-                            edit_shortcut(shortcut_id);
-                        }
-                    });
-                    
-                    $('#sp-shortcut-options .users').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'accept',
-                        drop: function(e, ui) {
-                            var action_type = ui.draggable.attr('action_type');
-                            var cls;
-                            if (action_type === 'list') {
-                                console.log(action_type + ' ' + cls);
+                    if (!order_mode) {
+                        $('.sp-shortcut').draggable({
+                            helper: 'clone',
+                            start: function() {
+                                $('#sp-shortcut-list').addClass('on-dragging');
+                                $('#sp-shortcut-options').slideDown();
+                            },
+                            stop: function() {
+                                $('#sp-shortcut-options').slideUp(function() {
+                                    $('#sp-shortcut-list').removeClass('on-dragging');
+                                });
                             }
-                            else {
-                                console.log(action_type);
-                            }
-                        }
-                    });
-                    
-                    $('#sp-shortcut-options .roles').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'accept',
-                        drop: function(e, ui) {
-                            var action_type = ui.draggable.attr('action_type');
-                            var cls;
-                            if (action_type === 'list') {
-                                console.log(action_type + ' ' + cls);
-                            }
-                            else {
-                                console.log(action_type);
-                            }
-                        }
-                    });
-                    
-                    $('#sp-shortcut-options .up').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'accept',
-                        drop: function(e, ui) {
-                            $.ajax({
-                                url: "{{tg.url('/dashboard/sc/move/')}}",
-                                data: {
-                                    id_shortcut: ui.draggable.attr('shortcut_id'),
-                                    id_group: "{{sc_parent}}"
-                                },
-                                success: function(res) {
-                                    if (res.status) {
-                                        ui.draggable.fadeOut(function() {
-                                            ui.draggable.remove();
-                                        });
-                                    }
-                                    else {
-                                        // Error 
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    
-                    $('#sp-shortcut-options .delete').droppable({
-                        accept: '.sp-shortcut',
-                        hoverClass: 'accept',
-                        drop: function(e, ui) {
-                            var shortcut_id = ui.draggable.attr('shortcut_id');
-                            var action_type = ui.draggable.attr('action_type');
-                            var cls = ui.draggable.attr('cls');
-                            
-                            $('#delete-confirmation').dialog({
-                                modal: true,
-                                resizable: false,
-                                width: 450,
-                                buttons: {
-                                    "{{_('Ok')}}": function() {
-                                        $.ajax({
-                                            url: "{{tg.url('/dashboard/sc/delete/')}}",
-                                            data: { id_shortcut: shortcut_id },
-                                            success: function(res) {
-                                                if (res.status) {
-                                                    $('#delete-confirmation').dialog('close');
-                                                    // delete shortcut (right pane) 
-                                                    ui.draggable.fadeOut();
-                                                    
-                                                    // delete shortcut from sidebar (left pane), if it exists 
-                                                    $('.sp_sidebar').find('div[shortcut_id=' + shortcut_id + ']').fadeOut();
-                                                }
-                                            },
-                                            error: function() {
-                                                alert('Error!');
-                                                $('#delete-confirmation').dialog('close');
-                                            }
-                                        });
-                                    },
-                                    "{{_('Cancel')}}": function() {
-                                        $('#delete-confirmation').dialog('close');
-                                    }
-                                }
-                            });
-                        }
-                    });
-                    
-                    $('.sp-select-shortcut').change(function() {
-                        var opc = $(this).find('option:selected').val();
-                        var sc = $(this).parent();
-                        if (opc == 'delete') {
-                            delete_shortcut(sc);
-                        }
-                        else if (opc == 'to-dashboard') {
-                            sendto_dashboard(sc);
-                        }
-                        else if (opc == 'share') {
-                            share_shortcut(sc);
-                        }
-                        else if (opc == 'ins-order') {
-                            ins_order(sc);
-                        }
-                        else if (opc == 'ref-order') {
-                            ref_order(sc);
-                        }
-                        else if (opc == 'up' || opc == 'down') {
-                            move_shortcut(sc, opc);
-                        }
+                        });
                         
-                        $(this).find('option:first').prop('selected', true);
-                    });
-                    
-                    
+                        $('.sp_sidebar').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'activo',
+                            drop: function(e, ui) {
+                                $.ajax({
+                                    url: "{{tg.url('/dashboard/sc/bookmark/')}}",
+                                    data: { id_shortcut: ui.draggable.attr('shortcut_id') },
+                                    success: function(res) {
+                                        if (res.status) {
+                                            var new_shortcut = '<div class="item_sb item_sb_sortable" shortcut_id="' + res.shortcut.id + '">\
+                                                <a href="' + res.shortcut.url + '">\
+                                                <span class="text_sb" title="' + res.shortcut.title + '">' + res.shortcut.title + '</span>\
+                                                </a></div>' 
+                                            
+                                            $('.sp_sidebar').append(new_shortcut);
+                                        }
+                                    },
+                                    error: function() {
+                                    }
+                                });
+                            }
+                        });
+                        
+                        $('.sp-shortcut.group').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'activo',
+                            drop: function(e, ui) {
+                                var id_group = $(this).attr('shortcut_id');
+                                $.ajax({
+                                    url: "{{tg.url('/dashboard/sc/move/')}}",
+                                    data: {
+                                        id_shortcut: ui.draggable.attr('shortcut_id'),
+                                        id_group: id_group
+                                    },
+                                    success: function(res) {
+                                        if (res.status) {
+                                            ui.draggable.fadeOut(function() {
+                                                ui.draggable.remove();
+                                            });
+                                        }
+                                        else {
+                                            // Error 
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                        $('#sp-shortcut-options .edit').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'accept',
+                            drop: function(e, ui) {
+                                var shortcut_id = ui.draggable.attr('shortcut_id');
+                                edit_shortcut(shortcut_id);
+                            }
+                        });
+                        
+                        $('#sp-shortcut-options .users').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'accept',
+                            drop: function(e, ui) {
+                                var action_type = ui.draggable.attr('action_type');
+                                var cls;
+                                if (action_type === 'list') {
+                                    console.log(action_type + ' ' + cls);
+                                }
+                                else {
+                                    console.log(action_type);
+                                }
+                            }
+                        });
+                        
+                        $('#sp-shortcut-options .roles').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'accept',
+                            drop: function(e, ui) {
+                                var action_type = ui.draggable.attr('action_type');
+                                var cls;
+                                if (action_type === 'list') {
+                                    console.log(action_type + ' ' + cls);
+                                }
+                                else {
+                                    console.log(action_type);
+                                }
+                            }
+                        });
+                        
+                        $('#sp-shortcut-options .up').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'accept',
+                            drop: function(e, ui) {
+                                $.ajax({
+                                    url: "{{tg.url('/dashboard/sc/move/')}}",
+                                    data: {
+                                        id_shortcut: ui.draggable.attr('shortcut_id'),
+                                        id_group: "{{sc_parent}}"
+                                    },
+                                    success: function(res) {
+                                        if (res.status) {
+                                            ui.draggable.fadeOut(function() {
+                                                ui.draggable.remove();
+                                            });
+                                        }
+                                        else {
+                                            // Error 
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                        $('#sp-shortcut-options .delete').droppable({
+                            accept: '.sp-shortcut',
+                            hoverClass: 'accept',
+                            drop: function(e, ui) {
+                                var shortcut_id = ui.draggable.attr('shortcut_id');
+                                var action_type = ui.draggable.attr('action_type');
+                                var cls = ui.draggable.attr('cls');
+                                
+                                $('#delete-confirmation').dialog({
+                                    modal: true,
+                                    resizable: false,
+                                    width: 450,
+                                    buttons: {
+                                        "{{_('Ok')}}": function() {
+                                            $.ajax({
+                                                url: "{{tg.url('/dashboard/sc/delete/')}}",
+                                                data: { id_shortcut: shortcut_id },
+                                                success: function(res) {
+                                                    if (res.status) {
+                                                        $('#delete-confirmation').dialog('close');
+                                                        // delete shortcut (right pane) 
+                                                        ui.draggable.fadeOut();
+                                                        
+                                                        // delete shortcut from sidebar (left pane), if it exists 
+                                                        $('.sp_sidebar').find('div[shortcut_id=' + shortcut_id + ']').fadeOut();
+                                                    }
+                                                },
+                                                error: function() {
+                                                    alert('Error!');
+                                                    $('#delete-confirmation').dialog('close');
+                                                }
+                                            });
+                                        },
+                                        "{{_('Cancel')}}": function() {
+                                            $('#delete-confirmation').dialog('close');
+                                        }
+                                    }
+                                });
+                            }
+                        });
+                        
+                        $('.sp-select-shortcut').change(function() {
+                            var opc = $(this).find('option:selected').val();
+                            var sc = $(this).parent();
+                            if (opc == 'delete') {
+                                delete_shortcut(sc);
+                            }
+                            else if (opc == 'to-dashboard') {
+                                sendto_dashboard(sc);
+                            }
+                            else if (opc == 'share') {
+                                share_shortcut(sc);
+                            }
+                            else if (opc == 'ins-order') {
+                                ins_order(sc);
+                            }
+                            else if (opc == 'ref-order') {
+                                ref_order(sc);
+                            }
+                            else if (opc == 'up' || opc == 'down') {
+                                move_shortcut(sc, opc);
+                            }
+                            
+                            $(this).find('option:first').prop('selected', true);
+                        });
+                    }
+                    else {
+                        $('#sp-shortcut-list').addClass('order-mode').sortable({
+                            stop: function() {
+                                var order = [];
+                                $('#sp-shortcut-list .sp-shortcut').each(function() {
+                                    order.push($(this).attr('shortcut_id')*1);
+                                });
+                                
+                                $.ajax({
+                                    url: "{{tg.url('/dashboard/sc/reorder/')}}",
+                                    data: { order: JSON.stringify(order) },
+                                    success: function(res) {
+                                        if (!res.status) {
+                                            $('#sp-shortcut-list').sortable('cancel');
+                                        }
+                                    },
+                                    error: function() {
+                                        $('#sp-shortcut-list').sortable('cancel');
+                                    }
+                                });
+                            }
+                        });
+                    }
                 }
             });
         }
@@ -306,15 +329,20 @@
             edit_shortcut();
         });
         
+        $('#sp-shortcut-order').click(function() {
+            order_mode = !order_mode;
+            load_shortcuts();
+        });
+        
         var s_ = '.sp-no-shortcuts span.here'; 
         $(document).off('click', s_).on('click', s_, function() {
             edit_shortcut();
         });
     	
-        // {# share #} 
+        // share 
         function share_shortcut(sc) {
         	
-        	// {# load list of users #} 
+        	// load list of users 
             $.ajax({
                 url: "{{tg.url('/dashboard/users/all_')}}",
                 type: 'get',
