@@ -1,0 +1,99 @@
+{% import 'sapns/dashboard/util.html' as util %}
+
+<div id="sp-shortcut-share-roles">
+    <div class="sp-field-row">
+        <div class="sp-field">
+            <div class="label">{{_('Role')}}</div>
+            <div class="role-add"></div>
+        </div>
+        
+        <div class="sp-field">
+            <div class="label">&nbsp;</div>
+            <button class="role-add-button">{{_('Add')}}</button>
+        </div>
+    </div>
+    
+    <div class="roles-list"></div>
+</div>
+
+{% raw %}
+<textarea id="role-tmpl" style="display:none">
+    <div class="role" role_id="{{role.id}}">
+        <div class="col role-name">{{role.name}}</div>
+        <div class="col button" title="{{title}}"><img src="{{src}}"></div>
+    </div>
+</textarea>
+{% endraw %}
+
+<script src="{{tg.url('/js/mustache/mustache.min.js')}}"></script>
+<script src="{{tg.url('/js/sprintf/sprintf.min.js')}}"></script>
+<script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.selector.min.js' %}
+    
+    function share_roles(callback, callback_error) {
+        
+        var roles = [];
+        $('#sp-shortcut-share-roles .roles-list .role').each(function() {
+            roles.push($(this).attr('role_id')*1);
+        });
+        
+        $.ajax({
+            url: "{{tg.url('/dashboard/sc/share')}}",
+            data: { shortcut_id: "{{shortcut.id}}", roles: JSON.stringify(roles) },
+            success: function(res) {
+                if (res.status) {
+                    callback();
+                }
+                else {
+                    alert('Error!');
+                    callback_error();
+                }
+            },
+            error: function() {
+                alert('Error!');
+                callback_error();
+            }
+        });        
+    }
+    
+    $(function() {
+        $('#sp-shortcut-share-roles .role-add').sapnsSelector({
+            rc: 'sp_roles', rc_title: "{{_('Roles')}}"
+        });
+        
+        $('#sp-shortcut-share-roles .roles-list').resizable({
+            minHeight: 200,
+            maxHeight: 350,
+            handles: 'n, s'
+        })
+        
+        var user_tmpl = $('#role-tmpl').text();
+        
+        $('#sp-shortcut-share-roles .role-add-button').click(function() {
+            var role_id = $('#sp-shortcut-share-roles .role-add').sapnsSelector('getValue'),
+                role_title = $('#sp-shortcut-share-roles .role-add').sapnsSelector('getTitle');
+            if (role_id) {
+                $('#sp-shortcut-share-roles .role-add').sapnsSelector('setValue', null);
+                
+                if ($('#sp-shortcut-share-roles .roles-list .role[role_id='+role_id+']').length === 0) {
+                    var role = Mustache.render(user_tmpl, {
+                        role: { id: role_id, name: role_title },
+                        src: "{{tg.url('/images/sapns/icons/delete.png')}}",
+                        title: "{{_('Remove')}}"
+                    });
+                    
+                    $('#sp-shortcut-share-roles .roles-list').append(role);
+                }
+            }
+        });
+        
+        var s_ = '#sp-shortcut-share-roles .roles-list .role .col.button';
+        $(document).off('click', s_).on('click', s_, function() {
+            var role = $(this).parents('.role');
+            role.fadeOut('slow', function() {
+                role.remove();
+            });
+        });
+    });
+</script>
