@@ -872,16 +872,20 @@ class SapnsClass(DeclarativeBase):
         Returns a list of actions associated with this class.
         
         OUT
-          [{"title":      <unicode>, 
-            "url":        <unicode>, 
-            "require_id": <bool>, 
+          [{"name":       <unicode>,
+            "title":      <unicode>,
+            "url":        <unicode>,
+            "require_id": <bool>,
             "type":       <unicode>}, ...]
         """
         
+        _logger = logging.getLogger('SapnsClass.sorted_actions')
+        
         def _sorted_actions():
             
-            #user = dbs.query(SapnsUser).get(id_user)
-            #user = 
+            # calculate the list of permissions_id of this user
+            user = dbs.query(SapnsUser).get(id_user)
+            permissions = [p.permission_id for p in user.permissions]
             
             actions = []
             for ac in dbs.query(SapnsPermission).\
@@ -890,17 +894,13 @@ class SapnsClass(DeclarativeBase):
                                 SapnsPermission.type != SapnsPermission.TYPE_LIST,
                                 )):
                 
-                # does this user has privilege on this action?
-                user = dbs.query(SapnsUser).get(id_user)
-                p_id = [p.permission_id for p in user.permissions]
-                if ac.permission_id in p_id: 
-                # SapnsActPrivilege.has_privilege(id_user, ac.action_id):
+                if ac.permission_id in permissions:
                     
                     url = ac.url
                     if url and url[-1] != '/':
                         url += '/'
                         
-                    require_id = ac.requires_id # True
+                    require_id = ac.requires_id
                     pos = 100
                     
                     # PROCESS: actions associated with this class with no implementation
@@ -908,30 +908,18 @@ class SapnsClass(DeclarativeBase):
                         continue
                         
                     if ac.type == SapnsPermission.TYPE_NEW:
-#                        if not ac.url:
-#                            url = SapnsPermission.URL_NEW
-                            
                         require_id = False
                         pos = 1
                     
                     elif ac.type == SapnsPermission.TYPE_EDIT:
-#                        if not ac.url:
-#                            url = SapnsPermission.URL_EDIT
-                            
                         require_id = True
                         pos = 2
                     
                     elif ac.type == SapnsPermission.TYPE_DELETE:
-#                        if not ac.url:
-#                            url = SapnsPermission.URL_DELETE
-                            
                         require_id = True
                         pos = 3
                         
                     elif ac.type == SapnsPermission.TYPE_DOCS:
-#                        if not ac.url:
-#                            url = SapnsPermission.URL_DOCS
-                            
                         require_id = True
                         pos = 4
                         
@@ -942,7 +930,7 @@ class SapnsClass(DeclarativeBase):
                     actions.append(Dict(name=p_name or '', title=_(ac.display_name), 
                                         type=ac.type, url=url, require_id=require_id, 
                                         pos=pos))
-                
+                    
             def cmp_act(x, y):
                 if x.pos == y.pos:
                     return cmp(x.title, y.title)
