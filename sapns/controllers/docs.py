@@ -317,6 +317,6 @@ class DocsController(BaseController):
         id_doc = SapnsDoc.get_id_doc(repo, doc)
                 
         content, mt, _file_name = SapnsDoc.download(id_doc)
-        response.headerlist.append(('Content-Type', mt.encode('utf-8')))
+        response.content_type = mt.encode('latin-1')
         
         return content
