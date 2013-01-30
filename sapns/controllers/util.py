@@ -35,8 +35,7 @@ class UtilController(BaseController):
     def code_model(self, app_name='MyApp', file_name=''):
         mdl = self.extract_model()
         if file_name:
-            response.headerlist.append(('Content-Disposition', 
-                                        'attachment;filename=%s' % file_name))
+            response.headers['Content-Disposition'] = 'attachment;filename=%s' % file_name
 
         return render_jinja2('sapns/util/model.template',
                              extra_vars=dict(app_name=app_name,

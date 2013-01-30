@@ -225,8 +225,8 @@ class DocsController(BaseController):
             id_doc = int(id_doc)
             
             content, mt, file_name = SapnsDoc.download(id_doc)
-            response.headerlist.append(('Content-Type', mt.encode('utf-8')))
-            response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+            response.content_type = mt.encode('latin-1')
+            response.headers['Content-Disposition'] = 'attachment;filename=%s' % file_name
         
             return content
             
@@ -236,8 +236,8 @@ class DocsController(BaseController):
             
             if len(docs) == 1:
                 content, mt, file_name = SapnsDoc.download(docs[0])
-                response.headerlist.append(('Content-Type', mt.encode('utf-8')))
-                response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % file_name))
+                response.content_type = mt.encode('latin-1')
+                response.headers['Content-Disposition'] =  'attachment;filename=%s' % file_name
         
                 return content
             
@@ -258,9 +258,9 @@ class DocsController(BaseController):
                 finally:
                     zip_file.close()
                         
-                response.headerlist.append(('Content-Type', 'application/zip'))
+                response.content_type = 'application/zip'
                 fn = _('docs__%s.zip') % datetostr(dt.date.today(), fmt='%Y%m%d')
-                response.headerlist.append(('Content-Disposition', 'attachment;filename=%s' % fn))
+                response.headers['Content-Disposition'] = 'attachment;filename=%s' % fn
                 
                 return zf.getvalue()
         

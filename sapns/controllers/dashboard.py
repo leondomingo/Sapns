@@ -191,8 +191,7 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
-        response.headerlist.append(('Content-Disposition',
-                                    'attachment;filename=%s.csv' % cls.encode('utf-8')))
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % cls.encode('utf-8')
         
         return ds.to_csv()
     
@@ -205,8 +204,7 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
 
-        response.headerlist.append(('Content-Disposition',
-                                    'attachment;filename=%s.xls' % cls.encode('utf-8')))
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % cls.encode('utf-8')
         
         # generate XLS content into "memory file"
         xl_file = cStringIO.StringIO()
