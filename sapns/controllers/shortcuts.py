@@ -5,13 +5,14 @@ from neptuno.util import get_paramw
 from pylons import cache
 from pylons.i18n import lazy_ugettext as l_, ugettext as _
 from sapns.lib.base import BaseController
+from sapns.lib.sapns.util import ROLE_MANAGERS
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
-    SapnsPermission, SapnsPrivilege
+    SapnsPermission, SapnsPrivilege, SapnsRole
+from sqlalchemy.sql.expression import and_, or_
 from tg import expose, url, request, require, predicates as p_
 import logging
 import simplejson as sj
-from sqlalchemy.sql.expression import and_, or_
 
 __all__ = ['ShortcutsController']
 
@@ -149,23 +150,59 @@ class ShortcutsController(BaseController):
                                   title=shortcut.title,
                                   ))
         
+    @expose('sapns/shortcuts/share/roles.html')
+    @require(p_.not_anonymous())
+    def share_roles(self, **kw):
+        
+        shortcut_id = get_paramw(kw, 'shortcut_id', int)
+        shortcut = dbs.query(SapnsShortcut).get(shortcut_id)
+        
+        return dict(shortcut=dict(id=shortcut.shortcut_id,
+                                  title=shortcut.title,
+                                  ))        
+        
     @expose('json')
     @require(p_.not_anonymous())
     def share(self, **kw):
         logger = logging.getLogger('ShortcutsController.share')
         try:
-            users = get_paramw(kw, 'users', sj.loads)
             shortcut_id = get_paramw(kw, 'shortcut_id', int)
+            shortcut = dbs.query(SapnsShortcut).get(shortcut_id)
+            
+            this_user = request.identity['user'].user_id
+            
+            # only "managers" are allowed to share other users' shortcuts
+            if ROLE_MANAGERS not in request.identity['groups'] and this_user != shortcut.user_id:
+                raise Exception(_(u'You are not the owner of this shortcut'))
+            
+            users = get_paramw(kw, 'users', sj.loads, opcional=True)
+            if not users:
+                roles = get_paramw(kw, 'roles', sj.loads)
             
             logger.info('Sharing shortcut [%s]' % shortcut_id)
             
-            for user_id in users:
-                try:
-                    user = dbs.query(SapnsUser).get(user_id)
-                    user.get_dashboard().add_child(shortcut_id)
-                    
-                except Exception, e:
-                    logger.error(e)
+            if users:
+                for user_id in users:
+                    if user_id != this_user:
+                        try:
+                            user = dbs.query(SapnsUser).get(user_id)
+                            user.get_dashboard().add_child(shortcut_id)
+                            
+                        except Exception, e:
+                            logger.error(e)
+                        
+            elif roles:
+                # sharing a shortcut with a role means sharing with all the users in that role
+                for role_id in roles:
+                    role = dbs.query(SapnsRole).get(role_id)
+                    for user in role.users_:
+                        if user.user_id != this_user:
+                            try:
+                                user = dbs.query(SapnsUser).get(user.user_id)
+                                user.get_dashboard().add_child(shortcut_id)
+                                
+                            except Exception, e:
+                                logger.error(e)
             
             return dict(status=True)
         

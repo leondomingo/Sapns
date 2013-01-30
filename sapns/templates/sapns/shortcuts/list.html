@@ -20,7 +20,7 @@
     <span class="title">{{this_shortcut.title}}</span>
     <!--{% endif %}-->
     
-    <div id="sp-shortcut-order" class="button" title="{{_('Order')}}"><img src="{{tg.url('/images/sapns/icons/order.png')}}"></div>
+    <div id="sp-shortcut-sort" class="button" title="{{_('Click here to place your shortcuts')}}"><img src="{{tg.url('/images/sapns/icons/sort.png')}}"></div>
     <div id="sp-shortcut-new" class="button" title="{{_('New')}}"><img src="{{tg.url('/images/sapns/icons/new.png')}}"></div>
     <!--{% if (sc_parent or '') != '' %}-->
     <a class="sp-shortcut-up button" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent))}}" title="{{_('up')}}">
@@ -48,7 +48,7 @@
     $(function() {
         
         var sbm = new SidebarMessages(),
-            order_mode = false;
+            sort_mode = false;
         
         function load_shortcuts() {
             $.ajax({
@@ -58,9 +58,9 @@
                     sc_parent: "{{this_shortcut.id or ''}}"
                 },
                 success: function(content) {
-                    $('#sp-shortcut-list').html(content).removeClass('order-mode');
+                    $('#sp-shortcut-list').html(content).removeClass('sort-mode');
                     
-                    if (!order_mode) {
+                    if (!sort_mode) {
                         $('.sp-shortcut').draggable({
                             helper: 'clone',
                             start: function() {
@@ -74,6 +74,7 @@
                             }
                         });
                         
+                        // sidebar 
                         $('.sp_sidebar').droppable({
                             accept: '.sp-shortcut',
                             hoverClass: 'activo',
@@ -96,6 +97,7 @@
                             }
                         });
                         
+                        // move into a group 
                         $('.sp-shortcut.group').droppable({
                             accept: '.sp-shortcut',
                             hoverClass: 'activo',
@@ -122,6 +124,7 @@
                             }
                         });
                         
+                        // edit 
                         $('#sp-shortcut-options .edit').droppable({
                             accept: '.sp-shortcut',
                             hoverClass: 'accept',
@@ -131,31 +134,25 @@
                             }
                         });
                         
+                        // users 
                         $('#sp-shortcut-options .users').droppable({
                             accept: '.sp-shortcut.list, .sp-shortcut.process',
                             hoverClass: 'accept',
                             drop: function(e, ui) {
-                                var action_type = ui.draggable.attr('action_type');
-                                var cls;
                                 share_shortcut(ui.draggable.attr('shortcut_id'));
                             }
                         });
                         
+                        // roles 
                         $('#sp-shortcut-options .roles').droppable({
                             accept: '.sp-shortcut.list, .sp-shortcut.process',
                             hoverClass: 'accept',
                             drop: function(e, ui) {
-                                var action_type = ui.draggable.attr('action_type');
-                                var cls;
-                                if (action_type === 'list') {
-                                    console.log(action_type + ' ' + cls);
-                                }
-                                else {
-                                    console.log(action_type);
-                                }
+                                share_shortcut_roles(ui.draggable.attr('shortcut_id'));
                             }
                         });
                         
+                        // up 
                         $('#sp-shortcut-options .up').droppable({
                             accept: '.sp-shortcut',
                             hoverClass: 'accept',
@@ -180,6 +177,7 @@
                             }
                         });
                         
+                        // delete 
                         $('#sp-shortcut-options .delete').droppable({
                             accept: '.sp-shortcut',
                             hoverClass: 'accept',
@@ -222,16 +220,16 @@
                         });
                     }
                     else {
-                        $('#sp-shortcut-list').addClass('order-mode').sortable({
+                        $('#sp-shortcut-list').addClass('sort-mode').sortable({
                             stop: function() {
-                                var order = [];
+                                var sort = [];
                                 $('#sp-shortcut-list .sp-shortcut').each(function() {
-                                    order.push($(this).attr('shortcut_id')*1);
+                                    sort.push($(this).attr('shortcut_id')*1);
                                 });
                                 
                                 $.ajax({
                                     url: "{{tg.url('/dashboard/sc/reorder/')}}",
-                                    data: { order: JSON.stringify(order) },
+                                    data: { order: JSON.stringify(sort) },
                                     success: function(res) {
                                         if (!res.status) {
                                             $('#sp-shortcut-list').sortable('cancel');
@@ -299,8 +297,24 @@
             edit_shortcut();
         });
         
-        $('#sp-shortcut-order').click(function() {
-            order_mode = !order_mode;
+        $('#sp-shortcut-sort').click(function() {
+            sort_mode = !sort_mode;
+            if (sort_mode) {
+                $('#sp-shortcut-sort').qtip({
+                    content: { text: "{{_('Click again when you finish placing your shortcuts')}}" },
+                    position: {
+                        at: 'left top',
+                        my: 'right bottom'
+                    },
+                    show: { ready: true },
+                    hide: false,
+                    style: 'ui-tooltip-tipped'
+                });
+            }
+            else {
+                $('.ui-tooltip.ui-tooltip-tipped').remove();
+            }
+            
             load_shortcuts();
         });
         
@@ -309,7 +323,7 @@
             edit_shortcut();
         });
     	
-        // share 
+        // share with users 
         function share_shortcut(shortcut_id) {
             
             var message_id = sbm.show({ message: "{{_('Wait, please')}}...", hide_after: 0 });
@@ -348,6 +362,56 @@
                             "{{_('Cancel')}}": function() {
                                 if (!on_progress) {
                                     $('#sp-shortcut-share-users-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });                    
+                },
+                error: function() {
+                    sbm.hide({ id: message_id });
+                }
+            });
+        }
+        
+        // share with roles 
+        function share_shortcut_roles(shortcut_id) {
+            
+            var message_id = sbm.show({ message: "{{_('Wait, please')}}...", hide_after: 0 });
+
+            $.ajax({
+                url: "{{tg.url('/dashboard/sc/share_roles/')}}",
+                data: { shortcut_id: shortcut_id },
+                success: function(content) {
+                    
+                    sbm.hide({ id: message_id });
+                    
+                    var on_progress = false;
+                    
+                    $('#sp-shortcut-share-roles-dialog').remove();
+                    $('<div id="sp-shortcut-share-roles-dialog" style="display:none"></div>').appendTo('body');
+                    
+                    $('#sp-shortcut-share-roles-dialog').html(content).dialog({
+                        title: "{{_('Share with roles')}}",
+                        modal: true,
+                        resizable: false,
+                        width: 600,
+                        height: 'auto',
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    
+                                    share_roles(function() {
+                                        $('#sp-shortcut-share-roles-dialog').dialog('close');
+                                    },
+                                    function() {
+                                        on_progress = false;
+                                    });
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-shortcut-share-roles-dialog').dialog('close');
                                 }
                             }
                         }
