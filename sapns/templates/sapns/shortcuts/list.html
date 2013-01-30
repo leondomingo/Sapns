@@ -91,8 +91,7 @@
                                             $('.sp_sidebar').append(new_shortcut);
                                         }
                                     },
-                                    error: function() {
-                                    }
+                                    error: function() {}
                                 });
                             }
                         });
@@ -117,7 +116,8 @@
                                         else {
                                             // Error 
                                         }
-                                    }
+                                    },
+                                    error: function() {}
                                 });
                             }
                         });
@@ -132,7 +132,7 @@
                         });
                         
                         $('#sp-shortcut-options .users').droppable({
-                            accept: '.sp-shortcut',
+                            accept: '.sp-shortcut.list, .sp-shortcut.process',
                             hoverClass: 'accept',
                             drop: function(e, ui) {
                                 var action_type = ui.draggable.attr('action_type');
@@ -142,7 +142,7 @@
                         });
                         
                         $('#sp-shortcut-options .roles').droppable({
-                            accept: '.sp-shortcut',
+                            accept: '.sp-shortcut.list, .sp-shortcut.process',
                             hoverClass: 'accept',
                             drop: function(e, ui) {
                                 var action_type = ui.draggable.attr('action_type');
