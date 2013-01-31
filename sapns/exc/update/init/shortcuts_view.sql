@@ -1,6 +1,6 @@
 -- __code__ = init. shortcuts view
 
-create or replace view view_sp_shortcuts as
+create or replace view _view_sp_shortcuts as
     select s.id, s.title as "Title", u.display_name as "User", p.title as "Parent", 
         s.order as "Order", perm.display_name as "Permission", perm.name as "Permission name"
     from sp_shortcuts s
