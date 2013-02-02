@@ -1,5 +1,5 @@
 html{background:#fff;text-align:center;margin:0;padding:0}body{text-align:left;width:1200px;margin:0 auto;padding:0;font-size:12px;font-family:"Lucida Grande","Lucida Sans Unicode",geneva,verdana,sans-serif}
-a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{position:absolute;left:393px;top:395px;width:410px;height:32px;background-color:#fee1ad;border-radius:3px;padding:6px 5px 5px 5px;font:14px arial;color:#444;text-align:center}
+a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;margin:25px auto;height:32px;background-color:#fee1ad;border-radius:3px;padding:6px 5px 5px 5px;font:14px arial;color:#444;text-align:center}
 #wrong-login span{font-weight:bold}#loginform{position:relative;width:400px;height:215px;border:1px solid #ffcc70;border-radius:5px;margin:140px auto 10px auto;box-shadow:3px 3px #ffcc70;background-color:#eee}
 #loginform .top-space{height:60px}#loginform .line{clear:left;height:30px;margin-bottom:3px;z-index:10}
 #loginform .line *{float:left}#loginform .line .label{width:170px;font:15px helvetica;margin-left:6px;text-align:center;font-weight:bold}

@@ -6,13 +6,13 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     <style>
-        .sp_center { width: 1198px !important; left: 0px !important }
-        #loginform .background-icon { position:absolute; left:15px; top:25px; width:150px; height:150px; opacity:0.4;
-        background:transparent url('{{tg.url("/images/sapns/icons/lock.png")}}') center center no-repeat; background-size:contain; z-index:0 }
-        #loginform #submit { width:50px; height:50px; border:0; float:right; margin-right:10px; cursor:pointer; 
-        background:transparent url('{{tg.url("/images/sapns/icons/to-right_disabled.png")}}') center center no-repeat;
-        background-size:contain; opacity:0.7 }
-        #loginform #submit:hover { background:transparent url('{{tg.url("/images/sapns/icons/to-right.png")}}') center center no-repeat; } 
+    .sp_center { width: 1198px !important; left: 0px !important }
+    #loginform .background-icon { position:absolute; left:15px; top:25px; width:150px; height:150px; opacity:0.4;
+    background:transparent url('{{tg.url("/images/sapns/icons/lock.png")}}') center center no-repeat; background-size:contain; z-index:0 }
+    #loginform #submit { width:50px; height:50px; border:0; float:right; margin-right:10px; cursor:pointer; 
+    background:transparent url('{{tg.url("/images/sapns/icons/to-right_disabled.png")}}') center center no-repeat;
+    background-size:contain; opacity:0.7 }
+    #loginform #submit:hover { background:transparent url('{{tg.url("/images/sapns/icons/to-right.png")}}') center center no-repeat; } 
     </style>
 {% endblock %}
 
@@ -22,10 +22,6 @@
     <h3>{{_('Enter your username or e-mail')}}</h3>
     <input id="username_or_email" type="text">
 </div>
-
-<!--{% if login_counter|int > 0 %}-->
-<div id="wrong-login">{{_('<span>Wrong login</span>. Please, verify your username or password')}}</div>
-<!--{% endif %}-->
 
 <div id="loginform">
 
@@ -57,6 +53,10 @@
 <div id="forgot_password">
     <label>{{_('Forgot my password')}}</label>
 </div>
+
+<!--{% if login_counter|int > 0 %}-->
+<div id="wrong-login">{{_('<span>Wrong login</span>. Please, verify your username or password')}}</div>
+<!--{% endif %}-->
 
 <script src="{{tg.url('/js/sidebar-messages.min.js')}}"></script>
 <script>

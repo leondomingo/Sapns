@@ -4,7 +4,7 @@ font-size:12px; font-family:"Lucida Grande","Lucida Sans Unicode",geneva,verdana
 
 a { color:#797C33; font-weight:bold; text-decoration:none }
 
-#wrong-login { position:absolute; left:393px; top:395px; width:410px;
+#wrong-login { width:410px; margin:25px auto;
 height:32px; background-color:#fee1ad; border-radius:3px; padding:6px 5px 5px 5px;
 font:14px arial; color:#444; text-align:center }
 #wrong-login span { font-weight:bold }
