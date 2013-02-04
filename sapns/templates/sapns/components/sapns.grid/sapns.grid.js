@@ -1922,6 +1922,10 @@
             else if (arg1 == "selectAll") {
                 self.selectAll();
             }
+            // getQuery
+            else if (arg1 === "getQuery") {
+                return { filters: self.filters, order: self.order };
+            }
             // TODO: other sapnsGrid methods
         }
 
