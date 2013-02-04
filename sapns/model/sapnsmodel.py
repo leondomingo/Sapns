@@ -774,8 +774,6 @@ class SapnsClass(DeclarativeBase):
                 order_by(*tuple(names[1:])).\
                 limit(MAX_VALUES)
                 
-        logger.info(sel)
-        
         titles = []
         for row in dbs.execute(sel):
             

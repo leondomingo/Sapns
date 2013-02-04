@@ -787,44 +787,45 @@ class DashboardController(BaseController):
         
         return dict(insertion=class_.insertion(), title=class_.title)
 
-    @expose()
+    @expose('json')
     @require(p.in_group(u'managers'))
-    def ins_order_save(self, attributes='', title='', came_from=''):
+    def insertion_order_save(self, **kw):
         
-        # save insertion order
-        attributes = sj.loads(attributes)
-        
-        title_saved = False
-        
-        cls_title = None
-        for attr in attributes:
+        logger = logging.getLogger('DashboardController.insertion_order_save')
+        try:
+            # save insertion order
+            attributes = get_paramw(kw, 'attributes', sj.loads)
+            title = get_paramw(kw, 'title', unicode)
             
-            attribute = dbs.query(SapnsAttribute).get(attr['id'])
+            title_saved = False
             
-            if not cls_title:
-                cls_title = attribute.class_.title
-            
-            attribute.title = attr['title']
-            attribute.insertion_order = attr['order']
-            attribute.required = attr['required']
-            attribute.visible = attr['visible']
-            
-            dbs.add(attribute)
-            
-            if not title_saved:
-                title_saved = True
-                attribute.class_.title = title
-                dbs.add(attribute.class_)
-            
-            dbs.flush()
-        
-        if came_from:
-            redirect(url(came_from))
-            
-        else:
-            redirect(url('/message', 
-                         params=dict(message=_('Insertion order for "%s" has been successfully updated') % cls_title, 
-                                     came_from='')))
+            cls_title = None
+            for attr in attributes:
+                
+                attribute = dbs.query(SapnsAttribute).get(attr['id'])
+                
+                if not cls_title:
+                    cls_title = attribute.class_.title
+                
+                attribute.title = attr['title']
+                attribute.insertion_order = attr['order']
+                attribute.required = attr['required']
+                attribute.visible = True #attr['visible']
+                
+                dbs.add(attribute)
+                
+                if not title_saved:
+                    title_saved = True
+                    attribute.class_.title = title
+                    dbs.add(attribute.class_)
+                
+                dbs.flush()
+                
+            return dict(status=True)
+                
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
     
     @expose('sapns/order/reference.html')
     @require(p.in_group(u'managers'))

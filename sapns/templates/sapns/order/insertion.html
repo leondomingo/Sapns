@@ -1,64 +1,86 @@
-<div id="insertion" style="margin-top: 10px;">
+<style>
+#title-class { font:18px arial; width:565px }
+#ins-list { height:350px; overflow:auto; margin-top:5px }
+#ins-list .attribute { height:21px; margin-bottom:2px; padding:2px 2px 2px 20px; 
+background-color:#f2f2f2; border-radius:2px; clear:left }
+#ins-list .attribute div { float:left }
+#ins-list .attribute div.attr-title { margin-right:10px }
+#ins-list .attribute div.attr-title input { font:12px arial; height:13px; width:485px }
+#ins-list .attribute.required div.attr-title input { font-weight:bold }
+</style>
 
 <div class="class-title">
-    <div style="margin-top:3px; margin-left:15px">
-        <div class="" style="width:78%; margin-bottom:15px;">
-            <input id="title-class" class="sp-text-field" style="width:99%;
-                font-weight:bold; font-size:18px"
-                type="text" value="{{title}}"/>
+    <div>
+        <div>
+            <input id="title-class" type="text" value="{{title}}">
         </div>
     </div>
 </div>
 
-<div id="ins_list" style="height:500px; overflow:auto">    
-<!--{% for attr in insertion %}-->
-<div class="ins-attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false"
-    style="height: 30px; padding-top: 5px;">
-    <div style="margin-top: 0px; margin-left: 5px;">
-    
-        <!-- Up -->
-        <div style="clear: left; float: left; width: 50px;">
-            <input class="sp-button insorder-up" type="button"
-                title="{{attr.title|escape}}" value="{{_('Up')}}"/>
-        </div>
-        
-        <!-- Down -->
-        <div style="float: left; width: 50px; margin-right: 5px;">
-            <input class="sp-button insorder-down" type="button" 
-                title="{{attr.title|escape}}" value="{{_('Down')}}"/>
-        </div>
-        
+<div id="ins-list">    
+    <!--{% for attr in insertion %}-->
+    <div class="attribute {% if attr.required %} required {% endif %}" attr_id="{{attr.id}}">
         <!-- Attribute -->
-        <div class="attr-title" style="float: left; width: 80%; margin-left: 5px; 
-            font-weight: bold; margin-top: 2px;">
-            <input class="sp-text-field" style="width: 99%;" type="text"
-                title="{{attr.name}}" value="{{attr.title}}"/>
+        <div class="attr-title"> 
+            <input type="text" title="{{attr.name}}" value="{{attr.title}}">
         </div>
         
         <!-- Required -->
-        <div style="float: left; width: 40px; text-align: center; margin-top: 3px;">
-            <input class="attr-required" type="checkbox" 
-                title='{{_("\"%s\" required")|format(attr.title)}}'
-                {%- if attr.required %} checked {% endif %} />
-        </div>
-        
-        <!-- Visible -->
-        <div style="float: left; width: 40px; text-align: center; margin-top: 3px;">
-            <input class="attr-visible" type="checkbox" 
-                title='{{_("\"%s\" visible")|format(attr.title)}}' 
-                {%- if attr.visible %} checked {% endif %}/>
+        <div class="attr-required">
+            <input type="checkbox" title='{{_("\"%s\" required")|format(attr.title)}}'
+                {%- if attr.required %} checked {% endif %}>
         </div>
     </div>
-</div>
-<!--{% endfor %}-->
-</div>
+    <!--{% endfor %}-->
 </div>
 
-{#
-<script src="{{tg.url('/js/ins_order.min.js')}}"></script>
 <script>
-    $(document).ready(function() {
-        ins_order();
+    function insertion_order(callback, callback_error) {
+        var attributes = [],
+            order = 0;
+        $('#ins-list .attribute').each(function() {
+            attributes.push({
+                id: $(this).attr('attr_id'),
+                title: $(this).find('.attr-title input').val(),
+                required: $(this).find('.attr-required input').prop('checked'),
+                order: order
+            });
+            
+            order += 1;
+        });
+        
+        $.ajax({
+            url: "{{tg.url('/dashboard/insertion_order_save/')}}",
+            data: {
+                attributes: JSON.stringify(attributes),
+                title: $('#title-class').val()
+            },
+            success: function(res) {
+                if (res.status) {
+                    callback();
+                }
+                else {
+                    callback_error();
+                }
+            },
+            error: function() {
+                callback_error();
+            }
+        });
+    }
+
+    $(function() {
+        $('#ins-list').sortable({
+            axis: 'y'
+        });
+        
+        $('#ins-list .attr-required input').change(function() {
+            if ($(this).prop('checked')) {
+                $(this).parents('.attribute').addClass('required');
+            }
+            else {
+                $(this).parents('.attribute').removeClass('required');
+            }
+        });
     });
 </script>
-#}
