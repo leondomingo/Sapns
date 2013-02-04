@@ -1141,6 +1141,53 @@ class SapnsClass(DeclarativeBase):
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
                                 createfunc=_get_attributes, expiretime=3600)
 
+    def cascade_delete(self, id_):
+        
+        meta = MetaData(bind=dbs.bind)
+        #_logger = logging.getLogger('SapnsClass.cascade_delete')
+        
+        def _related_classes(class_id, level=0):
+            
+            #prefix = '  '*level
+            #_logger.info('%s[class_id=%d]' % (prefix, class_id))
+            
+            classes = []
+            for attr in dbs.query(SapnsAttribute).\
+                    filter(and_(SapnsAttribute.related_class_id == class_id)):
+                
+                # avoid autoreference
+                if attr.class_.class_id != class_id:
+                    #_logger.info('%s%s' % (prefix, attr.class_.name))
+                    item = (attr.class_.name, attr.name, _related_classes(attr.class_.class_id, level=level+1),)
+                    classes.append(item)
+                
+            return classes
+            
+        classes = [(self.name, 'id', _related_classes(self.class_id),)]
+        
+        def _delete(classes, row_id, level=0):
+            #prefix_ = '  '*level
+            for class_, attr, rel_class in classes:
+                tbl = Table(class_, meta, autoload=True)
+                for row in dbs.execute(tbl.select(tbl.c[attr] == row_id)):
+                    #_logger.info('%s%s.%s=%d' % (prefix_, class_, attr, row_id))
+                    
+                    # delete related objects
+                    _delete(rel_class, row.id, level=level+1)
+                        
+                # delete object
+                dbs.execute(tbl.delete(tbl.c[attr] == row_id))
+                dbs.flush()
+                    
+        _delete(classes, id_)
+        
+        # force the changes
+        self.name = self.name
+        dbs.add(self)
+        dbs.flush()
+        
+        return classes
+
 class SapnsAttribute(DeclarativeBase):
     
     __tablename__ = 'sp_attributes'
