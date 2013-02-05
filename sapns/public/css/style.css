@@ -265,6 +265,17 @@ border-radius:3px; padding:2px; font:12px arial; cursor:text }
 .sidebar-messages .sbm-message { position:relative; padding:5px; border-radius:5px; min-height:50px; opacity:0.7; margin-bottom:5px }
 .sbm-message-std { background-color:coral; font:bold 13px arial }
 
+/* Admin bar */
+#sp-admin-bar-show { position:fixed; top:35px; right:0; width:50px; height:35px; 
+background-color:transparent; text-align:center; font:13px arial; cursor:pointer }
+#sp-admin-bar-show img { width:30px; height:30px }
+#sp-admin-bar { position:fixed; top:70px; right:0; width:200px; height:800px; 
+opacity:0.8; background-color:#fcd890; border-radius:0 0 0 3px }
+#sp-admin-bar .option { height:20px; margin:3px 3px 2px 3px; background-color:#ffc151;
+padding:3px 20px; font:14px arial; text-align:right; cursor:pointer }
+#sp-admin-bar .option:hover { border-bottom:2px solid orange; font-weight:bold }
+#sp-admin-bar .option-separator { height:5px; background-color:orange; margin:0 3px 2px 3px }
+
 /* delete */
 #cascade-title { font:16px arial; color:#B4BD3C }
 #wait-message { color:#e00100; font:12px arial }
