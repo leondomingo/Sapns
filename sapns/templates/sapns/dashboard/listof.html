@@ -34,7 +34,7 @@
             <!--{% if option.separator %}-->
             <div class="option-separator"></div>
             <!--{% else %}-->
-            <div class="option {{option.required_id}}"
+            <div class="option {% if option.required_id %} required_id {% endif %}"
                 option-type="{{option.type}}" option-url="{{option.url}}">{{ option.title|escape }}</div>
             <!--{% endif %}-->
         <!--{% endfor %}-->
@@ -109,10 +109,25 @@
         	        option_type = $(this).attr('option-type'),
         	        option_url = $(this).attr('option-url'),
         	        option_title = $(this).text(),
-        	        dialog_width = 900;
+        	        dialog_width = 900,
+        	        dialog_height = 'auto',
+        	        refresh = false;
         	    
-        	    if ($(this).hasClass('required_id') === '1' && ids.length == 0) {
-        	        alert('Error!');
+        	    if ($(this).hasClass('required_id') && ids.length == 0) {
+        	        $('#admin-bar-warning').remove();
+        	        $('<div id="admin-bar-warning" style="display:none"></div>').appendTo('body');
+        	        $('#admin-bar-warning').html("<p style='text-align:center;font-style:italic'>{{_('You must select a row before click on this action')}}</p>").dialog({
+        	            title: option_title,
+        	            modal: true,
+        	            resizable: false,
+        	            width: 600,
+        	            height: 155,
+        	            buttons: {
+        	                "{{_('Close')}}": function() {
+        	                    $('#admin-bar-warning').dialog('close');
+        	                }
+        	            }
+        	        });
                 }
         	    else {
         	        $('#sp-admin-bar').fadeToggle(function() {
@@ -130,6 +145,24 @@
         	                    option_url = "{{tg.url('/dashboard/insertion_order/')}}";
         	                }
         	            }
+        	            else if (option_type === 'cascade_delete') {
+        	                if (!option_url) {
+        	                    function_name = 'cascade_delete';
+        	                    dialog_width = 800;
+        	                    dialog_height = 230;
+        	                    option_url = "{{tg.url('/dashboard/cascade_delete/')}}";
+        	                    refresh = true;
+        	                }
+        	            }
+        	            else if (option_type === 'delete_all') {
+                            if (!option_url) {
+                                function_name = 'delete_all';
+                                dialog_width = 800;
+                                //dialog_height = '
+                                option_url = "{{tg.url('/dashboard/delete_all/')}}";
+                                refresh = true;
+                            }
+                        }
         	            
         	            if (option_url) {
             	            var option_dialog = '<div id="option-dialog" style="display:none"></div>';
@@ -152,13 +185,17 @@
             	                        modal: true,
             	                        resizable: false,
             	                        width: dialog_width,
-            	                        height: 'auto',
+            	                        height: dialog_height,
             	                        buttons: {
             	                            "{{_('Ok')}}": function() {
             	                                if (!on_process) {
             	                                    on_process = true;
             	                                    window[function_name](function() {
             	                                        $('#option-dialog').dialog('close');
+            	                                        
+            	                                        if (refresh) {
+            	                                            $('#grid').sapnsGrid('search', true);
+            	                                        }
             	                                    },
             	                                    function() {
             	                                        on_process = false;

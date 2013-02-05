@@ -88,5 +88,5 @@ a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-
 .sp-filename div:hover{border-color:orange}.sp-filename button{font:10px arial;margin:1px 0 0 3px}
 .sidebar-messages{position:fixed;right:10px;top:20px;width:200px;padding:5px;z-index:1000}
 .sidebar-messages .sbm-message{position:relative;padding:5px;border-radius:5px;min-height:50px;opacity:.7;margin-bottom:5px}
-.sbm-message-std{background-color:coral;font:bold 13px arial}.sp-field-error{color:red}
-.ui-widget-header{background:#b4bd3c}
+.sbm-message-std{background-color:coral;font:bold 13px arial}#cascade-title{font:16px arial;color:#b4bd3c}
+#wait-message{color:#e00100;font:12px arial}.sp-field-error{color:red}.ui-widget-header{background:#b4bd3c}

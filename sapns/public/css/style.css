@@ -265,6 +265,10 @@ border-radius:3px; padding:2px; font:12px arial; cursor:text }
 .sidebar-messages .sbm-message { position:relative; padding:5px; border-radius:5px; min-height:50px; opacity:0.7; margin-bottom:5px }
 .sbm-message-std { background-color:coral; font:bold 13px arial }
 
+/* delete */
+#cascade-title { font:16px arial; color:#B4BD3C }
+#wait-message { color:#e00100; font:12px arial }
+
 /* Sapns fields */
 .sp-field-error { color:red }
 

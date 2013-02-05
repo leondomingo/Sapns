@@ -1141,10 +1141,10 @@ class SapnsClass(DeclarativeBase):
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
                                 createfunc=_get_attributes, expiretime=3600)
 
-    def cascade_delete(self, id_):
+    def cascade_delete(self, id_, classes=None):
         
         meta = MetaData(bind=dbs.bind)
-        #_logger = logging.getLogger('SapnsClass.cascade_delete')
+        _logger = logging.getLogger('SapnsClass.cascade_delete')
         
         def _related_classes(class_id, level=0):
             
@@ -1163,8 +1163,9 @@ class SapnsClass(DeclarativeBase):
                 
             return classes
             
-        classes = [(self.name, 'id', _related_classes(self.class_id),)]
-        
+        if not classes:
+            classes = [(self.name, 'id', _related_classes(self.class_id),)]
+            
         def _delete(classes, row_id, level=0):
             #prefix_ = '  '*level
             for class_, attr, rel_class in classes:
@@ -2259,9 +2260,6 @@ class SapnsLog(DeclarativeBase):
           what         <unicode>
           description  <unicode>
         """
-        
-        #logger = logging.getLogger('SapnsLog.register')
-        #logger.info(kw)
         
         log = SapnsLog()
         

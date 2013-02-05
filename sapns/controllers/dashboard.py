@@ -124,7 +124,7 @@ class DashboardController(BaseController):
         
         # cascade delete
         admin_bar.append(dict(title=_(u'Cascade delete'),
-                              required_id='',
+                              required_id=True,
                               type='cascade_delete',
                               url=''))
         
@@ -874,6 +874,90 @@ class DashboardController(BaseController):
             transaction.commit()
             return dict(status=True)
             
+        except Exception, e:
+            transaction.abort()
+            logger.error(e)
+            return dict(status=False)
+        
+    @expose('sapns/dashboard/delete.html')
+    @require(p.in_group(u'managers'))
+    def cascade_delete(self, **kw):
+        
+        cls = get_paramw(kw, 'cls', unicode)
+        ids = get_paramw(kw, 'ids', sj.loads)
+        
+        title_ = []
+        ot = SapnsClass.ObjectTitle(cls)
+        for id_ in ids:
+            title_.append(ot.title(id_))
+            
+        return dict(title=' | '.join(title_), cascade=True, cls=cls, ids=sj.dumps(ids))
+    
+    @expose('json')
+    @require(p.in_group(u'managers'))
+    def cascade_delete_(self, **kw):
+        logger = logging.getLogger('DashboardController.cascade_delete_')
+        transaction.begin()
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            ids = get_paramw(kw, 'ids', sj.loads)
+            
+            user = request.identity['user']
+            
+            classes = None
+            cls_ = SapnsClass.by_name(cls)
+            for id_ in ids:
+                classes = cls_.cascade_delete(id_, classes=classes)
+                SapnsLog.register(table_name=cls_.name,
+                                  row_id=id_,
+                                  who=user.user_id,
+                                  what=_('cascade delete'),
+                                  )
+            
+            transaction.commit()
+            return dict(status=True)
+        
+        except Exception, e:
+            transaction.abort()
+            logger.error(e)
+            return dict(status=False)
+        
+    @expose('sapns/dashboard/delete_all.html')
+    @require(p.in_group(u'managers'))
+    def delete_all(self, **kw):
+        return dict(**kw)
+    
+    @expose('json')
+    @require(p.in_group(u'managers'))
+    def delete_all_(self, **kw):
+        logger = logging.getLogger('DashboardController.delete_all_')
+        transaction.begin()
+        try:
+            user = request.identity['user']
+            
+            cls = get_paramw(kw, 'cls', unicode)
+            cls_ = SapnsClass.by_name(cls)
+            
+            meta = MetaData(bind=dbs.bind)
+            tbl = Table(cls_.name, meta, autoload=True)
+            dbs.execute(tbl.delete())
+            dbs.flush()
+            
+            # force changes
+            cls_.name = cls_.name
+            dbs.add(cls_)
+            dbs.flush()
+            
+            # register log
+            SapnsLog.register(table_name=cls_.name,
+                              row_id=None,
+                              who=user.user_id,
+                              what=_('delete all'),
+                              )
+            
+            transaction.commit()
+            return dict(status=True)
+        
         except Exception, e:
             transaction.abort()
             logger.error(e)

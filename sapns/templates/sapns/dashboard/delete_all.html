@@ -1,0 +1,27 @@
+<div id="wait-message" style="display:none">{{_('Wait, please')}}...</div>
+<div id="delete-question">{{_('Do you really want to delete ALL records?')}}</div>
+
+<script>
+function delete_all(callback, callback_error) {
+    $('#wait-message').fadeIn();
+    $.ajax({
+        url: "{{tg.url('/dashboard/delete_all_/')}}",
+        data: { cls: "{{cls}}" },
+        success: function(res) {
+            $('#wait-message').fadeOut();
+            if (res.status) {
+                callback();
+            }
+            else {
+                alert('Error!');
+                callback_error();
+            }
+        },
+        error: function() {
+            $('#wait-message').fadeOut();
+            alert('Error!');
+            callback_error();
+        }
+    });
+}
+</script>
