@@ -17,13 +17,23 @@
 
 <div id="sp-exploration-head">
     <!--{% if this_shortcut.id %}-->
-    <span class="title">{{this_shortcut.title}}</span>
+    <span class="title">{{this_shortcut.title}}
+        <!--{% if user.id != tg.request.identity['user'].user_id %}-->
+        [[{{user.display_name}}]]
+        <!--{% endif %}-->
+    </span>
+    <!--{% else %}-->
+        <!--{% if user.id != tg.request.identity['user'].user_id %}-->
+        <span class="title">
+        [[{{user.display_name}}]]
+        </span>
+        <!--{% endif %}-->
     <!--{% endif %}-->
     
     <div id="sp-shortcut-sort" class="button" title="{{_('Click here to place your shortcuts')}}"><img src="{{tg.url('/images/sapns/icons/sort.png')}}"></div>
     <div id="sp-shortcut-new" class="button" title="{{_('New')}}"><img src="{{tg.url('/images/sapns/icons/new.png')}}"></div>
     <!--{% if (sc_parent or '') != '' %}-->
-    <a class="sp-shortcut-up button" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent))}}" title="{{_('up')}}">
+    <a class="sp-shortcut-up button" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent, user_id=user.id))}}" title="{{_('up')}}">
         <img src="{{tg.url('/images/sapns/icons/north.png')}}">
     </a>
     <!--{% endif %}-->
@@ -54,7 +64,7 @@
             $.ajax({
                 url: "{{tg.url('/dashboard/sc/list_/')}}",
                 data: {
-                    id_user: "{{tg.request.identity['user'].user_id}}",
+                    id_user: "{{user.id}}",
                     sc_parent: "{{this_shortcut.id or ''}}"
                 },
                 success: function(content) {
@@ -81,7 +91,10 @@
                             drop: function(e, ui) {
                                 $.ajax({
                                     url: "{{tg.url('/dashboard/sc/bookmark/')}}",
-                                    data: { id_shortcut: ui.draggable.attr('shortcut_id') },
+                                    data: {
+                                        user_id: "{{user.id}}",
+                                        id_shortcut: ui.draggable.attr('shortcut_id')
+                                    },
                                     success: function(res) {
                                         if (res.status) {
                                             var new_shortcut = '<div class="item_sb item_sb_sortable" shortcut_id="' + res.shortcut.id + '">\
@@ -254,7 +267,11 @@
             
             $.ajax({
                 url: "{{tg.url('/dashboard/sc/edit/')}}",
-                data: { id_shortcut: id_shortcut, id_parent: "{{this_shortcut.id or ''}}" },
+                data: {
+                    user_id: "{{user.id}}",
+                    id_shortcut: id_shortcut,
+                    id_parent: "{{this_shortcut.id or ''}}"
+                },
                 success: function(content) {
                     sbm.hide({ id: id_mensaje, velocity: 1500 });
                     

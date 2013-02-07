@@ -36,13 +36,10 @@ class ShortcutsController(BaseController):
 
         shortcuts = user.get_shortcuts(id_parent=id_parent)
         
-#        params = {}
-#        if sc_parent:
-#            params = dict(sc_parent=id_parent)
-            
-        came_from = url('/dashboard/data_exploration/', params=dict(sc_parent=id_parent))        
+        came_from = url('/dashboard/data_exploration/', params=dict(user_id=id_user, sc_parent=id_parent))        
         
-        return dict(shortcuts=shortcuts, sc_parent=id_parent, came_from=came_from)
+        return dict(shortcuts=shortcuts, sc_parent=id_parent,
+                    user_id=id_user, came_from=came_from)
     
     @expose('json')
     @require(p_.not_anonymous())
@@ -72,11 +69,17 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     @require(p_.not_anonymous())
-    def bookmark(self, id_shortcut, **params):
+    def bookmark(self, id_shortcut, **kw):
         logger = logging.getLogger('ShortcutsController.bookmark')
         try:
             logger.info('Bookmarking shortcut [%s]' % id_shortcut)
-            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            
+            # user
+            user_id = get_paramw(kw, 'user_id', int, opcional=True)
+            if not user_id:
+                user_id = request.identity['user'].user_id
+                
+            user = dbs.query(SapnsUser).get(user_id)
             
             dboard = user.get_dashboard()
             sc = dboard.add_child(id_shortcut)
@@ -216,7 +219,14 @@ class ShortcutsController(BaseController):
         
         logger = logging.getLogger('ShortcutsController.reorder')
         try:
-            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            # user
+            user_id = get_paramw(kw, 'user_id', int, opcional=True)
+            if not user_id:
+                user_id = request.identity['user'].user_id
+            
+            user = dbs.query(SapnsUser).get(user_id)
+            
+            # reorder shortcuts
             order = get_paramw(kw, 'order', sj.loads)
             i = 0
             for id_shortcut in order:
@@ -245,7 +255,13 @@ class ShortcutsController(BaseController):
             cls = get_paramw(kw, 'cls', str)
             
             class_ = SapnsClass.by_name(cls)
-            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            
+            # user
+            user_id = get_paramw(kw, 'user_id', int, opcional=True)
+            if not user_id:
+                user_id = request.identity['user'].user_id
+                
+            user = dbs.query(SapnsUser).get(user_id)
             
             db = user.get_dashboard()
             
@@ -281,9 +297,15 @@ class ShortcutsController(BaseController):
     @require(p_.not_anonymous())
     def edit(self, **kw):
         
-        roles = request.identity['groups']
-        user_id = request.identity['user'].user_id
+        # user
+        user_id = get_paramw(kw, 'user_id', int, opcional=True)
+        if not user_id:
+            user_id = request.identity['user'].user_id
+            
         user = dbs.query(SapnsUser).get(user_id)
+        
+        # roles (of this user)
+        roles = set([r.group_name for r in user.roles])        
         
         id_shortcut = get_paramw(kw, 'id_shortcut', int, opcional=True)
         id_parent = get_paramw(kw, 'id_parent', int, opcional=True)

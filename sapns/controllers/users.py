@@ -9,7 +9,7 @@ from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
 from sqlalchemy.sql.expression import and_
-from tg import expose, url, redirect, require, request, predicates
+from tg import expose, url, redirect, require, request, predicates as p_
 import logging
 import simplejson as sj
 
@@ -20,10 +20,10 @@ class EUser(Exception):
 
 class UsersController(BaseController):
     
-    allow_only = predicates.not_anonymous()
+    allow_only = p_.not_anonymous()
     
     @expose('sapns/users/edit/edit.html')
-    @require(predicates.not_anonymous())
+    @require(p_.not_anonymous())
     @add_language
     def edit(self, cls, id_, **params):
         
@@ -39,13 +39,13 @@ class UsersController(BaseController):
         return dict(user=user, came_from=params.get('came_from'))
     
     @expose('sapns/users/edit/edit.html')
-    @require(predicates.has_any_permission('manage', 'users'))
+    @require(p_.has_any_permission('manage', 'users'))
     def new(self, cls, **params):
         came_from = params.get('came_from', '/dashboard/users')
         return dict(user={}, came_from=url(came_from))
     
     @expose('json')
-    @require(predicates.has_any_permission('manage', 'users'))
+    @require(p_.has_any_permission('manage', 'users'))
     def save(self, **params):
         
         logger = logging.getLogger('UsersController.save')
@@ -112,12 +112,12 @@ class UsersController(BaseController):
             return dict(status=False)
 
     @expose('sapns/users/permission.html')
-    @require(predicates.has_any_permission('manage', 'users'))
+    @require(p_.has_any_permission('manage', 'users'))
     def permission(self, came_from='/dashboard/users'):
         return dict(came_from=url(came_from))
     
     @expose('sapns/users/roles.html')
-    @require(predicates.has_any_permission('manage', 'users'))
+    @require(p_.has_any_permission('manage', 'users'))
     @add_language
     def roles(self, id_user, **kw):
 
@@ -148,7 +148,7 @@ class UsersController(BaseController):
             logger.error(e)
         
     @expose('json')
-    @require(predicates.has_any_permission('manage', 'users'))
+    @require(p_.has_any_permission('manage', 'users'))
     def update_role(self, **kw):
 
         logger = logging.getLogger('UsersController.roles')        
@@ -206,3 +206,14 @@ class UsersController(BaseController):
         _cache = cache.get_cache('users_all')
                         
         return dict(users=_cache.get_value(key='all', createfunc=_all, expiretime=0))
+    
+    @expose('sapns/users/dashboard/dashboard.html')
+    @require(p_.in_group(u'managers'))
+    def dashboard(self, user_id, **kw):
+        user_id = int(user_id)
+        user = dbs.query(SapnsUser).get(user_id)
+        
+        return dict(page=u'dashboard [%s]' % user.display_name,
+                    came_from=kw.get('came_from'), 
+                    this_shortcut={}, user=dict(id=user_id, display_name=user.display_name),
+                    _came_from=url(user.entry_point() or '/dashboard/?user_id=%d' % user_id))
