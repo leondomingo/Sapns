@@ -1,6 +1,6 @@
 <!--{% for sc in shortcuts %}-->
     <!--{% if sc.action_type == '' %}-->
-    <a class="sp-shortcut group" href="{{tg.url('/dashboard/data_exploration/', params=dict(sc_parent=sc.id, came_from=came_from))}}"
+    <a class="sp-shortcut group" href="{{tg.url('/dashboard/data_exploration/', params=dict(user_id=user_id, sc_parent=sc.id, came_from=came_from))}}"
         shortcut_id="{{sc.id}}" action_type="" title="{{sc.title}}">{{sc.title}}</a>
     <!--{% elif sc.action_type == 'list' %}-->
     <a class="sp-shortcut list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=came_from))}}"

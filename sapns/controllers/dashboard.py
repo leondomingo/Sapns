@@ -77,33 +77,34 @@ class DashboardController(BaseController):
         else:
             this_shortcut = dict(id=None, title='')
         
-        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        user_id = get_paramw(kw, 'user_id', int, opcional=True)
+        if not user_id:
+            user_id = request.identity['user'].user_id
+            
+        user = dbs.query(SapnsUser).get(user_id)
         
         root = user.get_dashboard().shortcut_id
         if this_shortcut['id'] == root:
-            redirect(url('/dashboard/'))
-        
-#        data_e = user.get_dataexploration().shortcut_id
-        
-#        params = {}
-#        if sc_parent:
-#            params = dict(sc_parent=sc_parent)
-            
-        #came_from = url('/dashboard/data_exploration/', params=dict(sc_parent=sc_parent or ''))
+            redirect(url('/dashboard/?user_id=%d' % user_id))
         
         sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
             
-        return dict(page=l_(u'Data exploration'), #came_from=came_from,
+        return dict(page=l_(u'Data exploration'), 
+                    user=dict(id=user_id, display_name=user.display_name),
                     this_shortcut=this_shortcut, sc_parent=sc_parent)
 
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
     @add_language
     def index(self, **kw):
-        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        user_id = get_paramw(kw, 'user_id', int, opcional=True)
+        if not user_id:
+            user_id =  request.identity['user'].user_id
+        
+        user = dbs.query(SapnsUser).get(user_id)
         
         return dict(page='dashboard', came_from=kw.get('came_from'), 
-                    this_shortcut={}, 
+                    this_shortcut={}, user=dict(id=user_id, display_name=user.display_name),
                     _came_from=url(user.entry_point() or '/dashboard/'))
       
     @expose('sapns/dashboard/listof.html')
