@@ -19,7 +19,7 @@
 $(function() {
     $('#sp-user-data').click(function() {
         var f = '<form action="{{tg.url("/dashboard/users/edit/_/%d" % tg.request.identity["user"].user_id)}}">\
-            <input type="hidden" name="came_from" value="' + window.location.href + '">\
+            <input type="hidden" name="came_from" value="' + encodeURI(window.location.href) + '">\
         </form>';
         
         $(f).appendTo('body').submit().remove();

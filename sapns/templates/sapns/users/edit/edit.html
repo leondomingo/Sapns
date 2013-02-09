@@ -65,7 +65,8 @@
         <button id="save_user_btn">{{_('Ok')}}</button>
     </div>
 </div>
-<form id="form_exit" method="post" 
+
+<form id="form_exit" method="post"
     action="{% if came_from %}{{came_from}}
             {%else%}{{tg.url('/message', dict(message=_('Update was completed successfully'), came_from=''))}}{%endif%}">
 </form>

@@ -89,7 +89,7 @@ class DashboardController(BaseController):
         
         sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
             
-        return dict(page=l_(u'Data exploration'), 
+        return dict(page=l_(u'Data exploration'), #came_from=kw.get('came_from'),
                     user=dict(id=user_id, display_name=user.display_name),
                     this_shortcut=this_shortcut, sc_parent=sc_parent)
 
