@@ -8,9 +8,21 @@
     
     <div id="sp-user-menu">
         <!-- TODO: automatically generated -->
-        <div class="sp-user-option" id="sp-user-configuration">Configuración</div>
+        <div class="sp-user-option" id="sp-user-data">{{_('User data')}}</div>
         <div class="sp-user-option">
         {% include 'sapns/lang_selector.html' %}
         </div>
     </div>
 </div>
+
+<script>
+$(function() {
+    $('#sp-user-data').click(function() {
+        var f = '<form action="{{tg.url("/dashboard/users/edit/_/%d" % tg.request.identity["user"].user_id)}}">\
+            <input type="hidden" name="came_from" value="' + window.location.href + '">\
+        </form>';
+        
+        $(f).appendTo('body').submit().remove();
+    });
+});
+</script>

@@ -7,6 +7,11 @@ $(function() {
     
     SapnsFields.init('#user_name, #email_address, #password', 'change');
     
+    $('#cancel_user_btn').click(function() {
+        var f = '<form action="{{came_from}}"></form>';
+        $(f).appendTo('body').submit().remove();
+    });
+    
     $('#save_user_btn').click(function() {
         
         // display_name 
