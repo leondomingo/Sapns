@@ -6,7 +6,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <link rel="stylesheet" href="{{tg.url('/css/user.css', params=dict(v=1))}}">
+    <link rel="stylesheet" href="{{tg.url('/css/users/edit.css', params=dict(v=1))}}">
 {% endblock %}
 
 {% block middle %}
@@ -60,7 +60,8 @@
     </div>
     <!--{% endif %}-->
     
-    <div>
+    <div id="user-buttons">
+        <button id="cancel_user_btn">{{_('Cancel')}}</button>
         <button id="save_user_btn">{{_('Ok')}}</button>
     </div>
 </div>

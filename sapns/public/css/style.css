@@ -53,7 +53,7 @@ text-align:left; margin-left:10px; color:#FFB835 }
 background-color:#CCCFA5; border-radius:10px; cursor:pointer; opacity:0.8 }
 
 .sp-logout-user { padding-left:10px; float:left; font-style:italic;
-font-family:Arial; font-size:13px; width:195px; height:18px; opacity:1;
+font-family:Arial; font-size:13px; width:240px; height:18px; opacity:1;
 border-radius:10px }
 
 .sp-logout-user a { font-weight:normal }
