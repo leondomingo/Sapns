@@ -10,15 +10,17 @@ $(function() {
     $('#cancel_user_btn').click(function() {
         var came_from = "{{came_from}}",
             url = came_from.split('?')[0],
-            params = came_from.split('?')[1].split('&');
+            params = (came_from.split('?')[1] || '').split('&');
         
         var params_ = '';
         for (var i=0, l=params.length; i<l; i++) {
-            var p = params[i],
+            var p = params[i];
+            if (p !== '') {
                 p_name = p.split('=')[0],
                 p_value = p.split('=')[1];
             
-            params_ += '<input type="hidden" name="' + p_name + '" value="' + p_value + '">';
+                params_ += '<input type="hidden" name="' + p_name + '" value="' + p_value + '">';
+            }
         }
         
         var f = '<form action="' + url + '">' + params_ + '</form>';
