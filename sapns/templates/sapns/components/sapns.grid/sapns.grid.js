@@ -681,6 +681,7 @@
         
         var ajx = $.extend(true, {
             url: "{{tg.url('/dashboard/grid/')}}",
+            cache: false,
             data: {
                 cls: self.cls,
                 q: q,
