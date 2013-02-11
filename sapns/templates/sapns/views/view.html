@@ -2,33 +2,53 @@
 {% import 'sapns/dashboard/util.html' as util %}
 
 {% block head %}
-    {{super()}}
-    <link rel="stylesheet" type="text/css" media="screen" href="{{tg.url('/css/views.css')}}">
-    {{util.jquery()}}
-    {{util.jquery_ui()}}
-    <script type="text/javascript">
-    {#{% include 'sapns/views/views-min.js' %}#}
-    {% include 'sapns/views/views-min.js' %}
-    </script>
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.qtip2() }}
+    <style>
+    #sp-edit-view { padding:5px }
+    #sp-edit-view .header { padding:5px; border-radius:3px; background-color:#ECEFCC; height:85px }
+    #sp-view-title { width:450px }
+    #sp-view-name { width:450px }
+    #sp-view-table .sp-select-text { width:450px }
+    </style>
 {% endblock %}
 
 {% block middle %}
-<div id="views-dialog" style="display: none;"></div>
-<form id="form_view" method="post" action="/dashboard/views/save">
-    <input type="hidden" name="id" value="{{view.id}}"/>
-    <input type="hidden" name="title"/>
-    <input type="hidden" name="code"/>    
-    <input type="hidden" name="columns"/>
-    <input type="hidden" name="relations"/>
-    <input type="hidden" name="filters"/>
-    <input type="hidden" name="order"/>
-</form>
-{% if tmpl_context.form_errors %}
-{{tmpl_context.form_errors}}
-{% endif %}
-{% include 'sapns/views/header.html' %}
-{% include 'sapns/views/columns.html' %}
-{% include 'sapns/views/relations.html' %}
-{% include 'sapns/views/filters.html' %}
-{% include 'sapns/views/order.html' %}
+    {{view}}
+    <div id="sp-edit-view">
+        <div class="header">
+            <div class="sp-field-row">
+                <div class="sp-field">
+                    <div class="label required">{{_('Title')}}</div>
+                    <input id="sp-view-title" type="text" value="{{view.title or ''}}">
+                </div>
+                
+                <div class="sp-field">
+                    <div class="label required">{{_('Name')}}</div>
+                    <input id="sp-view-name" type="text" value="{{view.name or ''}}">
+                </div>
+            </div>
+            
+            <div class="sp-field-row">
+                <div class="sp-field">
+                    <div class="label">{{_('Table')}}</div>
+                    <div id="sp-view-table"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+    <script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.selector.min.js' %}
+    $(function() {
+        $('#sp-view-table').sapnsSelector({
+            rc: 'sp_classes', rc_title: "{{_('Classes')}}",
+            value: "{{view.class_id or ''}}"
+        });
+    });
+    </script>
 {% endblock %}
