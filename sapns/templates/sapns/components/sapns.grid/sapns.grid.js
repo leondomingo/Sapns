@@ -1112,53 +1112,101 @@
                     a += '/';
                 }
                 
-                var target = '';
-                if (ctrl) {
-                    target = '_blank';
-                }
-                
-                if (act.type === 'process') {
-                    if (act.require_id) {
-                        if (id) {
-                            a += id;
-                        }
-                        else {
-                            self.warningSelectedId();
-                            return;
-                        }
-                    } else {
-                        if (id) {
-                            a += id;
+                if (!act.data) {
+                    var target = '';
+                    if (ctrl) {
+                        target = '_blank';
+                    }
+                    
+                    if (act.type === 'process') {
+                        if (act.require_id) {
+                            if (id) {
+                                a += id;
+                            }
+                            else {
+                                self.warningSelectedId();
+                                return;
+                            }
+                        } else {
+                            if (id) {
+                                a += id;
+                            }
                         }
                     }
-                }
-                else if (act.type === 'new') {
-                    a += sprintf('%s/', self.cls);
-                }
-                else if (act.type === 'delete') {
-                    self.std_delete(ids, act.url);
-                    return;
+                    else if (act.type === 'new') {
+                        a += sprintf('%s/', self.cls);
+                    }
+                    else if (act.type === 'delete') {
+                        self.std_delete(ids, act.url);
+                        return;
+                    }
+                    else {
+                        if (act.require_id) {
+                            if (id) {
+                                a += sprintf('%s/%s', self.cls, id);
+                            }
+                            else {
+                                self.warningSelectedId();
+                                return;
+                            }
+                        } else {
+                            if (id) {
+                                a += sprintf('%s/%s', self.cls, id);
+                            } 
+                            else {
+                                a += sprintf('%s/', self.cls);
+                            }
+                        }
+                    }
+
+                    $(form(a, target)).appendTo('body').submit().remove();
                 }
                 else {
-                    if (act.require_id) {
-                        if (id) {
-                            a += sprintf('%s/%s', self.cls, id);
+                    var data = JSON.parse(act.data), 
+                        on_progress = false;
+                    
+                    var params = {};
+                    params[data.param_name] = id;
+                    
+                    // callback
+                    var dialog_id = self.name + '_dialog';
+                    $('#'+dialog_id).remove();
+                    $('<div id="' + dialog_id + '" style="display:none"></div>').appendTo('body');
+                    $.ajax({
+                        url: a,
+                        data: params,
+                        success: function(content) {
+                            $('#'+dialog_id).html(content).dialog({
+                                title: act.title,
+                                modal: true,
+                                resizable: false,
+                                width: data.width,
+                                height: data.height,
+                                closeOnEscape: false,
+                                buttons: {
+                                    "{{_('Ok')}}": function() {
+                                        if (!on_progress) {
+                                            on_progress = true;
+                                            
+                                            window[data.callback](function() {
+                                                self.search(self.q, true);
+                                                $('#'+dialog_id).dialog('close');
+                                            },
+                                            function() {
+                                                on_progress = false;
+                                            });
+                                        }
+                                    },
+                                    "{{_('Cancel')}}": function() {
+                                        if (!on_progress) {
+                                            $('#'+dialog_id).dialog('close');
+                                        }
+                                    }
+                                }
+                            });
                         }
-                        else {
-                            self.warningSelectedId();
-                            return;
-                        }
-                    } else {
-                        if (id) {
-                            a += sprintf('%s/%s', self.cls, id);
-                        } 
-                        else {
-                            a += sprintf('%s/', self.cls);
-                        }
-                    }
+                    });
                 }
-
-                $(form(a, target)).appendTo('body').submit().remove();
             }
             else {
                 // typeof(act.type) === 'object'
