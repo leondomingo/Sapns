@@ -929,7 +929,7 @@ class SapnsClass(DeclarativeBase):
                         
                     actions.append(Dict(name=p_name or '', title=_(ac.display_name), 
                                         type=ac.type, url=url, require_id=require_id, 
-                                        pos=pos))
+                                        pos=pos, data=ac.data))
                     
             def cmp_act(x, y):
                 if x.pos == y.pos:
@@ -1490,6 +1490,7 @@ class SapnsPermission(Permission):
     
     type = Column(Unicode(20))
     requires_id = Column(Boolean, default=True)
+    data = Column(UnicodeText)
     
     # TODO: puede ser nulo? (nullable=False)
     class_id = Column('id_class', Integer, 
