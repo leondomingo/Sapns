@@ -12,11 +12,18 @@
     #sp-view-title { width:450px }
     #sp-view-name { width:450px }
     #sp-view-table .sp-select-text { width:450px }
+    
+    #sp-edit-view-path { height:30px; border-radius:2px; background-color:#ecefcc; margin-top:5px; padding:1px 5px }
+    #sp-edit-view-path .item { float:left; border-radius:2px; background-color:#cecece; 
+    margin-top:5px; margin-right:5px; font:15px arial; padding:1px 3px; min-width:80px; text-align:center;
+    cursor:pointer }
+    #sp-edit-view-path .item:hover { background-color:#f2f2f2; color:#444 }
+    #sp-edit-view-attr-list { height:150px; border-radius:2px; background-color:#f2f2f2; margin-top:5px }
     </style>
 {% endblock %}
 
 {% block middle %}
-    {{view}}
+    {#{{view}}#}
     <div id="sp-edit-view">
         <div class="header">
             <div class="sp-field-row">
@@ -38,6 +45,14 @@
                 </div>
             </div>
         </div>
+        
+        <div id="sp-edit-view-path">
+            <div class="item">Uno</div>
+            <div class="item">Dos</div>
+            <div class="item">Tres</div>
+            <div class="item">Cuatro</div>
+        </div>
+        <div id="sp-edit-view-attr-list"></div>
     </div>
     
     <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
@@ -45,9 +60,31 @@
     {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
     {% include 'sapns/components/sapns.selector.min.js' %}
     $(function() {
+        
+        function reload_attributes(class_id) {
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/attributes_list/')}}",
+                data: { class_id: class_id },
+                success: function(res) {
+                    if (res.status) {
+                        
+                    }
+                    else {
+                        alert('Error!');
+                    }
+                },
+                error: function() {
+                    alert('Error!');
+                }
+            });
+        }
+        
         $('#sp-view-table').sapnsSelector({
             rc: 'sp_classes', rc_title: "{{_('Classes')}}",
-            value: "{{view.class_id or ''}}"
+            value: "{{view.class_id or ''}}",
+            onChange: function(class_id) {
+                reload_attributes(class_id);
+            }
         });
     });
     </script>

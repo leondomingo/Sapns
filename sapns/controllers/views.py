@@ -1,16 +1,17 @@
 # -*- coding: utf-8 -*-
 """Views management controller"""
 
-from formencode import schema
+from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsAttribute
 from tg import expose, redirect, url, predicates
+import logging
 import simplejson as sj
+from sqlalchemy.sql.expression import and_
 
 __all__ = ['ViewsController']
-
-class ViewSchema(schema.Schema):
-    pass   
 
 class ViewsController(BaseController):
     
@@ -20,7 +21,7 @@ class ViewsController(BaseController):
     def index(self, came_from='/'):
         return dict(page='views', came_from=url(came_from))
     
-    @expose('sapns/views/view.html')
+    @expose('sapns/views/edit/edit.html')
     def edit(self, id=None, came_from='/'):
         
         # TODO: cargar datos de la vista con ese "id"
@@ -60,6 +61,29 @@ class ViewsController(BaseController):
                     order=order)
                 
         return dict(page='views/edit', came_from=came_from, view=view)
+    
+    @expose('json')
+    def attributes_list(self, **kw):
+        logger = logging.getLogger('ViewsController.attributes_list')
+        try:
+            class_id = get_paramw(kw, 'class_id', int)
+            
+            attributes = []
+            for attr in dbs.query(SapnsAttribute).\
+                    filter(and_(SapnsAttribute.class_id == class_id)).\
+                    order_by(SapnsAttribute.title):
+                
+                attr = SapnsAttribute()
+                
+                attributes.append(dict(id=attr.attribute_id,
+                                       title=attr.title,
+                                       name=attr.name,
+                                       related_class=attr.related_class_id,
+                                       ))
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
 
     @expose('sapns/views/view.html')
     def error_handler(self, **kw):
