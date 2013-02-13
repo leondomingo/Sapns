@@ -14,11 +14,15 @@
     #sp-view-table .sp-select-text { width:450px }
     
     #sp-edit-view-path { height:30px; border-radius:2px; background-color:#ecefcc; margin-top:5px; padding:1px 5px }
-    #sp-edit-view-path .item { float:left; border-radius:2px; background-color:#cecece; 
-    margin-top:5px; margin-right:5px; font:15px arial; padding:1px 3px; min-width:80px; text-align:center;
-    cursor:pointer }
-    #sp-edit-view-path .item:hover { background-color:#f2f2f2; color:#444 }
-    #sp-edit-view-attr-list { height:150px; border-radius:2px; background-color:#f2f2f2; margin-top:5px }
+    
+    #sp-edit-view-class-attribute { height:150px; clear:left; border-radius:2px; background-color:#f2f2f2; margin-top:5px }
+    #sp-edit-view-class-attribute .col { float:left; padding:5px 10px; height:140px; overflow:auto; background-color:#f2f2f2 }
+    
+    #sp-edit-view-classes { width:400px; margin-right:5px }
+    #sp-edit-view-attr-list { width:540px; border-radius:2px }
+    #sp-edit-view-attr-list .attribute { border-radius:2px; background-color:#ECEFCC; color:#444; margin-bottom:3px;
+    padding:1px 5px; cursor:pointer; font:bold 14px arial }
+    #sp-edit-view-attr-list .attribute span { font-weight:normal; font-size:12px }
     </style>
 {% endblock %}
 
@@ -45,17 +49,15 @@
                 </div>
             </div>
         </div>
-        
-        <div id="sp-edit-view-path">
-            <div class="item">Uno</div>
-            <div class="item">Dos</div>
-            <div class="item">Tres</div>
-            <div class="item">Cuatro</div>
+
+        <div id="sp-edit-view-class-attribute">
+            <div id="sp-edit-view-classes" class="col"></div>
+            <div id="sp-edit-view-attr-list" class="col"></div>
         </div>
-        <div id="sp-edit-view-attr-list"></div>
     </div>
     
     <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+    <script src="{{tg.url('/js/jstree/jquery.jstree.js')}}"></script>
     <script>
     {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
     {% include 'sapns/components/sapns.selector.min.js' %}
@@ -67,7 +69,8 @@
                 data: { class_id: class_id },
                 success: function(res) {
                     if (res.status) {
-                        
+                        $('#sp-edit-view-attr-list').html(res.attributes);
+                        $('#sp-edit-view-attr-list .attribute').disableSelection();
                     }
                     else {
                         alert('Error!');
@@ -83,7 +86,54 @@
             rc: 'sp_classes', rc_title: "{{_('Classes')}}",
             value: "{{view.class_id or ''}}",
             onChange: function(class_id) {
+                $('#sp-edit-view-classes').jstree({
+                    json_data: {
+                        ajax: {
+                            url: "{{tg.url('/dashboard/views/classes/')}}",
+                            data: function(node) {
+                                return {
+                                    class_id0: class_id,
+                                    class_id: $(node).attr('class_id')
+                                };
+                            }
+                        }
+                    },
+                    core: { animation: 0 },
+                    themes: {
+                        theme: 'classic',
+                        url: "{{tg.url('/js/jstree/themes/classic/style.css')}}"
+                    },
+                    ui: { select_limit: 1 },
+                    types: {
+                        valid_children: ['classes']
+                        /*types: {
+                            'classes': {
+                                valid_children: ['producto', 'producto_hoja'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/departamento_16x16.png')}}" }
+                            },
+                            'producto': {
+                                valid_children: ['producto_hoja'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/agrupacion_16x16.png')}}" }
+                            },
+                            'producto_hoja': {
+                                valid_children: ['curso'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/producto_16x16.png')}}" }
+                            },
+                            'curso': {
+                                valid_children: ['none'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/curso_16x16.png')}}" }
+                            }
+                        }*/
+                    },
+                    plugins: ['themes', 'json_data', 'types', 'ui']
+                });                
+                
                 reload_attributes(class_id);
+                
+                $('#sp-edit-view-classes').bind('select_node.jstree', function(e, obj) {
+                    var nodo = obj.rslt.obj;
+                    reload_attributes(nodo.attr('class_id'));
+                });
             }
         });
     });

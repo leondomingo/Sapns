@@ -5,11 +5,12 @@ from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsAttribute
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass
 from tg import expose, redirect, url, predicates
 import logging
 import simplejson as sj
 from sqlalchemy.sql.expression import and_
+from sapns.lib.sapns.util import get_template
 
 __all__ = ['ViewsController']
 
@@ -63,6 +64,103 @@ class ViewsController(BaseController):
         return dict(page='views/edit', came_from=came_from, view=view)
     
     @expose('json')
+    def classes(self, **kw):
+        logger = logging.getLogger('arbol')
+        try:
+            class_id = get_paramw(kw, 'class_id', int, opcional=True)
+            class_id0 = None
+            if not class_id:
+                class_id = class_id0 = get_paramw(kw, 'class_id0', int)
+            
+            def _has_children(class_id):
+                return dbs.query(SapnsAttribute).\
+                    filter(SapnsAttribute.related_class_id == class_id).\
+                    first() != None
+            
+            def _state(class_id):
+                state_ = ''
+                if _has_children(class_id):
+                    state_ = 'closed'
+                        
+                return state_
+            
+            def _classes(class_id):
+                classes = []
+                for r_attr in dbs.query(SapnsAttribute).\
+                        filter(and_(SapnsAttribute.class_id == class_id,
+                                    SapnsAttribute.related_class_id != None,
+                                    )):
+                    
+                    classes.append(dict(data=u'%s (%s)' % (r_attr.related_class.title, r_attr.title),
+                                        attr=dict(class_id=r_attr.related_class_id,
+                                                  rel='class',
+                                                  id='class_%d' % r_attr.related_class_id
+                                                  ),
+                                        state=_state(r_attr.class_id),
+                                        children=[],
+                                        ))
+                    
+                return classes
+            
+            if class_id0:
+                class0 = dbs.query(SapnsClass).get(class_id0)
+                classes = dict(data=class0.title,
+                               attr=dict(class_id=class_id0,
+                                         rel='class',
+                                         id='class_%d' % class_id0,
+                                         ),
+                               state='open',
+                               children=_classes(class_id0)
+                               )
+                
+            else:
+                classes = _classes(class_id)
+                
+            return sj.dumps(classes)
+            
+#            id_departamento_ = get_paramw(kw, 'id_departamento', int, opcional=True)
+#            if not id_producto and not id_curso and not id_departamento_:
+#                
+#                # productos "raíz"
+#                if id_departamento:
+#                    # con departamento seleccionado
+#                    dpto = dbs.query(Departamentos).get(id_departamento)
+#                    productos=dict(data=dpto.nombre,
+#                                   attr=dict(id_departamento=dpto.id_,
+#                                             rel='departamento',
+#                                             id='departamento_%d' % dpto.id_),
+#                                   state='open',
+#                                   children=_productos(id_departamento, None)
+#                                   )
+#                    
+#                else:
+#                    # sin departamento seleccionado
+#                    productos = []
+#                    # sólo los departamentos del usuario
+#                    departamentos = get_departamentos()
+#                    for dpto in departamentos:
+#                        productos.append(dict(data=dpto['nombre'],
+#                                              attr=dict(id_departamento=dpto['id'],
+#                                                        rel='departamento',
+#                                                        id='departamento_%d' % dpto['id']),
+#                                              state='closed',
+#                                              children=_productos(dpto['id'], None)
+#                                              ))
+#
+#            elif id_producto:
+#                # productos "hijo" de id_producto
+#                productos = _productos(id_departamento, id_producto)
+#                
+#                if len(productos) == 0:
+#                    productos = _cursos(id_producto)
+#    
+#            return sj.dumps(productos)
+        
+        except Exception, e:
+            logger.error(e)
+            return sj.dumps([])        
+    
+    @expose('json')
     def attributes_list(self, **kw):
         logger = logging.getLogger('ViewsController.attributes_list')
         try:
@@ -73,13 +171,16 @@ class ViewsController(BaseController):
                     filter(and_(SapnsAttribute.class_id == class_id)).\
                     order_by(SapnsAttribute.title):
                 
-                attr = SapnsAttribute()
-                
+                #attr = SapnsAttribute()
                 attributes.append(dict(id=attr.attribute_id,
                                        title=attr.title,
                                        name=attr.name,
                                        related_class=attr.related_class_id,
                                        ))
+                
+            attr_tmpl = get_template('sapns/views/edit/attribute-list.html')
+            
+            return dict(status=True, attributes=attr_tmpl.render(attributes=attributes))
         
         except Exception, e:
             logger.error(e)
