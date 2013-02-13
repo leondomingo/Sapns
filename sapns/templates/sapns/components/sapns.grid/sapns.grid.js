@@ -1168,10 +1168,76 @@
                     var params = {};
                     params[data.param_name] = id;
                     
-                    // callback
+                    var button_title = "{{_('Ok')}}";
+                    if (data.button_title) {
+                        button_title = data.button_title;
+                    }
+                    
+                    var refresh = true;
+                    if (data.refresh !== undefined) {
+                        refresh = data.refresh;
+                    }
+                    
+                    // init dialog
                     var dialog_id = self.name + '_dialog';
                     $('#'+dialog_id).remove();
                     $('<div id="' + dialog_id + '" style="display:none"></div>').appendTo('body');
+                    
+                    // buttons
+                    var buttons = [];
+                    if (data.buttons === undefined) {
+                        data.buttons = [{
+                            button_title: button_title,
+                            callback: data.callback,
+                            refresh: refresh
+                        }];
+                    }
+
+                    var F = function(b) {
+                        
+                        var self_ = this;
+                        self_.b = b;
+                        
+                        self_.call = function () {
+                            if (!on_progress) {
+                                on_progress = true;
+                                
+                                window[self_.b.callback](function() {
+                                    if (self_.b.refresh) {
+                                        self.search(self.q, true);
+                                    }
+                                    
+                                    $('#'+dialog_id).dialog('close');
+                                },
+                                function() {
+                                    on_progress = false;
+                                });
+                            }
+                        }
+                    };
+                    
+                    for (var i=0, l=data.buttons.length; i<l; i++) {
+                        var b = data.buttons[i],
+                            f = new F(b);
+                        
+                        buttons.push({
+                            text: b.button_title,
+                            click: f.call
+                        });
+                    }
+                    
+                    // "Cancel" button
+                    buttons.push({
+                        text: "{{_('Cancel')}}",
+                        click: function() {
+                            if (!on_progress) {
+                                $('#'+dialog_id).dialog('close');
+                            }
+                        
+                        }
+                    });
+                    
+                    // load dialog content
                     $.ajax({
                         url: a,
                         data: params,
@@ -1183,26 +1249,7 @@
                                 width: data.width,
                                 height: data.height,
                                 closeOnEscape: false,
-                                buttons: {
-                                    "{{_('Ok')}}": function() {
-                                        if (!on_progress) {
-                                            on_progress = true;
-                                            
-                                            window[data.callback](function() {
-                                                self.search(self.q, true);
-                                                $('#'+dialog_id).dialog('close');
-                                            },
-                                            function() {
-                                                on_progress = false;
-                                            });
-                                        }
-                                    },
-                                    "{{_('Cancel')}}": function() {
-                                        if (!on_progress) {
-                                            $('#'+dialog_id).dialog('close');
-                                        }
-                                    }
-                                }
+                                buttons: buttons,
                             });
                         }
                     });
@@ -1282,6 +1329,8 @@
                 var action_id = $(this).val();
                 if (action_id) {
                     run_action($(this), action_id);
+                    // select first option again
+                    $(nonstd_selector).val('');
                 }
             });
         }
@@ -1297,7 +1346,7 @@
 
         // export button
         var export_sel = sprintf('#%s .export select', self.name);
-        $(document).off('change', 'export_sel').on('change', export_sel, function() {
+        $(document).on('change', export_sel, function() {
             var fmt = $(export_sel).val();
             
             if (fmt == '') {
