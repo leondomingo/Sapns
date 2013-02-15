@@ -183,7 +183,7 @@ class DashboardController(BaseController):
             
         return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))
     
-    @expose(content_type='text/csv')
+    @expose()
     @require(p.not_anonymous())
     def tocsv(self, cls, **kw):
         
@@ -192,11 +192,12 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
+        response.content_type = 'text/csv'
         response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % cls.encode('utf-8')
         
         return ds.to_csv()
     
-    @expose(content_type='application/excel')
+    @expose()
     @require(p.not_anonymous())
     def toxls(self, cls, **kw):
         
@@ -205,11 +206,12 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
 
+        response.content_type = 'application/excel'
         response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % cls.encode('utf-8')
         
         # generate XLS content into "memory file"
         xl_file = cStringIO.StringIO()
-        ds.to_xls(cls.capitalize().replace('_', ' ')[:30], xl_file)
+        ds.to_xls(cls.capitalize().replace('_', ' ')[:20], xl_file)
         
         return xl_file.getvalue()
     
