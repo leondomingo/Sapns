@@ -428,7 +428,11 @@ def create_data_exploration():
 
 def topdf(html_content, check_call=True, **kw):
     
+    VERSION_0_9 = '0.9'
+    VERSION_0_11 = '0.11'
+    
     topdf_path = config.get('htmltopdf.path')
+    version = config.get('htmltopdf.version', VERSION_0_9)
     
     fd_html, html_path = tempfile.mkstemp(suffix='.html', prefix='sapns_')
     os.close(fd_html)
@@ -450,8 +454,13 @@ def topdf(html_content, check_call=True, **kw):
         if not kw.get('q'):
             kw['q'] = None
             
-        if not kw.get('disable_pdf_compression'):
-            kw['disable-pdf-compression'] = None
+        if version == VERSION_0_9:
+            if not kw.get('disable_pdf_compression'):
+                kw['disable-pdf-compression'] = None
+                
+        elif version == VERSION_0_11:
+            if not kw.get('no_pdf_compression'):
+                kw['no-pdf-compression'] = None
         
         pdf_content = ''
         fd_pdf, pdf_path = tempfile.mkstemp(suffix='.pdf', prefix='sapns_')
