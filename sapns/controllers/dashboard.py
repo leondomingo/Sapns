@@ -209,7 +209,7 @@ class DashboardController(BaseController):
         
         # generate XLS content into "memory file"
         xl_file = cStringIO.StringIO()
-        ds.to_xls(cls.capitalize().replace('_', ' '), xl_file)
+        ds.to_xls(cls.capitalize().replace('_', ' ')[:30], xl_file)
         
         return xl_file.getvalue()
     
