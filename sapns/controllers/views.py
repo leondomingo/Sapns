@@ -11,6 +11,7 @@ import logging
 import simplejson as sj
 from sqlalchemy.sql.expression import and_
 from sapns.lib.sapns.util import get_template
+import re
 
 __all__ = ['ViewsController']
 
@@ -65,12 +66,16 @@ class ViewsController(BaseController):
     
     @expose('json')
     def classes(self, **kw):
-        logger = logging.getLogger('arbol')
+        logger = logging.getLogger('ViewsController.classes')
         try:
             class_id = get_paramw(kw, 'class_id', int, opcional=True)
             class_id0 = None
+            path = ''
             if not class_id:
                 class_id = class_id0 = get_paramw(kw, 'class_id0', int)
+                
+            else:
+                path = get_paramw(kw, 'path', str)
             
             def _has_children(class_id):
                 return dbs.query(SapnsAttribute).\
@@ -93,8 +98,8 @@ class ViewsController(BaseController):
                     
                     classes.append(dict(data=u'%s (%s)' % (r_attr.related_class.title, r_attr.title),
                                         attr=dict(class_id=r_attr.related_class_id,
+                                                  path='%d#%s' % (r_attr.attribute_id, path),
                                                   rel='class',
-                                                  id='class_%d' % r_attr.related_class_id
                                                   ),
                                         state=_state(r_attr.class_id),
                                         children=[],
@@ -106,8 +111,8 @@ class ViewsController(BaseController):
                 class0 = dbs.query(SapnsClass).get(class_id0)
                 classes = dict(data=class0.title,
                                attr=dict(class_id=class_id0,
+                                         path='',
                                          rel='class',
-                                         id='class_%d' % class_id0,
                                          ),
                                state='open',
                                children=_classes(class_id0)
@@ -165,6 +170,7 @@ class ViewsController(BaseController):
         logger = logging.getLogger('ViewsController.attributes_list')
         try:
             class_id = get_paramw(kw, 'class_id', int)
+            path = get_paramw(kw, 'path', str)
             
             attributes = []
             for attr in dbs.query(SapnsAttribute).\
@@ -176,6 +182,7 @@ class ViewsController(BaseController):
                                        title=attr.title,
                                        name=attr.name,
                                        related_class=attr.related_class_id,
+                                       path='%d#%s' % (attr.attribute_id, path),
                                        ))
                 
             attr_tmpl = get_template('sapns/views/edit/attribute-list.html')

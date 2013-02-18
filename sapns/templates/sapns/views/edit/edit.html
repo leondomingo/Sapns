@@ -19,6 +19,9 @@
     #sp-edit-view-class-attribute .col { float:left; padding:5px 10px; height:140px; overflow:auto; background-color:#f2f2f2 }
     
     #sp-edit-view-classes { width:400px; margin-right:5px }
+    #sp-edit-view-classes a { font-weight:normal; font:13px arial }
+    #sp-edit-view-classes a.jstree-clicked { background-color:#ECEFCC; border:0; color:#5b5d26; font-weight:bold }
+    #sp-edit-view-classes a:hover { background-color:orange }
     #sp-edit-view-attr-list { width:540px; border-radius:2px }
     #sp-edit-view-attr-list .attribute { border-radius:2px; background-color:#ECEFCC; color:#444; margin-bottom:3px;
     padding:1px 5px; cursor:pointer; font:bold 14px arial }
@@ -63,10 +66,13 @@
     {% include 'sapns/components/sapns.selector.min.js' %}
     $(function() {
         
-        function reload_attributes(class_id) {
+        function reload_attributes(class_id, path) {
             $.ajax({
                 url: "{{tg.url('/dashboard/views/attributes_list/')}}",
-                data: { class_id: class_id },
+                data: {
+                    class_id: class_id,
+                    path: path
+                },
                 success: function(res) {
                     if (res.status) {
                         $('#sp-edit-view-attr-list').html(res.attributes);
@@ -93,7 +99,8 @@
                             data: function(node) {
                                 return {
                                     class_id0: class_id,
-                                    class_id: $(node).attr('class_id')
+                                    class_id: $(node).attr('class_id'),
+                                    path: $(node).attr('path')
                                 };
                             }
                         }
@@ -128,11 +135,11 @@
                     plugins: ['themes', 'json_data', 'types', 'ui']
                 });                
                 
-                reload_attributes(class_id);
+                reload_attributes(class_id, '');
                 
                 $('#sp-edit-view-classes').bind('select_node.jstree', function(e, obj) {
                     var nodo = obj.rslt.obj;
-                    reload_attributes(nodo.attr('class_id'));
+                    reload_attributes(nodo.attr('class_id'), nodo.attr('path'));
                 });
             }
         });
