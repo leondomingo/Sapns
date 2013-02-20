@@ -4,14 +4,17 @@
 from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
-from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass
-from tg import expose, redirect, url, predicates
-import logging
-import simplejson as sj
-from sqlalchemy.sql.expression import and_
+from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.util import get_template
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsUser
+from sqlalchemy.sql.expression import and_
+from tg import expose, redirect, url, predicates
+import datetime as dt
+import logging
 import re
+import simplejson as sj
+from bson.objectid import ObjectId
 
 __all__ = ['ViewsController']
 
@@ -24,10 +27,15 @@ class ViewsController(BaseController):
         return dict(page='views', came_from=url(came_from))
     
     @expose('sapns/views/edit/edit.html')
-    def edit(self, id=None, came_from='/'):
+    def edit(self, id_=None, came_from='/'):
         
         # TODO: cargar datos de la vista con ese "id"
-        #id = validators.Int().to_python(id)
+        mdb = Mongo().db
+        view_id = mdb.user_views.insert(dict(creation_date=dt.datetime.now(),
+                                             saved=False,
+                                             attributes=[],
+                                             relations=[],
+                                             ))
         
         # fake data
         columns = [dict(title='t1',
@@ -54,7 +62,8 @@ class ViewsController(BaseController):
         filters = ['f1', 'f2', 'f3']
         order = ['o1', 'o2', 'o3']
         
-        view = dict(id=id or '',
+        view = dict(id=id_ or '',
+                    view_id=str(view_id),
                     title=u'Title',
                     code=u'Code',
                     columns=columns,
@@ -98,7 +107,7 @@ class ViewsController(BaseController):
                     
                     classes.append(dict(data=u'%s (%s)' % (r_attr.related_class.title, r_attr.title),
                                         attr=dict(class_id=r_attr.related_class_id,
-                                                  path='%d#%s' % (r_attr.attribute_id, path),
+                                                  path='%s#%d' % (path, r_attr.attribute_id),
                                                   rel='class',
                                                   ),
                                         state=_state(r_attr.class_id),
@@ -182,12 +191,45 @@ class ViewsController(BaseController):
                                        title=attr.title,
                                        name=attr.name,
                                        related_class=attr.related_class_id,
-                                       path='%d#%s' % (attr.attribute_id, path),
+                                       path='%s#%d' % (path, attr.attribute_id),
                                        ))
                 
             attr_tmpl = get_template('sapns/views/edit/attribute-list.html')
             
             return dict(status=True, attributes=attr_tmpl.render(attributes=attributes))
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+        
+    @expose('json')
+    def add_attribute(self, **kw):
+        logger = logging.getLogger('add_attribute')
+        try:
+            view_id = get_paramw(kw, 'view_id', str)
+            
+            mdb = Mongo().db
+            view = mdb.user_views.find_one(dict(_id=ObjectId(view_id)))
+            
+            title = []
+            attribute_path = get_paramw(kw, 'attribute_path', str)
+            if view['attributes'].count(attribute_path) == 0:
+                
+                for attribute_id in attribute_path.split('#')[1:]:
+                    attr = dbs.query(SapnsAttribute).get(attribute_id)
+                    if attr.related_class_id:
+                        title.append(attr.related_class.title)
+                        
+                    else:
+                        title.append(attr.title)
+                
+                view['attributes'].append(attribute_path)
+                
+                mdb.user_views.update(dict(_id=ObjectId(view_id)),
+                                      {'$set': dict(attributes=view['attributes'])})
+            
+            return dict(status=True, title='.'.join(title),
+                        attributes=view['attributes'])
         
         except Exception, e:
             logger.error(e)
