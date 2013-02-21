@@ -680,6 +680,7 @@ class SapnsClass(DeclarativeBase):
                                         onupdate='CASCADE', ondelete='CASCADE'))
     
     is_logged = Column(Boolean, default=False)
+    view_id = Column(Unicode(100))
     
     #attributes
     privileges = relation('SapnsPrivilege', backref='class_')
@@ -705,17 +706,15 @@ class SapnsClass(DeclarativeBase):
           <SapnsClass>
         """
         
-        logger = logging.getLogger('SapnsClass.by_name')
-        logger.info('Looking up a class by name...%s' % class_name)
+        _logger = logging.getLogger('SapnsClass.by_name')
+        #logger.info('Looking up a class by name...%s' % class_name)
         
         cls = dbs.query(SapnsClass).\
             filter(SapnsClass.name == class_name).\
             first()
-            
-        logger.info(cls)
-            
-        if parent and cls.parent_class_id:
-            logger.info('Getting parent class...')
+        
+        if cls and parent and cls.parent_class_id:
+            #_logger.info('Getting parent class...')
             cls = dbs.query(SapnsClass).get(cls.parent_class_id)
             
         return cls
