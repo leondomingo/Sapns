@@ -1112,53 +1112,148 @@
                     a += '/';
                 }
                 
-                var target = '';
-                if (ctrl) {
-                    target = '_blank';
-                }
-                
-                if (act.type === 'process') {
-                    if (act.require_id) {
-                        if (id) {
-                            a += id;
-                        }
-                        else {
-                            self.warningSelectedId();
-                            return;
-                        }
-                    } else {
-                        if (id) {
-                            a += id;
+                if (!act.data) {
+                    var target = '';
+                    if (ctrl) {
+                        target = '_blank';
+                    }
+                    
+                    if (act.type === 'process') {
+                        if (act.require_id) {
+                            if (id) {
+                                a += id;
+                            }
+                            else {
+                                self.warningSelectedId();
+                                return;
+                            }
+                        } else {
+                            if (id) {
+                                a += id;
+                            }
                         }
                     }
-                }
-                else if (act.type === 'new') {
-                    a += sprintf('%s/', self.cls);
-                }
-                else if (act.type === 'delete') {
-                    self.std_delete(ids, act.url);
-                    return;
+                    else if (act.type === 'new') {
+                        a += sprintf('%s/', self.cls);
+                    }
+                    else if (act.type === 'delete') {
+                        self.std_delete(ids, act.url);
+                        return;
+                    }
+                    else {
+                        if (act.require_id) {
+                            if (id) {
+                                a += sprintf('%s/%s', self.cls, id);
+                            }
+                            else {
+                                self.warningSelectedId();
+                                return;
+                            }
+                        } else {
+                            if (id) {
+                                a += sprintf('%s/%s', self.cls, id);
+                            } 
+                            else {
+                                a += sprintf('%s/', self.cls);
+                            }
+                        }
+                    }
+
+                    $(form(a, target)).appendTo('body').submit().remove();
                 }
                 else {
-                    if (act.require_id) {
-                        if (id) {
-                            a += sprintf('%s/%s', self.cls, id);
-                        }
-                        else {
-                            self.warningSelectedId();
-                            return;
-                        }
-                    } else {
-                        if (id) {
-                            a += sprintf('%s/%s', self.cls, id);
-                        } 
-                        else {
-                            a += sprintf('%s/', self.cls);
-                        }
+                    var data = JSON.parse(act.data), 
+                        on_progress = false;
+                    
+                    var params = {};
+                    params[data.param_name] = id;
+                    
+                    var button_title = "{{_('Ok')}}";
+                    if (data.button_title) {
+                        button_title = data.button_title;
                     }
-                }
+                    
+                    var refresh = true;
+                    if (data.refresh !== undefined) {
+                        refresh = data.refresh;
+                    }
+                    
+                    // init dialog
+                    var dialog_id = self.name + '_dialog';
+                    $('#'+dialog_id).remove();
+                    $('<div id="' + dialog_id + '" style="display:none"></div>').appendTo('body');
+                    
+                    // buttons
+                    var buttons = [];
+                    if (data.buttons === undefined) {
+                        data.buttons = [{
+                            button_title: button_title,
+                            callback: data.callback,
+                            refresh: refresh
+                        }];
+                    }
 
-                $(form(a, target)).appendTo('body').submit().remove();
+                    var F = function(b) {
+                        
+                        var self_ = this;
+                        self_.b = b;
+                        
+                        self_.call = function () {
+                            if (!on_progress) {
+                                on_progress = true;
+                                
+                                window[self_.b.callback](function() {
+                                    if (self_.b.refresh) {
+                                        self.search(self.q, true);
+                                    }
+                                    
+                                    $('#'+dialog_id).dialog('close');
+                                },
+                                function() {
+                                    on_progress = false;
+                                });
+                            }
+                        }
+                    };
+                    
+                    for (var i=0, l=data.buttons.length; i<l; i++) {
+                        var b = data.buttons[i],
+                            f = new F(b);
+                        
+                        buttons.push({
+                            text: b.button_title,
+                            click: f.call
+                        });
+                    }
+                    
+                    // "Cancel" button
+                    buttons.push({
+                        text: "{{_('Cancel')}}",
+                        click: function() {
+                            if (!on_progress) {
+                                $('#'+dialog_id).dialog('close');
+                            }
+                        
+                        }
+                    });
+                    
+                    // load dialog content
+                    $.ajax({
+                        url: a,
+                        data: params,
+                        success: function(content) {
+                            $('#'+dialog_id).html(content).dialog({
+                                title: act.title,
+                                modal: true,
+                                resizable: false,
+                                width: data.width,
+                                height: data.height,
+                                closeOnEscape: false,
+                                buttons: buttons,
+                            });
+                        }
+                    });
+                }
             }
             else {
                 // typeof(act.type) === 'object'
@@ -1234,6 +1329,8 @@
                 var action_id = $(this).val();
                 if (action_id) {
                     run_action($(this), action_id);
+                    // select first option again
+                    $(nonstd_selector).val('');
                 }
             });
         }
@@ -1249,7 +1346,7 @@
 
         // export button
         var export_sel = sprintf('#%s .export select', self.name);
-        $(document).off('change', 'export_sel').on('change', export_sel, function() {
+        $(document).on('change', export_sel, function() {
             var fmt = $(export_sel).val();
             
             if (fmt == '') {

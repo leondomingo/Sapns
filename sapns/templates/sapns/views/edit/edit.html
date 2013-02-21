@@ -1,0 +1,434 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.qtip2() }}
+    <style>
+    #sp-edit-view { padding:5px }
+    #sp-edit-view .header { padding:5px; border-radius:3px; background-color:#ECEFCC; height:63px }
+    #sp-view-title { width:250px }
+    #sp-view-name { width:250px }
+    #sp-view-table .sp-select-text { width:250px }
+    
+    #sp-edit-view-buttons button { font:13px arial; float:right; margin-left:10px }
+    
+    #sp-edit-view-path { height:30px; border-radius:2px; background-color:#ecefcc; 
+    margin-top:5px; padding:1px 5px }
+    
+    #sp-edit-view-class-attribute { height:150px; clear:left; border-radius:3px; 
+    background-color:#f2f2f2; margin-top:5px }
+    #sp-edit-view-class-attribute .col { float:left; padding:5px 10px; height:140px; 
+    overflow:auto; background-color:#f2f2f2 }
+    
+    #sp-edit-view-classes { width:400px; margin-right:5px }
+    #sp-edit-view-classes a { font-weight:normal; font:13px arial }
+    #sp-edit-view-classes a.jstree-clicked { background-color:#ECEFCC; border:0; color:#5b5d26; font-weight:bold }
+    #sp-edit-view-classes a:hover { background-color:orange }
+    #sp-edit-view-attr-list { width:540px; border-radius:2px }
+    #sp-edit-view-attr-list .attribute { border-radius:2px; background-color:#ECEFCC; 
+    color:#444; margin-bottom:3px; padding:1px 5px; font:bold 14px arial;
+    clear:left; height:18px }
+    #sp-edit-view-attr-list .attribute span { font-weight:normal; font-size:12px }
+    #sp-edit-view-attr-list .attribute .col-attr { float:left }
+    #sp-edit-view-attr-list .attribute .col-attr.name { width:485px; margin-right:5px }
+    #sp-edit-view-attr-list .attribute .col-attr.add { padding:0 2px; cursor:pointer }
+    #sp-edit-view-attr-list .attribute .col-attr.add:hover { background-color:#ddd; color:#fff }
+    
+    #sp-edit-view-cols { background-color:#B4BD3C; height:60px; clear:left; padding:5px; 
+    overflow:auto; margin-top:5px; border-radius:2px }
+    #sp-edit-view-cols .column { float:left; margin-right:4px; margin-top:2px; background-color:#f9f9f9;
+    border-radius:4px; cursor:default }
+    #sp-edit-view-cols .column div { float:left }
+    #sp-edit-view-cols .column div.title { text-align:center; font:13px arial; min-width:90px; padding:1px 4px }
+    #sp-edit-view-cols .column div.close { font:10px arial; background-color:#ddd; text-align:center;
+    width:15px; height:15px; padding-top:2px; border-radius:0 4px 4px 0 }
+    #sp-edit-view-cols .column div.close:hover { background-color:#444; color:#f2f2f2 }
+    #sp-edit-view-cols .placeholder { float:left; margin-right:4px; margin-top:2px; background-color:#444;
+    font:13px arial; padding:1px 4px; width:105px; text-align:center; border-radius:4px; cursor:default;
+    height:15px }
+    
+    #sp-edit-view-list { height:260px; margin-top:5px; background-color:transparent; border-radius:2px }
+    
+    #sp-edit-attribute-title { width:565px }
+    #sp-edit-attribute-expression { width:565px; font:bold 14px courier,arial }
+    </style>
+{% endblock %}
+
+{% block middle %}
+    <div id="sp-edit-view">
+        <div class="header">
+            <div class="sp-field-row">
+                <div class="sp-field">
+                    <div class="label required">{{_('Title')}}</div>
+                    <input id="sp-view-title" type="text" value="{{view.title or ''}}">
+                </div>
+                
+                <div class="sp-field">
+                    <div class="label required">{{_('Table')}}</div>
+                    <div id="sp-view-table"></div>
+                </div>
+                
+                <!--<div class="sp-field">
+                    <div class="label">{{_('User')}}</div>
+                    <div id="sp-view-user"></div>
+                </div>-->
+            </div>
+            
+            <div id="sp-edit-view-buttons">
+                <button id="sp-edit-view-cancel">{{_('Cancel')}}</button>
+                <button id="sp-edit-view-ok">{{_('Ok')}}</button>
+            </div>
+        </div>
+
+        <div id="sp-edit-view-class-attribute">
+            <div id="sp-edit-view-classes" class="col"></div>
+            <div id="sp-edit-view-attr-list" class="col"></div>
+        </div>
+        
+        <div id="sp-edit-view-cols">
+            <!--<div class="column">Nombre</div>-->
+        </div>
+        
+        <div id="sp-edit-view-list"></div>
+    </div>
+
+    <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+    <script src="{{tg.url('/js/jstree/jquery.jstree.js')}}"></script>
+    <script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    {% include 'sapns/components/sapns.selector.min.js' %}
+    
+    $(function() {
+        
+        var view_id = "{{view.view_id}}",
+            view_name = "{{view.name or ''}}";
+            
+        function return_() {
+            var came_from = "{{came_from}}",
+            url = came_from.split('?')[0],
+            params = (came_from.split('?')[1] || '').split('&');
+        
+            var params_ = '';
+            for (var i=0, l=params.length; i<l; i++) {
+                var p = params[i];
+                if (p !== '') {
+                    p_name = p.split('=')[0],
+                    p_value = p.split('=')[1];
+                
+                    params_ += '<input type="hidden" name="' + p_name + '" value="' + p_value + '">';
+                }
+            }
+            
+            var f = '<form action="' + url + '">' + params_ + '</form>';
+            $(f).appendTo('body').submit().remove();            
+        }
+        
+        $('#sp-edit-view-ok').click(function() {
+            var title = $('#sp-view-title').val();
+            if (!title) {
+                alert("{{_('You must specify a title')}}");
+                return;
+            }
+            
+            var class_id = $('#sp-view-table').sapnsSelector('getValue');
+            if (!class_id) {
+                alert("{{_('You must specify a base table')}}");
+                return;
+            }
+            
+            if (!view_name) {
+                alert("{{_('You have to add some columns to the view')}}");
+                return;
+            }
+            
+            var user_id = ''; //$('#sp-view-user').sapnsSelector('getValue');
+            
+            // TODO: mostrar sidebar-message modal=true 
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/view_save/')}}",
+                data: {
+                    view_id: view_id,
+                    view_name: view_name,
+                    id: "{{view.id or ''}}",
+                    title: title,
+                    name: "{{view.name or ''}}",
+                    class_id: class_id,
+                    user_id: user_id
+                },
+                success: function(res) {
+                    // TODO: ocultar sidebar-message 
+                    if (res.status) {
+                        return_();
+                    }
+                    else {
+                        alert('Error!');
+                    }
+                },
+                error: function() {
+                    // TODO: ocultar sidebar-message 
+                    alert('Error!');
+                }
+            });
+        });
+        
+        $('#sp-edit-view-cancel').click(function() {
+            return_();
+        });
+        
+        function reload_attributes(class_id, path) {
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/attributes_list/')}}",
+                data: {
+                    class_id: class_id,
+                    path: path
+                },
+                success: function(res) {
+                    if (res.status) {
+                        $('#sp-edit-view-attr-list').html(res.attributes);
+                        $('#sp-edit-view-attr-list .attribute').disableSelection();
+                    }
+                    else {
+                        alert('Error!');
+                    }
+                },
+                error: function() {
+                    alert('Error!');
+                }
+            });
+        }
+        
+        function reload_cols() {
+            $('#sp-edit-view-cols').html('');
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/view_cols/')}}",
+                data: { view_id: view_id },
+                success: function(content) {
+                    $('#sp-edit-view-cols').html(content);
+                },
+                error: function() {
+                    $('#sp-edit-view-cols').html('<div>Error!</div>');
+                }
+            });
+        }
+        
+        $('#sp-view-table').sapnsSelector({
+            rc: 'sp_classes', rc_title: "{{_('Classes')}}",
+            onChange: function(class_id) {
+                $('#sp-edit-view-classes').jstree({
+                    json_data: {
+                        ajax: {
+                            url: "{{tg.url('/dashboard/views/classes/')}}",
+                            data: function(node) {
+                                return {
+                                    class_id0: class_id,
+                                    class_id: $(node).attr('class_id'),
+                                    path: $(node).attr('path')
+                                };
+                            }
+                        }
+                    },
+                    core: { animation: 0 },
+                    themes: {
+                        theme: 'classic',
+                        url: "{{tg.url('/js/jstree/themes/classic/style.css')}}"
+                    },
+                    ui: { select_limit: 1 },
+                    types: {
+                        valid_children: ['classes']
+                        /*types: {
+                            'classes': {
+                                valid_children: ['producto', 'producto_hoja'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/departamento_16x16.png')}}" }
+                            },
+                            'producto': {
+                                valid_children: ['producto_hoja'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/agrupacion_16x16.png')}}" }
+                            },
+                            'producto_hoja': {
+                                valid_children: ['curso'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/producto_16x16.png')}}" }
+                            },
+                            'curso': {
+                                valid_children: ['none'],
+                                icon: { image: "{{tg.url('/images/atenea/arbol_de_productos/curso_16x16.png')}}" }
+                            }
+                        }*/
+                    },
+                    plugins: ['themes', 'json_data', 'types', 'ui']
+                });                
+                
+                reload_attributes(class_id, '');
+                
+                $('#sp-edit-view-classes').bind('select_node.jstree', function(e, obj) {
+                    var nodo = obj.rslt.obj;
+                    reload_attributes(nodo.attr('class_id'), nodo.attr('path'));
+                });
+            }
+        });
+        
+        $('#sp-view-table').sapnsSelector('setValue', "{{view.class_id or ''}}");
+        
+        $('#sp-view-user').sapnsSelector({
+            rc: 'sp_users', rc_title: "{{_('Users')}}"
+        });
+        
+        function show_grid() {
+            $('#sp-edit-view-list .grid').remove();
+            $('#sp-edit-view-list').append('<div class="grid"></div>');
+            $('#sp-edit-view-list .grid').sapnsGrid({
+                cls: view_name,
+                q: '',
+                rp: 25,
+                search_params: {
+                    url: "{{tg.url('/dashboard/views/grid/')}}"
+                },
+                height: parseInt($('#sp-edit-view-list').css('height').replace('px', '')) - 65
+            });            
+        }
+        
+        $('#sp-edit-view-cols').sortable({
+            placeholder: 'placeholder',
+            stop: function() {
+                var data_ = {};
+                $('#sp-edit-view-cols .column').each(function(i) {
+                    data_['atr_' + i] = $(this).attr('path');
+                });
+                
+                data_.view_id = view_id;
+                data_.view_name = view_name;
+                
+                $.ajax({
+                    url: "{{tg.url('/dashboard/views/reorder_attributes/')}}",
+                    data: data_,
+                    success: function(res) {
+                        if (res.status) {
+                            if (res.view_name !== '') {
+                                view_name = res.view_name;
+                                show_grid();
+                            }                            
+                        }
+                        else {
+                            $('#sp-edit-view-cols').sortable('cancel');
+                        }
+                    },
+                    error: function() {
+                        $('#sp-edit-view-cols').sortable('cancel');
+                    }
+                });
+            }
+        });
+        
+        var s_ = '#sp-edit-view-attr-list .attribute .col-attr.add';
+        $(document).off('click', s_).on('click', s_, function() {
+            var path = $(this).parent().attr('path');
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/add_attribute/')}}",
+                data: { view_id: view_id, attribute_path: path, view_name: view_name },
+                success: function(res) {
+                    if (res.status) {
+                        if (res.attribute.title) {
+                            /*var column = '<div class="column" path="' + res.attribute.path + 
+                                '" title="' + res.attribute.expression + '"><div class="title">' + res.attribute.title + '</div>\
+                                <div class="close">X</div></div>';
+                                
+                            $('#sp-edit-view-cols').append(column);*/
+                            reload_cols();
+                            
+                            if (res.view_name !== '') {
+                                view_name = res.view_name;
+                                show_grid();
+                            }
+                        }
+                    }
+                    else {
+                        alert('Error!');
+                    }
+                },
+                error: function() {
+                    alert('Error!');
+                }
+            });
+        });
+        
+        var s_ = '#sp-edit-view-cols .column .title';
+        $(document).off('dblclick', s_).on('dblclick', s_, function() {
+            var path = $(this).parent().attr('path'),
+                on_progress = false;
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/edit_attribute/')}}",
+                data: { view_id: view_id, view_name: view_name, path: path },
+                success: function(content) {
+                    $('#sp-edit-view-dialog').remove();
+                    $('<div id="sp-edit-view-dialog" style="display:none"></div>').appendTo('body');
+                    $('#sp-edit-view-dialog').html(content).dialog({
+                        title: path,
+                        modal: true,
+                        resizable: false,
+                        width: 600,
+                        height: 'auto',
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    
+                                    edit_attribute_save(function(res) {
+                                        view_name = res.view_name
+                                        reload_cols();
+                                        show_grid();
+                                        $('#sp-edit-view-dialog').dialog('close');
+                                    },
+                                    function() {
+                                        on_progress = false;
+                                    });
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-edit-view-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });
+                }
+            });
+        });
+        
+        var s_ = '#sp-edit-view-cols .column .close';
+        $(document).off('click', s_).on('click', s_, function() {
+            var path = $(this).parent().attr('path');
+            
+            $.ajax({
+                url: "{{tg.url('/dashboard/views/remove_attribute/')}}",
+                data: { view_id: view_id, view_name: view_name, path: path },
+                success: function(res) {
+                    if (res.status) {
+                        view_name = res.view_name;
+                        
+                        reload_cols();
+                        show_grid();
+                    }
+                    else {
+                        alert('Error!');
+                    }
+                },
+                error: function() {
+                    alert('Error!');
+                }
+            });
+        });
+        
+        if (view_name) {
+            reload_cols();
+            show_grid();
+        }
+        
+        $('#sp-view-title').focus();
+    });
+    </script>
+{% endblock %}

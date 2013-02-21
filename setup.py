@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name='sapns',
-    version='0.2',
+    version='0.3',
     description='',
     author='',
     author_email='',
@@ -29,6 +29,7 @@ setup(
         "tw2.forms",
         "Neptuno2",
         "argparse",
+        "pymongo",
     ],
     setup_requires=['PasteScript >= 1.7'],
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],
