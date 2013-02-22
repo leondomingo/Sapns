@@ -132,44 +132,6 @@ class ViewsController(BaseController):
                 
             return sj.dumps(classes)
             
-#            id_departamento_ = get_paramw(kw, 'id_departamento', int, opcional=True)
-#            if not id_producto and not id_curso and not id_departamento_:
-#                
-#                # productos "raíz"
-#                if id_departamento:
-#                    # con departamento seleccionado
-#                    dpto = dbs.query(Departamentos).get(id_departamento)
-#                    productos=dict(data=dpto.nombre,
-#                                   attr=dict(id_departamento=dpto.id_,
-#                                             rel='departamento',
-#                                             id='departamento_%d' % dpto.id_),
-#                                   state='open',
-#                                   children=_productos(id_departamento, None)
-#                                   )
-#                    
-#                else:
-#                    # sin departamento seleccionado
-#                    productos = []
-#                    # sólo los departamentos del usuario
-#                    departamentos = get_departamentos()
-#                    for dpto in departamentos:
-#                        productos.append(dict(data=dpto['nombre'],
-#                                              attr=dict(id_departamento=dpto['id'],
-#                                                        rel='departamento',
-#                                                        id='departamento_%d' % dpto['id']),
-#                                              state='closed',
-#                                              children=_productos(dpto['id'], None)
-#                                              ))
-#
-#            elif id_producto:
-#                # productos "hijo" de id_producto
-#                productos = _productos(id_departamento, id_producto)
-#                
-#                if len(productos) == 0:
-#                    productos = _cursos(id_producto)
-#    
-#            return sj.dumps(productos)
-        
         except Exception, e:
             logger.error(e)
             return sj.dumps([])        
@@ -242,9 +204,7 @@ class ViewsController(BaseController):
                 logger.error(e)
             
         query = get_query(view_id)
-        s = 'CREATE VIEW %s AS %s' % (view_name, query)
-        #logger.info(s)
-        dbs.execute(s)
+        dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
         dbs.flush()
         
         c = SapnsClass.by_name('sp_classes')
