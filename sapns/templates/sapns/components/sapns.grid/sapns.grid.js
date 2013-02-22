@@ -1797,20 +1797,6 @@
                         g.search($(this).val());
                     }
                 });
-
-                /*if (g.link) {
-                    g_content += '<div style="padding-left:20px">\
-                            <button id="link-shortcut" class="sp-button" style="float:left">{{_("Create a shortcut")}}</button>\
-                            <div style="font-size:9px;margin-top:7px;width:100px;float:left">\
-                            <a id="this-search" href="' + g.link + '" \
-                            target="_blank">[{{_("this search")}}]</a>\
-                            </div>\
-                            <div id="link-shortcut-dialog" style="display:none">\
-                            <p>{{_("Do you want to create a shortcut for this search?")}}</p>\
-                            <label>{{_("Shortcut title")}}:</label>\
-                            <input id="link-shortcut-title" type="text" value="({{_("title")}})">\
-                            </div></div>';
-                }*/
                 
                 g_content += '</div>';
             }

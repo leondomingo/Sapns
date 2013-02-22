@@ -1,19 +1,20 @@
 <div class="sp-field-row">
     <div class="sp-field">
         <div class="label">{{_('Title')}}</div>
-        <input id="sp-edit-attribute-title" type="text" value="{{attribute.title or ''}}">
+        <input id="sp-edit-attribute-title" class="sp-edit-attribute-field" 
+            type="text" value="{{attribute.title or ''}}">
     </div>
 </div>
 
 <div class="sp-field-row">
     <div class="sp-field">
         <div class="label">{{_('Expression')}}</div>
-        <input id="sp-edit-attribute-expression" type="text" value="{{attribute.expression or ''}}">
+        <input id="sp-edit-attribute-expression" class="sp-edit-attribute-field" 
+            type="text" value="{{attribute.expression or ''}}">
     </div>
 </div>
 
 <script>
-
 function edit_attribute_save(callback, callback_error) {
     var title = $('#sp-edit-attribute-title').val();
     if (!title) {
@@ -54,5 +55,13 @@ function edit_attribute_save(callback, callback_error) {
 
 $(function() {
     $('#sp-edit-attribute-title').focus();
+    
+    var s_ = '.sp-edit-attribute-field';
+    $(document).off('keypress', s_).on('keypress', s_, function(e) {
+        if (e.which === 13) {
+            // INTRO 
+            $(this).parents('.ui-dialog').find('.ui-dialog-buttonset button:first').click();
+        }
+    });
 });
 </script>
