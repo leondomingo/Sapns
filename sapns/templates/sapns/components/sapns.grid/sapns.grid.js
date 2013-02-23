@@ -239,6 +239,7 @@
             name: 'sapns_grid_' + Math.floor(Math.random() * 999999),
             cls: '',
             with_search: true,
+            with_filters: true,
             search_params: {},
             show_ids: false,
             link: '',
@@ -652,6 +653,32 @@
         
         return q;
     }
+    
+    SapnsGrid.prototype.query_ = function() {
+        var self = this,
+            qry = self.q + '$$';
+        
+        // filters
+        for (var i=0, l=self.filters.length; i<l; i++) {
+            if (i > 0) {
+                qry += ', ';
+            }
+            
+            qry += self.filters[i].stringify();
+        }
+        
+        // order
+        qry += '$$';
+        for (var i=0, l=self.order.length; i<l; i++) {
+            if (i > 0) {
+                qry += ', ';
+            }
+            
+            qry += self.order[i].stringify();
+        }
+        
+        return qry;
+    }
 
     // search
     SapnsGrid.prototype.search = function(q, force, on_load) {
@@ -769,7 +796,7 @@
 
                     self.data = response.data;
                     self.loadData(function() {
-                        $('.sp-grid-cell-tip, .edit_inline, .delete_inline, .docs_inline, .new_inline').qtip({
+                        $('.sp-grid-cell-tip, .edit_inline, .delete_inline, .docs_inline, .new_inline, .sp-grid-save-filter').qtip({
                             content: {
                                 text: true
                             },
@@ -910,9 +937,9 @@
                             + formats[i].title + '</option>';
                 }
 
-                var s_export = '<div class="export" style="height:25px;float:left">' +
-                    '<select class="sp-button sp-grid-action" style="height:20px">' +
-                    '<option value="">({{_("Export")}})</option>' + 
+                var s_export = '<div class="export">\
+                    <select class="sp-button sp-grid-action">\
+                    <option value="">({{_("Export")}})</option>' + 
                     options + '</select></div>';
                 
                 $('#'+self.name + ' .sp-grid-search-box').append(s_export);
@@ -1039,26 +1066,7 @@
 
         function form(action, target) {
             
-            var qry = self.q + '$$';
-            
-            // filters
-            for (var i=0, l=self.filters.length; i<l; i++) {
-                if (i > 0) {
-                    qry += ', ';
-                }
-                
-                qry += self.filters[i].stringify();
-            }
-            
-            // order
-            qry += '$$';
-            for (var i=0, l=self.order.length; i<l; i++) {
-                if (i > 0) {
-                    qry += ', ';
-                }
-                
-                qry += self.order[i].stringify();
-            }
+            var qry = self.query_();
             
             qry = encodeURI(qry).replace('-', '%2D', 'g').
                 replace('"', '%22', 'g').replace('+', '%2B', 'g').
@@ -1572,7 +1580,7 @@
 
     $.fn.sapnsGrid = function(arg1, arg2, arg3) {
 
-        if (typeof(arg1) == "object") {
+        if (typeof(arg1) === "object") {
             
             var g = new SapnsGrid(arg1);
             this.data('sapnsGrid', g);
@@ -1589,10 +1597,21 @@
 
             if (g.with_search) {
 
-                g_content += '<div><div class="sp-grid-search-box">' + 
-                        '<input class="sp-search-txt" style="float:left" name="q" type="text" value="">' +
-                        '<img class="inline_action sp-search-btn" ' +
-                            'src="{{tg.url("/images/sapns/icons/search.png")}}" titlee="{{_("Search...")}}"></div>';
+                g_content += '<div><div class="sp-grid-search-box">\
+                    <input class="sp-search-txt" name="q" type="text" value="">\
+                    <img class="inline_action sp-search-btn" \
+                        src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}">';
+                
+                if (g.with_filters) {
+                    g_content += 
+                        '<img class="inline_action sp-grid-save-filter" \
+                            src="{{tg.url("/images/sapns/icons/filters.png")}}" title="{{_("Save filter")}}">\
+                        <select class="sp-grid-action sp-button sp-grid-select-filter">\
+                            <option value="default">({{_("default")}})</option>\
+                        </select>';
+                }
+                
+                g_content += '</div>';
                 
                 g_content += '<div class="sp-grid-filters" style="display:none"></div>';
                 g_content += '<div class="sp-grid-edit-filter" style="display:none">\
@@ -2008,7 +2027,7 @@
             }
             // getQuery
             else if (arg1 === "getQuery") {
-                return { filters: self.filters, order: self.order };
+                return self.query_(); //{ filters: self.filters, order: self.order };
             }
             // TODO: other sapnsGrid methods
         }

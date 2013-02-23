@@ -4,7 +4,7 @@
 #sp-view-name { width:250px }
 #sp-view-table .sp-select-text { width:250px }
 
-#sp-edit-view-buttons button { font:13px arial; float:right; margin-left:10px }
+#sp-edit-view-buttons button { font:13px arial; float:right; margin-left:10px; width:100px }
 
 #sp-edit-view-path { height:30px; border-radius:2px; background-color:#ecefcc; 
 margin-top:5px; padding:1px 5px }

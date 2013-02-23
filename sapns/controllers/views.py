@@ -19,6 +19,8 @@ import logging
 import random
 import simplejson as sj
 import re
+import copy
+from sapns.lib.sapns.users import get_user
 
 __all__ = ['ViewsController']
 
@@ -33,13 +35,15 @@ class ViewsController(BaseController):
         return dict(page='views', came_from=url(came_from))
     
     @expose('sapns/views/edit/edit.html')
-    def edit(self, id_=None, came_from='/'):
+    def edit(self, id_=None, **kw):
         
+        _logger = logging.getLogger('ViewsController.edit')
+        
+        mdb = Mongo().db
         if id_:
+            query = ''
             view_ = dbs.query(SapnsClass).get(id_)
-            
             if not view_.view_id:
-                mdb = Mongo().db
                 view_id = mdb.user_views.insert(dict(creation_date=dt.datetime.now(),
                                                      saved=False,
                                                      attributes=[],
@@ -48,16 +52,21 @@ class ViewsController(BaseController):
                 
             else:
                 view_id = view_.view_id
+                view0 = mdb.user_views.find_one(dict(_id=ObjectId(view_id)))
+                view_copy = copy.deepcopy(view0)
+                del view_copy['_id']
+                view_id = mdb.user_views.insert(view_copy)
+                query = view_copy.get('query', '')
                 
             view = dict(id=id_ or '',
                         view_id=str(view_id),
                         title=view_.title,
                         class_id=view_.parent_class_id or view_.class_id,
                         name='%s%s' % (config.get('views_prefix', '_view_'), view_.name),
+                        query=query,
                         )
             
         else:
-            mdb = Mongo().db
             view_id = mdb.user_views.insert(dict(creation_date=dt.datetime.now(),
                                                  saved=False,
                                                  attributes=[],
@@ -66,12 +75,33 @@ class ViewsController(BaseController):
             
             view = dict(id=id_ or '',
                         view_id=str(view_id))
-                        
-        return dict(page='views/edit', came_from=came_from, view=view)
+            
+        user = get_user()
+        return dict(page='Edit view', came_from=kw.get('came_from', url(user.entry_point())), 
+                    view=view)
     
     @expose()
     def create(self, id_=None, **kw):
         redirect(url('/dashboard/views/edit/'), **kw)
+        
+    @expose('json')
+    def delete(self, **kw):
+        logger = logging.getLogger('ViewsController.remove')
+        try:
+            view_id = get_paramw(kw, 'view_id', str)
+            view_name = get_paramw(kw, 'view_name', str, opcional=True)
+            
+            if view_name:
+                self.drop_view(view_name)
+            
+            mdb = Mongo().db
+            mdb.user_views.remove(dict(_id=ObjectId(view_id)))
+            
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
     
     @expose('json')
     def classes(self, **kw):
@@ -163,25 +193,38 @@ class ViewsController(BaseController):
         except Exception, e:
             logger.error(e)
             return dict(status=False)
-
-    def create_view(self, view_id, view_name, new_name=None):
         
-        logger = logging.getLogger('ViewsController.create_view')
+    def drop_view(self, view_name):
+        logger = logging.getLogger('ViewsController.drop_view')
         
         def _exists_view(name):
             e = dbs.execute("SELECT count(*) FROM pg_views WHERE viewname = '%s' " % name).fetchone()
             return e[0] == 1
         
-        if view_name:
-            try:
-                # drop "old" view
-                if _exists_view(view_name):
-                    logger.info(u'Dropping "old" view [%s]' % view_name)
-                    dbs.execute('DROP VIEW %s' % view_name)
-                    dbs.flush()
+        try:
+            # drop "old" view
+            if _exists_view(view_name):
+                logger.info(u'Dropping "old" view [%s]' % view_name)
+                dbs.execute('DROP VIEW %s' % view_name)
+                dbs.flush()
                 
-            except Exception, e:
-                logger.error(e)
+                c = SapnsClass.by_name('sp_classes')
+                c.class_id = c.class_id
+                dbs.add(c)
+                dbs.flush()
+            
+        except Exception, e:
+            logger.error(e)
+
+    def create_view(self, view_id, view_name, new_name=None, old_name=None):
+        
+        _logger = logging.getLogger('ViewsController.create_view')
+        
+        if view_name:
+            self.drop_view(view_name)
+                
+        if old_name:
+            self.drop_view(old_name)
                         
         # create a new view
         if not new_name:
@@ -195,13 +238,7 @@ class ViewsController(BaseController):
             view_name = '%s%s' % (config.get('views_prefix', '_view_'), new_name)
             
             # TODO: drop view with "new_name"
-            try:
-                if _exists_view(view_name):
-                    logger.info(u'Dropping view "%s"' % view_name)
-                    dbs.execute('DROP VIEW %s' % view_name)
-                    dbs.flush()
-            except Exception, e:
-                logger.error(e)
+            self.drop_view(new_name)
             
         query = get_query(view_id)
         dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
@@ -266,6 +303,7 @@ class ViewsController(BaseController):
                                  path=attribute_path,
                                  class_name=attr.class_.name,
                                  class_alias='%s_%s' % (attr.class_.name, prefix),
+                                 width=150,
                                  )
                 
                 mdb.user_views.update(dict(_id=ObjectId(view_id)),
@@ -396,8 +434,12 @@ class ViewsController(BaseController):
             dbs.add(view)
             dbs.flush()
             
+            mdb = Mongo().db
+            mdb.user_views.update(dict(_id=ObjectId(view_id)), {'$set': dict(query=kw.get('query', ''))})
+            
             self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True),
-                             new_name=view.name)
+                             new_name=view.name, 
+                             old_name=get_paramw(kw, 'name', str, opcional=True))
             
             return dict(status=True)
         
@@ -493,36 +535,4 @@ class ViewsController(BaseController):
             total_pag = pag_n + 1
         
         return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
-                    this_page=this_page, total_count=ds.count, total_pag=total_pag)    
-
-    @expose('sapns/views/view.html')
-    def error_handler(self, **kw):
-        view = dict(id=kw['id'],
-                    title=kw['title'],
-                    code=kw['code'],
-                    columns=sj.loads(kw['columns']),
-                    relations=sj.loads(kw['relations']),
-                    filters=sj.loads(kw['filters']),
-                    order=sj.loads(kw['order']),
-                    )
-        
-        return dict(page='views/edit', view=view)
-    
-    @expose() #'json')
-#    @validate(validators={'title': validators.NotEmpty(), 'code': validators.NotEmpty()}, 
-#              error_handler=error_handler)
-    def save(self, **kw):
-        #id = validators.Int().to_python(kw['id'])
-        redirect(url('/views/edit'))
-        
-    @expose('sapns/views/share.html')
-    def share(self, **kw):
-        came_from = kw.get('came_from', url('/views'))
-        # TODO: views/share
-        return dict(page='views/share', came_from=came_from)
-    
-    @expose('sapns/message.html')
-    def delete(self, id_view=None, came_from='/views'):
-        
-        return dict(message=_('The view has been successfully deleted'),
-                    came_from=came_from)
+                    this_page=this_page, total_count=ds.count, total_pag=total_pag)

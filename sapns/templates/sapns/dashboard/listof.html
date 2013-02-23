@@ -29,7 +29,7 @@
 
     <script src="{{tg.url('/js/sprintf/sprintf.min.js')}}"></script>
     <script>
-        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
         $(function() {
         	$('.sp-search-txt').focus();
         	var title = $(document).attr('title');
@@ -38,7 +38,7 @@
         	$('#grid').sapnsGrid({
         	    cls: "{{grid.cls}}",
         	    caption: "{{grid.caption}}",
-        	    q: "{{grid.q}}", 
+        	    q: '{{grid.q}}', 
         	    rp: "{{grid.rp}}", 
         	    pag_n: "{{grid.pag_n}}",
         	    ch_attr: "{{grid.ch_attr or ''}}",

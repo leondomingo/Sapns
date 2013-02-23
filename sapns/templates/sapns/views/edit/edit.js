@@ -1,26 +1,12 @@
 $(function() {
     
     var view_id = "{{view.view_id}}",
-        view_name = "{{view.name or ''}}";
+        view_name = '',
+        query = '{{view.query or ""}}';
         
     function return_() {
-        var came_from = "{{came_from}}",
-        url = came_from.split('?')[0],
-        params = (came_from.split('?')[1] || '').split('&');
-    
-        var params_ = '';
-        for (var i=0, l=params.length; i<l; i++) {
-            var p = params[i];
-            if (p !== '') {
-                p_name = p.split('=')[0],
-                p_value = p.split('=')[1];
-            
-                params_ += '<input type="hidden" name="' + p_name + '" value="' + p_value + '">';
-            }
-        }
-        
-        var f = '<form action="' + url + '">' + params_ + '</form>';
-        $(f).appendTo('body').submit().remove();            
+        var f = '<form method="post" action="{{came_from}}"></form>';
+        $(f).appendTo('body').submit().remove();
     }
     
     $('#sp-edit-view-ok').click(function() {
@@ -36,12 +22,15 @@ $(function() {
             return;
         }
         
-        if (!view_name) {
+        if (!view_name && "{{view.name or ''}}" === '') {
             alert("{{_('You have to add some columns to the view')}}");
             return;
         }
         
-        var user_id = ''; //$('#sp-view-user').sapnsSelector('getValue');
+        var user_id = '', //$('#sp-view-user').sapnsSelector('getValue');
+            query = $('#sp-edit-view-list .grid').sapnsGrid('getQuery');
+        
+        console.log(query);
         
         // TODO: mostrar sidebar-message modal=true 
         
@@ -54,7 +43,8 @@ $(function() {
                 title: title,
                 name: "{{view.name or ''}}",
                 class_id: class_id,
-                user_id: user_id
+                user_id: user_id,
+                query: query
             },
             success: function(res) {
                 // TODO: ocultar sidebar-message 
@@ -73,7 +63,21 @@ $(function() {
     });
     
     $('#sp-edit-view-cancel').click(function() {
-        return_();
+        $.ajax({
+            url: "{{tg.url('/dashboard/views/delete/')}}",
+            data: { view_id: view_id, view_name: view_name },
+            success: function(res) {
+                if (res.status) {
+                    return_();
+                }
+                else {
+                    alert('Error!');
+                }
+            },
+            error: function() {
+                alert('Error!');
+            }
+        });
     });
     
     function reload_attributes(class_id, path) {
@@ -153,12 +157,21 @@ $(function() {
         rc: 'sp_users', rc_title: "{{_('Users')}}"
     });
     
-    function show_grid() {
+    function show_grid(cls) {
+        
+        if (cls !== undefined) {
+            cls = "{{view.name}}";
+        }
+        else {
+            cls = view_name;
+            query = $('#sp-edit-view-list .grid').sapnsGrid('getQuery');
+        }
+        
         $('#sp-edit-view-list .grid').remove();
         $('#sp-edit-view-list').append('<div class="grid"></div>');
         $('#sp-edit-view-list .grid').sapnsGrid({
-            cls: view_name,
-            q: '',
+            cls: cls,
+            q: query,
             rp: 25,
             search_params: {
                 url: "{{tg.url('/dashboard/views/grid/')}}"
@@ -296,9 +309,9 @@ $(function() {
         });
     });
     
-    if (view_name) {
+    if ("{{view.name or ''}}") {
         reload_cols();
-        show_grid();
+        show_grid("{{view.name}}");
     }
     
     $('#sp-view-title').focus();
