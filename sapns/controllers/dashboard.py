@@ -28,6 +28,8 @@ import datetime as dt
 import logging
 import re
 import simplejson as sj
+from sapns.lib.sapns.mongo import Mongo
+from bson.objectid import ObjectId
 
 # controllers
 __all__ = ['DashboardController']
@@ -182,6 +184,74 @@ class DashboardController(BaseController):
                 return cmp(x.pos, y.pos)
             
         return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))
+    
+    @expose('json')
+    @require(p.not_anonymous())
+    def save_user_filter(self, **kw):
+        logger = logging.getLogger('DashboardController.save_user_filter')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            filter_name = get_paramw(kw, 'filter_name', unicode)
+            query = get_paramw(kw, 'query', unicode)
+            
+            user_id = request.identity['user'].user_id
+            
+            mdb = Mongo().db
+            
+            cls_ = SapnsClass.by_name(cls)
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
+            create_view = False
+            if not view:
+                create_view = True
+                view = dict(user_filters={})
+            
+            if not view['user_filters']:
+                view['user_filters'] = {}
+                
+            if not view['user_filters'][str(user_id)]:
+                view['user_filters'][str(user_id)] = []
+                
+            found = False
+            for filter_ in view['user_filters'][str(user_id)]:
+                if filter_['name'] == filter_name:
+                    found = True
+                    filter_['query'] = query
+                    
+            if not found:
+                view['user_filters'][str(user_id)].append(dict(name=filter_name, query=query))
+                
+            if create_view:
+                view_id = mdb.user_views.insert(dict(user_filters=view['user_filters']))
+                
+                cls_.view_id = view_id
+                dbs.add(cls_)
+                dbs.flush()
+                
+            else:
+                mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
+                                      {'$set': view['user_filters']})
+
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+    
+    @expose('json')
+    @require(p.not_anonymous())
+    def delete_user_filter(self, **kw):
+        logger = logging.getLogger('DashboardController.delete_user_filter')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            filter_name = get_paramw(kw, 'filter_name', unicode)
+            
+            user_id = request.identity['user'].user_id
+            
+            mdb = Mongo().db
+            
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
     
     @expose(content_type='text/csv')
     @require(p.not_anonymous())

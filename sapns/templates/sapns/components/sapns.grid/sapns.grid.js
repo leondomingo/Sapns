@@ -244,6 +244,7 @@
             show_ids: false,
             link: '',
             q: '',
+            user_filters: [],
             ch_attr: '',
             parent_id: '',
             cols: [],
@@ -281,24 +282,10 @@
         self.ajx_data = JSON.stringify({});
         self.styles = [];
         
-        // obtener las tres partes de la query
-        // q$$filters$$order
-        var q_parts = self.q.split('$$');
+        // user filters
+        self.user_filters.push({ name: 'default', query: self.q });
         
-        // q
-        self.q = q_parts[0];
-        
-        // filters
-        self.filters = [];
-        if (q_parts.length > 1) {
-            self.filters = parseFilters(q_parts[1]);
-        }
-        
-        // order
-        self.order = [];
-        if (q_parts.length > 2) {
-            self.order = parseOrder(q_parts[2]);
-        }
+        self.setQuery(self.q);
         
         self._new_default = {
             name: 'new',
@@ -327,6 +314,29 @@
             require_id: 'true',
             type: 'docs'
         };
+    }
+    
+    SapnsGrid.prototype.setQuery = function(query) {
+        var self = this;
+        
+        // split "query" in three parts
+        // q$$filters$$order
+        var q_parts = query.split('$$');
+        
+        // q
+        self.q = q_parts[0];
+        
+        // filters
+        self.filters = [];
+        if (q_parts.length > 1) {
+            self.filters = parseFilters(q_parts[1]);
+        }
+        
+        // order
+        self.order = [];
+        if (q_parts.length > 2) {
+            self.order = parseOrder(q_parts[2]);
+        }
     }
 
     // getSelectedIds
@@ -1603,12 +1613,17 @@
                         src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}">';
                 
                 if (g.with_filters) {
+                    
+                    var filters_ = '';
+                    for (var i=0, l=g.user_filters.length; i<l; i++) {
+                        var f = g.user_filters[i];
+                        filters_ += '<option value="' + f.name + '">' + f.name + '</option>';
+                    }
+                    
                     g_content += 
                         '<img class="inline_action sp-grid-save-filter" \
-                            src="{{tg.url("/images/sapns/icons/filters.png")}}" title="{{_("Save filter")}}">\
-                        <select class="sp-grid-action sp-button sp-grid-select-filter">\
-                            <option value="default">({{_("default")}})</option>\
-                        </select>';
+                            src="{{tg.url("/images/sapns/icons/filters.png")}}" title="{{_("Manage filter")}}">\
+                        <select class="sp-grid-action sp-button sp-grid-select-filter">' + filters_ + '</select>';
                 }
                 
                 g_content += '</div>';
@@ -1815,6 +1830,137 @@
                     if (event.which === 13) {
                         g.search($(this).val());
                     }
+                });
+                
+                /* select-filter */
+                var select_filter = g_id + ' .sp-grid-select-filter';
+                $(document).off('change', select_filter).on('change', select_filter, function() {
+                    var filter_name = $(this).val(),
+                        query_filter = '';
+                    for (var i=0, l=g.user_filters.length; i<l; i++) {
+                        var f = g.user_filters[i];
+                        if (f.name === filter_name) {
+                            g.setQuery(f.query);
+                            g.search(g.query_().split('$$')[0], true);
+                            return;
+                        }
+                    }
+                });
+                
+                /* save-filter */
+                var save_filter = g_id + ' .sp-grid-save-filter';
+                $(document).off('click', save_filter).on('click', save_filter, function() {
+                    var current_query = g.query_(),
+                        current_filter = $(select_filter).val(),
+                        on_progress = false,
+                        dialog = 
+                        '<div id="sp-grid-save-filter-dialog" style="display:none">\
+                            <div class="sp-field-row">\
+                                <div class="sp-field">\
+                                    <div class="label">{{_("Filter name")}}</div>\
+                                    <input id="sp-grid-filter-name" type="text" value="' + current_filter + '">\
+                                </div>\
+                            </div>\
+                        </div>';
+                    
+                    $('#sp-grid-save-filter-dialog').remove();
+                    $(dialog).appendTo('body').dialog({
+                        title: "{{_('Save filter')}}",
+                        modal: true,
+                        resizable: false,
+                        width: 400,
+                        height: 'auto',
+                        buttons: {
+                            "{{_('Create or Modify')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    
+                                    var filter_name = $('#sp-grid-filter-name').val();
+                                    
+                                    // Web service to create/modify this filter
+                                    $.ajax({
+                                        url: "{{tg.url('/dashboard/save_user_filter/')}}",
+                                        data: { cls: g.cls, filter_name: filter_name, query: current_query },
+                                        success: function(res) {
+                                            if (res.status) {
+                                                /* looking for the filter */
+                                                var exists = false;
+                                                for (var i=0, l=g.user_filters.length; i<l; i++) {
+                                                    var f = g.user_filters[i];
+                                                    if (f.name === filter_name) {
+                                                        f.query = current_query;
+                                                        exists = true;
+                                                    }
+                                                }
+                                                
+                                                if (!exists) {
+                                                    g.user_filters.push({ name: filter_name, query: current_query });
+                                                    $(select_filter).append('<option value="' + filter_name + '">' + filter_name + '</option>');
+                                                    $(select_filter).val(filter_name);
+                                                }
+                                                
+                                                $('#sp-grid-save-filter-dialog').dialog('close');
+                                            }
+                                            else {
+                                                on_progress = false;
+                                                alert('Error!');
+                                            }
+                                        },
+                                        error: function() {
+                                            on_progress = false;
+                                            alert('Error!');
+                                        }
+                                    });
+                                }
+                            },
+                            "{{_('Delete')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    
+                                    var filter_name = $('#sp-grid-filter-name').val();
+                                    
+                                    // Web service to delete this filter
+                                    $.ajax({
+                                        url: "{{tg.url('/dashboard/delete_user_filter/')}}",
+                                        data: { cls: g.cls, filter_name: filter_name },
+                                        success: function(res) {
+                                            if (res.status) {
+                                                if (filter_name !== 'default') {
+                                                    $(select_filter).val('default').change();
+                                                    $(select_filter + ' option[value=' + filter_name + ']').remove();
+                                                    
+                                                    var user_filters = [];
+                                                    for (var i=0, l=g.user_filters.length; i<l; i++) {
+                                                        var uf = g.user_filters[i];
+                                                        if (uf.name !== filter_name) {
+                                                            user_filters.push(uf);
+                                                        }
+                                                    }
+                                                    
+                                                    g.user_filters = user_filters;
+                                                }
+                                                
+                                                $('#sp-grid-save-filter-dialog').dialog('close');
+                                            }
+                                            else {
+                                                on_progress = false;
+                                                alert('Error!');
+                                            }
+                                        },
+                                        error: function() {
+                                            on_progress = false;
+                                            alert('Error!');
+                                        }
+                                    });
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-grid-save-filter-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });
                 });
                 
                 g_content += '</div>';
@@ -2027,7 +2173,10 @@
             }
             // getQuery
             else if (arg1 === "getQuery") {
-                return self.query_(); //{ filters: self.filters, order: self.order };
+                return self.query_();
+            }
+            else if (arg1 === "setQuery") {
+                self.setQuery(arg2);
             }
             // TODO: other sapnsGrid methods
         }
