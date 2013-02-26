@@ -483,7 +483,7 @@ def topdf(html_content, check_call=True, **kw):
             else:
                 extra_params.append('-%s' % k_)
 
-            if v:
+            if v is not None:
                 extra_params.append(str(v))
                 
         try:
