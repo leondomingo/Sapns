@@ -60,7 +60,6 @@ class List(object):
             
         # shift enabled
         shift_enabled_ = u'managers' in roles
-
         
         # related classes
         rel_classes = cls_.related_classes()
@@ -84,10 +83,14 @@ class List(object):
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
+        # user_filters
+        user_filters = sj.dumps(self.view.get('user_filters', {}).get(str(request.identity['user'].user_id), []))
+            
         return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=self.came_from,
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
                               q=q,
+                              user_filters=user_filters,
                               rp=self.rp, pag_n=self.pag_n,
                               # collection
                               ch_attr=self.ch_attr, parent_id=self.parent_id,

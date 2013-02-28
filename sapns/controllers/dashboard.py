@@ -205,10 +205,10 @@ class DashboardController(BaseController):
                 create_view = True
                 view = dict(user_filters={})
             
-            if not view['user_filters']:
+            if not view.get('user_filters'):
                 view['user_filters'] = {}
                 
-            if not view['user_filters'][str(user_id)]:
+            if not view['user_filters'].get(str(user_id)):
                 view['user_filters'][str(user_id)] = []
                 
             found = False
@@ -220,6 +220,9 @@ class DashboardController(BaseController):
             if not found:
                 view['user_filters'][str(user_id)].append(dict(name=filter_name, query=query))
                 
+            logger.info(view)
+            logger.info(view['user_filters'])
+                
             if create_view:
                 view_id = mdb.user_views.insert(dict(user_filters=view['user_filters']))
                 
@@ -229,12 +232,13 @@ class DashboardController(BaseController):
                 
             else:
                 mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
-                                      {'$set': view['user_filters']})
+                                      {'$set': dict(user_filters=view['user_filters'])})
 
             return dict(status=True)
         
         except Exception, e:
             logger.error(e)
+            return dict(status=False, msg=str(e))
     
     @expose('json')
     @require(p.not_anonymous())
@@ -247,6 +251,19 @@ class DashboardController(BaseController):
             user_id = request.identity['user'].user_id
             
             mdb = Mongo().db
+            
+            cls_ = SapnsClass.by_name(cls)
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
+            user_filters = []
+            for f in view['user_filters'][str(user_id)]:
+                if f['name'] != filter_name:
+                    user_filters.append(f)
+                    
+            view['user_filters'][str(user_id)] = user_filters
+
+            mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
+                                      {'$set': dict(user_filters=view['user_filters'])})
+
             
             return dict(status=True)
         

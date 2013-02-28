@@ -1,5 +1,6 @@
 /* Sapns grid */
 
+var __DEFAULT_FILTER = 'default';
 (function($) {
     
     function Filter(params) {
@@ -189,7 +190,7 @@
     function SapnsGrid(settings) {
         
         var self = this;
-        
+
         if (typeof(settings.caption) === 'function') {
             settings.caption = settings.caption();
         }
@@ -283,7 +284,13 @@
         self.styles = [];
         
         // user filters
-        self.user_filters.push({ name: 'default', query: self.q });
+        self.current_user_filter = __DEFAULT_FILTER;
+        var user_filters_ = [{ name: __DEFAULT_FILTER, query: self.q }];
+        for (var i=0, l=self.user_filters.length; i<l; i++) {
+            user_filters_.push(self.user_filters[i]);
+        }
+        
+        self.user_filters = user_filters_;
         
         self.setQuery(self.q);
         
@@ -336,6 +343,14 @@
         self.order = [];
         if (q_parts.length > 2) {
             self.order = parseOrder(q_parts[2]);
+        }
+        
+        // user filter
+        if (q_parts.length > 3) {
+            self.current_user_filter = q_parts[3];
+        }
+        else {
+            self.current_user_filter = __DEFAULT_FILTER;
         }
     }
 
@@ -685,6 +700,11 @@
             }
             
             qry += self.order[i].stringify();
+        }
+        
+        // user_filter
+        if (self.current_user_filter !== __DEFAULT_FILTER) {
+            qry += '$$' + self.current_user_filter;
         }
         
         return qry;
@@ -1616,8 +1636,14 @@
                     
                     var filters_ = '';
                     for (var i=0, l=g.user_filters.length; i<l; i++) {
-                        var f = g.user_filters[i];
-                        filters_ += '<option value="' + f.name + '">' + f.name + '</option>';
+                        var f = g.user_filters[i],
+                            selected = '';
+                        
+                        if (g.current_user_filter == f.name) {
+                            selected = ' selected';
+                        }
+                        
+                        filters_ += '<option value="' + f.name + '"' + selected + '>' + f.name + '</option>';
                     }
                     
                     g_content += 
@@ -1841,6 +1867,7 @@
                         var f = g.user_filters[i];
                         if (f.name === filter_name) {
                             g.setQuery(f.query);
+                            g.current_user_filter = filter_name;
                             g.search(g.query_().split('$$')[0], true);
                             return;
                         }
@@ -1875,7 +1902,7 @@
                                 if (!on_progress) {
                                     on_progress = true;
                                     
-                                    var filter_name = $('#sp-grid-filter-name').val();
+                                    var filter_name = $('#sp-grid-filter-name').val().replace(/[^A-Za-z0-9_]/g, '_');
                                     
                                     // Web service to create/modify this filter
                                     $.ajax({
@@ -1902,6 +1929,10 @@
                                                 $('#sp-grid-save-filter-dialog').dialog('close');
                                             }
                                             else {
+                                                if (res.msg) {
+                                                    console.log(res.msg);
+                                                }
+                                                
                                                 on_progress = false;
                                                 alert('Error!');
                                             }
@@ -1915,17 +1946,16 @@
                             },
                             "{{_('Delete')}}": function() {
                                 if (!on_progress) {
-                                    on_progress = true;
-                                    
                                     var filter_name = $('#sp-grid-filter-name').val();
-                                    
-                                    // Web service to delete this filter
-                                    $.ajax({
-                                        url: "{{tg.url('/dashboard/delete_user_filter/')}}",
-                                        data: { cls: g.cls, filter_name: filter_name },
-                                        success: function(res) {
-                                            if (res.status) {
-                                                if (filter_name !== 'default') {
+                                    if (filter_name !== 'default') {
+                                        on_progress = true;
+                                        
+                                        // Web service to delete this filter
+                                        $.ajax({
+                                            url: "{{tg.url('/dashboard/delete_user_filter/')}}",
+                                            data: { cls: g.cls, filter_name: filter_name },
+                                            success: function(res) {
+                                                if (res.status) {
                                                     $(select_filter).val('default').change();
                                                     $(select_filter + ' option[value=' + filter_name + ']').remove();
                                                     
@@ -1938,20 +1968,23 @@
                                                     }
                                                     
                                                     g.user_filters = user_filters;
+                                                    
+                                                    $('#sp-grid-save-filter-dialog').dialog('close');
                                                 }
-                                                
-                                                $('#sp-grid-save-filter-dialog').dialog('close');
-                                            }
-                                            else {
+                                                else {
+                                                    on_progress = false;
+                                                    alert('Error!');
+                                                }
+                                            },
+                                            error: function() {
                                                 on_progress = false;
                                                 alert('Error!');
                                             }
-                                        },
-                                        error: function() {
-                                            on_progress = false;
-                                            alert('Error!');
-                                        }
-                                    });
+                                        });
+                                    }
+                                    else {
+                                        $('#sp-grid-save-filter-dialog').dialog('close');
+                                    }
                                 }
                             },
                             "{{_('Cancel')}}": function() {
