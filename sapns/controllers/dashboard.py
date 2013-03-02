@@ -204,29 +204,31 @@ class DashboardController(BaseController):
             if not view:
                 create_view = True
                 view = dict(user_filters={})
-            
-            if not view.get('user_filters'):
-                view['user_filters'] = {}
                 
-            if not view['user_filters'].get(str(user_id)):
-                view['user_filters'][str(user_id)] = []
+            USER_FILTERS = 'user_filters'
+            
+            if not view.get(USER_FILTERS):
+                view[USER_FILTERS] = {}
+                
+            if not view[USER_FILTERS].get(str(user_id)):
+                view[USER_FILTERS][str(user_id)] = []
                 
             found = False
-            for filter_ in view['user_filters'][str(user_id)]:
+            for filter_ in view[USER_FILTERS][str(user_id)]:
                 if filter_['name'] == filter_name:
                     found = True
                     filter_['query'] = query
                     
             if not found:
-                view['user_filters'][str(user_id)].append(dict(name=filter_name, query=query))
-                
-            logger.info(view)
-            logger.info(view['user_filters'])
+                if filter_name == 'default':
+                    view[USER_FILTERS][str(user_id)].insert(0, dict(name=filter_name, query=query))
+                else:
+                    view[USER_FILTERS][str(user_id)].append(dict(name=filter_name, query=query))
                 
             if create_view:
-                view_id = mdb.user_views.insert(dict(user_filters=view['user_filters']))
+                view_id = mdb.user_views.insert(view)
                 
-                cls_.view_id = view_id
+                cls_.view_id = str(view_id)
                 dbs.add(cls_)
                 dbs.flush()
                 
@@ -269,6 +271,54 @@ class DashboardController(BaseController):
         
         except Exception, e:
             logger.error(e)
+            
+    @expose('json')
+    @require(p.not_anonymous())
+    def save_col_width(self, **kw):
+        logger = logging.getLogger('DashboardController.save_col_width')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            length = get_paramw(kw, 'length', int)
+            col_num = get_paramw(kw, 'col_num', int)
+            width = get_paramw(kw, 'width', int)
+            
+            user_id = request.identity['user'].user_id
+            
+            mdb = Mongo().db
+            
+            cls_ = SapnsClass.by_name(cls)
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
+            create_view = False
+            if not view:
+                create_view = True
+                view = dict(user_filters={})
+                
+            COL_WIDTHS = 'col_widths'
+                
+            if not view.get(COL_WIDTHS):
+                view[COL_WIDTHS] = {}
+                
+            if not view[COL_WIDTHS].get(str(user_id)):
+                view[COL_WIDTHS][str(user_id)] = [0]*length
+                
+            view[COL_WIDTHS][str(user_id)][col_num-1] = width
+            
+            if create_view:
+                view_id = mdb.user_views.insert(view)
+                
+                cls_.view_id = str(view_id)
+                dbs.add(cls_)
+                dbs.flush()
+                
+            else:
+                mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
+                                      {'$set': dict(col_widths=view[COL_WIDTHS])})
+
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, msg=str(e))            
     
     @expose(content_type='text/csv')
     @require(p.not_anonymous())

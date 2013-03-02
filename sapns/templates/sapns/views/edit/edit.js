@@ -177,7 +177,13 @@ $(function() {
                 url: "{{tg.url('/dashboard/views/grid/')}}"
             },
             hide_check: true,
-            height: parseInt($('#sp-edit-view-list').css('height').replace('px', '')) - 65
+            height: parseInt($('#sp-edit-view-list').css('height').replace('px', '')) - 65,
+            with_filters: false,
+            resize: {
+                after: function(col_num) {
+                    console.log(col_num);
+                }
+            }
         });            
     }
     

@@ -26,7 +26,22 @@ class List(object):
         self.cls = cls
         self.cls_ = SapnsClass.by_name(self.cls, parent=False)
         self.mdb = Mongo().db
-        self.view = self.mdb.user_views.find_one(dict(_id=ObjectId(self.cls_.view_id)))
+        self.view = None
+        if self.cls_.view_id:
+            self.view = self.mdb.user_views.find_one(dict(_id=ObjectId(self.cls_.view_id)))
+            
+        if not self.view:
+            self.view = dict(attributes=[],
+                             attributes_detail=[],
+                             user_filters={},
+                             col_widths={})
+            
+            self.view['_id'] = self.mdb.user_views.insert(self.view)
+            
+            self.cls_.view_id = str(self.view['_id'])
+            dbs.add(self.cls_)
+            dbs.flush()
+            
         self.kw = kw
 
         self.q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
@@ -64,16 +79,6 @@ class List(object):
         # related classes
         rel_classes = cls_.related_classes()
         
-        if self.q:
-            q = self.q.replace('"', '\\\"')
-            
-        else:
-            query = ''
-            if self.view:
-                query = self.view.get('query', '')
-                
-            q = query            
-        
         # collection
         caption = ch_cls_.title
         if self.ch_attr and self.parent_id:
@@ -84,13 +89,33 @@ class List(object):
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
         # user_filters
-        user_filters = sj.dumps(self.view.get('user_filters', {}).get(str(request.identity['user'].user_id), []))
+        user_filters = self.view.get('user_filters', {}).get(str(request.identity['user'].user_id), [])
+        
+        default = False
+        for f in user_filters:
+            if f['name'] == 'default':
+                default = True
+                break
             
+        if not default:
+            user_filters.insert(0, dict(name='default', query=self.view.get('query', '')))
+
+        if self.q:
+            q = self.q.replace('"', '\\\"')
+            
+        else:
+            query = ''
+            if self.view:
+                #query = self.view.get('query', '')
+                query = user_filters[0]['query']
+                
+            q = query            
+        
         return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=self.came_from,
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
                               q=q,
-                              user_filters=user_filters,
+                              user_filters=sj.dumps(user_filters),
                               rp=self.rp, pag_n=self.pag_n,
                               # collection
                               ch_attr=self.ch_attr, parent_id=self.parent_id,
@@ -133,9 +158,22 @@ class List(object):
             
         view_cols = [default_width]*len(ds.labels)
         if self.view:
-            view_cols = [default_width]
-            for a in sorted(self.view['attributes_detail'], cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0))):
-                view_cols.append(a.get('width', default_width))
+            #view_cols = [default_width]
+            for i, a in enumerate(sorted(self.view.get('attributes_detail', []), cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0)))):
+                view_cols[i] = a.get('width', default_width)
+                
+            # user - col_widths
+            user_id = request.identity['user'].user_id
+            if self.view.get('col_widths', {}).get(str(user_id)):
+                view_cols_ = [default_width]
+                for w, w_ in zip(self.view['col_widths'][str(user_id)], view_cols):
+                    if w:
+                        view_cols_.append(w)
+                        
+                    else:
+                        view_cols_.append(w_)
+                    
+                view_cols = view_cols_
         
         cols = []
         for col, w in zip(ds.labels, view_cols):

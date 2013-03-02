@@ -267,6 +267,10 @@ var __DEFAULT_FILTER = 'default';
             pag_n: 1,
             rp: 10,
             onLoad: null,
+            resize: {
+                min_width: 90,
+                after: null
+            },
             default_: {
                 col_width: 60,
                 col_align: 'center',
@@ -282,15 +286,6 @@ var __DEFAULT_FILTER = 'default';
         self.total_pag = 0;
         self.ajx_data = JSON.stringify({});
         self.styles = [];
-        
-        // user filters
-        self.current_user_filter = __DEFAULT_FILTER;
-        var user_filters_ = [{ name: __DEFAULT_FILTER, query: self.q }];
-        for (var i=0, l=self.user_filters.length; i<l; i++) {
-            user_filters_.push(self.user_filters[i]);
-        }
-        
-        self.user_filters = user_filters_;
         
         self.setQuery(self.q);
         
@@ -506,7 +501,7 @@ var __DEFAULT_FILTER = 'default';
             }
             
             grid_header += '<div class="sp-col-title sp-col-title-sortable ' + is_ordered + '"' + order_type + 
-                ' style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
+                ' col_num="' + i + '" style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
         }
 
         grid_header += '</div>';
@@ -600,7 +595,7 @@ var __DEFAULT_FILTER = 'default';
                     }
                     
                     grid_row += '<div class="sp-grid-cell sp-grid-cell-tip clickable ' + row_style + '" \
-                        style="text-align:' + al + ';' + width + border_radius + '"';
+                        col_num="' + j + '" style="text-align:' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
                         grid_row += sprintf('title="%s"', cell.replace(/"/gi, "''"));
@@ -638,6 +633,45 @@ var __DEFAULT_FILTER = 'default';
         if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
             $('#' + self.name + ' .sp-grid-rowid:first').prop('checked', true);
         }
+        
+        var grid_id = '#'+self.name;
+        $('.sp-col-title-sortable').resizable({
+            handles: 'e',
+            minWidth: self.resize.min_width,
+            resize: function(e, ui) {
+                var width = ui.element.width(),
+                    col_num = ui.element.attr('col_num'),
+                    row_width = $('.sp-grid-row').width(),
+                    current_width = $('.sp-grid-cell[col_num=' + col_num + ']').width();
+                
+                $(grid_id + ' .sp-grid-cell[col_num=' + col_num + ']').width(width);
+                $(grid_id + ' .sp-grid-row').width(row_width + (width - current_width));
+            },
+            stop: function(e, ui) {
+                
+                var col_num = ui.element.attr('col_num');
+                
+                if (self.resize.after) {
+                    self.resize.after(col_num*1);
+                }
+                else {
+                    // TODO: guardar anchos para el "current_user_filter" del usuario correspondiente
+                    $.ajax({
+                        url: "{{tg.url('/dashboard/save_col_width/')}}",
+                        data: {
+                            cls: self.cls,
+                            length: self.cols.length-1,
+                            col_num: col_num,
+                            width: ui.element.width()
+                        },
+                        success: function(res) {
+                            if (res.status) {
+                            }
+                        }
+                    });
+                }
+            }
+        });
         
         if (callback) {
             callback();
@@ -1947,7 +1981,7 @@ var __DEFAULT_FILTER = 'default';
                             "{{_('Delete')}}": function() {
                                 if (!on_progress) {
                                     var filter_name = $('#sp-grid-filter-name').val();
-                                    if (filter_name !== 'default') {
+                                    //if (filter_name !== 'default') {
                                         on_progress = true;
                                         
                                         // Web service to delete this filter
@@ -1981,10 +2015,10 @@ var __DEFAULT_FILTER = 'default';
                                                 alert('Error!');
                                             }
                                         });
-                                    }
+                                    /*}
                                     else {
                                         $('#sp-grid-save-filter-dialog').dialog('close');
-                                    }
+                                    }*/
                                 }
                             },
                             "{{_('Cancel')}}": function() {
