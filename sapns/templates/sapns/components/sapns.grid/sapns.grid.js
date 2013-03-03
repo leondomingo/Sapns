@@ -216,7 +216,7 @@ var __DEFAULT_FILTER = 'default';
             pager_options = [{
                 val: 10,
                 desc: '10',
-                sel: true
+                sel: false
             },
             {
                 val: 50,
@@ -234,6 +234,17 @@ var __DEFAULT_FILTER = 'default';
                 sel: false
             }];
         }
+        
+        if ($.inArray(settings.rp*1, [10, 50, 100, 0]) === -1) {
+            pager_options.push({ val: settings.rp*1, desc: settings.rp, sel: true });
+        }
+        else {
+            pager_options[0].sel = true;
+        }
+        
+        pager_options.sort(function(x, y) {
+            return x.val - y.val;
+        });
         
         var _settings = $.extend(true, {
             caption: '',
@@ -2044,8 +2055,7 @@ var __DEFAULT_FILTER = 'default';
                     <div class="sp-grid-pager-desc"></div>';
                 
                 // pager_options
-                var pager_options = '',
-                    values = [];
+                var pager_options = '';
                 for (var i=0, l=g.pager_options.length; i<l; i++) {
                     var option = g.pager_options[i];
                     
@@ -2055,14 +2065,8 @@ var __DEFAULT_FILTER = 'default';
                     }
                     
                     pager_options += '<option value="' + option.val + '"' + selected + '>' + option.desc + '</option>';
-                    values.push(option.val);
                 }
                 
-                // add "rp" as another value in the "pager_options"
-                if ($.inArray(g.rp, values) === -1) {
-                    pager_options += '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
-                }
-
                 g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px">' +
                         '<select class="sp-button sp-grid-rp">' +
                         pager_options +

@@ -22,11 +22,6 @@
                     <div class="label required">{{_('Table')}}</div>
                     <div id="sp-view-table"></div>
                 </div>
-                
-                <!--<div class="sp-field">
-                    <div class="label">{{_('User')}}</div>
-                    <div id="sp-view-user"></div>
-                </div>-->
             </div>
             
             <div id="sp-edit-view-buttons">
@@ -50,7 +45,7 @@
     <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
     <script src="{{tg.url('/js/jstree/jquery.jstree.js')}}"></script>
     <script>
-    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
     {% include 'sapns/components/sapns.selector.min.js' %}
     {% include 'sapns/views/edit/edit.js' %}
     </script>
