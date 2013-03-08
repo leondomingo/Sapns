@@ -57,9 +57,9 @@ font-family:Arial; font-size:13px; width:240px; height:18px; opacity:1;
 border-radius:10px }
 
 .sp-logout-user { font-weight:normal }
-.sp-logout-user * { float:left; height:22px }
-.sp-logout-user img { width:16px; height:16px; margin-top:1px; margin-right:5px }
-.sp-logout-user .user-name { margin-top:2px; color:#444; height:16px }
+.sp-logout-user * { float:left; height:16px }
+.sp-logout-user img { width:16px; margin-top:1px; margin-right:5px }
+.sp-logout-user .user-name { margin-top:2px; color:#444 }
 
 .sp-logout-btn { text-align:center; background-color:white; border:2px solid gray;
 border-radius:10px; width:90px; margin-left:250px; font-family:Arial;
