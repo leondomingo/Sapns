@@ -24,13 +24,5 @@ $(function() {
         
         $(f).appendTo('body').submit().remove();
     });
-    
-    $('#sp-user-views').click(function() {
-        var f = '<form action="{{tg.url("/dashboard/views/")}}">\
-            <input type="hidden" name="came_from" value="' + encodeURI(window.location.href) + '">\
-        </form>';
-        
-        $(f).appendTo('body').submit().remove();
-    });
 });
 </script>
