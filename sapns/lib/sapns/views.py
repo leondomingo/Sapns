@@ -38,6 +38,8 @@ def get_query(view_id):
     columns = []
     relations = []
     relations_ = {}
+    nagg_columns = []
+    agg_columns = []
     for attribute in sorted(view['attributes_detail'], cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0))):
         
         if not relations_.get(attribute['class_alias']):
@@ -48,9 +50,9 @@ def get_query(view_id):
                 parent_alias, parent_attribute = _get_parent(attribute['class_alias'])
                 relations__ = []
                 relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'], attribute['class_alias'],
-                                                                        attribute['class_alias'], 
-                                                                        parent_alias, parent_attribute,
-                                                                        ))
+                                                                             attribute['class_alias'], 
+                                                                             parent_alias, parent_attribute,
+                                                                             ))
                 
                 end_ = False
                 while not end_:
@@ -60,11 +62,11 @@ def get_query(view_id):
                         parent_class = re.search(r'^([a-z_]+)_', parent_alias).group(1)
                         
                         if not relations_.get(parent_alias):
-                            relations_[parent_alias] = True 
+                            relations_[parent_alias] = True
                             relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (parent_class, parent_alias,
-                                                                                    parent_alias,
-                                                                                    parent_alias_, parent_attribute_,
-                                                                                    ))
+                                                                                         parent_alias,
+                                                                                         parent_alias_, parent_attribute_,
+                                                                                         ))
                         
                         parent_alias = parent_alias_
                         
@@ -72,14 +74,29 @@ def get_query(view_id):
                         end_ = True
                         
                 relations += relations__
-            
-        columns.append(u'%s as "%s"' % (attribute['expression'], attribute['title']))
         
-    columns.insert(0, '%s_0.id' % view['base_class'])
-
-    query = u'SELECT %s\n' % (',\n'.join(columns))
+        col_title = '"%s"' % attribute['title']    
+        columns.append(u'%s as %s' % (attribute['expression'], col_title))
+        
+        m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\([\w\,\.]+\)', attribute['expression'].upper())
+        if m_agg:
+            agg_columns.append(col_title)
+            
+        else:
+            nagg_columns.append(col_title)
+            
+    group_by = None
+    if not len(agg_columns):
+        columns.insert(0, '%s_0.id' % view['base_class'])
+        
+    else:
+        group_by = 'GROUP BY %s' % (', '.join(nagg_columns))
+        
+    query =  u'SELECT %s\n' % (',\n'.join(columns))
     query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
     query += '\n'.join(relations)
     
+    if group_by:
+        query += '\n%s' % group_by
+        
     return query
-    

@@ -286,7 +286,7 @@ class DashboardController(BaseController):
             
             mdb = Mongo().db
             
-            cls_ = SapnsClass.by_name(cls)
+            cls_ = SapnsClass.by_name(cls, parent=False)
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
             create_view = False
             if not view:
@@ -320,7 +320,7 @@ class DashboardController(BaseController):
             logger.error(e)
             return dict(status=False, msg=str(e))            
     
-    @expose(content_type='text/csv')
+    @expose()
     @require(p.not_anonymous())
     def tocsv(self, cls, **kw):
         
@@ -329,11 +329,14 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
-        response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % cls.encode('utf-8')
+        fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
+        
+        response.content_type = 'text/csv'
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % fn
         
         return ds.to_csv()
     
-    @expose(content_type='application/excel')
+    @expose()
     @require(p.not_anonymous())
     def toxls(self, cls, **kw):
         
@@ -341,12 +344,15 @@ class DashboardController(BaseController):
         kw['rp'] = 0
         list_ = List(cls, **kw)
         ds = list_.grid_data()
+        
+        fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
 
-        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % cls.encode('utf-8')
+        response.content_type = 'application/excel'
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % fn
         
         # generate XLS content into "memory file"
         xl_file = cStringIO.StringIO()
-        ds.to_xls(cls.capitalize().replace('_', ' '), xl_file)
+        ds.to_xls(fn[:25], xl_file)
         
         return xl_file.getvalue()
     

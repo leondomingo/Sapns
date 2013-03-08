@@ -5,6 +5,9 @@
     <!--{% elif sc.action_type == 'list' %}-->
     <a class="sp-shortcut list" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=came_from))}}"
         shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" cls="{{sc.cls}}" title="{{sc.title}}">{{sc.title|escape}}</a>
+    <!--{% elif sc.action_type == 'view' %}-->
+    <a class="sp-shortcut view" href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=came_from))}}"
+        shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" cls="{{sc.cls}}" title="{{sc.title}}">{{sc.title|escape}}</a>
     <!--{% elif sc.action_type == 'process' %}-->
     <a class="sp-shortcut process" href="{{tg.url(sc.url, params=dict(came_from=came_from))}}"
         shortcut_id="{{sc.id}}" action_type="{{sc.action_type}}" title="{{sc.title}}">{{sc.title|escape}}</a>

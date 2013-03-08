@@ -422,6 +422,12 @@ var __DEFAULT_FILTER = 'default';
         // row width
         var row_wd = cols.length * 42;
         
+        if (cols[0].title != 'id') {
+            self.hide_check = true;
+            self.hide_id = true;
+            self.actions_inline = false;
+        }
+        
         // hide_check
         if (!self.hide_check) {
             row_wd += 23;
@@ -667,11 +673,16 @@ var __DEFAULT_FILTER = 'default';
                 }
                 else {
                     // TODO: guardar anchos para el "current_user_filter" del usuario correspondiente
+                    var length = self.cols.length;
+                    if (self.cols[0].title === 'id') {
+                        length -= 1;
+                    }
+                    
                     $.ajax({
                         url: "{{tg.url('/dashboard/save_col_width/')}}",
                         data: {
                             cls: self.cls,
-                            length: self.cols.length-1,
+                            length: length,
                             col_num: col_num,
                             width: ui.element.width()
                         },

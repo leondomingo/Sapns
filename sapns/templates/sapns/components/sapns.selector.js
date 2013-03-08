@@ -47,7 +47,8 @@
                 search_params: {
                     url: settings.search_url,
                     data: settings.search_data
-                }
+                },
+                with_filters: false
             }
         }, settings);
         

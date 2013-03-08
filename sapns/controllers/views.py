@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+
 """Views management controller"""
 
 from bson.objectid import ObjectId
@@ -31,9 +32,9 @@ class ViewsController(BaseController):
                         p_.has_permission('views'),
                         )
     
-    @expose('sapns/views/index.html')
-    def index(self, came_from='/'):
-        return dict(page='views', came_from=url(came_from))
+#    @expose('sapns/views/index.html')
+#    def index(self, came_from='/'):
+#        return dict(page='views', came_from=url(came_from))
     
     @expose('sapns/views/edit/edit.html')
     def edit(self, id_=None, **kw):
@@ -116,18 +117,6 @@ class ViewsController(BaseController):
                 
             else:
                 path = get_paramw(kw, 'path', str)
-            
-#            def _has_children(class_id):
-#                return dbs.query(SapnsAttribute).\
-#                    filter(SapnsAttribute.related_class_id == class_id).\
-#                    first() != None
-#            
-#            def _state(class_id):
-#                state_ = ''
-#                if _has_children(class_id):
-#                    state_ = 'closed'
-#
-#                return state_
             
             def _classes(class_id):
                 classes = []
@@ -419,16 +408,20 @@ class ViewsController(BaseController):
                         
                     else:
                         view = SapnsClass()
+                        view.parent_class_id = get_paramw(kw, 'class_id', int)
                     
                 else:
                     view = SapnsClass()
+                    view.parent_class_id = get_paramw(kw, 'class_id', int)
                 
             else:
                 view = dbs.query(SapnsClass).get(id_)
                 
+            if view.parent_class_id:
+                view.parent_class_id = get_paramw(kw, 'class_id', int)
+                
             view.title = title
             view.name = name
-            view.parent_class_id = get_paramw(kw, 'class_id', int)
             #view.description = u'User view'
             view_id = get_paramw(kw, 'view_id', str)
             view.view_id = view_id

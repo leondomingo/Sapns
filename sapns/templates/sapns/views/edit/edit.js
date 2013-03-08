@@ -164,7 +164,10 @@ $(function() {
         }
         else {
             cls = view_name;
-            query = $('#sp-edit-view-list .grid').sapnsGrid('getQuery');
+            query = '';
+            if ($('#sp-edit-view-list .grid').length) {
+                query = $('#sp-edit-view-list .grid').sapnsGrid('getQuery');
+            }
         }
         
         $('#sp-edit-view-list .grid').remove();

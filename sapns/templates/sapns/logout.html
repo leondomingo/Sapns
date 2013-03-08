@@ -1,6 +1,6 @@
 <div class="sp_logout">
     <div class="sp-logout-user" title="{{request.identity.user.user_name}}">
-        <a>{{request.identity.user.display_name}}</a>
+        <img src="/images/sapns/icons/process.png"><div class="user-name">{{request.identity.user.display_name}}</div>
     </div>
     <div class="sp-logout-btn">
         <a title="{{_('Click here to logout')}}">{{_('logout')}}</a>
@@ -8,8 +8,7 @@
     
     <div id="sp-user-menu">
         <!-- TODO: automatically generated -->
-        <div class="sp-user-option" id="sp-user-data">{{_('User data')}}</div>
-        <div class="sp-user-option" id="sp-user-views">{{_('User views')}}</div>
+        <div class="sp-user-option" id="sp-user-data"><img src="{{tg.url('/images/sapns/icons/users.png')}}">{{_('User data')}}</div>
         <div class="sp-user-option">
         {% include 'sapns/lang_selector.html' %}
         </div>
