@@ -7,20 +7,21 @@ from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
+from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import get_template, pagination
 from sapns.lib.sapns.views import get_query
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission
 from sqlalchemy.sql.expression import and_
 from tg import expose, redirect, url, predicates as p_, config
+import copy
 import datetime as dt
 import hashlib
 import logging
 import random
-import simplejson as sj
 import re
-import copy
-from sapns.lib.sapns.users import get_user
+import simplejson as sj
+import transaction
 
 __all__ = ['ViewsController']
 
@@ -400,6 +401,7 @@ class ViewsController(BaseController):
     @expose('json')
     def view_save(self, **kw):
         logger = logging.getLogger('ViewsController.view_save')
+        transaction.begin()
         try:
             title = get_paramw(kw, 'title', unicode)
             name = re.sub(r'[^a-z0-9_]', '_', title.lower())
@@ -407,7 +409,7 @@ class ViewsController(BaseController):
             user_id = get_paramw(kw, 'user_id', int, opcional=True)
             if user_id:
                 name = '%s_%d' % (name, user_id)
-            
+                
             id_ = get_paramw(kw, 'id', int, opcional=True)
             if not id_:
                 if name:
@@ -434,16 +436,38 @@ class ViewsController(BaseController):
             dbs.add(view)
             dbs.flush()
             
+            # Look for "list" permission for this class/view
+            list_p = dbs.query(SapnsPermission).\
+                filter(and_(SapnsPermission.type == SapnsPermission.TYPE_LIST,
+                            SapnsPermission.class_id == view.class_id 
+                            )).\
+                first()
+                
+            if not list_p:
+                # create "list" permission
+                list_p = SapnsPermission()
+                list_p.permission_name = u'%s#list' % view.name
+                list_p.display_name = u'List'
+                list_p.class_id = view.class_id
+                list_p.type = SapnsPermission.TYPE_LIST
+                list_p.requires_id = False
+                dbs.add(list_p)
+                dbs.flush()
+            
             mdb = Mongo().db
-            mdb.user_views.update(dict(_id=ObjectId(view_id)), {'$set': dict(query=kw.get('query', ''))})
+            mdb.user_views.update(dict(_id=ObjectId(view_id)),
+                                  {'$set': dict(query=kw.get('query', ''), saved=True)})
             
             self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True),
                              new_name=view.name, 
                              old_name=get_paramw(kw, 'name', str, opcional=True))
             
+            transaction.commit()
+            
             return dict(status=True)
         
         except Exception, e:
+            transaction.abort()
             logger.error(e)
             return dict(status=False)            
     
