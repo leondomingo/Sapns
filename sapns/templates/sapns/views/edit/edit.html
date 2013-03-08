@@ -1,0 +1,52 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    {{ util.qtip2() }}
+    <link rel="stylesheet" href="{{tg.url('/css/views/edit.css', params=dict(v=1))}}">
+{% endblock %}
+
+{% block middle %}
+    <div id="sp-edit-view">
+        <div class="header">
+            <div class="sp-field-row">
+                <div class="sp-field">
+                    <div class="label required">{{_('Title')}}</div>
+                    <input id="sp-view-title" type="text" value="{{view.title or ''}}">
+                </div>
+                
+                <div class="sp-field">
+                    <div class="label required">{{_('Table')}}</div>
+                    <div id="sp-view-table"></div>
+                </div>
+            </div>
+            
+            <div id="sp-edit-view-buttons">
+                <button id="sp-edit-view-cancel">{{_('Cancel')}}</button>
+                <button id="sp-edit-view-ok">{{_('Ok')}}</button>
+            </div>
+        </div>
+
+        <div id="sp-edit-view-class-attribute">
+            <div id="sp-edit-view-classes" class="col"></div>
+            <div id="sp-edit-view-attr-list" class="col"></div>
+        </div>
+        
+        <div id="sp-edit-view-cols">
+            <!--<div class="column">Nombre</div>-->
+        </div>
+        
+        <div id="sp-edit-view-list"></div>
+    </div>
+
+    <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
+    <script src="{{tg.url('/js/jstree/jquery.jstree.js')}}"></script>
+    <script>
+    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+    {% include 'sapns/components/sapns.selector.min.js' %}
+    {% include 'sapns/views/edit/edit.js' %}
+    </script>
+{% endblock %}

@@ -5,10 +5,12 @@ from pylons.i18n import ugettext as _
 from sapns.config import app_cfg
 from sapns.lib.sapns.util import pagination
 from sapns.model import DBSession as dbs, SapnsUser, SapnsClass, SapnsPermission
-from tg import url, request, redirect, config
+from tg import url, request, config
 import logging
 import simplejson as sj
 from neptuno.postgres.search import Search
+from sapns.lib.sapns.mongo import Mongo
+from bson.objectid import ObjectId
 
 date_fmt = config.get('formats.date', default='%m/%d/%Y')
 _strtodate = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
@@ -22,6 +24,24 @@ class List(object):
         self.logger = logging.getLogger('sapns.lib.sapns.lists.List')
         
         self.cls = cls
+        self.cls_ = SapnsClass.by_name(self.cls, parent=False)
+        self.mdb = Mongo().db
+        self.view = None
+        if self.cls_.view_id:
+            self.view = self.mdb.user_views.find_one(dict(_id=ObjectId(self.cls_.view_id)))
+            
+        if not self.view:
+            self.view = dict(attributes=[],
+                             attributes_detail=[],
+                             user_filters={},
+                             col_widths={})
+            
+            self.view['_id'] = self.mdb.user_views.insert(self.view)
+            
+            self.cls_.view_id = str(self.view['_id'])
+            dbs.add(self.cls_)
+            dbs.flush()
+            
         self.kw = kw
 
         self.q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
@@ -55,7 +75,6 @@ class List(object):
             
         # shift enabled
         shift_enabled_ = u'managers' in roles
-
         
         # related classes
         rel_classes = cls_.related_classes()
@@ -69,10 +88,35 @@ class List(object):
             
             caption = _('%s of [%s]') % (ch_cls_.title, p_title)
             
+        # user_filters
+        user_filters = self.view.get('user_filters', {}).get(str(request.identity['user'].user_id), [])
+        
+        default = False
+        for f in user_filters:
+            if f['name'] == 'default':
+                default = True
+                break
+            
+        if not default:
+            user_filters.insert(0, dict(name='default', query=self.view.get('query', '')))
+
+        if self.q:
+            q = self.q.replace('"', '\\\"')
+            
+        else:
+            query = ''
+            if self.view:
+                #query = self.view.get('query', '')
+                query = user_filters[0]['query']
+                
+            q = query            
+        
         return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=self.came_from,
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
-                              q=self.q.replace('"', '\\\"'), rp=self.rp, pag_n=self.pag_n,
+                              q=q,
+                              user_filters=sj.dumps(user_filters),
+                              rp=self.rp, pag_n=self.pag_n,
                               # collection
                               ch_attr=self.ch_attr, parent_id=self.parent_id,
                               # related classes
@@ -111,13 +155,28 @@ class List(object):
         default_width = visible_width / len(ds.labels)
         if default_width < min_width:
             default_width = min_width
+            
+        view_cols = [default_width]*len(ds.labels)
+        if self.view:
+            #view_cols = [default_width]
+            for i, a in enumerate(sorted(self.view.get('attributes_detail', []), cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0)))):
+                view_cols[i] = a.get('width', default_width)
+                
+            # user - col_widths
+            user_id = request.identity['user'].user_id
+            if self.view.get('col_widths', {}).get(str(user_id)):
+                view_cols_ = [default_width]
+                for w, w_ in zip(self.view['col_widths'][str(user_id)], view_cols):
+                    if w:
+                        view_cols_.append(w)
+                        
+                    else:
+                        view_cols_.append(w_)
+                    
+                view_cols = view_cols_
         
         cols = []
-        for col in ds.labels:
-            w = default_width
-            if col == 'id':
-                w = 60
-                
+        for col, w in zip(ds.labels, view_cols):
             cols.append(dict(title=col, width=w, align='center'))
             
         this_page, total_pag = pagination(self.rp, self.pag_n, ds.count)
@@ -151,15 +210,15 @@ class List(object):
                         message=_('Sorry, you do not have privilege on this class'))
         
         # get view name
-        view = user.get_view_name(ch_cls_.name)
-            
+        view_name = user.get_view_name(ch_cls_.name)
+        
         # collection
         col = None
         if self.ch_attr and self.parent_id:
             col = (self.cls, self.ch_attr, self.parent_id,)
 
         # get dataset
-        _search = Search(dbs, view, strtodatef=_strtodate)
+        _search = Search(dbs, view_name, strtodatef=_strtodate)
         _search.apply_qry(self.q.encode('utf-8'))
         _search.apply_filters(filters)
         

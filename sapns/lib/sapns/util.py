@@ -17,6 +17,7 @@ import os
 import re
 import subprocess as sp
 import tempfile
+from pylons.templating import pylons_globals
 
 ROLE_MANAGERS = u'managers'
 
@@ -582,3 +583,15 @@ def add_language(f): #, lang='lang', languages='languages'):
     f.lang_key = 'lang'
     f.languages_key = 'languages'
     return decorator(_add_language, f)
+
+def get_template(tmpl_name, default_tmpl=None):
+    globs = {}
+    globs.update(pylons_globals())
+    try:
+        return globs['app_globals'].jinja2_env.get_template(tmpl_name)
+    
+    except:
+        if default_tmpl:
+            return globs['app_globals'].jinja2_env.get_template(default_tmpl)
+        else:
+            raise

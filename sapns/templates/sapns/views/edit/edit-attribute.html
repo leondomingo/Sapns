@@ -1,0 +1,67 @@
+<div class="sp-field-row">
+    <div class="sp-field">
+        <div class="label">{{_('Title')}}</div>
+        <input id="sp-edit-attribute-title" class="sp-edit-attribute-field" 
+            type="text" value="{{attribute.title or ''}}">
+    </div>
+</div>
+
+<div class="sp-field-row">
+    <div class="sp-field">
+        <div class="label">{{_('Expression')}}</div>
+        <input id="sp-edit-attribute-expression" class="sp-edit-attribute-field" 
+            type="text" value="{{attribute.expression or ''}}">
+    </div>
+</div>
+
+<script>
+function edit_attribute_save(callback, callback_error) {
+    var title = $('#sp-edit-attribute-title').val();
+    if (!title) {
+        callback_error();
+        return;
+    }
+    
+    var expression = $('#sp-edit-attribute-expression').val();
+    if (!expression) {
+        callback_error();
+        return;
+    }
+    
+    $.ajax({
+        url: "{{tg.url('/dashboard/views/attribute_save/')}}",
+        data: {
+            view_id: "{{view_id}}",
+            view_name: "{{view_name}}",
+            path: "{{attribute.path}}",
+            title: title,
+            expression: expression
+        },
+        success: function(res) {
+            if (res.status) {
+                callback(res);
+            }
+            else {
+                callback_error();
+                alert('Error!');
+            }
+        },
+        error: function() {
+            callback_error();
+            alert('Error!');
+        }
+    });
+}
+
+$(function() {
+    $('#sp-edit-attribute-title').focus();
+    
+    var s_ = '.sp-edit-attribute-field';
+    $(document).off('keypress', s_).on('keypress', s_, function(e) {
+        if (e.which === 13) {
+            // INTRO 
+            $(this).parents('.ui-dialog').find('.ui-dialog-buttonset button:first').click();
+        }
+    });
+});
+</script>

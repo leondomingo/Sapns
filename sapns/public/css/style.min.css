@@ -15,12 +15,17 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp_app_title_sep{color:#000;font-weight:bold}.sp_app_subtitle{font-size:12px;text-align:left;color:#723532}
 .sp_logout{position:absolute;right:10px;top:5px;border:1px solid;background-color:#cccfa5;border-radius:10px;cursor:pointer;opacity:.8}
 .sp-logout-user{padding-left:10px;float:left;font-style:italic;font-family:Arial;font-size:13px;width:240px;height:18px;opacity:1;border-radius:10px}
-.sp-logout-user a{font-weight:normal}.sp-logout-btn{text-align:center;background-color:white;border:2px solid gray;border-radius:10px;width:90px;margin-left:250px;font-family:Arial;height:14px}
+.sp-logout-user{font-weight:normal}.sp-logout-user *{float:left;height:22px}.sp-logout-user img{width:16px;height:16px;margin-top:1px;margin-right:5px}
+.sp-logout-user .user-name{margin-top:2px;color:#444}.sp-logout-btn{text-align:center;background-color:white;border:2px solid gray;border-radius:10px;width:90px;margin-left:250px;font-family:Arial;height:14px}
 .sp-logout-btn a{font-weight:normal}.sp-logout-btn:hover{background-color:#ffb835}
 #sp-language-selector{font-size:9px}#sp-language-selector-out{float:right;margin:5px 5px 0 0}
 .sp-button{font-size:11px;text-align:center;margin:2px}.sp-grid-container{padding-left:15px;padding-right:15px}
-.sp-grid-search-box{float:left;margin-bottom:5px}.sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}
-.sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}.sp-grid-caption{color:#666;font:bold 22px helvetica,arial;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
+.sp-grid-search-box{float:left;margin-bottom:5px;width:99%;background-color:#f2f2f2;padding:2px 5px 1px 5px;border-radius:4px}
+.sp-grid-search-box .export{height:25px;float:left;margin-top:1px}.sp-grid-search-box .export select{width:110px;height:20px}
+.sp-grid-search-box .sp-search-txt{float:left;margin-top:2px}.sp-grid-search-box .sp-grid-save-filter{float:right}
+.sp-grid-search-box .sp-grid-select-filter{float:right;width:180px;height:20px;margin-top:3px}
+.sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}.sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}
+.sp-grid-caption{color:#666;font:bold 22px helvetica,arial;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
 .sp-grid-dialog .wait-message{font:12px arial;color:#c00}.sp-search-txt{border:1px solid #777;width:450px}
 .sp-search-btn{float:none;width:80px;margin-left:5px}.sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}
 .sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;margin-bottom:-1px;padding:2px;overflow:hidden}
@@ -37,8 +42,8 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp-grid-pager{border-color:#ddd #777 #777 #ddd;border-radius:3px 3px 3px 3px;border-style:solid;border-width:1px;height:30px}
 .sp-grid-pager-desc{color:#777;font-family:arial;width:350px;text-align:center;float:left;height:30px;vertical-align:middle;margin-top:5px;height:25px}
 .sp-grid-current-page{width:40px;color:#777;font-weight:bold;float:left;border:1px solid #666!important}
-.sp-grid-pager button{font-size:10px;font-family:arial;height:18px;background-color:#faca6a}
-.sp-grid-rp{float:left;height:18px;background-color:#faca6a}.sp-grid-pag-back{float:left}
+.sp-grid-pager button{font-size:10px;font-family:arial;height:18px;background-color:#faca6a;margin-top:5px}
+.sp-grid-rp{float:left;height:18px;background-color:#faca6a;margin-top:5px}.sp-grid-pag-back{float:left}
 .sp-grid-actions{clear:left;background-color:#cccfa5;height:25px}.sp-grid-actions-title{width:150px;text-align:center;float:left;clear:left;margin-top:5px;color:gray;font-weight:bold;font-size:10px}
 .sp-grid-action{min-width:80px;margin:2px}.sp-grid-relatedinfo-title{float:left;color:gray;margin-top:3px;width:150px;font-size:10px;font-weight:bold;text-align:center;margin-top:5px}
 .sp_field_error{background-color:red;color:white}.sp_message{font-size:25px;color:#605b7c;margin-top:20px;padding-left:20px}
@@ -48,8 +53,9 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
 .inline_action{border-radius:3px;cursor:pointer;float:left;width:20px;height:20px;margin:3px 1px 0 0;padding:0 2px}
 .inline_action:hover{background-color:#fff}.nonstd_actions{width:22px;height:20px;float:left;font-size:10px;margin-top:3px;background-color:#faca6a}
-.item_sb{clear:left;min-height:22px;margin-top:2px;padding:2px}.item_sb_dragging{border:1px solid #b4bd3c;border-radius:3px;height:25px}
-.item_sb a{font-weight:normal}.item_sb_sortable img{width:18px;height:18px}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}
+.nonstd_actions option{width:180px}.item_sb{clear:left;min-height:22px;margin-top:2px;padding:2px}
+.item_sb_dragging{border:1px solid #b4bd3c;border-radius:3px;height:25px}.item_sb a{font-weight:normal}
+.item_sb_sortable img{width:18px;height:18px}.icon_sb{width:25px;height:25px;cursor:pointer;float:left}
 .return_sb{margin-left:5px}.text_sb{font-size:12px;padding-top:3px;margin-left:5px;float:left;width:130px;margin-bottom:3px}
 .text_sb,.subaction{padding:3px;cursor:pointer;width:150px}.text_sb:hover,.subaction:hover{background-color:#b4bd3c;border-radius:3px}
 .text_sb a{font-weight:bold;color:#333}.text_sb a:hover{color:black}.subactions{clear:left;min-height:22px;background-color:#f1f4dc;padding:2px;border-radius:2px}
@@ -61,7 +67,8 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:or
 .sp-select-text{border:1px solid red;border-radius:3px}.sp-select-button,.sp-empty-button{height:20px;font:bold 10px arial;margin-left:3px}
 .sp-empty-button{color:red}#sp-user-menu{width:330px;display:none;margin-top:5px;padding-bottom:5px}
 .sp-user-option{padding:2px 2px 2px 10px;color:#000;border-radius:3px;cursor:pointer;margin-left:1px;width:99%}
-.sp-user-option:hover{background-color:#ffa900;color:#fff}.caja3d{border:1px solid #999;border-bottom:2px solid #777;border-right:2px solid #777;border-radius:3px}
+.sp-user-option:hover{background-color:#ffa900;color:#fff}.sp-user-option img{width:20px;height:20px;margin-right:5px}
+.caja3d{border:1px solid #999;border-bottom:2px solid #777;border-right:2px solid #777;border-radius:3px}
 #sc_list{height:565px;overflow:auto}.sp-no-shortcuts{font:20px arial;color:#999;text-align:left}
 .sp-no-shortcuts span.subtitle{font:15px arial}.sp-no-shortcuts span.here{font-weight:bold;cursor:pointer}
 #sp-exploration-head{height:35px;padding:6px 25px 0 25px;background-color:#ecefcc;border-radius:3px;margin:4px 10px}
@@ -70,10 +77,11 @@ input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:or
 #sp-exploration-head .button:hover{background-color:#666;color:#f2f2f2}#sp-shortcut-new img,#sp-shortcut-sort img,.sp-shortcut-up img{width:20px;height:20px}
 .sp-shortcut-up{font-weight:normal;width:90%}#sp-shortcut-list{margin:0 10px 10px 10px;padding:5px;background-color:#fff;height:540px;overflow:auto}
 #sp-shortcut-list.sort-mode{border-radius:2px;background-color:#888}.on-dragging{height:415px!important}
-a.sp-shortcut{font-weight:normal;color:#666;border-radius:3px;width:102px;height:55px;margin:5px;padding:2px;text-align:center;float:left;font:16px arial;word-wrap:break-word;padding-top:25px;border:1px solid #ccc;box-shadow:2px 2px}
+a.sp-shortcut{font-weight:normal;color:#666;border-radius:3px;width:102px;height:55px;margin:5px;padding:2px;text-align:center;float:left;font:16px arial;word-wrap:break-word;padding-top:25px;border:1px solid #ccc;box-shadow:2px 2px;overflow:hidden}
 a.sp-shortcut:hover{color:#444!important}.sp-shortcut:hover{border-color:#f3ba13;box-shadow:2px 2px #b38809}
 a.sp-shortcut.group{background:#eee url('/images/sapns/icons/group.png') no-repeat center center}
 a.sp-shortcut.group.activo{background-color:#c2c2c2}a.sp-shortcut.list{background:#eee url('/images/sapns/icons/list.png') no-repeat center center}
+a.sp-shortcut.view{background:#eee url('/images/sapns/icons/view.png') no-repeat center center}
 a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-repeat center center}
 .sp_sidebar.activo{border:2px solid red}#sp-shortcut-options{height:100px;margin:0 10px 10px 10px;padding:5px 5px 5px 100px;background-color:#fff}
 #sp-shortcut-options .option{float:left;border-radius:3px;font-weight:normal;width:100px;height:80px;margin:10px 50px 0 0;text-align:center;word-wrap:break-word;border:1px solid #ccc}

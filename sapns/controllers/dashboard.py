@@ -28,6 +28,8 @@ import datetime as dt
 import logging
 import re
 import simplejson as sj
+from sapns.lib.sapns.mongo import Mongo
+from bson.objectid import ObjectId
 
 # controllers
 __all__ = ['DashboardController']
@@ -183,6 +185,141 @@ class DashboardController(BaseController):
             
         return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))
     
+    @expose('json')
+    @require(p.not_anonymous())
+    def save_user_filter(self, **kw):
+        logger = logging.getLogger('DashboardController.save_user_filter')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            filter_name = get_paramw(kw, 'filter_name', unicode)
+            query = get_paramw(kw, 'query', unicode)
+            
+            user_id = request.identity['user'].user_id
+            
+            mdb = Mongo().db
+            
+            cls_ = SapnsClass.by_name(cls)
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
+            create_view = False
+            if not view:
+                create_view = True
+                view = dict(user_filters={})
+                
+            USER_FILTERS = 'user_filters'
+            
+            if not view.get(USER_FILTERS):
+                view[USER_FILTERS] = {}
+                
+            if not view[USER_FILTERS].get(str(user_id)):
+                view[USER_FILTERS][str(user_id)] = []
+                
+            found = False
+            for filter_ in view[USER_FILTERS][str(user_id)]:
+                if filter_['name'] == filter_name:
+                    found = True
+                    filter_['query'] = query
+                    
+            if not found:
+                if filter_name == 'default':
+                    view[USER_FILTERS][str(user_id)].insert(0, dict(name=filter_name, query=query))
+                else:
+                    view[USER_FILTERS][str(user_id)].append(dict(name=filter_name, query=query))
+                
+            if create_view:
+                view_id = mdb.user_views.insert(view)
+                
+                cls_.view_id = str(view_id)
+                dbs.add(cls_)
+                dbs.flush()
+                
+            else:
+                mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
+                                      {'$set': dict(user_filters=view['user_filters'])})
+
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, msg=str(e))
+    
+    @expose('json')
+    @require(p.not_anonymous())
+    def delete_user_filter(self, **kw):
+        logger = logging.getLogger('DashboardController.delete_user_filter')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            filter_name = get_paramw(kw, 'filter_name', unicode)
+            
+            user_id = request.identity['user'].user_id
+            
+            mdb = Mongo().db
+            
+            cls_ = SapnsClass.by_name(cls)
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
+            user_filters = []
+            for f in view['user_filters'][str(user_id)]:
+                if f['name'] != filter_name:
+                    user_filters.append(f)
+                    
+            view['user_filters'][str(user_id)] = user_filters
+
+            mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
+                                      {'$set': dict(user_filters=view['user_filters'])})
+
+            
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            
+    @expose('json')
+    @require(p.not_anonymous())
+    def save_col_width(self, **kw):
+        logger = logging.getLogger('DashboardController.save_col_width')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            length = get_paramw(kw, 'length', int)
+            col_num = get_paramw(kw, 'col_num', int)
+            width = get_paramw(kw, 'width', int)
+            
+            user_id = request.identity['user'].user_id
+            
+            mdb = Mongo().db
+            
+            cls_ = SapnsClass.by_name(cls, parent=False)
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
+            create_view = False
+            if not view:
+                create_view = True
+                view = dict(user_filters={})
+                
+            COL_WIDTHS = 'col_widths'
+                
+            if not view.get(COL_WIDTHS):
+                view[COL_WIDTHS] = {}
+                
+            if not view[COL_WIDTHS].get(str(user_id)):
+                view[COL_WIDTHS][str(user_id)] = [0]*length
+                
+            view[COL_WIDTHS][str(user_id)][col_num-1] = width
+            
+            if create_view:
+                view_id = mdb.user_views.insert(view)
+                
+                cls_.view_id = str(view_id)
+                dbs.add(cls_)
+                dbs.flush()
+                
+            else:
+                mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
+                                      {'$set': dict(col_widths=view[COL_WIDTHS])})
+
+            return dict(status=True)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False, msg=str(e))            
+    
     @expose()
     @require(p.not_anonymous())
     def tocsv(self, cls, **kw):
@@ -192,8 +329,10 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
+        fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
+        
         response.content_type = 'text/csv'
-        response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % cls.encode('utf-8')
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % fn
         
         return ds.to_csv()
     
@@ -205,13 +344,15 @@ class DashboardController(BaseController):
         kw['rp'] = 0
         list_ = List(cls, **kw)
         ds = list_.grid_data()
+        
+        fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
 
         response.content_type = 'application/excel'
-        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % cls.encode('utf-8')
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % fn
         
         # generate XLS content into "memory file"
         xl_file = cStringIO.StringIO()
-        ds.to_xls(cls.capitalize().replace('_', ' ')[:20], xl_file)
+        ds.to_xls(fn[:25], xl_file)
         
         return xl_file.getvalue()
     

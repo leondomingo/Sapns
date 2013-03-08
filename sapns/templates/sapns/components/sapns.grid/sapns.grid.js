@@ -1,5 +1,6 @@
 /* Sapns grid */
 
+var __DEFAULT_FILTER = 'default';
 (function($) {
     
     function Filter(params) {
@@ -189,7 +190,7 @@
     function SapnsGrid(settings) {
         
         var self = this;
-        
+
         if (typeof(settings.caption) === 'function') {
             settings.caption = settings.caption();
         }
@@ -215,7 +216,7 @@
             pager_options = [{
                 val: 10,
                 desc: '10',
-                sel: true
+                sel: false
             },
             {
                 val: 50,
@@ -234,15 +235,28 @@
             }];
         }
         
+        if ($.inArray(settings.rp*1, [10, 50, 100, 0]) === -1) {
+            pager_options.push({ val: settings.rp*1, desc: settings.rp, sel: true });
+        }
+        else {
+            pager_options[0].sel = true;
+        }
+        
+        pager_options.sort(function(x, y) {
+            return x.val - y.val;
+        });
+        
         var _settings = $.extend(true, {
             caption: '',
             name: 'sapns_grid_' + Math.floor(Math.random() * 999999),
             cls: '',
             with_search: true,
+            with_filters: true,
             search_params: {},
             show_ids: false,
             link: '',
             q: '',
+            user_filters: [],
             ch_attr: '',
             parent_id: '',
             cols: [],
@@ -264,6 +278,10 @@
             pag_n: 1,
             rp: 10,
             onLoad: null,
+            resize: {
+                min_width: 90,
+                after: null
+            },
             default_: {
                 col_width: 60,
                 col_align: 'center',
@@ -280,24 +298,7 @@
         self.ajx_data = JSON.stringify({});
         self.styles = [];
         
-        // obtener las tres partes de la query
-        // q$$filters$$order
-        var q_parts = self.q.split('$$');
-        
-        // q
-        self.q = q_parts[0];
-        
-        // filters
-        self.filters = [];
-        if (q_parts.length > 1) {
-            self.filters = parseFilters(q_parts[1]);
-        }
-        
-        // order
-        self.order = [];
-        if (q_parts.length > 2) {
-            self.order = parseOrder(q_parts[2]);
-        }
+        self.setQuery(self.q);
         
         self._new_default = {
             name: 'new',
@@ -326,6 +327,37 @@
             require_id: 'true',
             type: 'docs'
         };
+    }
+    
+    SapnsGrid.prototype.setQuery = function(query) {
+        var self = this;
+        
+        // split "query" in three parts
+        // q$$filters$$order
+        var q_parts = query.split('$$');
+        
+        // q
+        self.q = q_parts[0];
+        
+        // filters
+        self.filters = [];
+        if (q_parts.length > 1) {
+            self.filters = parseFilters(q_parts[1]);
+        }
+        
+        // order
+        self.order = [];
+        if (q_parts.length > 2) {
+            self.order = parseOrder(q_parts[2]);
+        }
+        
+        // user filter
+        if (q_parts.length > 3) {
+            self.current_user_filter = q_parts[3];
+        }
+        else {
+            self.current_user_filter = __DEFAULT_FILTER;
+        }
     }
 
     // getSelectedIds
@@ -389,6 +421,12 @@
         
         // row width
         var row_wd = cols.length * 42;
+        
+        if (cols[0].title != 'id') {
+            self.hide_check = true;
+            self.hide_id = true;
+            self.actions_inline = false;
+        }
         
         // hide_check
         if (!self.hide_check) {
@@ -480,7 +518,7 @@
             }
             
             grid_header += '<div class="sp-col-title sp-col-title-sortable ' + is_ordered + '"' + order_type + 
-                ' style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
+                ' col_num="' + i + '" style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
         }
 
         grid_header += '</div>';
@@ -574,7 +612,7 @@
                     }
                     
                     grid_row += '<div class="sp-grid-cell sp-grid-cell-tip clickable ' + row_style + '" \
-                        style="text-align:' + al + ';' + width + border_radius + '"';
+                        col_num="' + j + '" style="text-align:' + al + ';' + width + border_radius + '"';
                     
                     if (cell) {
                         grid_row += sprintf('title="%s"', cell.replace(/"/gi, "''"));
@@ -612,6 +650,50 @@
         if (self.select_first && self.with_search && self.q && ld < 5 && ld > 0) {
             $('#' + self.name + ' .sp-grid-rowid:first').prop('checked', true);
         }
+        
+        var grid_id = '#'+self.name;
+        $('.sp-col-title-sortable').resizable({
+            handles: 'e',
+            minWidth: self.resize.min_width,
+            resize: function(e, ui) {
+                var width = ui.element.width(),
+                    col_num = ui.element.attr('col_num'),
+                    row_width = $('.sp-grid-row').width(),
+                    current_width = $('.sp-grid-cell[col_num=' + col_num + ']').width();
+                
+                $(grid_id + ' .sp-grid-cell[col_num=' + col_num + ']').width(width);
+                $(grid_id + ' .sp-grid-row').width(row_width + (width - current_width));
+            },
+            stop: function(e, ui) {
+                
+                var col_num = ui.element.attr('col_num');
+                
+                if (self.resize.after) {
+                    self.resize.after(col_num*1);
+                }
+                else {
+                    // TODO: guardar anchos para el "current_user_filter" del usuario correspondiente
+                    var length = self.cols.length;
+                    if (self.cols[0].title === 'id') {
+                        length -= 1;
+                    }
+                    
+                    $.ajax({
+                        url: "{{tg.url('/dashboard/save_col_width/')}}",
+                        data: {
+                            cls: self.cls,
+                            length: length,
+                            col_num: col_num,
+                            width: ui.element.width()
+                        },
+                        success: function(res) {
+                            if (res.status) {
+                            }
+                        }
+                    });
+                }
+            }
+        });
         
         if (callback) {
             callback();
@@ -651,6 +733,37 @@
         }
         
         return q;
+    }
+    
+    SapnsGrid.prototype.query_ = function() {
+        var self = this,
+            qry = self.q + '$$';
+        
+        // filters
+        for (var i=0, l=self.filters.length; i<l; i++) {
+            if (i > 0) {
+                qry += ', ';
+            }
+            
+            qry += self.filters[i].stringify();
+        }
+        
+        // order
+        qry += '$$';
+        for (var i=0, l=self.order.length; i<l; i++) {
+            if (i > 0) {
+                qry += ', ';
+            }
+            
+            qry += self.order[i].stringify();
+        }
+        
+        // user_filter
+        if (self.current_user_filter !== __DEFAULT_FILTER) {
+            qry += '$$' + self.current_user_filter;
+        }
+        
+        return qry;
     }
 
     // search
@@ -769,7 +882,7 @@
 
                     self.data = response.data;
                     self.loadData(function() {
-                        $('.sp-grid-cell-tip, .edit_inline, .delete_inline, .docs_inline, .new_inline').qtip({
+                        $('.sp-grid-cell-tip, .edit_inline, .delete_inline, .docs_inline, .new_inline, .sp-grid-save-filter').qtip({
                             content: {
                                 text: true
                             },
@@ -910,9 +1023,9 @@
                             + formats[i].title + '</option>';
                 }
 
-                var s_export = '<div class="export" style="height:25px;float:left">' +
-                    '<select class="sp-button sp-grid-action" style="height:20px">' +
-                    '<option value="">({{_("Export")}})</option>' + 
+                var s_export = '<div class="export">\
+                    <select class="sp-button sp-grid-action">\
+                    <option value="">({{_("Export")}})</option>' + 
                     options + '</select></div>';
                 
                 $('#'+self.name + ' .sp-grid-search-box').append(s_export);
@@ -1039,26 +1152,7 @@
 
         function form(action, target) {
             
-            var qry = self.q + '$$';
-            
-            // filters
-            for (var i=0, l=self.filters.length; i<l; i++) {
-                if (i > 0) {
-                    qry += ', ';
-                }
-                
-                qry += self.filters[i].stringify();
-            }
-            
-            // order
-            qry += '$$';
-            for (var i=0, l=self.order.length; i<l; i++) {
-                if (i > 0) {
-                    qry += ', ';
-                }
-                
-                qry += self.order[i].stringify();
-            }
+            var qry = self.query_();
             
             qry = encodeURI(qry).replace('-', '%2D', 'g').
                 replace('"', '%22', 'g').replace('+', '%2B', 'g').
@@ -1572,7 +1666,7 @@
 
     $.fn.sapnsGrid = function(arg1, arg2, arg3) {
 
-        if (typeof(arg1) == "object") {
+        if (typeof(arg1) === "object") {
             
             var g = new SapnsGrid(arg1);
             this.data('sapnsGrid', g);
@@ -1589,10 +1683,32 @@
 
             if (g.with_search) {
 
-                g_content += '<div><div class="sp-grid-search-box">' + 
-                        '<input class="sp-search-txt" style="float:left" name="q" type="text" value="">' +
-                        '<img class="inline_action sp-search-btn" ' +
-                            'src="{{tg.url("/images/sapns/icons/search.png")}}" titlee="{{_("Search...")}}"></div>';
+                g_content += '<div><div class="sp-grid-search-box">\
+                    <input class="sp-search-txt" name="q" type="text" value="">\
+                    <img class="inline_action sp-search-btn" \
+                        src="{{tg.url("/images/sapns/icons/search.png")}}" title="{{_("Search...")}}">';
+                
+                if (g.with_filters) {
+                    
+                    var filters_ = '';
+                    for (var i=0, l=g.user_filters.length; i<l; i++) {
+                        var f = g.user_filters[i],
+                            selected = '';
+                        
+                        if (g.current_user_filter == f.name) {
+                            selected = ' selected';
+                        }
+                        
+                        filters_ += '<option value="' + f.name + '"' + selected + '>' + f.name + '</option>';
+                    }
+                    
+                    g_content += 
+                        '<img class="inline_action sp-grid-save-filter" \
+                            src="{{tg.url("/images/sapns/icons/filters.png")}}" title="{{_("Manage filter")}}">\
+                        <select class="sp-grid-action sp-button sp-grid-select-filter">' + filters_ + '</select>';
+                }
+                
+                g_content += '</div>';
                 
                 g_content += '<div class="sp-grid-filters" style="display:none"></div>';
                 g_content += '<div class="sp-grid-edit-filter" style="display:none">\
@@ -1797,20 +1913,144 @@
                         g.search($(this).val());
                     }
                 });
-
-                /*if (g.link) {
-                    g_content += '<div style="padding-left:20px">\
-                            <button id="link-shortcut" class="sp-button" style="float:left">{{_("Create a shortcut")}}</button>\
-                            <div style="font-size:9px;margin-top:7px;width:100px;float:left">\
-                            <a id="this-search" href="' + g.link + '" \
-                            target="_blank">[{{_("this search")}}]</a>\
+                
+                /* select-filter */
+                var select_filter = g_id + ' .sp-grid-select-filter';
+                $(document).off('change', select_filter).on('change', select_filter, function() {
+                    var filter_name = $(this).val(),
+                        query_filter = '';
+                    for (var i=0, l=g.user_filters.length; i<l; i++) {
+                        var f = g.user_filters[i];
+                        if (f.name === filter_name) {
+                            g.setQuery(f.query);
+                            g.current_user_filter = filter_name;
+                            g.search(g.query_().split('$$')[0], true);
+                            return;
+                        }
+                    }
+                });
+                
+                /* save-filter */
+                var save_filter = g_id + ' .sp-grid-save-filter';
+                $(document).off('click', save_filter).on('click', save_filter, function() {
+                    var current_query = g.query_(),
+                        current_filter = $(select_filter).val(),
+                        on_progress = false,
+                        dialog = 
+                        '<div id="sp-grid-save-filter-dialog" style="display:none">\
+                            <div class="sp-field-row">\
+                                <div class="sp-field">\
+                                    <div class="label">{{_("Filter name")}}</div>\
+                                    <input id="sp-grid-filter-name" type="text" value="' + current_filter + '">\
+                                </div>\
                             </div>\
-                            <div id="link-shortcut-dialog" style="display:none">\
-                            <p>{{_("Do you want to create a shortcut for this search?")}}</p>\
-                            <label>{{_("Shortcut title")}}:</label>\
-                            <input id="link-shortcut-title" type="text" value="({{_("title")}})">\
-                            </div></div>';
-                }*/
+                        </div>';
+                    
+                    $('#sp-grid-save-filter-dialog').remove();
+                    $(dialog).appendTo('body').dialog({
+                        title: "{{_('Save filter')}}",
+                        modal: true,
+                        resizable: false,
+                        width: 400,
+                        height: 'auto',
+                        buttons: {
+                            "{{_('Create or Modify')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    
+                                    var filter_name = $('#sp-grid-filter-name').val().replace(/[^A-Za-z0-9_]/g, '_');
+                                    
+                                    // Web service to create/modify this filter
+                                    $.ajax({
+                                        url: "{{tg.url('/dashboard/save_user_filter/')}}",
+                                        data: { cls: g.cls, filter_name: filter_name, query: current_query },
+                                        success: function(res) {
+                                            if (res.status) {
+                                                /* looking for the filter */
+                                                var exists = false;
+                                                for (var i=0, l=g.user_filters.length; i<l; i++) {
+                                                    var f = g.user_filters[i];
+                                                    if (f.name === filter_name) {
+                                                        f.query = current_query;
+                                                        exists = true;
+                                                    }
+                                                }
+                                                
+                                                if (!exists) {
+                                                    g.user_filters.push({ name: filter_name, query: current_query });
+                                                    $(select_filter).append('<option value="' + filter_name + '">' + filter_name + '</option>');
+                                                    $(select_filter).val(filter_name);
+                                                }
+                                                
+                                                $('#sp-grid-save-filter-dialog').dialog('close');
+                                            }
+                                            else {
+                                                if (res.msg) {
+                                                    console.log(res.msg);
+                                                }
+                                                
+                                                on_progress = false;
+                                                alert('Error!');
+                                            }
+                                        },
+                                        error: function() {
+                                            on_progress = false;
+                                            alert('Error!');
+                                        }
+                                    });
+                                }
+                            },
+                            "{{_('Delete')}}": function() {
+                                if (!on_progress) {
+                                    var filter_name = $('#sp-grid-filter-name').val();
+                                    //if (filter_name !== 'default') {
+                                        on_progress = true;
+                                        
+                                        // Web service to delete this filter
+                                        $.ajax({
+                                            url: "{{tg.url('/dashboard/delete_user_filter/')}}",
+                                            data: { cls: g.cls, filter_name: filter_name },
+                                            success: function(res) {
+                                                if (res.status) {
+                                                    $(select_filter).val('default').change();
+                                                    $(select_filter + ' option[value=' + filter_name + ']').remove();
+                                                    
+                                                    var user_filters = [];
+                                                    for (var i=0, l=g.user_filters.length; i<l; i++) {
+                                                        var uf = g.user_filters[i];
+                                                        if (uf.name !== filter_name) {
+                                                            user_filters.push(uf);
+                                                        }
+                                                    }
+                                                    
+                                                    g.user_filters = user_filters;
+                                                    
+                                                    $('#sp-grid-save-filter-dialog').dialog('close');
+                                                }
+                                                else {
+                                                    on_progress = false;
+                                                    alert('Error!');
+                                                }
+                                            },
+                                            error: function() {
+                                                on_progress = false;
+                                                alert('Error!');
+                                            }
+                                        });
+                                    /*}
+                                    else {
+                                        $('#sp-grid-save-filter-dialog').dialog('close');
+                                    }*/
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-grid-save-filter-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });
+                });
                 
                 g_content += '</div>';
             }
@@ -1826,8 +2066,7 @@
                     <div class="sp-grid-pager-desc"></div>';
                 
                 // pager_options
-                var pager_options = '',
-                    values = [];
+                var pager_options = '';
                 for (var i=0, l=g.pager_options.length; i<l; i++) {
                     var option = g.pager_options[i];
                     
@@ -1837,14 +2076,8 @@
                     }
                     
                     pager_options += '<option value="' + option.val + '"' + selected + '>' + option.desc + '</option>';
-                    values.push(option.val);
                 }
                 
-                // add "rp" as another value in the "pager_options"
-                if ($.inArray(g.rp, values) === -1) {
-                    pager_options += '<option value="' + g.rp + '" selected>' + g.rp + '</option>';
-                }
-
                 g_pager += '<div style="float:left;clear:right;height:25px;margin-top:2px">' +
                         '<select class="sp-button sp-grid-rp">' +
                         pager_options +
@@ -2022,7 +2255,10 @@
             }
             // getQuery
             else if (arg1 === "getQuery") {
-                return { filters: self.filters, order: self.order };
+                return self.query_();
+            }
+            else if (arg1 === "setQuery") {
+                self.setQuery(arg2);
             }
             // TODO: other sapnsGrid methods
         }
