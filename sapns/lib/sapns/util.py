@@ -2,6 +2,7 @@
 
 from decorator import decorator
 from pylons.i18n import lazy_ugettext as l_
+from pylons.templating import pylons_globals
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsClass, SapnsPermission, SapnsAttribute, \
     SapnsUser, SapnsShortcut, SapnsAttrPrivilege, SapnsRole, SapnsUserRole
@@ -13,11 +14,11 @@ from sqlalchemy.types import INTEGER, NUMERIC, BIGINT, DATE, TEXT, VARCHAR, \
 from tg import config, response, request
 from tg.i18n import set_lang, get_lang
 import logging
+import neptuno.util as nutil
 import os
 import re
 import subprocess as sp
 import tempfile
-from pylons.templating import pylons_globals
 
 ROLE_MANAGERS = u'managers'
 
@@ -595,3 +596,19 @@ def get_template(tmpl_name, default_tmpl=None):
             return globs['app_globals'].jinja2_env.get_template(default_tmpl)
         else:
             raise
+
+# date/time functions (from and to string)
+def strtodate(s):
+    date_fmt = config.get('formats.date')
+    return nutil.strtodate(s, fmt=date_fmt)
+
+def datetostr(d):
+    date_fmt = config.get('formats.date')
+    return nutil.datetostr(d, fmt=date_fmt)
+
+def strtotime(s):
+    return nutil.strtotime(s)
+    
+def timetostr(t):
+    time_fmt = config.get('formats.time')
+    return nutil.timetostr(t, fmt=time_fmt)
