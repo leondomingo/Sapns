@@ -7,6 +7,8 @@ import re
 from sapns.model.sapnsmodel import SapnsAttribute
 import logging
 
+COLLECTION_CHAR = 'c'
+
 def get_query(view_id):
     
     _logger = logging.getLogger('sapns.lib.sapns.views.get_query')
@@ -20,19 +22,25 @@ def get_query(view_id):
     
     def _get_parent(alias):
         
-        _logger.info(alias)
-        
-        parent_class = re.search(r'_(\d+)$', alias)
-        attribute_id = int(parent_class.group(1))
+        # alumnos
+        parent_class = re.search(r'_(%s?)(\d+)$' % COLLECTION_CHAR, alias)
+        collection = parent_class.group(1)
+        attribute_id = int(parent_class.group(2))
         attribute_ = dbs.query(SapnsAttribute).get(attribute_id)
         
         class_ = re.search(r'^([a-z_]+)_', alias).group(1)
-        alias_ = alias.replace(class_, attribute_.class_.name)
         
-        alias_ = re.sub(r'_%s$' % attribute_id, '', alias_)
-        if not re.search(r'_\d+$', alias_):
+        if not collection:
+            alias_ = alias.replace(class_, attribute_.class_.name)
+            
+        else:
+            alias_ = alias.replace(class_, attribute_.related_class.name)
+        
+        alias_ = re.sub(r'_%s?%s$' % (COLLECTION_CHAR, attribute_id), '', alias_)
+        
+        if not re.search(r'_%s?\d+$' % COLLECTION_CHAR, alias_):
             alias_ = '%s_0' % alias_
-        
+            
         return (alias_, attribute_.name,)
     
     columns = []
@@ -48,25 +56,41 @@ def get_query(view_id):
             base_table = re.search(r'^(\w+)_0$', attribute['class_alias'])
             if not base_table:
                 parent_alias, parent_attribute = _get_parent(attribute['class_alias'])
+                
                 relations__ = []
-                relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'], attribute['class_alias'],
-                                                                             attribute['class_alias'], 
-                                                                             parent_alias, parent_attribute,
-                                                                             ))
+                
+                if re.search(r'\w+_%s\d+$' % COLLECTION_CHAR, attribute['class_alias']):
+                    relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'], attribute['class_alias'],
+                                                                                 parent_alias,
+                                                                                 attribute['class_alias'], parent_attribute))
+                
+                else:
+                    relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'], attribute['class_alias'],
+                                                                                 attribute['class_alias'], 
+                                                                                 parent_alias, parent_attribute,
+                                                                                 ))
                 
                 end_ = False
                 while not end_:
                     base = re.search(r'\w+_0', parent_alias)
                     if not base:
                         parent_alias_, parent_attribute_ = _get_parent(parent_alias)
+                        
                         parent_class = re.search(r'^([a-z_]+)_', parent_alias).group(1)
                         
                         if not relations_.get(parent_alias):
                             relations_[parent_alias] = True
-                            relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (parent_class, parent_alias,
-                                                                                         parent_alias,
-                                                                                         parent_alias_, parent_attribute_,
-                                                                                         ))
+                            if re.search(r'\w+_%s\d+$' % COLLECTION_CHAR, parent_alias):
+                                relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (parent_class, parent_alias,
+                                                                                             parent_alias_,
+                                                                                             parent_alias, parent_attribute_,
+                                                                                             ))
+                            
+                            else:
+                                relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (parent_class, parent_alias,
+                                                                                             parent_alias,
+                                                                                             parent_alias_, parent_attribute_,
+                                                                                             ))
                         
                         parent_alias = parent_alias_
                         
@@ -99,4 +123,5 @@ def get_query(view_id):
     if group_by:
         query += '\n%s' % group_by
         
+    #_logger.info(query)
     return query
