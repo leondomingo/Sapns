@@ -4,7 +4,7 @@
 
 {% block head %}
     {{ super() }}
-    <link rel="stylesheet" href="{{tg.url('/css/edit.min.css', params=dict(v=1))}}">
+    <link rel="stylesheet" href="{{tg.url('/css/edit.min.css', params=dict(v=2))}}">
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.dateformat() }}
@@ -80,13 +80,15 @@
     </div>
     
     <div id="edit_buttons">
-        <div style="float: left;">
-            <button id="save-button" class="sp-button">{{_('Save')}}</button>
+        <div>
+            <!--<button id="save-button" class="sp-button">{{_('Save')}}</button>-->
+            <img id="save-button" src="{{tg.url('/images/sapns/icons/save.png')}}" title="{{_('Save')}}">
         </div>
         
         <!--{% if came_from %}-->
-        <div id="edit-back" style="float: left;">
-            <button id="back-button" class="sp-button">{{_('return')}}</button>
+        <div id="edit-back">
+            <!--<button id="back-button" class="sp-button">{{_('return')}}</button>-->
+            <img id="back-button" src="{{tg.url('/images/sapns/icons/return.png')}}" title="{{_('return')}}">
         </div>
         <!--{% endif %}-->
     </div>

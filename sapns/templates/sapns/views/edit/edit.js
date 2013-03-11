@@ -80,12 +80,13 @@ $(function() {
         });
     });
     
-    function reload_attributes(class_id, path) {
+    function reload_attributes(class_id, path, rel) {
         $.ajax({
             url: "{{tg.url('/dashboard/views/attributes_list/')}}",
             data: {
                 class_id: class_id,
-                path: path
+                path: path,
+                rel: rel
             },
             success: function(res) {
                 if (res.status) {
@@ -146,7 +147,7 @@ $(function() {
             
             $('#sp-edit-view-classes').bind('select_node.jstree', function(e, obj) {
                 var nodo = obj.rslt.obj;
-                reload_attributes(nodo.attr('class_id'), nodo.attr('path'));
+                reload_attributes(nodo.attr('class_id'), nodo.attr('path'), nodo.attr('rel'));
             });
         }
     });

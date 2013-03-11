@@ -10,7 +10,7 @@ from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import get_template, pagination
-from sapns.lib.sapns.views import get_query
+from sapns.lib.sapns.views import get_query, COLLECTION_CHAR
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission
 from sqlalchemy.sql.expression import and_
@@ -25,6 +25,9 @@ import simplejson as sj
 import transaction
 
 __all__ = ['ViewsController']
+
+REL_CLASS = 'class'
+REL_COLLECTION = 'collection'
 
 class ViewsController(BaseController):
     
@@ -128,20 +131,33 @@ class ViewsController(BaseController):
                     classes.append(dict(data=u'%s (%s)' % (r_attr.related_class.title, r_attr.title),
                                         attr=dict(class_id=r_attr.related_class_id,
                                                   path='%s#%d' % (path, r_attr.attribute_id),
-                                                  rel='class',
+                                                  rel=REL_CLASS,
                                                   ),
-                                        state='closed', #_state(r_attr.class_id),
+                                        state='closed',
                                         children=[],
                                         ))
                     
-                return classes
+                # collections
+                for r_attr in dbs.query(SapnsAttribute).\
+                        filter(and_(SapnsAttribute.related_class_id == class_id)):
+                    
+                    classes.append(dict(data=r_attr.class_.title,
+                                        attr=dict(class_id=r_attr.class_id,
+                                                  path='%s#%s%d' % (path, COLLECTION_CHAR, r_attr.attribute_id),
+                                                  rel=REL_COLLECTION,
+                                                  ),
+                                        state='closed',
+                                        children=[],
+                                        ))
+
+                return sorted(classes, cmp=lambda x,y: cmp(x['data'], y['data']))
             
             if class_id0:
                 class0 = dbs.query(SapnsClass).get(class_id0)
                 classes = dict(data=class0.title,
                                attr=dict(class_id=class_id0,
                                          path='',
-                                         rel='class',
+                                         rel=REL_CLASS,
                                          ),
                                state='open',
                                children=_classes(class_id0)
@@ -161,19 +177,23 @@ class ViewsController(BaseController):
         logger = logging.getLogger('ViewsController.attributes_list')
         try:
             class_id = get_paramw(kw, 'class_id', int)
-            path = get_paramw(kw, 'path', str)
-            
+            path_ = get_paramw(kw, 'path', str)
+            rel = get_paramw(kw, 'rel', str, opcional=True, por_defecto=REL_CLASS)
+
             attributes = []
             for attr in dbs.query(SapnsAttribute).\
                     filter(and_(SapnsAttribute.class_id == class_id)).\
                     order_by(SapnsAttribute.title):
+
+                path = '%s#%d' % (path_, attr.attribute_id)
+                if rel == REL_COLLECTION:
+                    path = '%s#%s%d' % (path_, COLLECTION_CHAR, attr.attribute_id)
                 
-                #attr = SapnsAttribute()
                 attributes.append(dict(id=attr.attribute_id,
                                        title=attr.title,
                                        name=attr.name,
                                        related_class=attr.related_class_id,
-                                       path='%s#%d' % (path, attr.attribute_id),
+                                       path=path,
                                        ))
                 
             attr_tmpl = get_template('sapns/views/edit/attribute-list.html')
@@ -275,17 +295,35 @@ class ViewsController(BaseController):
                 
                 paths = attribute_path.split('#')[1:]
                 prefix = '_'.join(paths[:-1]) or '0'
+                logger.info(prefix)
                 for i, attribute_id in enumerate(paths):
-                    attr = dbs.query(SapnsAttribute).get(attribute_id)
-                    if attr.related_class_id and i < len(paths)-1:
-                        title.append(attr.related_class.title)
+                
+                    #attribute_id = int(attribute_id.replace(COLLECTION_CHAR, ''))
+                    if attribute_id.startswith(COLLECTION_CHAR):
+                        attr = dbs.query(SapnsAttribute).get(int(attribute_id.replace(COLLECTION_CHAR, '')))
                         
+                        if attr.class_id and i < len(paths)-1:
+                            title.append(attr.class_.title)
+                            
+                        else:
+                            title.append(attr.title)
+                            
+                        # base class
+                        if i == 0:
+                            base_class = attr.related_class.name
+                    
                     else:
-                        title.append(attr.title)
+                        attr = dbs.query(SapnsAttribute).get(int(attribute_id))
                         
-                    # base class
-                    if i == 0:
-                        base_class = attr.class_.name 
+                        if attr.related_class_id and i < len(paths)-1:
+                            title.append(attr.related_class.title)
+                            
+                        else:
+                            title.append(attr.title)
+                        
+                        # base class
+                        if i == 0:
+                            base_class = attr.class_.name 
                         
                 attribute = dict(order=len(view['attributes']),
                                  title='.'.join(title),
@@ -295,6 +333,8 @@ class ViewsController(BaseController):
                                  class_alias='%s_%s' % (attr.class_.name, prefix),
                                  width=150,
                                  )
+                
+                logger.info(attribute)
                 
                 mdb.user_views.update(dict(_id=ObjectId(view_id)),
                                       {'$set': dict(base_class=base_class),
@@ -481,7 +521,7 @@ class ViewsController(BaseController):
                     view['attributes_detail'][i]['expression'] = get_paramw(kw, 'expression', unicode)
                     break
                 
-            logger.info(view['attributes_detail'])
+            #logger.info(view['attributes_detail'])
             
             mdb.user_views.update(dict(_id=ObjectId(view_id)),
                                   {'$set': dict(attributes_detail=view['attributes_detail'])})

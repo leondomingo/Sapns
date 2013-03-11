@@ -18,6 +18,12 @@ overflow:auto; background-color:#f2f2f2 }
 #sp-edit-view-classes a { font-weight:normal; font:13px arial }
 #sp-edit-view-classes a.jstree-clicked { background-color:#ECEFCC; border:0; color:#5b5d26; font-weight:bold }
 #sp-edit-view-classes a:hover { background-color:orange }
+
+#sp-edit-view-classes li[rel=class] > a { color:#000 }
+#sp-edit-view-classes li[rel=class] > a:hover { background-color:orange }
+#sp-edit-view-classes li[rel=collection] > a { color:orange }
+#sp-edit-view-classes li[rel=collection] > a:hover { background-color:#777; color:#fff }
+
 #sp-edit-view-attr-list { width:540px; border-radius:2px }
 #sp-edit-view-attr-list .attribute { border-radius:2px; background-color:#ECEFCC; 
 color:#444; margin-bottom:3px; padding:1px 5px; font:bold 14px arial;
@@ -27,6 +33,8 @@ clear:left; height:18px }
 #sp-edit-view-attr-list .attribute .col-attr.name { width:485px; margin-right:5px }
 #sp-edit-view-attr-list .attribute .col-attr.add { padding:0 2px; cursor:pointer }
 #sp-edit-view-attr-list .attribute .col-attr.add:hover { background-color:#ddd; color:#fff }
+
+#sp-edit-view-attr-list .attribute:hover { background-color:#B4BD3C; color:#fff }
 
 #sp-edit-view-cols { background-color:#B4BD3C; height:60px; clear:left; padding:5px; 
 overflow:auto; margin-top:5px; border-radius:2px }
