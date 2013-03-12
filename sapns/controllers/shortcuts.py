@@ -332,7 +332,8 @@ class ShortcutsController(BaseController):
                 
                 cls_ = dict(id=cls.class_id,
                             title=cls.title,
-                            name=cls.name)
+                            name=cls.name,
+                            is_view=cls.parent_class_id != None)
                                 
                 classes.append(cls_)
                 
@@ -374,7 +375,10 @@ class ShortcutsController(BaseController):
             
             title = p.display_name
             if p.type == SapnsPermission.TYPE_LIST:
-                title = u'[%s]' % l_(u'Table')
+                if p.class_.parent_class_id is None:
+                    title = u'[%s]' % l_(u'Table')
+                else:
+                    title = u'[%s]' % l_(u'View')
             
             elif p.type == SapnsPermission.TYPE_PROCESS:
                 pass

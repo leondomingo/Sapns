@@ -66,23 +66,20 @@ class PrivilegesController(BaseController):
                 
             else:
                 who = dbs.query(SapnsUser).get(id_user)
-                #who = SapnsUser()
                 def has_privilege(id_class):
                     priv = who.get_privilege(id_class)
                     if priv:
                         return priv.granted
                     
                     return None
-                        
-                    #cls = dbs.query(SapnsClass).get(id_class)
-                    #return who.has_privilege(cls.name, no_cache=True)
     
             classes = []
             
             classes.append(Dict(id=-1,
                                 id_class_p=None,
                                 name='*',
-                                granted=True
+                                granted=True,
+                                is_view=False,
                                 ))
             
             for cls in dbs.query(SapnsClass).order_by(SapnsClass.title):
@@ -90,6 +87,7 @@ class PrivilegesController(BaseController):
                                     id_class_p=None,
                                     name=cls.title,
                                     granted=has_privilege(cls.class_id),
+                                    is_view=cls.parent_class_id != None,
                                     ))
             
             return dict(classes=classes, show_none=id_user != None)

@@ -1,12 +1,20 @@
-{% for cls in classes %}
-<div class="class_row" id_class="{{cls.id}}">
-    <div class="class_name" title="{{cls.name}}">{{cls.name|escape}}</div>
+<!--{% for cls in classes %}-->
+<div class="class_row {% if cls.is_view %} view {% endif %}" id_class="{{cls.id}}">
+    <div class="class_name" title="{{cls.name}}">
+        <!--{% if not cls.is_view %}-->
+        <img src="{{tg.url('/images/sapns/icons/list.png')}}">
+        <!--{% else %}-->
+        <img src="{{tg.url('/images/sapns/icons/view.png')}}">
+        <!--{% endif %}-->
+        {{cls.name|escape}}
+    </div>
+    
     <select class="class_granted">
-        {% if show_none %}
+        <!--{% if show_none %}-->
         <option value="" {% if cls.granted == None %} selected {% endif %}>({{_('none')}})</option>
-        {% endif %}
+        <!--{% endif %}-->
         <option value="true" {% if cls.granted == True %} selected {% endif %}>{{_('Yes')}}</option>
         <option value="false" {% if cls.granted == False %} selected {% endif %}>{{_('No')}}</option>
     </select>
 </div>
-{% endfor %}
+<!--{% endfor %}-->

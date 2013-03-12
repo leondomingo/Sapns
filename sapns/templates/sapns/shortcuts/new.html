@@ -7,18 +7,30 @@
 
 <!--{% if (shortcut.id_shortcut or '') == '' %}-->
 <div id="newsp-class-list">
-<!--{% for cls in classes %}-->
-<div class="newsp-class" class_id="{{cls.id}}">{{cls.title}}
-<!--{% if (cls.name or '') != '' %}-->
-<span>({{cls.name}})</span>
-<!--{% endif %}-->
+    <!--{% for cls in classes %}-->
+        <div class="newsp-class {% if cls.is_view %} view {% endif %}" class_id="{{cls.id}}">
+        
+            <div class="icon">
+                <!--{% if cls.is_view %}-->
+                <img src="{{tg.url('/images/sapns/icons/view.png')}}">
+                <!--{% else %}-->
+                <img src="{{tg.url('/images/sapns/icons/list.png')}}">
+                <!--{% endif %}-->
+            </div>
+            
+            <div class="title-name">
+            {{cls.title}}
+            <!--{% if (cls.name or '') != '' %}-->
+            <span>({{cls.name}})</span>
+            <!--{% endif %}-->
+            </div>
+            
+        </div>
+        
+        <div class="newsp-permissions" class_id="{{cls.id}}" style="display:none"></div>
+    <!--{% endfor %}-->
 </div>
-<div class="newsp-permissions" class_id="{{cls.id}}" style="display:none"></div>
-<!--{% endfor %}-->
-</div>
 <!--{% endif %}-->
-
-{#<h1>{{shortcut}}</h1>#}
 
 <script>
 function sp_shortcut_new(callback, callback_error) {
@@ -81,12 +93,12 @@ $(function() {
             
             if (!cls.hasClass('loaded')) {
                 
-                $('.newsp-class[class_id=' + class_id + ']').append('<img src="{{tg.url("/images/sapns/loading.gif")}}">');
+                $('.newsp-class[class_id=' + class_id + ']').append('<img class="loading" src="{{tg.url("/images/sapns/loading.gif")}}">');
                 $.ajax({
                     url: "{{tg.url('/dashboard/sc/class_permissions/')}}",
                     data: { class_id: class_id },
                     success: function(content) {
-                        $('.newsp-class[class_id=' + class_id + '] img').remove();
+                        $('.newsp-class[class_id=' + class_id + '] img.loading').remove();
                         
                         cls.addClass('loaded');
                         $('.newsp-permissions[class_id=' + class_id + ']').html(content);
@@ -94,7 +106,7 @@ $(function() {
                         show_permissions();
                     },
                     error: function() {
-                        $('.newsp-class[class_id=' + class_id + '] img').remove();
+                        $('.newsp-class[class_id=' + class_id + '] img.loading').remove();
                     }
                 });
             }

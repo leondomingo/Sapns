@@ -5,7 +5,7 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    <link rel="stylesheet" href="{{tg.url('/css/privileges/privileges.min.css', params=dict(v=1))}}">
+    <link rel="stylesheet" href="{{tg.url('/css/privileges/privileges.css', params=dict(v=2))}}">
 {% endblock %}
 
 {% block middle %}
@@ -36,7 +36,7 @@
         </div>
     </div>
 
-    <script type="text/javascript">
+    <script>
         {% include 'sapns/privileges/privileges.min.js' %}
     </script>
 </div>
