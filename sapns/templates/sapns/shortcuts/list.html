@@ -152,7 +152,7 @@
                         
                         // users 
                         $('#sp-shortcut-options .users').droppable({
-                            accept: '.sp-shortcut.list, .sp-shortcut.process',
+                            accept: '.sp-shortcut.list, .sp-shortcut.process, .sp-shortcut.view',
                             hoverClass: 'accept',
                             drop: function(e, ui) {
                                 share_shortcut(ui.draggable.attr('shortcut_id'));
@@ -161,7 +161,7 @@
                         
                         // roles 
                         $('#sp-shortcut-options .roles').droppable({
-                            accept: '.sp-shortcut.list, .sp-shortcut.process',
+                            accept: '.sp-shortcut.list, .sp-shortcut.process, .sp-shortcut.view',
                             hoverClass: 'accept',
                             drop: function(e, ui) {
                                 share_shortcut_roles(ui.draggable.attr('shortcut_id'));
