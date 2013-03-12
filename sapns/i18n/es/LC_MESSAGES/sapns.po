@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-01-19 13:23+0100\n"
+"POT-Creation-Date: 2013-03-12 12:14+0100\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,58 +17,58 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 1.0dev-r661\n"
 
-#: sapns/controllers/dashboard.py:96 sapns/lib/sapns/util.py:310
+#: sapns/controllers/dashboard.py:94 sapns/lib/sapns/util.py:312
 msgid "Data exploration"
 msgstr "Exploración de datos"
 
-#: sapns/controllers/dashboard.py:410
+#: sapns/controllers/dashboard.py:552
 msgid "updating an existing record"
 msgstr "actualizando un registro existente"
 
-#: sapns/controllers/dashboard.py:411
+#: sapns/controllers/dashboard.py:553
 msgid "update"
 msgstr "actualizar"
 
-#: sapns/controllers/dashboard.py:413
+#: sapns/controllers/dashboard.py:555
 msgid "creating a new record"
 msgstr "creando un nuevo registro"
 
-#: sapns/controllers/dashboard.py:414
+#: sapns/controllers/dashboard.py:556
 msgid "create"
 msgstr "crear"
 
-#: sapns/controllers/dashboard.py:460
+#: sapns/controllers/dashboard.py:602
 msgid "edit record"
 msgstr "editar registro"
 
-#: sapns/controllers/dashboard.py:462
+#: sapns/controllers/dashboard.py:604
 msgid "new record"
 msgstr "nuevo registro"
 
-#: sapns/controllers/dashboard.py:484 sapns/controllers/dashboard.py:640
-#: sapns/controllers/dashboard.py:734 sapns/controllers/dashboard.py:791
-#: sapns/controllers/logs.py:52 sapns/lib/sapns/lists.py:54
-#: sapns/lib/sapns/lists.py:151
+#: sapns/controllers/dashboard.py:626 sapns/controllers/dashboard.py:782
+#: sapns/controllers/dashboard.py:876 sapns/controllers/dashboard.py:933
+#: sapns/controllers/logs.py:52 sapns/lib/sapns/lists.py:74
+#: sapns/lib/sapns/lists.py:210
 msgid "Sorry, you do not have privilege on this class"
 msgstr "Lo siento, no tienes privilegios sobre esta clase"
 
-#: sapns/controllers/dashboard.py:497
+#: sapns/controllers/dashboard.py:639
 msgid "This class does not exist"
 msgstr "La clase no existe"
 
-#: sapns/controllers/dashboard.py:528 sapns/controllers/dashboard.py:656
+#: sapns/controllers/dashboard.py:670 sapns/controllers/dashboard.py:798
 msgid "Record does not exist"
 msgstr "El registro no existe"
 
-#: sapns/controllers/dashboard.py:662
+#: sapns/controllers/dashboard.py:804
 msgid "Some records do not exist"
 msgstr "Algunos registros no existen"
 
-#: sapns/controllers/dashboard.py:700 sapns/controllers/dashboard.py:712
+#: sapns/controllers/dashboard.py:842 sapns/controllers/dashboard.py:854
 msgid "delete"
 msgstr "borrar"
 
-#: sapns/controllers/dashboard.py:778
+#: sapns/controllers/dashboard.py:920
 #, python-format
 msgid "Insertion order for \"%s\" has been successfully updated"
 msgstr "El orden de inserción para \"%s\" se ha actualizado correctamente"
@@ -83,16 +83,18 @@ msgstr "Documentos de [%s]"
 msgid "docs__%s.zip"
 msgstr "documentos__%s.zip"
 
-#: sapns/controllers/logs.py:83 sapns/lib/sapns/lists.py:103
+#: sapns/controllers/logs.py:83 sapns/controllers/views.py:569
+#: sapns/lib/sapns/lists.py:147
 #: sapns/templates/sapns/privileges/actions.html:13
-#: sapns/templates/sapns/privileges/classes.html:8
+#: sapns/templates/sapns/privileges/classes.html:16
 #: sapns/templates/sapns/privileges/index.html:32
 msgid "Yes"
 msgstr "Sí"
 
-#: sapns/controllers/logs.py:84 sapns/lib/sapns/lists.py:104
+#: sapns/controllers/logs.py:84 sapns/controllers/views.py:570
+#: sapns/lib/sapns/lists.py:148
 #: sapns/templates/sapns/privileges/actions.html:14
-#: sapns/templates/sapns/privileges/classes.html:9
+#: sapns/templates/sapns/privileges/classes.html:17
 #: sapns/templates/sapns/privileges/index.html:33
 msgid "No"
 msgstr "No"
@@ -102,7 +104,7 @@ msgstr "No"
 msgid "Privilege management for \"%s\""
 msgstr "Gestión de privilegios para \"%s\""
 
-#: sapns/controllers/privileges.py:328
+#: sapns/controllers/privileges.py:326
 msgid "Role privileges copy"
 msgstr "Copia de privilegios de rol"
 
@@ -110,19 +112,24 @@ msgstr "Copia de privilegios de rol"
 msgid "No user has been found"
 msgstr "No se ha encontrado ningún usuario"
 
-#: sapns/controllers/shortcuts.py:293
-#: sapns/templates/sapns/views/header.html:18
-#: sapns/templates/sapns/views/relations.html:12
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:166
+#: sapns/controllers/shortcuts.py:179
+msgid "You are not the owner of this shortcut"
+msgstr "No eres el propietario de este favorito"
+
+#: sapns/controllers/shortcuts.py:379
+#: sapns/templates/sapns/views/edit/edit.html:22
 msgid "Table"
 msgstr "Tabla"
 
-#: sapns/controllers/users.py:78
+#: sapns/controllers/shortcuts.py:381
+msgid "View"
+msgstr "Vista"
+
+#: sapns/controllers/users.py:76
 msgid "\"User name\" is already in use"
 msgstr "\"Nombre de usuario\" ya está en uso"
 
-#: sapns/controllers/users.py:88
+#: sapns/controllers/users.py:86
 msgid "\"E-mail address\" is already in use"
 msgstr "\"E-mail\" ya está en uso"
 
@@ -130,82 +137,80 @@ msgstr "\"E-mail\" ya está en uso"
 msgid "Process terminated"
 msgstr "Proceso terminado"
 
-#: sapns/controllers/views.py:93
-msgid "The view has been successfully deleted"
-msgstr "La vista ha sido borrada correctamente"
-
 #: sapns/lib/sapns/conditions.py:46
 msgid "(new permission)"
 msgstr "(nuevo permiso)"
 
-#: sapns/lib/sapns/lists.py:70
+#: sapns/lib/sapns/lists.py:89
 #, python-format
 msgid "%s of [%s]"
 msgstr "%s de [%s]"
 
-#: sapns/lib/sapns/lists.py:72
+#: sapns/lib/sapns/lists.py:114
 #, python-format
 msgid "list of %s"
 msgstr "lista de %s"
 
-#: sapns/lib/sapns/util.py:158
+#: sapns/lib/sapns/util.py:160
 #, python-format
 msgid "Class: %s"
 msgstr "Clase: %s"
 
-#: sapns/lib/sapns/util.py:200
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:852
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:88
-#: sapns/templates/sapns/shortcuts/list.html:28
+#: sapns/lib/sapns/util.py:202
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:966
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:99
+#: sapns/templates/sapns/shortcuts/list.html:35
 msgid "New"
 msgstr "Nuevo"
 
-#: sapns/lib/sapns/util.py:201
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:525
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1655
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:53
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:187
+#: sapns/lib/sapns/util.py:203
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:563
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1889
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:57
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:211
 #: sapns/templates/sapns/docs/index.html:327
-#: sapns/templates/sapns/shortcuts/list.html:40
+#: sapns/templates/sapns/shortcuts/list.html:47
 msgid "Edit"
 msgstr "Editar"
 
-#: sapns/lib/sapns/util.py:202
+#: sapns/lib/sapns/util.py:204
 #: sapns/templates/sapns/components/sapns.uploader.js:184
 #: sapns/templates/sapns/components/sapns.uploader.min.js:16
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:527
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1340
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:53
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:148
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:565
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1532
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:2023
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:57
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:166
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:228
 #: sapns/templates/sapns/dashboard/grid.html:84
 #: sapns/templates/sapns/docs/index.html:349
-#: sapns/templates/sapns/shortcuts/list.html:48
+#: sapns/templates/sapns/shortcuts/list.html:55
 msgid "Delete"
 msgstr "Borrar"
 
-#: sapns/lib/sapns/util.py:203 sapns/lib/sapns/util.py:377
+#: sapns/lib/sapns/util.py:205 sapns/lib/sapns/util.py:379
 msgid "List"
 msgstr "Lista"
 
-#: sapns/lib/sapns/util.py:204
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:529
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:53
+#: sapns/lib/sapns/util.py:206
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:567
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:57
 msgid "Docs"
 msgstr "Documentos"
 
-#: sapns/lib/sapns/util.py:301
+#: sapns/lib/sapns/util.py:303
 msgid "Dashboard"
 msgstr "Escritorio"
 
-#: sapns/lib/sapns/util.py:329
+#: sapns/lib/sapns/util.py:331
 msgid "Project"
 msgstr "Proyecto"
 
-#: sapns/model/sapnsmodel.py:1821
+#: sapns/model/sapnsmodel.py:1812
 msgid "NO_TITLE"
 msgstr "SIN_TITULO"
 
-#: sapns/model/sapnsmodel.py:1929 sapns/model/sapnsmodel.py:1982
+#: sapns/model/sapnsmodel.py:1920 sapns/model/sapnsmodel.py:1973
 #, python-format
 msgid "Repo [%d] was not found"
 msgstr "No se encontró el repositorio [%d]"
@@ -215,7 +220,8 @@ msgid "You are in"
 msgstr "Estás en"
 
 #: sapns/templates/myapp/base.html:34
-#: sapns/templates/sapns/dashboard/edit/edit.html:89
+#: sapns/templates/sapns/dashboard/edit/edit.html:90
+#: sapns/templates/sapns/dashboard/edit/edit.html:91
 msgid "return"
 msgstr "volver"
 
@@ -231,25 +237,26 @@ msgstr "Selecciona tu idioma"
 msgid "Enter your username or e-mail"
 msgstr "Introduce tu nombre de usuario o e-mail"
 
-#: sapns/templates/sapns/login.html:27
-msgid "<span>Wrong login</span>. Please, verify your username or password"
-msgstr "<span>Login incorrecto</span><br>Por favor, comprueba tu nombre de usuario o contraseña"
-
-#: sapns/templates/sapns/login.html:37
+#: sapns/templates/sapns/login.html:33
 msgid "Username"
 msgstr "Usuario"
 
-#: sapns/templates/sapns/login.html:42 sapns/templates/sapns/users/edit.html:50
+#: sapns/templates/sapns/login.html:38
+#: sapns/templates/sapns/users/edit/edit.html:42
 msgid "Password"
 msgstr "Contraseña"
 
-#: sapns/templates/sapns/login.html:47
+#: sapns/templates/sapns/login.html:43
 msgid "remember me"
 msgstr "recordarme"
 
-#: sapns/templates/sapns/login.html:58
+#: sapns/templates/sapns/login.html:54
 msgid "Forgot my password"
 msgstr "Olvidé mi contraseña"
+
+#: sapns/templates/sapns/login.html:58
+msgid "<span>Wrong login</span>. Please, verify your username or password"
+msgstr "<span>Login incorrecto</span><br>Por favor, comprueba tu nombre de usuario o contraseña"
 
 #: sapns/templates/sapns/login.html:69
 msgid "Remember password"
@@ -264,26 +271,28 @@ msgid "A new password has been sent to you by e-mail"
 msgstr "Se te ha enviado una nueva contraseña por e-mail"
 
 #: sapns/templates/sapns/login.html:110
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:819
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1396
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1408
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1683
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:84
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:156
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:157
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:192
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:933
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1588
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1600
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1917
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:95
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:174
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:175
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:216
 #: sapns/templates/sapns/dashboard/grid.html:126
 #: sapns/templates/sapns/dashboard/grid.html:136
 #: sapns/templates/sapns/dashboard/edit/edit.js:276
 #: sapns/templates/sapns/dashboard/edit/edit.min.js:26
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:456
 msgid "Close"
 msgstr "Cerrar"
 
 #: sapns/templates/sapns/logout.html:6
 msgid "Click here to logout"
 msgstr "Pulsa aquí para salir"
+
+#: sapns/templates/sapns/logout.html:11
+msgid "User data"
+msgstr "Datos de usuario"
 
 #: sapns/templates/sapns/message.html:12
 msgid "This window will be closed in"
@@ -293,45 +302,59 @@ msgstr "Este ventana se cerrará en"
 msgid "Return"
 msgstr "Volver"
 
-#: sapns/templates/sapns/components/sapns.selector.js:186
+#: sapns/templates/sapns/components/sapns.selector.js:187
 #: sapns/templates/sapns/components/sapns.selector.min.js:15
 msgid "Set value"
 msgstr "Dar valor"
 
-#: sapns/templates/sapns/components/sapns.selector.js:225
+#: sapns/templates/sapns/components/sapns.selector.js:226
 #: sapns/templates/sapns/components/sapns.selector.min.js:19
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1347
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1604
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:148
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:181
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1265
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1539
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1838
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:135
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:166
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:205
 #: sapns/templates/sapns/dashboard/grid.html:86
 #: sapns/templates/sapns/dashboard/grid.html:361
 #: sapns/templates/sapns/docs/index.html:60
 #: sapns/templates/sapns/docs/index.html:288
-#: sapns/templates/sapns/shortcuts/list.html:204
-#: sapns/templates/sapns/shortcuts/list.html:283
-#: sapns/templates/sapns/shortcuts/list.html:360
+#: sapns/templates/sapns/shortcuts/list.html:210
+#: sapns/templates/sapns/shortcuts/list.html:291
+#: sapns/templates/sapns/shortcuts/list.html:371
+#: sapns/templates/sapns/shortcuts/list.html:421
+#: sapns/templates/sapns/users/edit/edit.html:65
+#: sapns/templates/sapns/views/edit/edit.html:29
+#: sapns/templates/sapns/views/edit/edit.js:272
 msgid "Ok"
 msgstr "Aceptar"
 
-#: sapns/templates/sapns/components/sapns.selector.js:237
+#: sapns/templates/sapns/components/sapns.selector.js:238
 #: sapns/templates/sapns/components/sapns.selector.min.js:21
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1417
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1627
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:158
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:184
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1325
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1609
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1861
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:2066
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:141
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:176
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:208
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:232
 #: sapns/templates/sapns/dashboard/grid.html:144
 #: sapns/templates/sapns/dashboard/grid.html:383
 #: sapns/templates/sapns/docs/index.html:142
 #: sapns/templates/sapns/docs/index.html:296
 #: sapns/templates/sapns/privileges/copy.html:34
-#: sapns/templates/sapns/shortcuts/list.html:224
-#: sapns/templates/sapns/shortcuts/list.html:295
-#: sapns/templates/sapns/shortcuts/list.html:390
+#: sapns/templates/sapns/shortcuts/list.html:230
+#: sapns/templates/sapns/shortcuts/list.html:303
+#: sapns/templates/sapns/shortcuts/list.html:383
+#: sapns/templates/sapns/shortcuts/list.html:433
+#: sapns/templates/sapns/users/edit/edit.html:64
+#: sapns/templates/sapns/views/edit/edit.html:28
+#: sapns/templates/sapns/views/edit/edit.js:287
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: sapns/templates/sapns/components/sapns.selector.js:250
+#: sapns/templates/sapns/components/sapns.selector.js:251
 #: sapns/templates/sapns/components/sapns.selector.min.js:22
 msgid "Remove value"
 msgstr "Borrar valor"
@@ -347,38 +370,38 @@ msgid "There is no repo selected"
 msgstr "No hay ningún repositorio seleccionado"
 
 #: sapns/templates/sapns/components/sapns.grid/grid.html:31
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:583
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:60
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:621
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:64
 #: sapns/templates/sapns/dashboard/grid.html:459
 msgid "empty"
 msgstr "vacío"
 
 #: sapns/templates/sapns/components/sapns.grid/grid.html:53
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:604
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:605
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:62
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:642
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:643
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:66
 #: sapns/templates/sapns/dashboard/grid.html:481
 msgid "No results"
 msgstr "No hay resultados"
 
 #: sapns/templates/sapns/components/sapns.grid/grid.html:63
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:736
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:74
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:850
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:85
 #: sapns/templates/sapns/dashboard/grid.html:492
 #, python-format
 msgid "Page %(curr_page)d of %(total_page)d / Showing rows %(pos0)d to %(pos1)d"
 msgstr "Página %(curr_page)d de %(total_page)d / Mostrando filas %(pos0)d hasta %(pos1)d"
 
 #: sapns/templates/sapns/components/sapns.grid/grid.html:70
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:232
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:233
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:23
 #: sapns/templates/sapns/dashboard/grid.html:499
 msgid "All"
 msgstr "Todos"
 
 #: sapns/templates/sapns/components/sapns.grid/grid.html:89
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:738
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:75
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:852
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:86
 #: sapns/templates/sapns/dashboard/grid.html:518
 msgid "page 1"
 msgstr "página 1"
@@ -386,12 +409,12 @@ msgstr "página 1"
 #: sapns/templates/sapns/components/sapns.grid/grid.html:96
 #: sapns/templates/sapns/components/sapns.grid/grid.html:110
 #: sapns/templates/sapns/components/sapns.grid/grid.html:119
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:742
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:751
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:762
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:75
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:77
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:79
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:856
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:865
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:876
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:86
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:88
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:90
 #: sapns/templates/sapns/dashboard/grid.html:526
 #: sapns/templates/sapns/dashboard/grid.html:541
 #: sapns/templates/sapns/dashboard/grid.html:550
@@ -399,64 +422,64 @@ msgstr "página 1"
 msgid "page %(p)d"
 msgstr "página %(p)d"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:31
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1508
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:32
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1722
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Contains"
 msgstr "Contiene"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:32
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1509
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:33
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1723
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Equals to"
 msgstr "Igual a"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:33
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1510
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:34
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1724
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Less than"
 msgstr "Menor que"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:34
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1511
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:35
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1725
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Greater than"
 msgstr "Mayor que"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:35
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1512
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:36
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1726
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Less than or equals to"
 msgstr "Menor o igual que"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:36
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1513
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:37
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1727
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Greater than or equals to"
 msgstr "Mayor o igual que"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:37
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1514
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:38
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1728
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Does not contain"
 msgstr "No contiene"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:38
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1515
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:39
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1729
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:6
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Not equals to"
 msgstr "Distinto"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:678
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:69
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:791
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:80
 #: sapns/templates/sapns/privileges/privileges.js:54
 #: sapns/templates/sapns/privileges/privileges.js:65
 #: sapns/templates/sapns/privileges/privileges.js:111
@@ -464,133 +487,204 @@ msgstr "Distinto"
 msgid "Loading"
 msgstr "Cargando"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:810
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:84
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:924
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:95
 #: sapns/templates/sapns/dashboard/grid.html:263
 msgid "You must select a row before click on this action"
 msgstr "Tienes que seleccionar una fila antes de utilizar esta acción"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:914
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:96
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1028
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:107
 #: sapns/templates/sapns/dashboard/grid.html:587
 #: sapns/templates/sapns/dashboard/grid.html:591
 msgid "Export"
 msgstr "Exportar"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1309
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:144
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1501
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:162
 #: sapns/templates/sapns/dashboard/delete.html:1
 #: sapns/templates/sapns/dashboard/grid.html:50
 msgid "Do you really want to delete this record?"
 msgstr "¿Seguro que quieres borrar este registro?"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1310
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:144
-#: sapns/templates/sapns/shortcuts/list.html:266
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1502
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:162
+#: sapns/templates/sapns/shortcuts/list.html:270
+#: sapns/templates/sapns/shortcuts/list.html:350
+#: sapns/templates/sapns/shortcuts/list.html:400
 msgid "Wait, please"
 msgstr "Espera, por favor"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1312
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:145
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1504
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:163
 #: sapns/templates/sapns/dashboard/grid.html:54
 msgid "Oops, something went wrong..."
 msgstr "Ups, algo fue mal..."
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1371
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:152
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1563
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:170
 #: sapns/templates/sapns/dashboard/grid.html:106
 msgid "For your information this object is related with other objects in the following classes:"
 msgstr "Para tu información este objeto está relacionado con otros objetos en las siguientes clases:"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1497
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:168
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1689
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:186
 #: sapns/templates/sapns/dashboard/grid.html:415
 msgid "Search..."
 msgstr "Buscar..."
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1502
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1707
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:189
+msgid "Manage filter"
+msgstr "Gestionar filtro"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1716
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Field"
 msgstr "Campo"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1506
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1720
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Operator"
 msgstr "Operador"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1519
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:169
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1733
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
 msgid "Value"
 msgstr "Valor"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1538
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1568
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:173
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:177
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1736
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "date functions"
+msgstr "funciones de fecha"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1737
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "Today"
+msgstr "Hoy"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1738
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "Yesterday"
+msgstr "Ayer"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1739
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "Tomorrow"
+msgstr "Mañana"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1740
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "Start week"
+msgstr "Inicio semana"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1741
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "End week"
+msgstr "Fin semana"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1742
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "Start month"
+msgstr "Inicio mes"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1743
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "End month"
+msgstr "Fin mes"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1744
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "Start year"
+msgstr "Inicio año"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1745
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:190
+msgid "End year"
+msgstr "Fin año"
+
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1772
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1802
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:197
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:201
 msgid "Activate"
 msgstr "Activar"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1542
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1564
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:174
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:176
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1776
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1798
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:198
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:200
 msgid "Deactivate"
 msgstr "Desactivar"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1580
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:178
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1814
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:202
 msgid "There are no filters"
 msgstr "No hay filtros"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1591
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:179
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1825
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:203
 msgid "Edit filter"
 msgstr "Editar filtro"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1649
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:186
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1883
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:210
 #: sapns/templates/sapns/docs/index.html:319
+#: sapns/templates/sapns/shortcuts/share/roles.html:12
+#: sapns/templates/sapns/shortcuts/share/users.html:12
 msgid "Add"
 msgstr "Añadir"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1664
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:189
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1898
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:213
+#: sapns/templates/sapns/shortcuts/share/roles.html:83
+#: sapns/templates/sapns/shortcuts/share/users.html:83
 msgid "Remove"
 msgstr "Borrar"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1678
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:191
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1912
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:215
 msgid "Remove all"
 msgstr "Borrar todos"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1705
-#: sapns/templates/sapns/dashboard/grid.html:422
-msgid "Create a shortcut"
-msgstr "Crear un favorito"
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1963
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:222
+msgid "Filter name"
+msgstr "Nombre del filtro"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1708
-#: sapns/templates/sapns/dashboard/grid.html:424
-msgid "this search"
-msgstr "esta búsqueda"
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1971
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:223
+msgid "Save filter"
+msgstr "Guardar filtro"
 
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1711
-#: sapns/templates/sapns/dashboard/grid.html:427
-msgid "Do you want to create a shortcut for this search?"
-msgstr "¿Quieres crear un favorito para esta búsqueda?"
-
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1712
-#: sapns/templates/sapns/dashboard/grid.html:428
-msgid "Shortcut title"
-msgstr "Título del favorito"
-
-#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1713
-#: sapns/templates/sapns/dashboard/grid.html:429
-msgid "title"
-msgstr "título"
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1977
+#: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:223
+msgid "Create or Modify"
+msgstr "Crear o Modificar"
 
 #: sapns/templates/sapns/dashboard/grid.html:355
 msgid "Create a shortcut for this search"
 msgstr "Crear un favorito para esta búsqueda"
+
+#: sapns/templates/sapns/dashboard/grid.html:422
+msgid "Create a shortcut"
+msgstr "Crear un favorito"
+
+#: sapns/templates/sapns/dashboard/grid.html:424
+msgid "this search"
+msgstr "esta búsqueda"
+
+#: sapns/templates/sapns/dashboard/grid.html:427
+msgid "Do you want to create a shortcut for this search?"
+msgstr "¿Quieres crear un favorito para esta búsqueda?"
+
+#: sapns/templates/sapns/dashboard/grid.html:428
+msgid "Shortcut title"
+msgstr "Título del favorito"
+
+#: sapns/templates/sapns/dashboard/grid.html:429
+msgid "title"
+msgstr "título"
 
 #: sapns/templates/sapns/dashboard/grid.html:558
 #: sapns/templates/sapns/dashboard/edit/edit.html:67
@@ -824,7 +918,7 @@ msgstr "Actualizado"
 
 #: sapns/templates/sapns/dashboard/edit/edit.html:69
 #: sapns/templates/sapns/privileges/attributes.html:6
-#: sapns/templates/sapns/privileges/classes.html:6
+#: sapns/templates/sapns/privileges/classes.html:14
 msgid "none"
 msgstr "ninguno"
 
@@ -833,13 +927,13 @@ msgid "Go"
 msgstr "Ir"
 
 #: sapns/templates/sapns/dashboard/edit/edit.html:84
+#: sapns/templates/sapns/dashboard/edit/edit.html:85
 #: sapns/templates/sapns/order/insert.html:69
 #: sapns/templates/sapns/order/reference.html:45
-#: sapns/templates/sapns/users/edit.html:69
 msgid "Save"
 msgstr "Guardar"
 
-#: sapns/templates/sapns/dashboard/edit/edit.html:156
+#: sapns/templates/sapns/dashboard/edit/edit.html:158
 msgid "Go to link"
 msgstr "Ir a enlace"
 
@@ -855,10 +949,8 @@ msgstr "este campo es requerido"
 
 #: sapns/templates/sapns/docs/edit.html:5
 #: sapns/templates/sapns/shortcuts/new.html:3
-#: sapns/templates/sapns/views/columns.html:12
-#: sapns/templates/sapns/views/header.html:6
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:107
+#: sapns/templates/sapns/views/edit/edit-attribute.html:3
+#: sapns/templates/sapns/views/edit/edit.html:17
 msgid "Title"
 msgstr "Título"
 
@@ -911,7 +1003,10 @@ msgstr "Autor del documento"
 
 #: sapns/templates/sapns/docs/index.html:212
 #: sapns/templates/sapns/privileges/privileges.js:182
-#: sapns/templates/sapns/shortcuts/list.html:41
+#: sapns/templates/sapns/shortcuts/list.html:48
+#: sapns/templates/sapns/shortcuts/share/users.html:62
+#: sapns/templates/sapns/users/edit/edit.js:3
+#: sapns/templates/sapns/views/edit/edit.js:158
 msgid "Users"
 msgstr "Usuarios"
 
@@ -929,31 +1024,13 @@ msgstr "Descargar"
 
 #: sapns/templates/sapns/order/insert.html:32
 #: sapns/templates/sapns/order/reference.html:29
-#: sapns/templates/sapns/shortcuts/list.html:44
-#: sapns/templates/sapns/shortcuts/list.html:46
-#: sapns/templates/sapns/views/columns.html:27
-#: sapns/templates/sapns/views/filters.html:15
-#: sapns/templates/sapns/views/order.html:15
-#: sapns/templates/sapns/views/relations.html:19
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:122
-#: sapns/templates/sapns/views/views.js:173
-#: sapns/templates/sapns/views/views.js:222
-#: sapns/templates/sapns/views/views.js:271
+#: sapns/templates/sapns/shortcuts/list.html:51
+#: sapns/templates/sapns/shortcuts/list.html:53
 msgid "Up"
 msgstr "Subir"
 
 #: sapns/templates/sapns/order/insert.html:38
 #: sapns/templates/sapns/order/reference.html:35
-#: sapns/templates/sapns/views/columns.html:28
-#: sapns/templates/sapns/views/filters.html:16
-#: sapns/templates/sapns/views/order.html:16
-#: sapns/templates/sapns/views/relations.html:20
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:123
-#: sapns/templates/sapns/views/views.js:174
-#: sapns/templates/sapns/views/views.js:223
-#: sapns/templates/sapns/views/views.js:272
 msgid "Down"
 msgstr "Bajar"
 
@@ -1003,6 +1080,7 @@ msgid "You have to select one role at least"
 msgstr "Tienes que seleccionar al menos un rol"
 
 #: sapns/templates/sapns/privileges/index.html:14
+#: sapns/templates/sapns/views/edit/edit.js:121
 msgid "Classes"
 msgstr "Clases"
 
@@ -1011,22 +1089,32 @@ msgid "Attributes"
 msgstr "Atributos"
 
 #: sapns/templates/sapns/privileges/privileges.js:161
+#: sapns/templates/sapns/shortcuts/share/roles.html:6
 msgid "Role"
 msgstr "Rol"
 
 #: sapns/templates/sapns/privileges/privileges.js:163
-#: sapns/templates/sapns/shortcuts/list.html:42
+#: sapns/templates/sapns/shortcuts/list.html:49
+#: sapns/templates/sapns/shortcuts/share/roles.html:62
 msgid "Roles"
 msgstr "Roles"
 
 #: sapns/templates/sapns/privileges/privileges.js:180
-#: sapns/templates/sapns/users/edit.html:149
+#: sapns/templates/sapns/shortcuts/share/users.html:6
 msgid "User"
 msgstr "Usuario"
 
 #: sapns/templates/sapns/roles/users.html:64
 msgid "Check (or uncheck) the USERS you want this role to have in"
 msgstr "Marca (o desmarca) los USUARIOS que pertenecen a este rol"
+
+#: sapns/templates/sapns/shortcuts/inner_list.html:16
+msgid "There are not shortcuts here"
+msgstr "No hay favoritos aquí"
+
+#: sapns/templates/sapns/shortcuts/inner_list.html:17
+msgid "For adding new shortcuts <span class=\"here\">click here</span>"
+msgstr "Para crear nuevos favoritos <span class=\"here\">Pincha aquí</span>"
 
 #: sapns/templates/sapns/shortcuts/list.html:13
 msgid "Delete shortcut"
@@ -1036,66 +1124,86 @@ msgstr "Borrar favorito"
 msgid "Do you want to delete this shortcut?"
 msgstr "¿Quieres borrar este favorito?"
 
-#: sapns/templates/sapns/shortcuts/list.html:31
+#: sapns/templates/sapns/shortcuts/list.html:34
+msgid "Click here to place your shortcuts"
+msgstr "Pincha aquí para mover tus favoritos"
+
+#: sapns/templates/sapns/shortcuts/list.html:37
 msgid "up"
 msgstr "subir"
 
-#: sapns/templates/sapns/shortcuts/list.html:277
+#: sapns/templates/sapns/shortcuts/list.html:285
 msgid "New shortcut"
 msgstr "Nuevo favorito"
 
-#: sapns/templates/sapns/shortcuts/new.html:29
+#: sapns/templates/sapns/shortcuts/list.html:325
+msgid "Click again when you finish placing your shortcuts"
+msgstr "Pulsa otra vez cuando termines de colocar tus favoritos"
+
+#: sapns/templates/sapns/shortcuts/list.html:365
+msgid "Share with users"
+msgstr "Compartir con usuarios"
+
+#: sapns/templates/sapns/shortcuts/list.html:415
+msgid "Share with roles"
+msgstr "Compartir con roles"
+
+#: sapns/templates/sapns/shortcuts/new.html:47
 msgid "A title must be specified"
 msgstr "Tienes que indicar un título"
-
-#: sapns/templates/sapns/users/edit.html:30
-msgid "Display name"
-msgstr "Nombre"
-
-#: sapns/templates/sapns/users/edit.html:36
-msgid "User name"
-msgstr "Nombre de usuario"
-
-#: sapns/templates/sapns/users/edit.html:43
-msgid "E-mail address"
-msgstr "E-mail"
-
-#: sapns/templates/sapns/users/edit.html:56
-msgid "Re-type password"
-msgstr "Re-escribe contraseña"
-
-#: sapns/templates/sapns/users/edit.html:63
-msgid "Copy from"
-msgstr "Copiar desde"
-
-#: sapns/templates/sapns/users/edit.html:74
-msgid "Update was completed successfully"
-msgstr "Actualización completada con éxito"
-
-#: sapns/templates/sapns/users/edit.html:103
-msgid "\"Display name\" is required"
-msgstr "\"Nombre\" es requerido"
-
-#: sapns/templates/sapns/users/edit.html:112
-msgid "\"User name\" is required"
-msgstr "\"Nombre de usuario\" es requerido"
-
-#: sapns/templates/sapns/users/edit.html:121
-msgid "\"E-mail address\" is required"
-msgstr "\"E-mail\" es requerido"
-
-#: sapns/templates/sapns/users/edit.html:131
-#: sapns/templates/sapns/users/edit.html:138
-msgid "\"Password\" is required"
-msgstr "\"Contraseña\" es requerido"
-
-#: sapns/templates/sapns/users/edit.html:147
-msgid "Passwords must be equal"
-msgstr "Las contraseñas deben ser iguales"
 
 #: sapns/templates/sapns/users/roles.html:44
 msgid "Check (or uncheck) the ROLES you want this user to be in"
 msgstr "Marca (o desmarca) los ROLES que quieres para este usuario"
+
+#: sapns/templates/sapns/users/edit/edit.html:19
+msgid "Display name"
+msgstr "Nombre"
+
+#: sapns/templates/sapns/users/edit/edit.html:26
+msgid "User name"
+msgstr "Nombre de usuario"
+
+#: sapns/templates/sapns/users/edit/edit.html:34
+msgid "E-mail address"
+msgstr "E-mail"
+
+#: sapns/templates/sapns/users/edit/edit.html:49
+msgid "Re-type password"
+msgstr "Re-escribe contraseña"
+
+#: sapns/templates/sapns/users/edit/edit.html:57
+msgid "Copy from"
+msgstr "Copiar desde"
+
+#: sapns/templates/sapns/users/edit/edit.html:71
+msgid "Update was completed successfully"
+msgstr "Actualización completada con éxito"
+
+#: sapns/templates/sapns/users/edit/edit.js:35
+msgid "\"Display name\" is required"
+msgstr "\"Nombre\" es requerido"
+
+#: sapns/templates/sapns/users/edit/edit.js:44
+msgid "\"User name\" is required"
+msgstr "\"Nombre de usuario\" es requerido"
+
+#: sapns/templates/sapns/users/edit/edit.js:53
+msgid "\"E-mail address\" is required"
+msgstr "\"E-mail\" es requerido"
+
+#: sapns/templates/sapns/users/edit/edit.js:63
+#: sapns/templates/sapns/users/edit/edit.js:70
+msgid "\"Password\" is required"
+msgstr "\"Contraseña\" es requerido"
+
+#: sapns/templates/sapns/users/edit/edit.js:77
+msgid "Passwords must be equal"
+msgstr "Las contraseñas deben ser iguales"
+
+#: sapns/templates/sapns/users/edit/edit.js:86
+msgid "A user to copy from must be specified"
+msgstr "Tienes que especificar un usuario del que copiar"
 
 #: sapns/templates/sapns/util/index.html:24
 msgid "Extract model"
@@ -1126,130 +1234,91 @@ msgstr "Tipo"
 msgid "Primary key/References"
 msgstr "Clave primaria/Referencias"
 
-#: sapns/templates/sapns/views/columns.html:2
-msgid "Columns"
-msgstr "Columnas"
+#: sapns/templates/sapns/views/edit/edit-attribute.html:11
+msgid "Expression"
+msgstr "Expresión"
 
-#: sapns/templates/sapns/views/columns.html:5
-msgid "Add column"
-msgstr "Añadir columna"
+#: sapns/templates/sapns/views/edit/edit.js:15
+msgid "You must specify a title"
+msgstr "Tienes que indicar un título"
 
-#: sapns/templates/sapns/views/columns.html:14
-#: sapns/templates/sapns/views/filters.html:12
-#: sapns/templates/sapns/views/order.html:12
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:109
-#: sapns/templates/sapns/views/views.js:219
-#: sapns/templates/sapns/views/views.js:268
-msgid "Definition"
-msgstr "Definición"
+#: sapns/templates/sapns/views/edit/edit.js:21
+msgid "You must specify a base table"
+msgstr "Tienes que indicar una tabla base"
 
-#: sapns/templates/sapns/views/columns.html:16
-#: sapns/templates/sapns/views/header.html:24
-#: sapns/templates/sapns/views/relations.html:14
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:111
-#: sapns/templates/sapns/views/views.js:168
-msgid "Alias"
-msgstr "Alias"
+#: sapns/templates/sapns/views/edit/edit.js:26
+msgid "You have to add some columns to the view"
+msgstr "Tienes que añadir algunas columnas a la vista"
 
-#: sapns/templates/sapns/views/columns.html:18
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:113
-msgid "Align"
-msgstr "Alineación"
+#~ msgid "The view has been successfully deleted"
+#~ msgstr "La vista ha sido borrada correctamente"
 
-#: sapns/templates/sapns/views/columns.html:21
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:116
-msgid "center"
-msgstr "centro"
+#~ msgid "Columns"
+#~ msgstr "Columnas"
 
-#: sapns/templates/sapns/views/columns.html:22
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:117
-msgid "left"
-msgstr "izqda"
+#~ msgid "Add column"
+#~ msgstr "Añadir columna"
 
-#: sapns/templates/sapns/views/columns.html:23
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:118
-msgid "right"
-msgstr "dcha"
+#~ msgid "Definition"
+#~ msgstr "Definición"
 
-#: sapns/templates/sapns/views/columns.html:26
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:121
-msgid "Remove column"
-msgstr "Quitar columna"
+#~ msgid "Alias"
+#~ msgstr "Alias"
 
-#: sapns/templates/sapns/views/filters.html:2
-msgid "Filters"
-msgstr "Filtros"
+#~ msgid "Align"
+#~ msgstr "Alineación"
 
-#: sapns/templates/sapns/views/filters.html:5
-msgid "Add filter"
-msgstr "Añadir filtro"
+#~ msgid "center"
+#~ msgstr "centro"
 
-#: sapns/templates/sapns/views/filters.html:14
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:221
-msgid "Remove filter"
-msgstr "Quitar filtro"
+#~ msgid "left"
+#~ msgstr "izqda"
 
-#: sapns/templates/sapns/views/header.html:2
-msgid "View"
-msgstr "Vista"
+#~ msgid "right"
+#~ msgstr "dcha"
 
-#: sapns/templates/sapns/views/header.html:12
-msgid "Code"
-msgstr "Código"
+#~ msgid "Remove column"
+#~ msgstr "Quitar columna"
 
-#: sapns/templates/sapns/views/header.html:31
-msgid "Save view"
-msgstr "Guardar vista"
+#~ msgid "Filters"
+#~ msgstr "Filtros"
 
-#: sapns/templates/sapns/views/order.html:2
-msgid "Order"
-msgstr "Orden"
+#~ msgid "Add filter"
+#~ msgstr "Añadir filtro"
 
-#: sapns/templates/sapns/views/order.html:5
-msgid "Add order"
-msgstr "Añadir orden"
+#~ msgid "Remove filter"
+#~ msgstr "Quitar filtro"
 
-#: sapns/templates/sapns/views/order.html:14
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:270
-msgid "Remove order"
-msgstr "Quitar orden"
+#~ msgid "Code"
+#~ msgstr "Código"
 
-#: sapns/templates/sapns/views/relations.html:2
-msgid "Relations"
-msgstr "Relaciones"
+#~ msgid "Save view"
+#~ msgstr "Guardar vista"
 
-#: sapns/templates/sapns/views/relations.html:5
-msgid "Add relation"
-msgstr "Añadir relación"
+#~ msgid "Order"
+#~ msgstr "Orden"
 
-#: sapns/templates/sapns/views/relations.html:16
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:170
-msgid "Condition"
-msgstr "Condición"
+#~ msgid "Add order"
+#~ msgstr "Añadir orden"
 
-#: sapns/templates/sapns/views/relations.html:18
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:172
-msgid "Remove relation"
-msgstr "Quitar relación"
+#~ msgid "Remove order"
+#~ msgstr "Quitar orden"
 
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:448
-msgid "Please, check the information you have entered"
-msgstr "Por favor, comprueba la información que has introducido"
+#~ msgid "Relations"
+#~ msgstr "Relaciones"
 
-#: sapns/templates/sapns/views/views-min.js:1
-#: sapns/templates/sapns/views/views.js:450
-msgid "Warning"
-msgstr "Aviso"
+#~ msgid "Add relation"
+#~ msgstr "Añadir relación"
+
+#~ msgid "Condition"
+#~ msgstr "Condición"
+
+#~ msgid "Remove relation"
+#~ msgstr "Quitar relación"
+
+#~ msgid "Please, check the information you have entered"
+#~ msgstr "Por favor, comprueba la información que has introducido"
+
+#~ msgid "Warning"
+#~ msgstr "Aviso"
 
