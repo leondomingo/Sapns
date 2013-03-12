@@ -106,9 +106,10 @@ padding:2px; overflow:hidden }
 .sp-col-title-sortable:hover { background-color:#444 }
 
 .sp-grid-filter-label { font:12px arial }
-.sp-grid-filter-field, .sp-grid-filter-operator { width:200px; border:0; border-radius:4px;
+.sp-grid-filter-field, .sp-grid-filter-operator { width:190px; border:0; border-radius:4px;
 font:15px arial; padding-top:1px; height:21px; background-color:#e6e6e6 }
-.sp-grid-filter-value { font:15px arial }
+.sp-grid-filter-value { font:15px arial; width:160px }
+.sp-grid-filter-functions { font:11px arial; width:110px; text-align:center }
 .sp-grid-row-filter button { font-size:9px; width:90px }
 .sp-grid-row-filter.inactive .sp-grid-filter-description { text-decoration:line-through }
 .sp-grid-no-filters { font:bold 15px arial; text-align:center; color:#FFB835 }

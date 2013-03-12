@@ -1732,18 +1732,38 @@ var __DEFAULT_FILTER = 'default';
                     <div style="float:left;height:40px">\
                         <div class="sp-grid-filter-label">{{_("Value")}}</div>\
                         <input class="sp-grid-filter-value" type="text">\
+                        <select class="sp-grid-filter-functions">\
+                            <option value="">({{_("date functions")}})</option>\
+                            <option value="{today}">{{_("Today")}}</option>\
+                            <option value="{today - 1}">{{_("Yesterday")}}</option>\
+                            <option value="{today + 1}">{{_("Tomorrow")}}</option>\
+                            <option value="{start_week}">{{_("Start week")}}</option>\
+                            <option value="{end_week}">{{_("End week")}}</option>\
+                            <option value="{start_month}">{{_("Start month")}}</option>\
+                            <option value="{end_month}">{{_("End month")}}</option>\
+                            <option value="{start_year}">{{_("Start year")}}</option>\
+                            <option value="{end_year}">{{_("End year")}}</option>\
+                        </select>\
                     </div></div>';
                 
                 var ad_sel = '.sp-grid-activate-filter, .sp-grid-deactivate-filter';
                 
-                $(document).off('keypress', '.sp-grid-filter-value').on('keypress', '.sp-grid-filter-value', function(e) {
+                var s_ = '.sp-grid-filter-value';
+                $(document).off('keypress', s_).on('keypress', s_, function(e) {
                     if (e.which === 13) {
                         // INTRO
                         $(this).parents('.ui-dialog').find('.ui-dialog-buttonset button:first').click();
                     }
                 });
                 
-                $(document).off('click', '.sp-grid-row-filter button').on('click', '.sp-grid-row-filter button', function() {
+                var s_ = '.sp-grid-filter-functions';
+                $(document).off('change', s_).on('change', s_, function() {
+                    var date_function = $(this).val();
+                    $(this).parent().find('.sp-grid-filter-value').val(date_function);
+                });
+                
+                var s_ = '.sp-grid-row-filter button';
+                $(document).off('click', s_).on('click', s_, function() {
                     var i = $(this).parent().attr('filter_order');
                     var f = g.filters[i];
                     
