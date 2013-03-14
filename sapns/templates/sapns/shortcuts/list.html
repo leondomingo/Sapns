@@ -92,6 +92,25 @@
                             accept: '.sp-shortcut',
                             hoverClass: 'activo',
                             drop: function(e, ui) {
+                                
+                                var img = '';
+                                // list 
+                                if (ui.draggable.hasClass('list')) {
+                                    img = '<img src="{{tg.url("/images/sapns/icons/list.png")}}"> '; 
+                                }
+                                // view 
+                                else if (ui.draggable.hasClass('view')) {
+                                    img = '<img src="{{tg.url("/images/sapns/icons/view.png")}}"> ';
+                                }
+                                // process 
+                                else if (ui.draggable.hasClass('process')) {
+                                    img = '<img src="{{tg.url("/images/sapns/icons/process.png")}}"> ';
+                                }
+                                // group 
+                                else if (ui.draggable.hasClass('group')) {
+                                    img = '<img src="{{tg.url("/images/sapns/icons/group.png")}}"> ';
+                                }
+                                
                                 $.ajax({
                                     url: "{{tg.url('/dashboard/sc/bookmark/')}}",
                                     data: {
@@ -102,7 +121,7 @@
                                         if (res.status) {
                                             var new_shortcut = '<div class="item_sb item_sb_sortable" shortcut_id="' + res.shortcut.id + '">\
                                                 <a href="' + res.shortcut.url + '">\
-                                                <span class="text_sb" title="' + res.shortcut.title + '">' + res.shortcut.title + '</span>\
+                                                <span class="text_sb" title="' + res.shortcut.title + '">' + img + res.shortcut.title + '</span>\
                                                 </a></div>' 
                                             
                                             $('.sp_sidebar').append(new_shortcut);
