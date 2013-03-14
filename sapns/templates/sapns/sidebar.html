@@ -9,10 +9,16 @@
 
 <!--{% for sc in shortcuts %}-->
 <!--{% if sc.action_type %}-->
-<!--{% if sc.action_type == 'list' %}-->
+<!--{% if sc.action_type == 'list' or sc.action_type == 'view' %}-->
 <div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
     <a href="{{tg.url('/dashboard/list/%(cls)s'|format(cls=sc.cls), params=dict(came_from=''))}}">
-        <span class="text_sb" title="{{sc.title}}"><img src="{{tg.url('/images/sapns/icons/list.png')}}"> {{sc.title}}</span></a>
+        <span class="text_sb" title="{{sc.title}}">
+        <!--{% if sc.action_type == 'list' %}-->
+        <img src="{{tg.url('/images/sapns/icons/list.png')}}"> 
+        <!--{% elif sc.action_type == 'view' %}-->
+        <img src="{{tg.url('/images/sapns/icons/view.png')}}">
+        <!--{% endif %}-->
+        {{sc.title}}</span></a>
     
     <!--{% if sc.actions %}-->
     <div class="subactions">
