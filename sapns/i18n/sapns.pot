@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.3\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-12 12:14+0100\n"
+"POT-Creation-Date: 2013-03-18 12:34+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr ""
 msgid "docs__%s.zip"
 msgstr ""
 
-#: sapns/controllers/logs.py:83 sapns/controllers/views.py:569
+#: sapns/controllers/logs.py:83 sapns/controllers/views.py:572
 #: sapns/lib/sapns/lists.py:147
 #: sapns/templates/sapns/privileges/actions.html:13
 #: sapns/templates/sapns/privileges/classes.html:16
@@ -91,7 +91,7 @@ msgstr ""
 msgid "Yes"
 msgstr ""
 
-#: sapns/controllers/logs.py:84 sapns/controllers/views.py:570
+#: sapns/controllers/logs.py:84 sapns/controllers/views.py:573
 #: sapns/lib/sapns/lists.py:148
 #: sapns/templates/sapns/privileges/actions.html:14
 #: sapns/templates/sapns/privileges/classes.html:17
@@ -135,6 +135,14 @@ msgstr ""
 
 #: sapns/controllers/util.py:32
 msgid "Process terminated"
+msgstr ""
+
+#: sapns/controllers/views.py:618
+msgid "There is not a defined view"
+msgstr ""
+
+#: sapns/controllers/views.py:622
+msgid "A class with the same name already exists"
 msgstr ""
 
 #: sapns/lib/sapns/conditions.py:46
@@ -319,10 +327,10 @@ msgstr ""
 #: sapns/templates/sapns/dashboard/grid.html:361
 #: sapns/templates/sapns/docs/index.html:60
 #: sapns/templates/sapns/docs/index.html:288
-#: sapns/templates/sapns/shortcuts/list.html:210
-#: sapns/templates/sapns/shortcuts/list.html:291
-#: sapns/templates/sapns/shortcuts/list.html:371
-#: sapns/templates/sapns/shortcuts/list.html:421
+#: sapns/templates/sapns/shortcuts/list.html:229
+#: sapns/templates/sapns/shortcuts/list.html:310
+#: sapns/templates/sapns/shortcuts/list.html:390
+#: sapns/templates/sapns/shortcuts/list.html:440
 #: sapns/templates/sapns/users/edit/edit.html:65
 #: sapns/templates/sapns/views/edit/edit.html:29
 #: sapns/templates/sapns/views/edit/edit.js:272
@@ -344,10 +352,10 @@ msgstr ""
 #: sapns/templates/sapns/docs/index.html:142
 #: sapns/templates/sapns/docs/index.html:296
 #: sapns/templates/sapns/privileges/copy.html:34
-#: sapns/templates/sapns/shortcuts/list.html:230
-#: sapns/templates/sapns/shortcuts/list.html:303
-#: sapns/templates/sapns/shortcuts/list.html:383
-#: sapns/templates/sapns/shortcuts/list.html:433
+#: sapns/templates/sapns/shortcuts/list.html:249
+#: sapns/templates/sapns/shortcuts/list.html:322
+#: sapns/templates/sapns/shortcuts/list.html:402
+#: sapns/templates/sapns/shortcuts/list.html:452
 #: sapns/templates/sapns/users/edit/edit.html:64
 #: sapns/templates/sapns/views/edit/edit.html:28
 #: sapns/templates/sapns/views/edit/edit.js:287
@@ -509,9 +517,9 @@ msgstr ""
 
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1502
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:162
-#: sapns/templates/sapns/shortcuts/list.html:270
-#: sapns/templates/sapns/shortcuts/list.html:350
-#: sapns/templates/sapns/shortcuts/list.html:400
+#: sapns/templates/sapns/shortcuts/list.html:289
+#: sapns/templates/sapns/shortcuts/list.html:369
+#: sapns/templates/sapns/shortcuts/list.html:419
 msgid "Wait, please"
 msgstr ""
 
@@ -1132,19 +1140,19 @@ msgstr ""
 msgid "up"
 msgstr ""
 
-#: sapns/templates/sapns/shortcuts/list.html:285
+#: sapns/templates/sapns/shortcuts/list.html:304
 msgid "New shortcut"
 msgstr ""
 
-#: sapns/templates/sapns/shortcuts/list.html:325
+#: sapns/templates/sapns/shortcuts/list.html:344
 msgid "Click again when you finish placing your shortcuts"
 msgstr ""
 
-#: sapns/templates/sapns/shortcuts/list.html:365
+#: sapns/templates/sapns/shortcuts/list.html:384
 msgid "Share with users"
 msgstr ""
 
-#: sapns/templates/sapns/shortcuts/list.html:415
+#: sapns/templates/sapns/shortcuts/list.html:434
 msgid "Share with roles"
 msgstr ""
 
@@ -1223,6 +1231,7 @@ msgid "Source of this model"
 msgstr ""
 
 #: sapns/templates/sapns/util/tables.html:21
+#: sapns/templates/sapns/views/copy_view/copy_view.html:9
 msgid "Name"
 msgstr ""
 
@@ -1232,6 +1241,14 @@ msgstr ""
 
 #: sapns/templates/sapns/util/tables.html:23
 msgid "Primary key/References"
+msgstr ""
+
+#: sapns/templates/sapns/views/copy_view/copy_view.html:6
+msgid "Do you want to copy this view?"
+msgstr ""
+
+#: sapns/templates/sapns/views/copy_view/copy_view.html:18
+msgid "A view name must be specified"
 msgstr ""
 
 #: sapns/templates/sapns/views/edit/edit-attribute.html:11

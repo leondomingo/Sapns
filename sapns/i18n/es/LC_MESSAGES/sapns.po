@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-12 12:14+0100\n"
+"POT-Creation-Date: 2013-03-18 12:34+0100\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -83,7 +83,7 @@ msgstr "Documentos de [%s]"
 msgid "docs__%s.zip"
 msgstr "documentos__%s.zip"
 
-#: sapns/controllers/logs.py:83 sapns/controllers/views.py:569
+#: sapns/controllers/logs.py:83 sapns/controllers/views.py:572
 #: sapns/lib/sapns/lists.py:147
 #: sapns/templates/sapns/privileges/actions.html:13
 #: sapns/templates/sapns/privileges/classes.html:16
@@ -91,7 +91,7 @@ msgstr "documentos__%s.zip"
 msgid "Yes"
 msgstr "Sí"
 
-#: sapns/controllers/logs.py:84 sapns/controllers/views.py:570
+#: sapns/controllers/logs.py:84 sapns/controllers/views.py:573
 #: sapns/lib/sapns/lists.py:148
 #: sapns/templates/sapns/privileges/actions.html:14
 #: sapns/templates/sapns/privileges/classes.html:17
@@ -136,6 +136,14 @@ msgstr "\"E-mail\" ya está en uso"
 #: sapns/controllers/util.py:32
 msgid "Process terminated"
 msgstr "Proceso terminado"
+
+#: sapns/controllers/views.py:618
+msgid "There is not a defined view"
+msgstr "No hay una vista definida"
+
+#: sapns/controllers/views.py:622
+msgid "A class with the same name already exists"
+msgstr "Ya existe una clase con el mismo nombre"
 
 #: sapns/lib/sapns/conditions.py:46
 msgid "(new permission)"
@@ -319,10 +327,10 @@ msgstr "Dar valor"
 #: sapns/templates/sapns/dashboard/grid.html:361
 #: sapns/templates/sapns/docs/index.html:60
 #: sapns/templates/sapns/docs/index.html:288
-#: sapns/templates/sapns/shortcuts/list.html:210
-#: sapns/templates/sapns/shortcuts/list.html:291
-#: sapns/templates/sapns/shortcuts/list.html:371
-#: sapns/templates/sapns/shortcuts/list.html:421
+#: sapns/templates/sapns/shortcuts/list.html:229
+#: sapns/templates/sapns/shortcuts/list.html:310
+#: sapns/templates/sapns/shortcuts/list.html:390
+#: sapns/templates/sapns/shortcuts/list.html:440
 #: sapns/templates/sapns/users/edit/edit.html:65
 #: sapns/templates/sapns/views/edit/edit.html:29
 #: sapns/templates/sapns/views/edit/edit.js:272
@@ -344,10 +352,10 @@ msgstr "Aceptar"
 #: sapns/templates/sapns/docs/index.html:142
 #: sapns/templates/sapns/docs/index.html:296
 #: sapns/templates/sapns/privileges/copy.html:34
-#: sapns/templates/sapns/shortcuts/list.html:230
-#: sapns/templates/sapns/shortcuts/list.html:303
-#: sapns/templates/sapns/shortcuts/list.html:383
-#: sapns/templates/sapns/shortcuts/list.html:433
+#: sapns/templates/sapns/shortcuts/list.html:249
+#: sapns/templates/sapns/shortcuts/list.html:322
+#: sapns/templates/sapns/shortcuts/list.html:402
+#: sapns/templates/sapns/shortcuts/list.html:452
 #: sapns/templates/sapns/users/edit/edit.html:64
 #: sapns/templates/sapns/views/edit/edit.html:28
 #: sapns/templates/sapns/views/edit/edit.js:287
@@ -509,9 +517,9 @@ msgstr "¿Seguro que quieres borrar este registro?"
 
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.js:1502
 #: sapns/templates/sapns/components/sapns.grid/sapns.grid.min.js:162
-#: sapns/templates/sapns/shortcuts/list.html:270
-#: sapns/templates/sapns/shortcuts/list.html:350
-#: sapns/templates/sapns/shortcuts/list.html:400
+#: sapns/templates/sapns/shortcuts/list.html:289
+#: sapns/templates/sapns/shortcuts/list.html:369
+#: sapns/templates/sapns/shortcuts/list.html:419
 msgid "Wait, please"
 msgstr "Espera, por favor"
 
@@ -1132,19 +1140,19 @@ msgstr "Pincha aquí para mover tus favoritos"
 msgid "up"
 msgstr "subir"
 
-#: sapns/templates/sapns/shortcuts/list.html:285
+#: sapns/templates/sapns/shortcuts/list.html:304
 msgid "New shortcut"
 msgstr "Nuevo favorito"
 
-#: sapns/templates/sapns/shortcuts/list.html:325
+#: sapns/templates/sapns/shortcuts/list.html:344
 msgid "Click again when you finish placing your shortcuts"
 msgstr "Pulsa otra vez cuando termines de colocar tus favoritos"
 
-#: sapns/templates/sapns/shortcuts/list.html:365
+#: sapns/templates/sapns/shortcuts/list.html:384
 msgid "Share with users"
 msgstr "Compartir con usuarios"
 
-#: sapns/templates/sapns/shortcuts/list.html:415
+#: sapns/templates/sapns/shortcuts/list.html:434
 msgid "Share with roles"
 msgstr "Compartir con roles"
 
@@ -1223,6 +1231,7 @@ msgid "Source of this model"
 msgstr "Código de este modelo"
 
 #: sapns/templates/sapns/util/tables.html:21
+#: sapns/templates/sapns/views/copy_view/copy_view.html:9
 msgid "Name"
 msgstr "Nombre"
 
@@ -1233,6 +1242,14 @@ msgstr "Tipo"
 #: sapns/templates/sapns/util/tables.html:23
 msgid "Primary key/References"
 msgstr "Clave primaria/Referencias"
+
+#: sapns/templates/sapns/views/copy_view/copy_view.html:6
+msgid "Do you want to copy this view?"
+msgstr "¿Quieres copiar esta vista?"
+
+#: sapns/templates/sapns/views/copy_view/copy_view.html:18
+msgid "A view name must be specified"
+msgstr "Tienes que indicar un nombre para la vista"
 
 #: sapns/templates/sapns/views/edit/edit-attribute.html:11
 msgid "Expression"
@@ -1249,76 +1266,4 @@ msgstr "Tienes que indicar una tabla base"
 #: sapns/templates/sapns/views/edit/edit.js:26
 msgid "You have to add some columns to the view"
 msgstr "Tienes que añadir algunas columnas a la vista"
-
-#~ msgid "The view has been successfully deleted"
-#~ msgstr "La vista ha sido borrada correctamente"
-
-#~ msgid "Columns"
-#~ msgstr "Columnas"
-
-#~ msgid "Add column"
-#~ msgstr "Añadir columna"
-
-#~ msgid "Definition"
-#~ msgstr "Definición"
-
-#~ msgid "Alias"
-#~ msgstr "Alias"
-
-#~ msgid "Align"
-#~ msgstr "Alineación"
-
-#~ msgid "center"
-#~ msgstr "centro"
-
-#~ msgid "left"
-#~ msgstr "izqda"
-
-#~ msgid "right"
-#~ msgstr "dcha"
-
-#~ msgid "Remove column"
-#~ msgstr "Quitar columna"
-
-#~ msgid "Filters"
-#~ msgstr "Filtros"
-
-#~ msgid "Add filter"
-#~ msgstr "Añadir filtro"
-
-#~ msgid "Remove filter"
-#~ msgstr "Quitar filtro"
-
-#~ msgid "Code"
-#~ msgstr "Código"
-
-#~ msgid "Save view"
-#~ msgstr "Guardar vista"
-
-#~ msgid "Order"
-#~ msgstr "Orden"
-
-#~ msgid "Add order"
-#~ msgstr "Añadir orden"
-
-#~ msgid "Remove order"
-#~ msgstr "Quitar orden"
-
-#~ msgid "Relations"
-#~ msgstr "Relaciones"
-
-#~ msgid "Add relation"
-#~ msgstr "Añadir relación"
-
-#~ msgid "Condition"
-#~ msgstr "Condición"
-
-#~ msgid "Remove relation"
-#~ msgstr "Quitar relación"
-
-#~ msgid "Please, check the information you have entered"
-#~ msgstr "Por favor, comprueba la información que has introducido"
-
-#~ msgid "Warning"
-#~ msgstr "Aviso"
 
