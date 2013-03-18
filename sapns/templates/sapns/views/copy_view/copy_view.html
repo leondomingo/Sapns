@@ -1,0 +1,50 @@
+<style>
+#sp-copy-view-question { font:18px arial; height:25px }
+#sp-copy-view-name { width:500px }
+</style>
+
+<div id="sp-copy-view-question">{{_('Do you want to copy this view?')}}</div>
+<div class="sp-field-row">
+    <div class="sp-field">
+        <div class="label required">{{_('Name')}}</div>
+        <input id="sp-copy-view-name" type="text" value="{{cls.name}}">
+    </div>
+</div>
+
+<script>
+function copy_view(callback, callback_error) {
+    var view_name = $('#sp-copy-view-name').val();
+    if (!view_name) {
+        alert("{{_('A view name must be specified')}}");
+        $('#sp-copy-view-name').focus();
+        callback_error();
+        return;
+    }
+    
+    $.ajax({
+        url: "{{tg.url('/dashboard/views/copy_/')}}",
+        data: { id_class: "{{cls.id}}", view_name: view_name },
+        success: function(res) {
+            if (res.status) {
+                callback();
+            }
+            else if (res.msg) {
+                alert(res.msg);
+                callback_error();
+            }
+            else {
+                alert('Error!');
+                callback_error();
+            }
+        },
+        error: function() {
+            alert('Error!');
+            callback_error();
+        }
+    });
+}
+
+$(function() {
+    $('#sp-copy-view-name').focus();    
+});
+</script>

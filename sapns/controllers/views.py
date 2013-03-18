@@ -29,6 +29,9 @@ __all__ = ['ViewsController']
 REL_CLASS = 'class'
 REL_COLLECTION = 'collection'
 
+class EViews(Exception):
+    pass
+
 class ViewsController(BaseController):
     
     allow_only = p_.Any(p_.in_group('managers'),
@@ -593,3 +596,67 @@ class ViewsController(BaseController):
         
         return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
+        
+    @expose('sapns/views/copy_view/copy_view.html')
+    def copy(self, **kw):
+        id_class = get_paramw(kw, 'id_class', int)
+        cls = dbs.query(SapnsClass).get(id_class)
+        
+        return dict(cls=dict(id=id_class,
+                             name=u'%s (2)' % cls.title,
+                             ))
+    
+    @expose('json')
+    def copy_(self, **kw):
+        logger = logging.getLogger('ViewsController.copy_view_')
+        try:
+            id_class = get_paramw(kw, 'id_class', int)
+            view_name = get_paramw(kw, 'view_name', unicode)
+            
+            cls = dbs.query(SapnsClass).get(id_class)
+            if cls.view_id is None:
+                raise EViews(_(u'There is not a defined view').encode('utf-8'))
+            
+            name = re.sub(r'[^a-z0-9_]', '_', view_name.lower())
+            if SapnsClass.by_name(name):
+                raise EViews(_(u'A class with the same name already exists').encode('utf-8'))
+            
+            # create "class"
+            cls_c = SapnsClass()
+            cls_c.title = view_name
+            cls_c.name = name
+            cls_c.parent_class_id = cls.parent_class_id
+            
+            # copy "view"
+            mdb = Mongo().db
+            
+            view0 = mdb.user_views.find_one(dict(_id=ObjectId(cls.view_id)))
+            view_copy = copy.deepcopy(view0)
+            del view_copy['_id']
+            view_id = mdb.user_views.insert(view_copy)
+            cls_c.view_id = str(view_id)
+            
+            dbs.add(cls_c)
+            dbs.flush()
+            
+            # create "list" permission
+            list_p = SapnsPermission()
+            list_p.permission_name = u'%s#list' % cls_c.name
+            list_p.display_name = u'List'
+            list_p.class_id = cls_c.class_id
+            list_p.type = SapnsPermission.TYPE_LIST
+            list_p.requires_id = False
+            dbs.add(list_p)
+            dbs.flush()
+            
+            self.create_view(view_id, '', new_name=cls_c.name)            
+            
+            return dict(status=True)
+            
+        except EViews, e:
+            logger.error(e)
+            return dict(status=False, msg=str(e))
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
