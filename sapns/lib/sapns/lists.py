@@ -124,7 +124,7 @@ class List(object):
                               shift_enabled=shift_enabled_,
                               ))
         
-    def grid(self):
+    def grid(self, **kw):
         """
         OUT
           {
@@ -138,7 +138,7 @@ class List(object):
           }
         """
         
-        ds = self.grid_data()        
+        ds = self.grid_data(**kw)        
         
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -187,7 +187,7 @@ class List(object):
         return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
         
-    def grid_data(self):
+    def grid_data(self, **kw):
         
         _logger = logging.getLogger('DashboardController.grid_data')
 
