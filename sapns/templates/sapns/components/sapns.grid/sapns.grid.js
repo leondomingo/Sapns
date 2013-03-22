@@ -652,14 +652,14 @@ var __DEFAULT_FILTER = 'default';
         }
         
         var grid_id = '#'+self.name;
-        $('.sp-col-title-sortable').resizable({
+        $(grid_id + ' .sp-col-title-sortable').resizable({
             handles: 'e',
             minWidth: self.resize.min_width,
             resize: function(e, ui) {
                 var width = ui.element.width(),
                     col_num = ui.element.attr('col_num'),
-                    row_width = $('.sp-grid-row').width(),
-                    current_width = $('.sp-grid-cell[col_num=' + col_num + ']').width();
+                    row_width = $(grid_id + ' .sp-grid-row').width(),
+                    current_width = $(grid_id + ' .sp-grid-cell[col_num=' + col_num + ']').width();
                 
                 $(grid_id + ' .sp-grid-cell[col_num=' + col_num + ']').width(width);
                 $(grid_id + ' .sp-grid-row').width(row_width + (width - current_width));
