@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from sapns.lib.sapns.mongo import Mongo
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass
+from tg import config
 import datetime as dt
 import logging
 import re
@@ -135,7 +136,9 @@ def create_view(view):
     mdb = Mongo().db
 
     query = get_query(view)
-    dbs.execute('CREATE VIEW %s AS %s' % (view['name'], query))
+    
+    view_name = '%s%s' % (config.get('views_prefix', '_view_'), view['name'])
+    dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
     dbs.flush()
     
     # create "class"
