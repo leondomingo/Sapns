@@ -3,7 +3,7 @@
 from bson.objectid import ObjectId
 from sapns.lib.sapns.mongo import Mongo
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission
 from tg import config
 import datetime as dt
 import logging
@@ -153,6 +153,16 @@ def create_view(view):
     cls_c.view_id = str(view_id)
     
     dbs.add(cls_c)
+    dbs.flush()
+    
+    # create "list" permission
+    list_p = SapnsPermission()
+    list_p.permission_name = u'%s#list' % cls_c.name
+    list_p.display_name = u'List'
+    list_p.class_id = cls_c.class_id
+    list_p.type = SapnsPermission.TYPE_LIST
+    list_p.requires_id = False
+    dbs.add(list_p)
     dbs.flush()
     
     return view_id
