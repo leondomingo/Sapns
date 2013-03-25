@@ -10,11 +10,12 @@ from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import get_template, pagination
-from sapns.lib.sapns.views import get_query, COLLECTION_CHAR
+from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission,\
+    SapnsRepo
 from sqlalchemy.sql.expression import and_
-from tg import expose, redirect, url, predicates as p_, config
+from tg import expose, redirect, url, predicates as p_, config, response
 import copy
 import datetime as dt
 import hashlib
@@ -23,6 +24,7 @@ import random
 import re
 import simplejson as sj
 import transaction
+import os.path
 
 __all__ = ['ViewsController']
 
@@ -656,6 +658,80 @@ class ViewsController(BaseController):
         except EViews, e:
             logger.error(e)
             return dict(status=False, msg=str(e))
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+        
+    @expose('sapns/views/export_view/export_view.html')
+    def export(self, **kw):
+        id_class = get_paramw(kw, 'id_class', int)
+        cls = dbs.query(SapnsClass).get(id_class)
+        
+        return dict(cls=dict(id=id_class,
+                             title=cls.title,
+                             name=cls.name,
+                             ))
+        
+    @expose()
+    def export_(self, **kw):
+        
+        _logger = logging.getLogger('ViewsController.export_')
+        
+        class_id = get_paramw(kw, 'class_id', int)
+        cls = dbs.query(SapnsClass).get(class_id)
+        
+        response.content_type = 'text/plain'
+        try:
+            if not cls.view_id:
+                raise Exception(_(u'This class does not have a view').encode('utf-8'))
+            
+            file_name = re.sub(r'[^a-zA-Z0-9]', '_', cls.name) 
+            response.headers['Content-Disposition'] = 'attachment;filename=%s.view.json' % file_name
+            
+            mdb = Mongo().db
+            view = mdb.user_views.find_one(dict(_id=ObjectId(cls.view_id)))
+            
+            del view['_id']
+            del view['creation_date']
+            view['col_widths'] = {}
+            
+            view['name'] = cls.name
+            view['title'] = cls.title
+            
+            return sj.dumps(view)
+        
+        except Exception, e:
+            _logger.error(e)
+            response.headers['Content-Disposition'] = 'attachment;filename=error'
+            return ''
+        
+    @expose('sapns/views/import_view/import_view.html')
+    def import_view(self, _class_id=None, **kw):
+        return {}
+        
+    @expose('json')
+    def import_view_(self, **kw):
+        logger = logging.getLogger('ViewsController.import_view')
+        try:
+            view_file = get_paramw(kw, 'view_file', str)
+            repo = dbs.query(SapnsRepo).get(1)
+            
+            file_path = os.path.join(repo.abs_path(), view_file)
+            if not os.path.exists(file_path):
+                raise Exception(_(u'File view does not exists anymore').encode('utf-8'))
+            
+            # read view file
+            with open(file_path, 'rb') as f:
+                view = sj.load(f)
+                
+            # remove view file
+            if os.path.exists(file_path):
+                os.remove(file_path)
+                
+            create_view(view)
+                
+            return dict(status=True)
         
         except Exception, e:
             logger.error(e)

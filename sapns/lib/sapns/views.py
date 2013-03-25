@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
-from sapns.model import DBSession as dbs
-from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
-import re
-from sapns.model.sapnsmodel import SapnsAttribute
+from sapns.lib.sapns.mongo import Mongo
+from sapns.model import DBSession as dbs
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass
+import datetime as dt
 import logging
+import re
 
 COLLECTION_CHAR = 'c'
 
@@ -17,8 +18,11 @@ def get_query(view_id):
     
     if isinstance(view_id, (str, unicode,)):
         view_id = ObjectId(view_id)
-    
-    view = mdb.user_views.find_one(dict(_id=view_id))
+        
+        view = mdb.user_views.find_one(dict(_id=view_id))
+        
+    elif isinstance(view_id, dict):
+        view = view_id
     
     def _get_parent(alias):
         
@@ -125,3 +129,27 @@ def get_query(view_id):
         
     #_logger.info(query)
     return query
+
+def create_view(view):
+    
+    mdb = Mongo().db
+
+    query = get_query(view)
+    dbs.execute('CREATE VIEW %s AS %s' % (view['name'], query))
+    dbs.flush()
+    
+    # create "class"
+    cls_c = SapnsClass()
+    cls_c.title = view['title']
+    cls_c.name = view['name']
+    cls_c.parent_class_id = SapnsClass.by_name(view['base_class']).class_id
+    
+    view['create_date'] = dt.datetime.now()
+    view_id = mdb.user_views.insert(view)
+    
+    cls_c.view_id = str(view_id)
+    
+    dbs.add(cls_c)
+    dbs.flush()
+    
+    return view_id

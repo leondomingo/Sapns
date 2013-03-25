@@ -1,0 +1,20 @@
+<style>
+#sp-export-view-question { font:18px arial; height:25px }
+#sp-export-view-name { font:16px arial }
+#sp-export-view-name span { font-size:13px; font-style:italic }
+</style>
+
+<div id="sp-export-view-question">{{_('Do you want to copy this view?')}}</div>
+<div id="sp-export-view-name">{{cls.title}} <span>{{cls.name}}</span></div>
+
+<script>
+function export_view(callback, callback_error) {
+    var form_ = '<form action="{{tg.url("/dashboard/views/export_/")}}">' +
+        '<input type="hidden" name="class_id" value="{{cls.id}}">' +  
+        '</form>';
+        
+    $(form_).appendTo('body').submit().remove();
+    
+    setTimeout(callback, 500);
+}
+</script>

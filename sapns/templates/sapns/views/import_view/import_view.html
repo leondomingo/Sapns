@@ -1,0 +1,45 @@
+<style>
+#sp-import-view .sp-filename div { width:350px }
+</style>
+
+<div class="sp-field-row">
+    <div class="sp-field">
+        <div class="label">{{_('View file')}}</div>
+        <div id="sp-import-view"></div>
+    </div>
+</div>
+
+<script>
+{% include 'sapns/components/sapns.uploader.min.js' %}
+function import_view(callback, callback_error) {
+    
+    var view_file = $('#sp-import-view').sapnsUploader('getFilename');
+    if (!view_file) {
+        alert("{{_('A file must be specified')}}");
+        callback_error();
+        return;
+    }
+    
+    $.ajax({
+        url: "{{tg.url('/dashboard/views/import_view_/')}}",
+        data: { view_file: view_file },
+        success: function(res) {
+            if (res.status) {
+                callback();
+            }
+            else {
+                alert('Error!');
+                callback_error();
+            }
+        },
+        error: function() {
+            alert('Error!');
+            callback_error();
+        }
+    });
+}
+
+$(function() {
+    $('#sp-import-view').sapnsUploader({ repo: 1, removeOnDelete: true });
+});
+</script>
