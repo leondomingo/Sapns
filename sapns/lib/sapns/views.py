@@ -131,17 +131,48 @@ def get_query(view_id):
     #_logger.info(query)
     return query
 
+def drop_view(self, view_name):
+    logger = logging.getLogger('sapns.lib.sapns.views.drop_view')
+    
+    def _exists_view(name):
+        e = dbs.execute("SELECT count(*) FROM pg_views WHERE viewname = '%s' " % name).fetchone()
+        return e[0] == 1
+    
+    try:
+        # drop "old" view
+        if _exists_view(view_name):
+            logger.info(u'Dropping view [%s]' % view_name)
+            dbs.execute('DROP VIEW %s' % view_name)
+            dbs.flush()
+            
+            c = SapnsClass.by_name('sp_classes')
+            c.class_id = c.class_id
+            dbs.add(c)
+            dbs.flush()
+        
+    except Exception, e:
+        logger.error(e)
+
 def create_view(view):
+    
+    _logger = logging.getLogger('sapns.lib.sapns.views.create_view')
     
     mdb = Mongo().db
 
     query = get_query(view)
     
     view_name = '%s%s' % (config.get('views_prefix', '_view_'), view['name'])
+
+    # drop view before is created    
+    drop_view(view_name)
+    
+    # create view
+    _logger.info(u'Creating view "%s"' % view_name)
     dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
     dbs.flush()
     
     # create "class"
+    _logger.info(u'Creating class "%s" (%s)' % (view['title'], view['name']))
     cls_c = SapnsClass()
     cls_c.title = view['title']
     cls_c.name = view['name']
@@ -156,6 +187,7 @@ def create_view(view):
     dbs.flush()
     
     # create "list" permission
+    _logger.info(u'Creating "list" permission')
     list_p = SapnsPermission()
     list_p.permission_name = u'%s#list' % cls_c.name
     list_p.display_name = u'List'

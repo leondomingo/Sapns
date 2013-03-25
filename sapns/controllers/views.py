@@ -10,9 +10,10 @@ from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import get_template, pagination
-from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view
+from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view, \
+    drop_view
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission,\
+from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission, \
     SapnsRepo
 from sqlalchemy.sql.expression import and_
 from tg import expose, redirect, url, predicates as p_, config, response
@@ -20,11 +21,11 @@ import copy
 import datetime as dt
 import hashlib
 import logging
+import os.path
 import random
 import re
 import simplejson as sj
 import transaction
-import os.path
 
 __all__ = ['ViewsController']
 
@@ -102,7 +103,7 @@ class ViewsController(BaseController):
             view_name = get_paramw(kw, 'view_name', str, opcional=True)
             
             if view_name:
-                self.drop_view(view_name)
+                drop_view(view_name)
             
             mdb = Mongo().db
             mdb.user_views.remove(dict(_id=ObjectId(view_id)))
@@ -209,37 +210,15 @@ class ViewsController(BaseController):
             logger.error(e)
             return dict(status=False)
         
-    def drop_view(self, view_name):
-        logger = logging.getLogger('ViewsController.drop_view')
-        
-        def _exists_view(name):
-            e = dbs.execute("SELECT count(*) FROM pg_views WHERE viewname = '%s' " % name).fetchone()
-            return e[0] == 1
-        
-        try:
-            # drop "old" view
-            if _exists_view(view_name):
-                logger.info(u'Dropping "old" view [%s]' % view_name)
-                dbs.execute('DROP VIEW %s' % view_name)
-                dbs.flush()
-                
-                c = SapnsClass.by_name('sp_classes')
-                c.class_id = c.class_id
-                dbs.add(c)
-                dbs.flush()
-            
-        except Exception, e:
-            logger.error(e)
-
     def create_view(self, view_id, view_name, new_name=None, old_name=None):
         
         _logger = logging.getLogger('ViewsController.create_view')
         
         if view_name:
-            self.drop_view(view_name)
+            drop_view(view_name)
                 
         if old_name:
-            self.drop_view(old_name)
+            drop_view(old_name)
                         
         # create a new view
         if not new_name:
@@ -253,7 +232,7 @@ class ViewsController(BaseController):
             view_name = '%s%s' % (config.get('views_prefix', '_view_'), new_name)
             
             # TODO: drop view with "new_name"
-            self.drop_view(new_name)
+            drop_view(new_name)
             
         query = get_query(view_id)
         dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
