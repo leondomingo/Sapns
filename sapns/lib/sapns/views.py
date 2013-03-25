@@ -131,7 +131,7 @@ def get_query(view_id):
     #_logger.info(query)
     return query
 
-def drop_view(self, view_name):
+def drop_view(view_name):
     logger = logging.getLogger('sapns.lib.sapns.views.drop_view')
     
     def _exists_view(name):
