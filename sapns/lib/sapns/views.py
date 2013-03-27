@@ -166,6 +166,11 @@ def create_view(view):
     # drop view before is created    
     drop_view(view_name)
     
+    # drop "class"
+    if SapnsClass.by_name(view['name']):
+        dbs.query(SapnsClass).filter(SapnsClass.name == view['name']).delete()
+        dbs.flush()
+    
     # create view
     _logger.info(u'Creating view "%s"' % view_name)
     dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
@@ -178,7 +183,7 @@ def create_view(view):
     cls_c.name = view['name']
     cls_c.parent_class_id = SapnsClass.by_name(view['base_class']).class_id
     
-    view['create_date'] = dt.datetime.now()
+    view['creation_date'] = dt.datetime.now()
     view_id = mdb.user_views.insert(view)
     
     cls_c.view_id = str(view_id)

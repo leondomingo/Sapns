@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-03-26 18:52+0100\n"
+"POT-Creation-Date: 2013-03-27 12:39+0100\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -149,7 +149,7 @@ msgstr "Ya existe una clase con el mismo nombre"
 msgid "This class does not have a view"
 msgstr "Esta clase no tiene una vista"
 
-#: sapns/controllers/views.py:701
+#: sapns/controllers/views.py:705
 msgid "File view does not exists anymore"
 msgstr "El fichero de la vista ya no existe"
 
@@ -1252,7 +1252,6 @@ msgid "Primary key/References"
 msgstr "Clave primaria/Referencias"
 
 #: sapns/templates/sapns/views/copy_view/copy_view.html:6
-#: sapns/templates/sapns/views/export_view/export_view.html:7
 msgid "Do you want to copy this view?"
 msgstr "¿Quieres copiar esta vista?"
 
@@ -1275,6 +1274,10 @@ msgstr "Tienes que indicar una tabla base"
 #: sapns/templates/sapns/views/edit/edit.js:26
 msgid "You have to add some columns to the view"
 msgstr "Tienes que añadir algunas columnas a la vista"
+
+#: sapns/templates/sapns/views/export_view/export_view.html:7
+msgid "Do you want to export this view?"
+msgstr "¿Quieres exportar esta vista?"
 
 #: sapns/templates/sapns/views/import_view/import_view.html:7
 msgid "View file"

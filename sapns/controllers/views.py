@@ -672,7 +672,11 @@ class ViewsController(BaseController):
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls.view_id)))
             
             del view['_id']
-            del view['creation_date']
+            if view.get('creation_date'):
+                del view['creation_date']
+                
+            _logger.info(view)
+                
             view['col_widths'] = {}
             
             view['name'] = cls.name
@@ -704,11 +708,11 @@ class ViewsController(BaseController):
             with open(file_path, 'rb') as f:
                 view = sj.load(f)
                 
+            create_view(view)
+            
             # remove view file
             if os.path.exists(file_path):
                 os.remove(file_path)
-                
-            create_view(view)
                 
             return dict(status=True)
         
