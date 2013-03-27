@@ -214,7 +214,7 @@ class SapnsUser(User):
         id_parent = int(id_parent)
             
         def __get_shortcuts(id_parent):
-            logger.info('Getting shortcuts of [%d]' % id_parent)
+            logger.debug('Getting shortcuts of [%d]' % id_parent)
             
             shortcuts = []
             for sc, ac, cl in dbs.query(SapnsShortcut, SapnsPermission, SapnsClass).\
@@ -708,15 +708,15 @@ class SapnsClass(DeclarativeBase):
           <SapnsClass>
         """
         
-        _logger = logging.getLogger('SapnsClass.by_name')
-        #logger.info('Looking up a class by name...%s' % class_name)
+        logger = logging.getLogger('SapnsClass.by_name')
+        logger.debug('Looking up a class by name...%s' % class_name)
         
         cls = dbs.query(SapnsClass).\
             filter(SapnsClass.name == class_name).\
             first()
         
         if cls and parent and cls.parent_class_id:
-            #_logger.info('Getting parent class...')
+            logger.debug('Getting parent class...')
             cls = dbs.query(SapnsClass).get(cls.parent_class_id)
             
         return cls
@@ -724,7 +724,7 @@ class SapnsClass(DeclarativeBase):
     @staticmethod
     def class_titles(class_name):
         
-        logger = logging.getLogger(__name__ + '/class_titles')
+        logger = logging.getLogger('SapnsClass.class_titles')
         
         date_fmt = config.get('formats.date', default='%m/%d/%Y')
         

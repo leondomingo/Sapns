@@ -213,7 +213,7 @@ class UsersController(BaseController):
         user_id = int(user_id)
         user = dbs.query(SapnsUser).get(user_id)
         
-        return dict(page=u'dashboard [%s]' % user.display_name,
+        return dict(page=u'[%s]' % user.display_name,
                     came_from=kw.get('came_from'), 
                     this_shortcut={}, user=dict(id=user_id, display_name=user.display_name),
                     _came_from=url(user.entry_point() or '/dashboard/?user_id=%d' % user_id))

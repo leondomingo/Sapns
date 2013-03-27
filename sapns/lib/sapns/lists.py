@@ -111,7 +111,7 @@ class List(object):
                 
             q = query            
         
-        return dict(page=_('list of %s') % ch_cls_.title.lower(), came_from=self.came_from,
+        return dict(page=ch_cls_.title, came_from=self.came_from,
                     grid=dict(cls=ch_cls_.name,
                               caption=caption,
                               q=q,

@@ -31,10 +31,6 @@
     <script>
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(function() {
-        	$('.sp-search-txt').focus();
-        	var title = $(document).attr('title');
-        	$(document).attr('title', sprintf('[%s] %s', "{{grid.caption}}", title));
-        	
         	$('#grid').sapnsGrid({
         	    cls: "{{grid.cls}}",
         	    caption: "{{grid.caption}}",

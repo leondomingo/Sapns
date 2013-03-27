@@ -3,8 +3,9 @@
 <head>
 {% block head %}
 <meta charset="UTF-8">
-<title>{% if page %} {{page}} -{% endif %} {{tg.config.get('app.name', 'Sapns')}} - 
-    {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
+<title>{% if page %} {{page}} -{% endif %}
+    {{tg.config.get('app.name', 'Sapns')}} - {{tg.config.get('app.subtitle', 'Web Information System')}}
+    [{{tg.request.identity['user'].display_name}}]</title>
 {% endblock %}
 <link rel="stylesheet" href="{{tg.url('/css/style.min.css', dict(v=15))}}">
 <!--{% if tg.config.get('app.root_folder') %}-->

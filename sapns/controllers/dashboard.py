@@ -74,7 +74,7 @@ class DashboardController(BaseController):
         
         if this_shortcut:
             ts = dbs.query(SapnsShortcut).get(this_shortcut)
-            this_shortcut = dict(id=ts.shortcut_id, title=l_(ts.title))
+            this_shortcut = dict(id=ts.shortcut_id, title=_(ts.title))
             
         else:
             this_shortcut = dict(id=None, title='')
@@ -90,8 +90,22 @@ class DashboardController(BaseController):
             redirect(url('/dashboard/?user_id=%d' % user_id))
         
         sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
+        
+        fin = False
+        parents = []
+        shortcut_id_ = this_shortcut['id']
+        if shortcut_id_:
+            parents.append(this_shortcut['title'])
+            while not fin:
+                parent = dbs.query(SapnsShortcut).get(shortcut_id_).parent
+                if parent:
+                    parents.insert(0, _(parent.title))
+                    shortcut_id_ = parent.shortcut_id
+                    
+                else:
+                    fin = True
             
-        return dict(page=l_(u'Data exploration'), #came_from=kw.get('came_from'),
+        return dict(page=' / '.join(parents),
                     user=dict(id=user_id, display_name=user.display_name),
                     this_shortcut=this_shortcut, sc_parent=sc_parent)
 
@@ -105,7 +119,7 @@ class DashboardController(BaseController):
         
         user = dbs.query(SapnsUser).get(user_id)
         
-        return dict(page='dashboard', came_from=kw.get('came_from'), 
+        return dict(came_from=kw.get('came_from'), 
                     this_shortcut={}, user=dict(id=user_id, display_name=user.display_name),
                     _came_from=url(user.entry_point() or '/dashboard/'))
       
