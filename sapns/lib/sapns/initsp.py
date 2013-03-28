@@ -236,7 +236,7 @@ class InitSapns(object):
                 log_cols = []
                 first_ref = False
                 for i, col in enumerate(tbl['columns']):
-                    logger.debug('Column: %s' % col['name'])
+                    logger.info('Column: %s' % col['name'])
                     
                     attr = dbs.query(SapnsAttribute).\
                         filter(and_(SapnsAttribute.name == col['name'],
