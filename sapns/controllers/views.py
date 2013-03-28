@@ -709,7 +709,7 @@ class ViewsController(BaseController):
         
     @expose('json')
     def import_view_(self, **kw):
-        logger = logging.getLogger('ViewsController.import_view')
+        logger = logging.getLogger('ViewsController.import_view_')
         try:
             view_file = get_paramw(kw, 'view_file', str)
             repo = dbs.query(SapnsRepo).get(1)

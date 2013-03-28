@@ -156,7 +156,10 @@ def drop_view(view_name):
         
 def translate_view(view_):
     
+    _logger = logging.getLogger('sapns.lib.sapns.views.translate_view')
+    
     view = deepcopy(view_)
+    _logger.debug(view)
     
     attributes = []
     mapped_attributes = {}
@@ -164,6 +167,7 @@ def translate_view(view_):
         mapped_attribute = view['attributes_map'][attribute]
         attributes_ = []
         for class_name, attr_name in re.findall(r'#(\w+)\.(\w+)', mapped_attribute):
+            _logger.debug('%s.%s' % (class_name, attr_name))
             attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
             attributes_.append(str(attr.attribute_id))
     
@@ -180,6 +184,7 @@ def translate_view(view_):
         
         attributes_ = []
         for class_name, attr_name in re.findall(r'(\w+)\.(\w+)', am)[:-1]:
+            _logger.debug('%s.%s' % (class_name, attr_name))
             attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
             attributes_.append(str(attr.attribute_id))
             
@@ -217,22 +222,26 @@ def create_view(view):
     # drop view before is created    
     drop_view(view_name)
     
-    # drop "class"
-    if SapnsClass.by_name(view['name']):
-        dbs.query(SapnsClass).filter(SapnsClass.name == view['name']).delete()
-        dbs.flush()
-    
     # create view
     _logger.info(u'Creating view "%s"' % view_name)
     dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
     dbs.flush()
     
-    # create "class"
-    _logger.info(u'Creating class "%s" (%s)' % (view['title'], view['name']))
-    cls_c = SapnsClass()
-    cls_c.title = view['title']
-    cls_c.name = view['name']
-    cls_c.parent_class_id = SapnsClass.by_name(view['base_class']).class_id
+    # create "class" (if it don't exist already)
+    creation = False
+    cls_c = SapnsClass.by_name(view['name'])
+    if not cls_c:
+        _logger.info(u'Creating class "%s" (%s)' % (view['title'], view['name']))
+        cls_c = SapnsClass()
+        cls_c.name = view['name']
+        cls_c.title = view['title']
+        cls_c.parent_class_id = SapnsClass.by_name(view['base_class']).class_id
+        
+        creation = True
+        
+    else:
+        # drop old "user view"
+        mdb.user_views.remove(dict(_id=ObjectId(cls_c.view_id)))
     
     view['creation_date'] = dt.datetime.now()
     view_id = mdb.user_views.insert(view)
@@ -243,14 +252,15 @@ def create_view(view):
     dbs.flush()
     
     # create "list" permission
-    _logger.info(u'Creating "list" permission')
-    list_p = SapnsPermission()
-    list_p.permission_name = u'%s#list' % cls_c.name
-    list_p.display_name = u'List'
-    list_p.class_id = cls_c.class_id
-    list_p.type = SapnsPermission.TYPE_LIST
-    list_p.requires_id = False
-    dbs.add(list_p)
-    dbs.flush()
+    if creation:
+        _logger.info(u'Creating "list" permission')
+        list_p = SapnsPermission()
+        list_p.permission_name = u'%s#list' % cls_c.name
+        list_p.display_name = u'List'
+        list_p.class_id = cls_c.class_id
+        list_p.type = SapnsPermission.TYPE_LIST
+        list_p.requires_id = False
+        dbs.add(list_p)
+        dbs.flush()
     
     return view_id
