@@ -155,22 +155,16 @@ class InitSapns(object):
         
         env = Environment(loader=FileSystemLoader(current_path))
         
-        managers = dbs.query(SapnsRole).\
-            filter(SapnsRole.group_name == u'managers').\
-            first()
+        managers = SapnsRole.by_name(u'managers')
                 
         tables = self.extract_model(all_=True)
         tables_id = {}
         for tbl in tables:
-            
             logger.info('Table: %s' % tbl['name'])
-            
-            klass = dbs.query(SapnsClass).\
-                filter(SapnsClass.name == tbl['name']).\
-                first()
+            klass = SapnsClass.by_name(tbl['name'])
             
             if not klass:
-                logger.warning('.....creating')
+                logger.debug('.....creating')
                 
                 klass = SapnsClass()
                 klass.name = tbl['name']
@@ -190,231 +184,237 @@ class InitSapns(object):
                 dbs.flush()
                 
             else:
-                logger.warning('.....already exists')
+                logger.debug('.....already exists')
                 
-            tables_id[tbl['name']] = klass #.class_id
+            tables_id[tbl['name']] = klass
             
         tmpl = env.get_template('trigger_function_log.txt')
         
         pending_attr = {}
         for tbl in tables:
             
-            #tables_id[tbl['name']] = klass.class_id
-            klass = tables_id[tbl['name']]
-                
-            # create an action
-            def create_action(name, type_):
-                action = dbs.query(SapnsPermission).\
-                    filter(and_(SapnsPermission.class_id == klass.class_id,
-                                SapnsPermission.type == type_)).\
-                    first()
+            transaction.begin()
+            try:
+                #tables_id[tbl['name']] = klass.class_id
+                klass = tables_id[tbl['name']]
+                    
+                # create an action
+                def create_action(name, type_):
+                    action = dbs.query(SapnsPermission).\
+                        filter(and_(SapnsPermission.class_id == klass.class_id,
+                                    SapnsPermission.type == type_)).\
+                        first()
+                                    
+                    if not action:
+                        action = SapnsPermission()
+                        action.permission_name = u'%s#%s' % (klass.name, name.lower())
+                        action.display_name = name
+                        action.type = type_
+                        action.class_id = klass.class_id
+                        
+                        dbs.add(action)
+                        dbs.flush()
+                        
+                        # add this action to "managers" role
+                        managers.permissions_.append(action)
+                        dbs.flush()
+                        
+                    elif action.type == SapnsPermission.TYPE_LIST:
+                        for s in action.shortcuts:
+                            s.title = action.class_.title
+                            dbs.add(s)
+                            dbs.flush()
+                        
+                # create standard actions
+                create_action(u'New', SapnsPermission.TYPE_NEW)
+                create_action(u'Edit', SapnsPermission.TYPE_EDIT)
+                create_action(u'Delete', SapnsPermission.TYPE_DELETE)
+                create_action(u'List', SapnsPermission.TYPE_LIST)
+                create_action(u'Docs', SapnsPermission.TYPE_DOCS)
+                    
+                log_attributes = Dict(created=False, updated=False)
+                log_cols = []
+                first_ref = False
+                for i, col in enumerate(tbl['columns']):
+                    logger.debug('Column: %s' % col['name'])
+                    
+                    attr = dbs.query(SapnsAttribute).\
+                        filter(and_(SapnsAttribute.name == col['name'],
+                                    SapnsAttribute.class_id == klass.class_id, 
+                                    )).\
+                        first()
+                        
+                    # log attributes
+                    if col['name'] in ['_created', '_updated']:
+                        
+                        if col['name'] == '_created':
+                            log_attributes.created = True
+                            
+                        if col['name'] == '_updated':
+                            log_attributes.updated = True
+                        
+                        continue
+                    
+                    elif col['name'] != 'id':
+                        log_cols.append(col['name'])
+                            
+                    if col['name'] not in ['id', '_created', '_updated']:
+                        if not attr: 
+                            logger.debug('.....creating')
+                            
+                            attr = SapnsAttribute()
+                            attr.name = col['name']
+                            col_name = re.sub(r'^id_', '', col['name'])
+                            attr.title = col_name.replace('_', ' ').title()
+                            attr.class_id = klass.class_id
+                            attr.type = col['type_name']
+                            if attr.type == SapnsAttribute.TYPE_STRING and not first_ref:
+                                attr.reference_order = 0
+                                first_ref = True
                                 
-                if not action:
-                    action = SapnsPermission()
-                    action.permission_name = u'%s#%s' % (klass.name, name.lower())
-                    action.display_name = name
-                    action.type = type_
-                    action.class_id = klass.class_id
-                    
-                    dbs.add(action)
-                    dbs.flush()
-                    
-                    # add this action to "managers" role
-                    managers.permissions_.append(action)
-                    dbs.flush()
-                    
-                elif action.type == SapnsPermission.TYPE_LIST:
-                    for s in action.shortcuts:
-                        s.title = action.class_.title
-                        dbs.add(s)
-                        dbs.flush()
-                    
-            # create standard actions
-            create_action(u'New', SapnsPermission.TYPE_NEW)
-            create_action(u'Edit', SapnsPermission.TYPE_EDIT)
-            create_action(u'Delete', SapnsPermission.TYPE_DELETE)
-            create_action(u'List', SapnsPermission.TYPE_LIST)
-            create_action(u'Docs', SapnsPermission.TYPE_DOCS)
-                
-            log_attributes = Dict(created=False, updated=False)
-            log_cols = []
-            first_ref = False
-            for i, col in enumerate(tbl['columns']):
-                
-                logger.info('Column: %s' % col['name'])
-                
-                attr = dbs.query(SapnsAttribute).\
-                    filter(and_(SapnsAttribute.name == col['name'],
-                                SapnsAttribute.class_id == klass.class_id, 
-                                )).\
-                    first()
-                    
-                # log attributes
-                if col['name'] in ['_created', '_updated']:
-                    
-                    if col['name'] == '_created':
-                        log_attributes.created = True
-                        
-                    if col['name'] == '_updated':
-                        log_attributes.updated = True
-                    
-                    continue
-                
-                elif col['name'] != 'id':
-                    log_cols.append(col['name'])
-                        
-                if col['name'] not in ['id', '_created', '_updated']:
-                    if not attr: 
-                        logger.warning('.....creating')
-                        
-                        attr = SapnsAttribute()
-                        attr.name = col['name']
-                        col_name = re.sub(r'^id_', '', col['name'])
-                        attr.title = col_name.replace('_', ' ').title()
-                        attr.class_id = klass.class_id
-                        attr.type = col['type_name']
-                        if attr.type == SapnsAttribute.TYPE_STRING and not first_ref:
-                            attr.reference_order = 0
-                            first_ref = True
+                            attr.visible = True
+                            attr.insertion_order = i
                             
-                        attr.visible = True
-                        attr.insertion_order = i
-                        
-                        if attr.type == SapnsAttribute.TYPE_INTEGER and not attr.name.startswith('id_'):
-                            # signed
-                            attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
-                            
-                        elif attr.type == SapnsAttribute.TYPE_FLOAT:
-                            # signed
-                            # col['prec']
-                            # col['scale']
-                            attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
-                                (col['prec']-col['scale'],
-                                 col['scale'])
-                                
-                        elif attr.type == SapnsAttribute.TYPE_TIME:
-                            attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
-                            
-                                            
-                        elif attr.type == SapnsAttribute.TYPE_INTEGER and attr.name.startswith('id_'):
-                            # related field
-                            idx_name = '%s__%s' % (tbl['name'], attr.name[3:])
-                            idx_exists = dbs.execute("select search_index('%s', '%s')" % (tbl['name'], idx_name)).fetchone()[0]
-                            if not idx_exists:
-                                logger.info('Creating index: %s' % idx_name)
-                                args = (idx_name, tbl['name'], attr.name, attr.name)
-                                dbs.execute('CREATE INDEX %s ON %s USING BTREE(%s) WHERE %s IS NOT NULL' % args)
-                                dbs.flush()
-                        
-                        dbs.add(attr)
-                        dbs.flush()
-                        
-                        # grant access (r/w) to managers
-                        priv = SapnsAttrPrivilege()
-                        priv.role_id = managers.group_id
-                        priv.attribute_id = attr.attribute_id
-                        priv.access = SapnsAttrPrivilege.ACCESS_READWRITE
-                        
-                        dbs.add(priv)
-                        dbs.flush()
-                        
-                    else:
-                        logger.warning('.....already exists')
-                        
-                        # fill the "field_regex"
-                        if attr and not attr.field_regex:
-                            if attr.type == SapnsAttribute.TYPE_INTEGER and \
-                            not attr.name.startswith('id_'):
+                            if attr.type == SapnsAttribute.TYPE_INTEGER and not attr.name.startswith('id_'):
                                 # signed
                                 attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
                                 
                             elif attr.type == SapnsAttribute.TYPE_FLOAT:
                                 # signed
+                                # col['prec']
+                                # col['scale']
                                 attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
-                                    (col['prec'] - col['scale'], col['scale'])
+                                    (col['prec']-col['scale'],
+                                     col['scale'])
                                     
                             elif attr.type == SapnsAttribute.TYPE_TIME:
                                 attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
-
-                        if attr.type == SapnsAttribute.TYPE_INTEGER and attr.name.startswith('id_'):
-                            # related field
-                            idx_name = '%s__%s' % (tbl['name'], attr.name[3:])
-                            idx_exists = dbs.execute("select search_index('%s', '%s')" % (tbl['name'], idx_name)).fetchone()[0]
-                            if not idx_exists:
-                                logger.info('Creating index: %s' % idx_name)
-                                args = (idx_name, tbl['name'], attr.name, attr.name)
-                                dbs.execute('CREATE INDEX %s ON %s USING BTREE(%s) WHERE %s IS NOT NULL' % args)
-                                dbs.flush()
-
-                # foreign key
-                if col['fk_table'] != None:
-                    pending_attr[attr.attribute_id] = col['fk_table'].name
+                                
+                                                
+                            elif attr.type == SapnsAttribute.TYPE_INTEGER and attr.name.startswith('id_'):
+                                # related field
+                                idx_name = '%s__%s' % (tbl['name'], attr.name[3:])
+                                idx_exists = dbs.execute("select search_index('%s', '%s')" % (tbl['name'], idx_name)).fetchone()[0]
+                                if not idx_exists:
+                                    logger.info('Creating index: %s' % idx_name)
+                                    args = (idx_name, tbl['name'], attr.name, attr.name)
+                                    dbs.execute('CREATE INDEX %s ON %s USING BTREE(%s) WHERE %s IS NOT NULL' % args)
+                                    dbs.flush()
+                            
+                            dbs.add(attr)
+                            dbs.flush()
+                            
+                            # grant access (r/w) to managers
+                            priv = SapnsAttrPrivilege()
+                            priv.role_id = managers.group_id
+                            priv.attribute_id = attr.attribute_id
+                            priv.access = SapnsAttrPrivilege.ACCESS_READWRITE
+                            
+                            dbs.add(priv)
+                            dbs.flush()
+                            
+                        else:
+                            logger.debug('.....already exists')
+                            
+                            # fill the "field_regex"
+                            if attr and not attr.field_regex:
+                                if attr.type == SapnsAttribute.TYPE_INTEGER and \
+                                not attr.name.startswith('id_'):
+                                    # signed
+                                    attr.field_regex = r'^\s*(\+|\-)?\d+\s*$'
+                                    
+                                elif attr.type == SapnsAttribute.TYPE_FLOAT:
+                                    # signed
+                                    attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
+                                        (col['prec'] - col['scale'], col['scale'])
+                                        
+                                elif attr.type == SapnsAttribute.TYPE_TIME:
+                                    attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
+    
+                            if attr.type == SapnsAttribute.TYPE_INTEGER and attr.name.startswith('id_'):
+                                # related field
+                                idx_name = '%s__%s' % (tbl['name'], attr.name[3:])
+                                idx_exists = dbs.execute("select search_index('%s', '%s')" % (tbl['name'], idx_name)).fetchone()[0]
+                                if not idx_exists:
+                                    logger.info('Creating index: %s' % idx_name)
+                                    args = (idx_name, tbl['name'], attr.name, attr.name)
+                                    dbs.execute('CREATE INDEX %s ON %s USING BTREE(%s) WHERE %s IS NOT NULL' % args)
+                                    dbs.flush()
+    
+                    # foreign key
+                    if col['fk_table'] != None:
+                        pending_attr[attr.attribute_id] = col['fk_table'].name
+                        
+                if tbl['name'] not in [u'sp_logs', 
+                                       u'sp_role_permission', 
+                                       u'sp_user_role']:
                     
-            if tbl['name'] not in [u'sp_logs', 
-                                   u'sp_role_permission', 
-                                   u'sp_user_role']:
-                
-                _log_attributes = []
-                
-                # _created
-                if not log_attributes.created:
-                    _log_attributes.append('ADD _created TIMESTAMP')
-                
-                # _updated
-                if not log_attributes.updated:
-                    _log_attributes.append('ADD _updated TIMESTAMP')
+                    _log_attributes = []
                     
-                if _log_attributes:
-                    _alter = 'ALTER TABLE %s %s;' % (tbl['name'], ', '.join(_log_attributes))
-                    logger.info(_alter)
+                    # _created
+                    if not log_attributes.created:
+                        _log_attributes.append('ADD _created TIMESTAMP')
                     
+                    # _updated
+                    if not log_attributes.updated:
+                        _log_attributes.append('ADD _updated TIMESTAMP')
+                        
+                    if _log_attributes:
+                        _alter = 'ALTER TABLE %s %s;' % (tbl['name'], ', '.join(_log_attributes))
+                        logger.info(_alter)
+                        
+                        try:
+                            dbs.execute(_alter)
+                            dbs.flush()
+                            
+                        except Exception, e:
+                            #dbs.rollback()
+                            logger.error(e)
+                            
+                    # log trigger function
                     try:
-                        dbs.execute(_alter)
+                        logf = tmpl.render(tbl_name=tbl['name'], cols=log_cols,
+                                           class_id=klass.class_id,
+                                           )
+                        #logger.info(logf)
+                        dbs.execute(logf)
                         dbs.flush()
                         
                     except Exception, e:
                         #dbs.rollback()
                         logger.error(e)
+                                
+                    # log triggers
+                    log_trigger = 'SELECT COUNT(*) FROM pg_trigger WHERE tgname = \'zzzflog_%s\'' % tbl['name']
+                    lt = dbs.execute(log_trigger).fetchone()
+                    if lt[0] == 0:
+                        _trigger = '''create trigger zzzflog_%s
+                                      after insert or update or delete
+                                      on %s
+                                      for each row
+                                      execute procedure flog_%s();''' % ((tbl['name'],)*3)
+                                      
+                        #logger.info(_trigger)
+                        try:
+                            dbs.execute(_trigger)
+                            dbs.flush()
+                            
+                        except Exception, e:
+                            #dbs.rollback()
+                            logger.error(e)
                         
-                # log trigger function
-                try:
-                    logf = tmpl.render(tbl_name=tbl['name'], cols=log_cols,
-                                       class_id=klass.class_id,
-                                       )
-                    #logger.info(logf)
-                    dbs.execute(logf)
+                # update related classes
+                for attr_id, fk_table in pending_attr.iteritems():
+                    attr = dbs.query(SapnsAttribute).get(attr_id)
+                    attr.related_class_id = tables_id[fk_table].class_id
+                
+                    dbs.add(attr)
                     dbs.flush()
                     
-                except Exception, e:
-                    #dbs.rollback()
-                    logger.error(e)
-                            
-                # log triggers
-                log_trigger = 'SELECT COUNT(*) FROM pg_trigger WHERE tgname = \'zzzflog_%s\'' % tbl['name']
-                lt = dbs.execute(log_trigger).fetchone()
-                if lt[0] == 0:
-                    _trigger = '''create trigger zzzflog_%s
-                                  after insert or update or delete
-                                  on %s
-                                  for each row
-                                  execute procedure flog_%s();''' % ((tbl['name'],)*3)
-                                  
-                    #logger.info(_trigger)
-                    try:
-                        dbs.execute(_trigger)
-                        dbs.flush()
-                        
-                    except Exception, e:
-                        #dbs.rollback()
-                        logger.error(e)
+                transaction.commit()
                     
-            # update related classes
-            for attr_id, fk_table in pending_attr.iteritems():
-                attr = dbs.query(SapnsAttribute).get(attr_id)
-                attr.related_class_id = tables_id[fk_table].class_id
-            
-                dbs.add(attr)
-                dbs.flush()
+            except:
+                transaction.abort()
         
     def create_dashboards(self, us):
         
@@ -546,7 +546,7 @@ class InitSapns(object):
                         dbs.flush()
                     
                     else:
-                        logger.info(u'Shortcut for "%s" already exists' % cls.title)
+                        logger.debug(u'Shortcut for "%s" already exists' % cls.title)
                     
             # sort (alphabetically) shortcuts inside "data exploration"
             if sc_project:

@@ -138,7 +138,6 @@ def update_metadata():
     logger = logging.getLogger('lib.sapns.update_metadata')
     
     managers = SapnsRole.by_name(ROLE_MANAGERS)
-    #managers = SapnsRole()
     
     tables = extract_model(all_=True)
     tables_id = {}
@@ -283,7 +282,6 @@ def update_metadata():
         
         dbs.add(attr)
         dbs.flush()
-    
     
 def create_dashboards(us):
     
