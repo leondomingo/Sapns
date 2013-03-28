@@ -682,7 +682,7 @@ class ViewsController(BaseController):
             view['name'] = cls.name
             view['title'] = cls.title
             
-            return sj.dumps(view)
+            return sj.dumps(view, indent=' '*2)
         
         except Exception, e:
             _logger.error(e)
