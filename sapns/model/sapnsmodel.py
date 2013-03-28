@@ -1177,6 +1177,15 @@ class SapnsAttribute(DeclarativeBase):
     
     def __repr__(self):
         return unicode(self).encode('utf-8')
+
+    @staticmethod
+    def by_class_and_name(class_name, name):
+        return dbs.query(SapnsAttribute).\
+            join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
+            filter(and_(SapnsClass.name == class_name,
+                        SapnsAttribute.name == name
+                        )).\
+            first()
     
 SapnsClass.attributes = \
     relation(SapnsAttribute, backref='class_',

@@ -8,6 +8,7 @@ from tg import config
 import datetime as dt
 import logging
 import re
+from copy import deepcopy
 
 COLLECTION_CHAR = 'c'
 
@@ -152,6 +153,56 @@ def drop_view(view_name):
         
     except Exception, e:
         logger.error(e)
+        
+def translate_view(view_):
+    
+    view = deepcopy(view_)
+    
+    attributes = []
+    mapped_attributes = {}
+    for attribute in view['attributes']:
+        mapped_attribute = view['attributes_map'][attribute]
+        attributes_ = []
+        for class_name, attr_name in re.findall(r'#(\w+)\.(\w+)', mapped_attribute):
+            attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
+            attributes_.append(str(attr.attribute_id))
+    
+        a = '#' + '#'.join(attributes_)
+        
+        mapped_attributes[attribute] = a                   
+        attributes.append(a)
+        
+    view['attributes'] = attributes
+    
+    aliases = {}
+    for attribute_detail in view['attributes_detail']:
+        am = view['attributes_map'][attribute_detail['path']]
+        
+        attributes_ = []
+        for class_name, attr_name in re.findall(r'(\w+)\.(\w+)', am)[:-1]:
+            attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
+            attributes_.append(str(attr.attribute_id))
+            
+        if len(attributes_) == 0:
+            attributes_ = ['0']
+            
+        old_class_alias = attribute_detail['class_alias']
+        
+        class_alias = '%s_%s' % (attribute_detail['class_name'], '_'.join(attributes_))
+        aliases[old_class_alias] = class_alias
+    
+        attribute_detail['class_alias'] = class_alias
+        
+        attribute_detail['path'] = mapped_attributes[attribute_detail['path']]
+        
+    for attribute_detail in view['attributes_detail']:
+        for old, new in aliases.iteritems():
+            # alumnos -> alumnos.
+            old_ = '%s.' % old
+            new_ = '%s.' % new
+            attribute_detail['expression'] = attribute_detail['expression'].replace(old_, new_)
+            
+    return view    
 
 def create_view(view):
     

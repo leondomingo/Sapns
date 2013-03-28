@@ -11,7 +11,7 @@ from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import get_template, pagination
 from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view, \
-    drop_view
+    drop_view, translate_view
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission, \
     SapnsRepo
@@ -675,12 +675,26 @@ class ViewsController(BaseController):
             if view.get('creation_date'):
                 del view['creation_date']
                 
+            if view.get('create_date'):
+                del view['create_date']
+                
             _logger.info(view)
                 
             view['col_widths'] = {}
             
             view['name'] = cls.name
             view['title'] = cls.title
+            
+            # generate attributes "translation"
+            view['attributes_map'] = {}
+            for attribute in view['attributes']:
+                
+                mapped_attributes = []
+                for attribute_id in re.findall(r'\d+', attribute):
+                    attr = dbs.query(SapnsAttribute).get(int(attribute_id))
+                    mapped_attributes.append('%s.%s' % (attr.class_.name, attr.name))
+                    
+                view['attributes_map'][attribute] = '#' + '#'.join(mapped_attributes)
             
             return sj.dumps(view, indent=' '*2)
         
@@ -708,7 +722,8 @@ class ViewsController(BaseController):
             with open(file_path, 'rb') as f:
                 view = sj.load(f)
                 
-            create_view(view)
+            # translate and create view
+            create_view(translate_view(view))
             
             # remove view file
             if os.path.exists(file_path):
