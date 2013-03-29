@@ -243,7 +243,16 @@ var __DEFAULT_FILTER = 'default';
         }
         
         pager_options.sort(function(x, y) {
-            return x.val - y.val;
+            // 0=all
+            if (x.val === 0) {
+                return 1; 
+            }
+            else if (y.val == 0) {
+                return -1;
+            }
+            else {
+                return x.val - y.val;
+            }
         });
         
         var _settings = $.extend(true, {
@@ -279,7 +288,7 @@ var __DEFAULT_FILTER = 'default';
             rp: 10,
             onLoad: null,
             resize: {
-                min_width: 90,
+                min_width: 60,
                 after: null
             },
             default_: {
@@ -652,7 +661,7 @@ var __DEFAULT_FILTER = 'default';
         }
         
         var grid_id = '#'+self.name;
-        $(grid_id + ' .sp-col-title-sortable').resizable({
+        $(grid_id + ' .sp-col-title-sortable, ' + grid_id + ' .sp-grid-cell-tip').resizable({
             handles: 'e',
             minWidth: self.resize.min_width,
             resize: function(e, ui) {
@@ -661,6 +670,7 @@ var __DEFAULT_FILTER = 'default';
                     row_width = $(grid_id + ' .sp-grid-row').width(),
                     current_width = $(grid_id + ' .sp-grid-cell[col_num=' + col_num + ']').width();
                 
+                $(grid_id + ' .sp-col-title-sortable[col_num=' + col_num + ']').width(width);
                 $(grid_id + ' .sp-grid-cell[col_num=' + col_num + ']').width(width);
                 $(grid_id + ' .sp-grid-row').width(row_width + (width - current_width));
             },
@@ -672,7 +682,7 @@ var __DEFAULT_FILTER = 'default';
                     self.resize.after(col_num*1);
                 }
                 else {
-                    // TODO: guardar anchos para el "current_user_filter" del usuario correspondiente
+                    // save column width for the current user
                     var length = self.cols.length;
                     if (self.cols[0].title === 'id') {
                         length -= 1;

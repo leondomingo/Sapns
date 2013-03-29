@@ -4,9 +4,9 @@
     <div id="logs" class="sapns_grid"></div>
 </div>
 
-<script type="text/javascript">
+<script>
     {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
-    $(document).ready(function() {
+    $(function() {
         
         $('#logs').sapnsGrid({
             search_params: {
@@ -24,8 +24,7 @@
             exportable: false,
             height: 420,
             hide_id: true,
+            with_filters: false
         });
-        
-        $('#logs .sp-search-txt').focus();
     });
 </script>
