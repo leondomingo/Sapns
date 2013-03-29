@@ -1,31 +1,32 @@
-#options { position:relative; height:53px; border:1px solid gray; background-color:lightgray }
+#options { position:relative; height:53px; border:1px solid gray; background-color:#D3D3D3 }
 #role_option { position:absolute; top:3px; left:20px; width:450px; height:25px; padding:10px; border:1px solid gray; background-color:white }
 .option_title { float:left; width:90px; font-weight:bold; font-size:15px }
 #user_option { position:absolute; top:3px; left:510px; width:450px; height:25px; padding:10px; border:1px solid gray; background-color:white }
 #main_pane { position:relative; height:570px; padding:10px }
 #classes_sidebar { position:absolute; left:0px; top:0px; height:565px; width:315px; padding:10px; font-size:14px }
-#classes_title { height:30px; padding-left:10px; padding-top:3px; font-size:15px; background-color:lightgray }
+#classes_title { height:30px; padding-left:10px; padding-top:3px; font-size:15px; background-color:#D3D3D3 }
 #classes_list { overflow:auto; height:541px }
 .class_row { height:21px; border:1px solid gray; padding-left:10px; cursor:pointer; background-color:gray; margin-bottom:3px }
 .class_row.view { background-color:#c1c1c1; color:#444 }
 .class_row_selected { background-color:orange }
-.class_name { font:14px arial; width:228px; height:22px; float:left; overflow:hidden }
+.class_name { font:14px arial; width:240px; height:22px; float:left; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;
+padding-right:3px }
 .class_name img { width:20px; height:20px; margin-right:10px }
 .class_name:hover { text-decoration:underline }
 .class_granted, .action_granted { font-size:10px; text-align:center }
 .attr_granted { font-size:10px; width:115px; text-align:center }
 #right_content { position:absolute; top:0px; left:335px; width:640px; height:540px; padding:10px }
 #attr_pane { position:relative; height:331px; background-color:navy; margin-bottom:10px }
-#attr_title { height:30px; padding-left:10px; font-size:15px; background-color:lightgray }
+#attr_title { height:30px; padding-left:10px; font-size:15px; background-color:#D3D3D3 }
 #attr_title_caption, #actions_title_caption { width:500px; float:left }
 #btn_denied, #btn_readonly, #btn_readwrite, #btn_yes, #btn_no { font-size:9px }
-#attr_list { overflow:auto; height:301px; background-color:lightgray; padding-left:10px }
+#attr_list { overflow:auto; height:301px; background-color:#D3D3D3; padding-left:10px }
 .attr_row { heigth:21px; padding-left:10px; margin-bottom:3px; float:left; background-color:gray; border:1px solid gray }
 .attr_name { width:486px; float:left }
 .attr_name span { font-size:10px; font-style:italic; color:white }
 #actions_pane { position:relative; height:236px; overflow:auto; background-color:blue }
-#actions_title { height:30px; padding-left:10px; font-size:15px; background-color:lightgray }
-#actions_list { overflow:auto; height:206px; padding-left:10px; background-color:lightgray }
+#actions_title { height:30px; padding-left:10px; font-size:15px; background-color:#D3D3D3 }
+#actions_list { overflow:auto; height:206px; padding-left:10px; background-color:#D3D3D3 }
 .action_row { heigth:21px; padding-left:10px; margin-bottom:3px; float:left; background-color:gray; border:1px solid gray }
 .action_name { width:553px; float:left }
 .action_name span { font-size:10px; font-style:italic; color:white }
