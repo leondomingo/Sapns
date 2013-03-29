@@ -5,3 +5,5 @@ production.ini
 .settings/
 *.pyc
 data/
+*.sublime-project
+*.sublime-workspace
