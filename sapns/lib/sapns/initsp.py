@@ -160,33 +160,41 @@ class InitSapns(object):
         tables = self.extract_model(all_=True)
         tables_id = {}
         for tbl in tables:
-            logger.info('Table: %s' % tbl['name'])
-            klass = SapnsClass.by_name(tbl['name'])
-            
-            if not klass:
-                logger.debug('.....creating')
+
+            transaction.begin()
+            try:
+                logger.info('Table: %s' % tbl['name'])
+                klass = SapnsClass.by_name(tbl['name'])
                 
-                klass = SapnsClass()
-                klass.name = tbl['name']
-                klass.title = tbl['name'].title()
-                klass.description =  u'Clases: %s' % tbl['name']
-                
-                dbs.add(klass)
-                dbs.flush()
-                
-                # grant access (r/w) to "managers"
-                priv = SapnsPrivilege()
-                priv.role_id = managers.group_id
-                priv.class_id = klass.class_id
-                priv.granted = True
-                
-                dbs.add(priv)
-                dbs.flush()
-                
-            else:
-                logger.debug('.....already exists')
-                
-            tables_id[tbl['name']] = klass
+                if not klass:
+                    logger.debug('.....creating')
+                    
+                    klass = SapnsClass()
+                    klass.name = tbl['name']
+                    klass.title = tbl['name'].title()
+                    klass.description =  u'Clases: %s' % tbl['name']
+                    
+                    dbs.add(klass)
+                    dbs.flush()
+                    
+                    # grant access (r/w) to "managers"
+                    priv = SapnsPrivilege()
+                    priv.role_id = managers.group_id
+                    priv.class_id = klass.class_id
+                    priv.granted = True
+                    
+                    dbs.add(priv)
+                    dbs.flush()
+                    
+                else:
+                    logger.debug('.....already exists')
+                    
+                tables_id[tbl['name']] = klass
+
+                transaction.commit()
+
+            except:
+                transaction.abort()
             
         tmpl = env.get_template('trigger_function_log.txt')
         
