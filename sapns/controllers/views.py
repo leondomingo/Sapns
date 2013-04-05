@@ -17,6 +17,7 @@ from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission, 
     SapnsRepo
 from sqlalchemy.sql.expression import and_
 from tg import expose, redirect, url, predicates as p_, config, response
+import tg
 import copy
 import datetime as dt
 import hashlib
@@ -279,10 +280,9 @@ class ViewsController(BaseController):
                 
                 paths = attribute_path.split('#')[1:]
                 prefix = '_'.join(paths[:-1]) or '0'
-                logger.info(prefix)
+                logger.debug(prefix)
                 for i, attribute_id in enumerate(paths):
                 
-                    #attribute_id = int(attribute_id.replace(COLLECTION_CHAR, ''))
                     if attribute_id.startswith(COLLECTION_CHAR):
                         attr = dbs.query(SapnsAttribute).get(int(attribute_id.replace(COLLECTION_CHAR, '')))
                         
@@ -318,7 +318,7 @@ class ViewsController(BaseController):
                                  width=150,
                                  )
                 
-                logger.info(attribute)
+                logger.debug(attribute)
                 
                 mdb.user_views.update(dict(_id=ObjectId(view_id)),
                                       {'$set': dict(base_class=base_class),
@@ -330,6 +330,84 @@ class ViewsController(BaseController):
                 
             return dict(status=True, attribute=attribute, view_name=view_name)
         
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+
+    @expose('json')
+    def add_filter(self, **kw):
+        logger = logging.getLogger('ViewsController.add_filter')
+        try:
+            attribute_path = get_paramw(kw, 'attribute_path', str)
+
+            paths = attribute_path.split('#')[1:]
+            prefix = '_'.join(paths[:-1]) or '0'
+            title = []
+            for i, attribute_id in enumerate(paths):
+            
+                if attribute_id.startswith(COLLECTION_CHAR):
+                    attr = dbs.query(SapnsAttribute).get(int(attribute_id.replace(COLLECTION_CHAR, '')))
+                    
+                    if attr.class_id and i < len(paths)-1:
+                        title.append(attr.class_.title)
+                        
+                    else:
+                        title.append(attr.title)
+                        
+                    # base class
+                    if i == 0:
+                        base_class = attr.related_class.name
+                
+                else:
+                    attr = dbs.query(SapnsAttribute).get(int(attribute_id))
+                    
+                    if attr.related_class_id and i < len(paths)-1:
+                        title.append(attr.related_class.title)
+                        
+                    else:
+                        title.append(attr.title)
+                    
+                    # base class
+                    if i == 0:
+                        base_class = attr.class_.name
+
+            attribute = dict(title='.'.join(title),
+                             expression='%s_%s.%s' % (attr.class_.name, prefix, attr.name),
+                             path=attribute_path,
+                             class_name=attr.class_.name,
+                             class_alias='%s_%s' % (attr.class_.name, prefix),
+                             )
+
+            logger.debug(attribute)
+
+            tmpl = get_template('sapns/views/edit/add-filter/add-filter.html')
+    
+            content = tmpl.render(tg=tg, _=_, filter=dict(field=attr.title,
+                                                          field_title=attribute['title'])).encode('utf-8')
+    
+            return dict(status=True, content=content)
+    
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+
+    @expose('json')
+    def add_filter_(self, **kw):
+        logger = logging.getLogger('ViewsController.add_filter')
+        try:
+            operator = get_paramw(kw, 'operator', str)
+            value = get_paramw(kw, 'value', unicode)
+
+            # mdb.user_views.update(dict(_id=ObjectId(view_id)),
+            #                       {'$set': dict(base_class=base_class),
+            #                        '$push': dict(attributes_detail=attribute,
+            #                                      attributes=attribute_path)
+            #                        })
+            
+            # view_name = self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True))
+
+            return dict(status=True)
+
         except Exception, e:
             logger.error(e)
             return dict(status=False)

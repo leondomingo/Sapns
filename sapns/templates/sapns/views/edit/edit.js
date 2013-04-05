@@ -193,6 +193,7 @@ $(function() {
     
     $('#sp-edit-view-cols').sortable({
         placeholder: 'placeholder',
+        items: '.column',
         stop: function() {
             var data_ = {};
             $('#sp-edit-view-cols .column').each(function(i) {
@@ -223,9 +224,10 @@ $(function() {
         }
     });
     
-    var s_ = '#sp-edit-view-attr-list .attribute .col-attr.add';
-    $(document).off('click', s_).on('click', s_, function() {
-        var path = $(this).parent().attr('path');
+    // add field
+    var s_add_field = '#sp-edit-view-attr-list .attribute .col-attr.add';
+    $(document).off('click', s_add_field).on('click', s_add_field, function() {
+        var path = $(this).parents('.attribute').attr('path');
         
         $.ajax({
             url: "{{tg.url('/dashboard/views/add_attribute/')}}",
@@ -240,6 +242,69 @@ $(function() {
                             show_grid();
                         }
                     }
+                }
+                else {
+                    alert('Error!');
+                }
+            },
+            error: function() {
+                alert('Error!');
+            }
+        });
+    });
+
+    // add (advanced) filter
+    var s_add_filter = '#sp-edit-view-attr-list .attribute .col-attr.add-filter';
+    $(document).off('click', s_add_filter).on('click', s_add_filter, function() {
+        var path = $(this).parents('.attribute').attr('path'),
+            on_progress = false;
+
+        $.ajax({
+            url: "{{tg.url('/dashboard/views/add_filter/')}}",
+            data: { attribute_path: path },
+            success: function(res) {
+                if (res.status) {
+                    $('#sp-add-filter-dialog').remove();
+                    $('<div id="sp-add-filter-dialog" style="display:none"></div>').appendTo('body');
+                    $('#sp-add-filter-dialog').html(res.content).dialog({
+                        title: "{{_('Advanced filter')}}",
+                        modal: true,
+                        resizable: false,
+                        closeOnEscape: false,
+                        width: 750,
+                        height: 150,
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    add_filter(function() {
+                                        $('#sp-add-filter-dialog').dialog('close');
+                                        // TODO: add filter
+                                    },
+                                    function() {
+                                        on_progress = false;
+                                    });
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-add-filter-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });
+                }
+                else {}
+            },
+            error: function() {}
+        });
+
+        $.ajax({
+            url: "{{tg.url('/dashboard/views/add_filter/')}}",
+            data: { view_id: view_id, attribute_path: path, view_name: view_name },
+            success: function(res) {
+                if (res.status) {
+                    // TODO
                 }
                 else {
                     alert('Error!');

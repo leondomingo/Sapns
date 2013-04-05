@@ -1,0 +1,54 @@
+<style>
+#sp-add-filter-field,
+#sp-add-filter-operator,
+#sp-add-filter-value { background-color:#E6E6E6; border:0 none; border-radius:4px 4px 4px 4px;
+    font:15px arial; height:21px; padding-top:1px; width:190px }
+#sp-add-filter-date-functions { font: 11px arial; text-align: center; width: 120px }
+</style>
+
+<div class="sp-field-row">
+    <div class="sp-field">
+        <div class="label">{{_('Field')}}</div>
+        <input id="sp-add-filter-field" type="text" readonly value="{{filter.field}}" title="{{filter.field_title}}">
+    </div>
+
+    <div class="sp-field">
+        <div class="label">{{_('Operator')}}</div>
+        <select id="sp-add-filter-operator">
+            <option value="co">{{_('Contains')}}</option>
+            <option value="eq">{{_('Equals to')}}</option>
+            <option value="lt">{{_('Less than')}}</option>
+            <option value="gt">{{_('Greater than')}}</option>
+            <option value="let">{{_('Less than or equals to')}}</option>
+            <option value="get">{{_('Greater than or equals to')}}</option>
+            <option value="nco">{{_('Does not contain')}}</option>
+            <option value="neq">{{_('Not equals to')}}</option>
+        </select>
+    </div>
+
+    <div class="sp-field">
+        <div class="label">{{_('Value')}}</div>
+        <input id="sp-add-filter-value" type="text">
+    </div>
+
+    <div class="sp-field">
+        <div class="label">&nbsp;</div>
+        <select id="sp-add-filter-date-functions">
+            <option>({{_('date functions')}})</option>
+            <option value="{today}">{{_('Today')}}</option>
+            <option value="{today - 1}">{{_('Yesterday')}}</option>
+            <option value="{today + 1}">{{_('Tomorrow')}}</option>
+            <option value="{start_week}">{{_('Start week')}}</option>
+            <option value="{end_week}">{{_('End week')}}</option>
+            <option value="{start_month}">{{_('Start month')}}</option>
+            <option value="{end_month}">{{_('End month')}}</option>
+            <option value="{start_year}">{{_('Start year')}}</option>
+            <option value="{end_year}">{{_('End year')}}</option>
+            </select>
+        </select>
+    </div>
+</div>
+
+<script>
+    {% include 'sapns/views/edit/add-filter/add-filter.js' %}
+</script>
