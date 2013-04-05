@@ -9,24 +9,27 @@ import datetime as dt
 import logging
 import re
 from copy import deepcopy
+import simplejson as sj
 
+# might be anything except a number (0, 1, 2, ...) or # (sharp symbol)
 COLLECTION_CHAR = 'c'
 
 def get_query(view_id):
     
-    _logger = logging.getLogger('sapns.lib.sapns.views.get_query')
+    logger = logging.getLogger('sapns.lib.sapns.views.get_query')
     
     mdb = Mongo().db
-    
+
     if isinstance(view_id, (str, unicode,)):
         view_id = ObjectId(view_id)
-        
         view = mdb.user_views.find_one(dict(_id=view_id))
         
     elif isinstance(view_id, dict):
         view = view_id
     
     def _get_parent(alias):
+
+        logger.debug(u'parent of "%s"' % alias)
         
         # alumnos
         parent_class = re.search(r'_(%s?)(\d+)$' % COLLECTION_CHAR, alias)
@@ -47,6 +50,7 @@ def get_query(view_id):
         if not re.search(r'_%s?\d+$' % COLLECTION_CHAR, alias_):
             alias_ = '%s_0' % alias_
             
+        logger.debug((alias_, attribute_.name,))
         return (alias_, attribute_.name,)
     
     columns = []
@@ -55,6 +59,8 @@ def get_query(view_id):
     nagg_columns = []
     agg_columns = []
     for attribute in sorted(view['attributes_detail'], cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0))):
+
+        logger.debug(attribute)
         
         if not relations_.get(attribute['class_alias']):
             relations_[attribute['class_alias']] = True
@@ -129,7 +135,7 @@ def get_query(view_id):
     if group_by:
         query += '\n%s' % group_by
         
-    #_logger.info(query)
+    logger.debug(query)
     return query
 
 def drop_view(view_name):
@@ -156,20 +162,26 @@ def drop_view(view_name):
         
 def translate_view(view_):
     
-    _logger = logging.getLogger('sapns.lib.sapns.views.translate_view')
+    logger = logging.getLogger('sapns.lib.sapns.views.translate_view')
+    logger.debug('starting')
     
     view = deepcopy(view_)
-    _logger.debug(view)
     
     attributes = []
     mapped_attributes = {}
     for attribute in view['attributes']:
         mapped_attribute = view['attributes_map'][attribute]
         attributes_ = []
-        for class_name, attr_name in re.findall(r'#(\w+)\.(\w+)', mapped_attribute):
-            _logger.debug('%s.%s' % (class_name, attr_name))
+        for is_collection, expression in mapped_attribute:
+            
+            m_expresion = re.search(r'(\w+)\.(\w+)', expression)
+            class_name = m_expresion.group(1)
+            attr_name = m_expresion.group(2)
+
+            logger.debug('%s.%s (is_collection=%s)' % (class_name, attr_name, is_collection))
+
             attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
-            attributes_.append(str(attr.attribute_id))
+            attributes_.append('%s%s' % (COLLECTION_CHAR if is_collection else '', attr.attribute_id))
     
         a = '#' + '#'.join(attributes_)
         
@@ -177,16 +189,15 @@ def translate_view(view_):
         attributes.append(a)
         
     view['attributes'] = attributes
-    
+
     aliases = {}
     for attribute_detail in view['attributes_detail']:
-        am = view['attributes_map'][attribute_detail['path']]
-        
+        am = mapped_attributes[attribute_detail['path']]
+        logger.debug(am)
+
         attributes_ = []
-        for class_name, attr_name in re.findall(r'(\w+)\.(\w+)', am)[:-1]:
-            _logger.debug('%s.%s' % (class_name, attr_name))
-            attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
-            attributes_.append(str(attr.attribute_id))
+        for is_collection, attribute_id in re.findall(r'(%s)?(\d+)' % COLLECTION_CHAR, am)[:-1]:
+            attributes_.append('%s%s' % (is_collection, attribute_id))
             
         if len(attributes_) == 0:
             attributes_ = ['0']
@@ -211,7 +222,7 @@ def translate_view(view_):
 
 def create_view(view):
     
-    _logger = logging.getLogger('sapns.lib.sapns.views.create_view')
+    logger = logging.getLogger('sapns.lib.sapns.views.create_view')
     
     mdb = Mongo().db
 
@@ -223,7 +234,7 @@ def create_view(view):
     drop_view(view_name)
     
     # create view
-    _logger.info(u'Creating view "%s"' % view_name)
+    logger.debug(u'Creating view "%s"' % view_name)
     dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
     dbs.flush()
     
@@ -231,7 +242,7 @@ def create_view(view):
     creation = False
     cls_c = SapnsClass.by_name(view['name'])
     if not cls_c:
-        _logger.info(u'Creating class "%s" (%s)' % (view['title'], view['name']))
+        logger.debug(u'Creating class "%s" (%s)' % (view['title'], view['name']))
         cls_c = SapnsClass()
         cls_c.name = view['name']
         cls_c.title = view['title']
@@ -253,7 +264,7 @@ def create_view(view):
     
     # create "list" permission
     if creation:
-        _logger.info(u'Creating "list" permission')
+        logger.info(u'Creating "list" permission')
         list_p = SapnsPermission()
         list_p.permission_name = u'%s#list' % cls_c.name
         list_p.display_name = u'List'

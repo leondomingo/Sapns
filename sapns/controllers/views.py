@@ -655,7 +655,7 @@ class ViewsController(BaseController):
     @expose()
     def export_(self, **kw):
         
-        _logger = logging.getLogger('ViewsController.export_')
+        logger = logging.getLogger('ViewsController.export_')
         
         class_id = get_paramw(kw, 'class_id', int)
         cls = dbs.query(SapnsClass).get(class_id)
@@ -670,15 +670,13 @@ class ViewsController(BaseController):
             
             mdb = Mongo().db
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls.view_id)))
-            
+
             del view['_id']
             if view.get('creation_date'):
                 del view['creation_date']
                 
             if view.get('create_date'):
                 del view['create_date']
-                
-            _logger.info(view)
                 
             view['col_widths'] = {}
             
@@ -690,16 +688,16 @@ class ViewsController(BaseController):
             for attribute in view['attributes']:
                 
                 mapped_attributes = []
-                for attribute_id in re.findall(r'\d+', attribute):
+                for collection, attribute_id in re.findall(r'(%s)?(\d+)' % COLLECTION_CHAR, attribute):
                     attr = dbs.query(SapnsAttribute).get(int(attribute_id))
-                    mapped_attributes.append('%s.%s' % (attr.class_.name, attr.name))
+                    mapped_attributes.append((collection != '', '%s.%s' % (attr.class_.name, attr.name),))
                     
-                view['attributes_map'][attribute] = '#' + '#'.join(mapped_attributes)
+                view['attributes_map'][attribute] = mapped_attributes #'#' + '#'.join(mapped_attributes)
             
             return sj.dumps(view, indent=' '*2)
         
         except Exception, e:
-            _logger.error(e)
+            logger.error(e)
             response.headers['Content-Disposition'] = 'attachment;filename=error'
             return ''
         
@@ -719,9 +717,10 @@ class ViewsController(BaseController):
                 raise Exception(_(u'File view does not exists anymore').encode('utf-8'))
             
             # read view file
+            logger.debug(u'Opening file view "%s"' % file_path)
             with open(file_path, 'rb') as f:
                 view = sj.load(f)
-                
+
             # translate and create view
             create_view(translate_view(view))
             
