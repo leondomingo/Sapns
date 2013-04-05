@@ -212,7 +212,7 @@ class DashboardController(BaseController):
             
             mdb = Mongo().db
             
-            cls_ = SapnsClass.by_name(cls)
+            cls_ = SapnsClass.by_name(cls, parent=False)
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
             create_view = False
             if not view:
@@ -248,7 +248,7 @@ class DashboardController(BaseController):
                 
             else:
                 mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
-                                      {'$set': dict(user_filters=view['user_filters'])})
+                                      {'$set': dict(user_filters=view[USER_FILTERS])})
 
             return dict(status=True)
         
@@ -268,7 +268,7 @@ class DashboardController(BaseController):
             
             mdb = Mongo().db
             
-            cls_ = SapnsClass.by_name(cls)
+            cls_ = SapnsClass.by_name(cls, parent=False)
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
             user_filters = []
             for f in view['user_filters'][str(user_id)]:
