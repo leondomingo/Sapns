@@ -9,11 +9,11 @@ except ImportError:
 
 setup(
     name='sapns',
-    version='0.3',
-    description='',
-    author='',
-    author_email='',
-    #url='',
+    version='0.4',
+    description='Web platform by Ender',
+    author='León Domingo',
+    author_email='leon.domingo@ender.es',
+    url='http://www.ender.es',
     install_requires=[
         "TurboGears2 >= 2.2.0",
         "Genshi",
