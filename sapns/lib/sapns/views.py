@@ -26,6 +26,9 @@ def get_query(view_id):
         
     elif isinstance(view_id, dict):
         view = view_id
+
+    elif isinstance(view_id, ObjectId):
+        view = mdb.user_views.find_one(dict(_id=view_id))
     
     def _get_parent(alias):
 
@@ -54,11 +57,15 @@ def get_query(view_id):
         return (alias_, attribute_.name,)
     
     columns = []
+    filters = []
     relations = []
     relations_ = {}
     nagg_columns = []
     agg_columns = []
-    for attribute in sorted(view['attributes_detail'], cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0))):
+    
+    _cmp = lambda x,y: cmp(x.get('order', 0), y.get('order', 0))
+    attributes_list = sorted(view['attributes_detail'], cmp=_cmp) + view['advanced_filters']
+    for attribute in attributes_list:
 
         logger.debug(attribute)
         
@@ -111,8 +118,11 @@ def get_query(view_id):
                         
                 relations += relations__
         
-        col_title = '"%s"' % attribute['title']    
-        columns.append(u'%s as %s' % (attribute['expression'], col_title))
+        if not attribute.get('is_filter'):
+            col_title = '"%s"' % attribute['title']    
+            columns.append(u'%s as %s' % (attribute['expression'], col_title))
+        else:
+            filters.append(attribute['expression'])
         
         m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\([\w\,\.]+\)', attribute['expression'].upper())
         if m_agg:
@@ -131,6 +141,11 @@ def get_query(view_id):
     query =  u'SELECT %s\n' % (',\n'.join(columns))
     query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
     query += '\n'.join(relations)
+
+    if len(filters):
+        # TODO: poder indicar OR
+        where_ = ' AND\n'.join(filters)
+        query += '\nWHERE %s' % where_
     
     if group_by:
         query += '\n%s' % group_by

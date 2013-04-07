@@ -259,6 +259,14 @@ class ViewsController(BaseController):
                              expression=attribute['expression'],
                              title=attribute['title'],
                              ))
+
+        for i, filter_ in enumerate(view['advanced_filters']):
+            cols.append(dict(path=filter_['path'],
+                             expression=filter_['expression'],
+                             title=filter_['title'],
+                             is_filter=True,
+                             pos=i,
+                             ))
             
         return dict(cols=cols)
         
@@ -335,55 +343,74 @@ class ViewsController(BaseController):
             return dict(status=False)
 
     @expose('json')
-    def add_filter(self, **kw):
-        logger = logging.getLogger('ViewsController.add_filter')
+    def edit_filter(self, **kw):
+        logger = logging.getLogger('ViewsController.edit_filter')
         try:
-            attribute_path = get_paramw(kw, 'attribute_path', str)
+            view_id = get_paramw(kw, 'view_id', str)
+            pos = get_paramw(kw, 'pos', int, opcional=True)
 
-            paths = attribute_path.split('#')[1:]
-            prefix = '_'.join(paths[:-1]) or '0'
-            title = []
-            for i, attribute_id in enumerate(paths):
-            
-                if attribute_id.startswith(COLLECTION_CHAR):
-                    attr = dbs.query(SapnsAttribute).get(int(attribute_id.replace(COLLECTION_CHAR, '')))
-                    
-                    if attr.class_id and i < len(paths)-1:
-                        title.append(attr.class_.title)
-                        
-                    else:
-                        title.append(attr.title)
-                        
-                    # base class
-                    if i == 0:
-                        base_class = attr.related_class.name
+            mdb = Mongo().db
+
+            if pos is None:
+                attribute_path = get_paramw(kw, 'attribute_path', str)
+
+                paths = attribute_path.split('#')[1:]
+                prefix = '_'.join(paths[:-1]) or '0'
+                title = []
+                for i, attribute_id in enumerate(paths):
                 
-                else:
-                    attr = dbs.query(SapnsAttribute).get(int(attribute_id))
-                    
-                    if attr.related_class_id and i < len(paths)-1:
-                        title.append(attr.related_class.title)
+                    if attribute_id.startswith(COLLECTION_CHAR):
+                        attr = dbs.query(SapnsAttribute).get(int(attribute_id.replace(COLLECTION_CHAR, '')))
                         
+                        if attr.class_id and i < len(paths)-1:
+                            title.append(attr.class_.title)
+                            
+                        else:
+                            title.append(attr.title)
+                            
                     else:
-                        title.append(attr.title)
-                    
-                    # base class
-                    if i == 0:
-                        base_class = attr.class_.name
+                        attr = dbs.query(SapnsAttribute).get(int(attribute_id))
+                        
+                        if attr.related_class_id and i < len(paths)-1:
+                            title.append(attr.related_class.title)
+                            
+                        else:
+                            title.append(attr.title)
+                        
+                filter = dict(title='.'.join(title),
+                              field=attr.title,
+                              path=attribute_path,
+                              attr='%s_%s.%s' % (attr.class_.name, prefix, attr.name),
+                              class_name=attr.class_.name,
+                              class_alias='%s_%s' % (attr.class_.name, prefix),
+                              view_id=ObjectId(view_id),
+                              is_filter=True,
+                              view_name=get_paramw(kw, 'view_name', str),
+                              operator=None,
+                              value=None,
+                              )
 
-            attribute = dict(title='.'.join(title),
-                             expression='%s_%s.%s' % (attr.class_.name, prefix, attr.name),
-                             path=attribute_path,
-                             class_name=attr.class_.name,
-                             class_alias='%s_%s' % (attr.class_.name, prefix),
-                             )
+                logger.debug(filter)
 
-            logger.debug(attribute)
+                filter_id = mdb.advanced_filters.insert(filter)
 
-            tmpl = get_template('sapns/views/edit/add-filter/add-filter.html')
-    
-            content = tmpl.render(tg=tg, _=_, filter=dict(field=attr.title,
-                                                          field_title=attribute['title'])).encode('utf-8')
+            else:
+                view = mdb.user_views.find_one(dict(_id=ObjectId(view_id)))
+                filter = view['advanced_filters'][pos]
+                filter.update(view_id=view_id,
+                              view_name=get_paramw(kw, 'view_name', str))
+
+                logger.debug(filter)
+
+                filter_id = mdb.advanced_filters.insert(filter)
+
+            tmpl = get_template('sapns/views/edit/edit-filter/edit-filter.html')
+            content = tmpl.render(tg=tg, _=_, filter=dict(id=str(filter_id),
+                                                          pos=pos if pos is not None else '',
+                                                          field=filter['field'],
+                                                          field_title=filter['title'],
+                                                          operator=filter['operator'],
+                                                          value=filter['value'])).encode('utf-8')
     
             return dict(status=True, content=content)
     
@@ -392,21 +419,40 @@ class ViewsController(BaseController):
             return dict(status=False)
 
     @expose('json')
-    def add_filter_(self, **kw):
-        logger = logging.getLogger('ViewsController.add_filter')
+    def edit_filter_(self, **kw):
+        logger = logging.getLogger('ViewsController.edit_filter_')
         try:
             operator = get_paramw(kw, 'operator', str)
-            value = get_paramw(kw, 'value', unicode)
+            value = get_paramw(kw, 'value', unicode, opcional=True)
+            filter_id = get_paramw(kw, 'filter_id', str)
 
-            # mdb.user_views.update(dict(_id=ObjectId(view_id)),
-            #                       {'$set': dict(base_class=base_class),
-            #                        '$push': dict(attributes_detail=attribute,
-            #                                      attributes=attribute_path)
-            #                        })
+            mdb = Mongo().db
+            filter_ = mdb.advanced_filters.find_one(dict(_id=ObjectId(filter_id)))
+
+            del filter_['_id']
+            filter_['operator'] = operator
+            filter_['value'] = value
+
+            # TODO: crear filtro utilizando "expression", "operator" y "value"
+            filter_['expression'] = "%s = '%s'" % (filter_['attr'], value)
+
+            pos = get_paramw(kw, 'pos', int, opcional=True)
+            if pos is None:
+                mdb.user_views.update(dict(_id=filter_['view_id']),
+                                      {'$push': dict(advanced_filters=filter_)})
+
+            else:
+                key = 'advanced_filters.%d' % pos
+                mdb.user_views.update(dict(_id=ObjectId(filter_['view_id'])),
+                                      {'$set': { key: filter_}})
             
-            # view_name = self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True))
+            # create SQL view
+            view_name = self.create_view(filter_['view_id'], get_paramw(kw, 'view_name', str, opcional=True))
 
-            return dict(status=True)
+            # remove filter from "advanced_filters"
+            mdb.advanced_filters.remove(dict(_id=ObjectId(filter_id)))
+
+            return dict(status=True, filter=filter_, view_name=view_name)
 
         except Exception, e:
             logger.error(e)
@@ -480,6 +526,30 @@ class ViewsController(BaseController):
             mdb.user_views.update(dict(_id=ObjectId(view_id)),
                                   {'$set': dict(attributes=view['attributes'],
                                                 attributes_detail=attributes_detail)})
+            
+            view_name = self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True))
+            
+            return dict(status=True, view_name=view_name)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+
+    @expose('json')
+    def remove_filter(self, **kw):
+        logger = logging.getLogger('ViewsController.remove_attribute')
+        try:
+            view_id = get_paramw(kw, 'view_id', str)
+            pos = get_paramw(kw, 'pos', int)
+            
+            mdb = Mongo().db
+            view = mdb.user_views.find_one(dict(_id=ObjectId(view_id)))
+
+            # remove filter in position "pos"
+            view['advanced_filters'].pop(pos)
+                
+            mdb.user_views.update(dict(_id=ObjectId(view_id)),
+                                  {'$set': dict(advanced_filters=view['advanced_filters'])})
             
             view_name = self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True))
             

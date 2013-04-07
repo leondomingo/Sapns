@@ -1,20 +1,20 @@
 <style>
-#sp-add-filter-field,
-#sp-add-filter-operator,
-#sp-add-filter-value { background-color:#E6E6E6; border:0 none; border-radius:4px 4px 4px 4px;
+#sp-edit-filter-field,
+#sp-edit-filter-operator,
+#sp-edit-filter-value { background-color:#E6E6E6; border:0 none; border-radius:4px 4px 4px 4px;
     font:15px arial; height:21px; padding-top:1px; width:190px }
-#sp-add-filter-date-functions { font: 11px arial; text-align: center; width: 120px }
+#sp-edit-filter-date-functions { font: 11px arial; text-align: center; width: 120px }
 </style>
 
 <div class="sp-field-row">
     <div class="sp-field">
         <div class="label">{{_('Field')}}</div>
-        <input id="sp-add-filter-field" type="text" readonly value="{{filter.field}}" title="{{filter.field_title}}">
+        <input id="sp-edit-filter-field" type="text" readonly value="{{filter.field}}" title="{{filter.field_title}}">
     </div>
 
     <div class="sp-field">
         <div class="label">{{_('Operator')}}</div>
-        <select id="sp-add-filter-operator">
+        <select id="sp-edit-filter-operator">
             <option value="co">{{_('Contains')}}</option>
             <option value="eq">{{_('Equals to')}}</option>
             <option value="lt">{{_('Less than')}}</option>
@@ -28,12 +28,12 @@
 
     <div class="sp-field">
         <div class="label">{{_('Value')}}</div>
-        <input id="sp-add-filter-value" type="text">
+        <input id="sp-edit-filter-value" type="text" value="{{filter.value or ''}}">
     </div>
 
     <div class="sp-field">
         <div class="label">&nbsp;</div>
-        <select id="sp-add-filter-date-functions">
+        <select id="sp-edit-filter-date-functions">
             <option>({{_('date functions')}})</option>
             <option value="{today}">{{_('Today')}}</option>
             <option value="{today - 1}">{{_('Yesterday')}}</option>
@@ -50,5 +50,5 @@
 </div>
 
 <script>
-    {% include 'sapns/views/edit/add-filter/add-filter.js' %}
+    {% include 'sapns/views/edit/edit-filter/edit-filter.js' %}
 </script>
