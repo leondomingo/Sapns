@@ -92,6 +92,8 @@ margin-left:0; margin-top:7px; overflow:hidden; width:100% }
 
 .sp-grid-dialog .wait-message { font:12px arial; color:#cc0000 }
 
+.sp-grid-filter-name { width:350px }
+
 .sp-search-txt { border:1px solid #777; width:450px }
 .sp-search-btn { float:none; width:80px; margin-left:5px }
 
@@ -99,7 +101,7 @@ margin-left:0; margin-top:7px; overflow:hidden; width:100% }
 
 .sp-col-title { color:#F9F9F9; background-color:#B4BD3C; font-weight:bold;
 text-align:center; font-family:arial; font-size:11px; height:29px;
-min-width:20px; border:1px solid lightgray; float:left; margin-right:-1px; margin-bottom:-1px;
+min-width:20px; border:1px solid #d3d3d3; float:left; margin-right:-1px; margin-bottom:-1px;
 padding:2px; overflow:hidden }
 
 .sp-col-title-sortable { cursor:pointer }
@@ -125,7 +127,7 @@ font:13px arial; margin-top:3px }
 .sp-grid-row-id {}
 .sp-grid-row { clear:left; height:31px; margin-bottom:-1px }
 
-.sp-grid-cell { background-color:white; border:1px solid lightgray;
+.sp-grid-cell { background-color:white; border:1px solid #d3d3d3;
 font:11px arial; height:25px; min-width:20px; overflow:hidden; cursor:pointer;
 padding:2px; float:left; margin-right:-1px; margin-bottom:-1px }
 .sp-grid-noresults { text-align:center; color:maroon; font-weight:bold;
@@ -198,7 +200,7 @@ input[type=text], input[type=password], textarea {
 border:1px solid #bbb; border-bottom:1px solid #777; border-right:1px solid #777;
 border-radius:3px; padding:2px }
 
-input[type=text]:focus, input[type=password]:focus, textarea:focus { border-color:orange }
+input[type=text]:focus, input[type=password]:focus, textarea:focus { border-color:#ffb328 }
 
 /* sapns.selector */
 .sp-select-text { border:1px solid red; border-radius:3px }
@@ -302,13 +304,13 @@ padding-left:20px; width:620px }
 /* sapns.uploader */
 .sp-filename div { height:16px; border:1px solid #bbb; border-right-color:#777; border-bottom-color:#777; 
 border-radius:3px; padding:2px; font:12px arial; cursor:text }
-.sp-filename div:hover { border-color:orange }
+.sp-filename div:hover { border-color:#ffb328 }
 .sp-filename button { font:10px arial; margin:1px 0 0 3px }
 
 /* sidebar-messages */
 .sidebar-messages { position:fixed; right:10px; top:20px; width:200px; padding:5px; z-index:1000 }
 .sidebar-messages .sbm-message { position:relative; padding:5px; border-radius:5px; min-height:50px; opacity:0.7; margin-bottom:5px }
-.sbm-message-std { background-color:coral; font:bold 13px arial }
+.sbm-message-std { background-color:#ffb328; font:bold 13px arial }
 
 /* Sapns fields */
 .sp-field-error { color:red }

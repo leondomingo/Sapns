@@ -391,6 +391,8 @@ class ViewsController(BaseController):
                               value=None,
                               )
 
+                logger.debug(filter)
+
                 filter_id = mdb.advanced_filters.insert(filter)
 
             else:
@@ -426,24 +428,30 @@ class ViewsController(BaseController):
             mdb = Mongo().db
             filter_ = mdb.advanced_filters.find_one(dict(_id=ObjectId(filter_id)))
 
+            view_id = filter_['view_id']
+            if isinstance(view_id, (str, unicode,)):
+              view_id = ObjectId(view_id)
+
+            del filter_['view_id']
+
             del filter_['_id']
             filter_['operator'] = operator
             filter_['value'] = value
 
-            # TODO: crear filtro utilizando "expression", "operator" y "value"
+            # SQL and title for the filter
             filter_['expression'] = filter_sql(filter_['path'], filter_['attr'], operator, value)
             filter_['title'] = filter_title(filter_)
 
             pos = get_paramw(kw, 'pos', int, opcional=True)
             if pos is None:
-                mdb.user_views.update(dict(_id=filter_['view_id']), {'$push': dict(advanced_filters=filter_)})
+                mdb.user_views.update(dict(_id=view_id), {'$push': dict(advanced_filters=filter_)})
 
             else:
                 key = 'advanced_filters.%d' % pos
-                mdb.user_views.update(dict(_id=ObjectId(filter_['view_id'])), {'$set': { key: filter_ }})
+                mdb.user_views.update(dict(_id=view_id), {'$set': { key: filter_ }})
             
             # create SQL view
-            view_name = self.create_view(filter_['view_id'], get_paramw(kw, 'view_name', str, opcional=True))
+            view_name = self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True))
 
             # remove filter from "advanced_filters"
             mdb.advanced_filters.remove(dict(_id=ObjectId(filter_id)))
@@ -558,7 +566,6 @@ class ViewsController(BaseController):
     @expose('json')
     def view_save(self, **kw):
         logger = logging.getLogger('ViewsController.view_save')
-        transaction.begin()
         try:
             title = get_paramw(kw, 'title', unicode)
             name = re.sub(r'[^a-z0-9_]', '_', title.lower())
@@ -590,7 +597,6 @@ class ViewsController(BaseController):
                 
             view.title = title
             view.name = name
-            #view.description = u'User view'
             view_id = get_paramw(kw, 'view_id', str)
             view.view_id = view_id
             
@@ -623,12 +629,9 @@ class ViewsController(BaseController):
                              new_name=view.name, 
                              old_name=get_paramw(kw, 'name', str, opcional=True))
             
-            transaction.commit()
-            
             return dict(status=True)
         
         except Exception, e:
-            transaction.abort()
             logger.error(e)
             return dict(status=False)            
     
@@ -649,8 +652,6 @@ class ViewsController(BaseController):
                     view['attributes_detail'][i]['expression'] = get_paramw(kw, 'expression', unicode)
                     break
                 
-            #logger.info(view['attributes_detail'])
-            
             mdb.user_views.update(dict(_id=ObjectId(view_id)),
                                   {'$set': dict(attributes_detail=view['attributes_detail'])})
             
@@ -821,7 +822,11 @@ class ViewsController(BaseController):
                 
             if view.get('create_date'):
                 del view['create_date']
-                
+
+            for af in view.get('advanced_filters'):
+              if af.get('view_id'):
+                del af['view_id']
+
             view['col_widths'] = {}
             
             view['name'] = cls.name
@@ -829,14 +834,19 @@ class ViewsController(BaseController):
             
             # generate attributes "translation"
             view['attributes_map'] = {}
-            for attribute in view['attributes']:
+            attributes = view['attributes']
+            for af in view.get('advanced_filters'):
+                if af['path'] not in attributes:
+                    attributes.append(af['path'])
+
+            for attribute in attributes:
                 
                 mapped_attributes = []
                 for collection, attribute_id in re.findall(r'(%s)?(\d+)' % COLLECTION_CHAR, attribute):
                     attr = dbs.query(SapnsAttribute).get(int(attribute_id))
                     mapped_attributes.append((collection != '', '%s.%s' % (attr.class_.name, attr.name),))
                     
-                view['attributes_map'][attribute] = mapped_attributes #'#' + '#'.join(mapped_attributes)
+                view['attributes_map'][attribute] = mapped_attributes
             
             return sj.dumps(view, indent=' '*2)
         
@@ -852,6 +862,7 @@ class ViewsController(BaseController):
     @expose('json')
     def import_view_(self, **kw):
         logger = logging.getLogger('ViewsController.import_view_')
+        import transaction
         try:
             view_file = get_paramw(kw, 'view_file', str)
             repo = dbs.query(SapnsRepo).get(1)
@@ -866,14 +877,17 @@ class ViewsController(BaseController):
                 view = sj.load(f)
 
             # translate and create view
-            create_view(translate_view(view))
-            
+            view_id = create_view(translate_view(view))
+
             # remove view file
             if os.path.exists(file_path):
                 os.remove(file_path)
+
+            transaction.commit()
                 
             return dict(status=True)
         
         except Exception, e:
+            transaction.abort()
             logger.error(e)
             return dict(status=False)

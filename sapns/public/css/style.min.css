@@ -26,9 +26,9 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp-grid-search-box .sp-grid-select-filter{float:right;width:180px;height:20px;margin-top:3px}
 .sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}.sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}
 .sp-grid-caption{color:#666;font:bold 22px helvetica,arial;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%}
-.sp-grid-dialog .wait-message{font:12px arial;color:#c00}.sp-search-txt{border:1px solid #777;width:450px}
-.sp-search-btn{float:none;width:80px;margin-left:5px}.sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}
-.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid lightgray;float:left;margin-right:-1px;margin-bottom:-1px;padding:2px;overflow:hidden}
+.sp-grid-dialog .wait-message{font:12px arial;color:#c00}.sp-grid-filter-name{width:350px}
+.sp-search-txt{border:1px solid #777;width:450px}.sp-search-btn{float:none;width:80px;margin-left:5px}
+.sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid #d3d3d3;float:left;margin-right:-1px;margin-bottom:-1px;padding:2px;overflow:hidden}
 .sp-col-title-sortable{cursor:pointer}.sp-col-title-sortable:hover{background-color:#444}
 .sp-grid-filter-label{font:12px arial}.sp-grid-filter-field,.sp-grid-filter-operator{width:190px;border:0;border-radius:4px;font:15px arial;padding-top:1px;height:21px;background-color:#e6e6e6}
 .sp-grid-filter-value{font:15px arial;width:160px}.sp-grid-filter-functions{font:11px arial;width:110px;text-align:center}
@@ -37,7 +37,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp-grid-filter-description span.col{color:#b4bd3c}.sp-grid-filter-description span.operator{color:#ffb835}
 .sp-grid-filter-description span.value{color:#b4bd3c;font-style:italic}.sp-grid-button-actions{clear:left;height:20px;padding:2px}
 .sp-grid-button-action{min-width:80px;font-size:9px;margin-right:3px}.sp-grid-row{clear:left;height:31px;margin-bottom:-1px}
-.sp-grid-cell{background-color:white;border:1px solid lightgray;font:11px arial;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
+.sp-grid-cell{background-color:white;border:1px solid #d3d3d3;font:11px arial;height:25px;min-width:20px;overflow:hidden;cursor:pointer;padding:2px;float:left;margin-right:-1px;margin-bottom:-1px}
 .sp-grid-noresults{text-align:center;color:maroon;font-weight:bold;font-size:15px;border-radius:0 0 5px 5px}
 .sp-grid-pager{border-color:#ddd #777 #777 #ddd;border-radius:3px 3px 3px 3px;border-style:solid;border-width:1px;height:30px}
 .sp-grid-pager-desc{color:#777;font-family:arial;width:350px;text-align:center;float:left;height:30px;vertical-align:middle;margin-top:5px;height:25px}
@@ -63,7 +63,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .subactions ul{margin-top:0;margin-bottom:0;list-style-type:none}.item_sb .subaction{font-weight:normal;color:#999;font:11px arial;height:18px}
 .item_sb .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}
 input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
-input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:orange}
+input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#ffb328}
 .sp-select-text{border:1px solid red;border-radius:3px}.sp-select-button,.sp-empty-button{height:20px;font:bold 10px arial;margin-left:3px}
 .sp-empty-button{color:red}#sp-user-menu{width:330px;display:none;margin-top:5px;padding-bottom:5px}
 .sp-user-option{padding:2px 2px 2px 10px;color:#000;border-radius:3px;cursor:pointer;margin-left:1px;width:99%}
@@ -110,9 +110,9 @@ a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-
 .sp-field-row{clear:left;height:38px;margin-bottom:5px}.sp-field-row .sp-field{float:left;margin-right:5px}
 .sp-field .label{font:12px arial}.sp-field .input *{float:left}.sp-field .label.required{font-weight:bold}
 .sp-filename div{height:16px;border:1px solid #bbb;border-right-color:#777;border-bottom-color:#777;border-radius:3px;padding:2px;font:12px arial;cursor:text}
-.sp-filename div:hover{border-color:orange}.sp-filename button{font:10px arial;margin:1px 0 0 3px}
+.sp-filename div:hover{border-color:#ffb328}.sp-filename button{font:10px arial;margin:1px 0 0 3px}
 .sidebar-messages{position:fixed;right:10px;top:20px;width:200px;padding:5px;z-index:1000}
 .sidebar-messages .sbm-message{position:relative;padding:5px;border-radius:5px;min-height:50px;opacity:.7;margin-bottom:5px}
-.sbm-message-std{background-color:coral;font:bold 13px arial}.sp-field-error{color:red}
+.sbm-message-std{background-color:#ffb328;font:bold 13px arial}.sp-field-error{color:red}
 .ui-widget-header,.ui-dialog .ui-dialog-buttonpane button{background:#b4bd3c}button,select{border:0;border-radius:2px;background-color:#faca6a}
 button:hover{background-color:#666;color:#fff}

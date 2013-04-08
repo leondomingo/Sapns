@@ -1971,7 +1971,7 @@ var __DEFAULT_FILTER = 'default';
                             <div class="sp-field-row">\
                                 <div class="sp-field">\
                                     <div class="label">{{_("Filter name")}}</div>\
-                                    <input id="sp-grid-filter-name" type="text" value="' + current_filter + '">\
+                                    <input class="sp-grid-filter-name" grid-id="' + g_id + '" type="text" value="' + current_filter + '">\
                                 </div>\
                             </div>\
                         </div>';
@@ -1988,7 +1988,7 @@ var __DEFAULT_FILTER = 'default';
                                 if (!on_progress) {
                                     on_progress = true;
                                     
-                                    var filter_name = $('#sp-grid-filter-name').val().replace(/[^A-Za-z0-9_]/g, '_');
+                                    var filter_name = $('.sp-grid-filter-name[grid-id=' + g_id + ']').val().replace(/[^A-Za-z0-9_]/g, '_');
                                     
                                     // Web service to create/modify this filter
                                     $.ajax({
@@ -2032,45 +2032,40 @@ var __DEFAULT_FILTER = 'default';
                             },
                             "{{_('Delete')}}": function() {
                                 if (!on_progress) {
-                                    var filter_name = $('#sp-grid-filter-name').val();
-                                    //if (filter_name !== 'default') {
+                                    var filter_name = $('.sp-grid-filter-name[grid-id=' + g_id + ']').val();
                                         on_progress = true;
                                         
-                                        // Web service to delete this filter
-                                        $.ajax({
-                                            url: "{{tg.url('/dashboard/delete_user_filter/')}}",
-                                            data: { cls: g.cls, filter_name: filter_name },
-                                            success: function(res) {
-                                                if (res.status) {
-                                                    $(select_filter).val('default').change();
-                                                    $(select_filter + ' option[value=' + filter_name + ']').remove();
-                                                    
-                                                    var user_filters = [];
-                                                    for (var i=0, l=g.user_filters.length; i<l; i++) {
-                                                        var uf = g.user_filters[i];
-                                                        if (uf.name !== filter_name) {
-                                                            user_filters.push(uf);
-                                                        }
+                                    // Web service to delete this filter
+                                    $.ajax({
+                                        url: "{{tg.url('/dashboard/delete_user_filter/')}}",
+                                        data: { cls: g.cls, filter_name: filter_name },
+                                        success: function(res) {
+                                            if (res.status) {
+                                                $(select_filter).val('default').change();
+                                                $(select_filter + ' option[value=' + filter_name + ']').remove();
+                                                
+                                                var user_filters = [];
+                                                for (var i=0, l=g.user_filters.length; i<l; i++) {
+                                                    var uf = g.user_filters[i];
+                                                    if (uf.name !== filter_name) {
+                                                        user_filters.push(uf);
                                                     }
-                                                    
-                                                    g.user_filters = user_filters;
-                                                    
-                                                    $('#sp-grid-save-filter-dialog').dialog('close');
                                                 }
-                                                else {
-                                                    on_progress = false;
-                                                    alert('Error!');
-                                                }
-                                            },
-                                            error: function() {
+                                                
+                                                g.user_filters = user_filters;
+                                                
+                                                $('#sp-grid-save-filter-dialog').dialog('close');
+                                            }
+                                            else {
                                                 on_progress = false;
                                                 alert('Error!');
                                             }
-                                        });
-                                    /*}
-                                    else {
-                                        $('#sp-grid-save-filter-dialog').dialog('close');
-                                    }*/
+                                        },
+                                        error: function() {
+                                            on_progress = false;
+                                            alert('Error!');
+                                        }
+                                    });
                                 }
                             },
                             "{{_('Cancel')}}": function() {
@@ -2084,6 +2079,14 @@ var __DEFAULT_FILTER = 'default';
                 
                 g_content += '</div>';
             }
+
+            var s_filter_name = '.sp-grid-filter-name[grid-id=' + g_id + ']';
+            $(document).off('keypress', s_filter_name).on('keypress', s_filter_name, function(e) {
+                if (e.which === 13) {
+                    // INTRO
+                    $(this).parents('.ui-dialog').find('.ui-dialog-buttonset button:first').click();
+                }
+            });
             
             var g_table = 
                 '<div class="sp-grid-parent" style="overflow:auto;clear:left;height:' + 
