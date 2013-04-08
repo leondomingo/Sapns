@@ -6,7 +6,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    <link rel="stylesheet" href="{{tg.url('/css/views/edit.css', params=dict(v=1))}}">
+    <link rel="stylesheet" href="{{tg.url('/css/views/edit.css', params=dict(v=2))}}">
 {% endblock %}
 
 {% block middle %}
@@ -35,9 +35,7 @@
             <div id="sp-edit-view-attr-list" class="col"></div>
         </div>
         
-        <div id="sp-edit-view-cols">
-            <!--<div class="column">Nombre</div>-->
-        </div>
+        <div id="sp-edit-view-cols"></div>
         
         <div id="sp-edit-view-list"></div>
     </div>
@@ -45,8 +43,8 @@
     <script src="{{tg.url('/js/sprintf.min.js')}}"></script>
     <script src="{{tg.url('/js/jstree/jquery.jstree.js')}}"></script>
     <script>
-    {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
-    {% include 'sapns/components/sapns.selector.min.js' %}
-    {% include 'sapns/views/edit/edit.js' %}
+        {% include 'sapns/components/sapns.grid/sapns.grid.js' %}
+        {% include 'sapns/components/sapns.selector.min.js' %}
+        {% include 'sapns/views/edit/edit.js' %}
     </script>
 {% endblock %}

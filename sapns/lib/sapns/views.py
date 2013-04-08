@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 
 from bson.objectid import ObjectId
+from pylons.i18n import ugettext as _
+from sapns.lib.sapns.util import strtodate as _strtodate, datetostr as _datetostr
 from sapns.lib.sapns.mongo import Mongo
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission
@@ -26,6 +28,9 @@ def get_query(view_id):
         
     elif isinstance(view_id, dict):
         view = view_id
+
+    elif isinstance(view_id, ObjectId):
+        view = mdb.user_views.find_one(dict(_id=view_id))
     
     def _get_parent(alias):
 
@@ -54,11 +59,15 @@ def get_query(view_id):
         return (alias_, attribute_.name,)
     
     columns = []
+    filters = []
     relations = []
     relations_ = {}
     nagg_columns = []
     agg_columns = []
-    for attribute in sorted(view['attributes_detail'], cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0))):
+    
+    _cmp = lambda x,y: cmp(x.get('order', 0), y.get('order', 0))
+    attributes_list = sorted(view['attributes_detail'], cmp=_cmp) + view.get('advanced_filters', [])
+    for attribute in attributes_list:
 
         logger.debug(attribute)
         
@@ -111,8 +120,11 @@ def get_query(view_id):
                         
                 relations += relations__
         
-        col_title = '"%s"' % attribute['title']    
-        columns.append(u'%s as %s' % (attribute['expression'], col_title))
+        if not attribute.get('is_filter'):
+            col_title = '"%s"' % attribute['title']    
+            columns.append(u'%s as %s' % (attribute['expression'], col_title))
+        else:
+            filters.append(attribute['expression'])
         
         m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\([\w\,\.]+\)', attribute['expression'].upper())
         if m_agg:
@@ -131,6 +143,11 @@ def get_query(view_id):
     query =  u'SELECT %s\n' % (',\n'.join(columns))
     query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
     query += '\n'.join(relations)
+
+    if len(filters):
+        # TODO: poder indicar OR
+        where_ = ' AND\n'.join(filters)
+        query += '\nWHERE %s' % where_
     
     if group_by:
         query += '\n%s' % group_by
@@ -275,3 +292,243 @@ def create_view(view):
         dbs.flush()
     
     return view_id
+
+OPERATOR_CONTAIN = 'co'
+OPERATOR_EQUAL = 'eq'
+OPERATOR_LESS_THAN = 'lt'
+OPERATOR_GREATER_THAN = 'gt'
+OPERATOR_LESS_THAN_OR_EQUAL = 'let'
+OPERATOR_GREATER_THAN_OR_EQUAL = 'get'
+OPERATOR_NOT_CONTAIN = 'nco'
+OPERATOR_NOT_EQUAL = 'neq'
+
+_CONSTANT_DATE_TODAY       = 'today'
+_CONSTANT_DATE_START_WEEK  = 'start_week'
+_CONSTANT_DATE_END_WEEK    = 'end_week'
+_CONSTANT_DATE_START_MONTH = 'start_month'
+_CONSTANT_DATE_END_MONTH   = 'end_month'
+_CONSTANT_DATE_START_YEAR  = 'start_year'
+_CONSTANT_DATE_END_YEAR    = 'end_year'
+_CONSTANT_DAY              = 'd'
+_CONSTANT_WEEK             = 'w'
+_CONSTANT_MONTH            = 'm'
+_CONSTANT_YEAR             = 'y'
+
+def filter_title(filter_):
+    operators = { OPERATOR_CONTAIN: _(u'Contains'),
+                  OPERATOR_EQUAL: _(u'Equals to'),
+                  OPERATOR_LESS_THAN: _(u'Less than'),
+                  OPERATOR_GREATER_THAN: _(u'Greater than'),
+                  OPERATOR_LESS_THAN_OR_EQUAL: _(u'Less than or equals to'),
+                  OPERATOR_GREATER_THAN_OR_EQUAL: _(u'Greater than or equals to'),
+                  OPERATOR_NOT_CONTAIN: _(u'Does not contain'),
+                  OPERATOR_NOT_EQUAL: _(u'Not equals to'),
+                }
+
+    return u'<%s> %s "%s"' % (filter_['field'], operators[filter_['operator']], filter_['value'])
+
+def filter_sql(path, attribute, operator, value):
+
+    logger = logging.getLogger('filter_sql')
+
+    attribute_id = int(path.split('#')[-1])
+    attr = dbs.query(SapnsAttribute).get(attribute_id)
+
+    value_ = None
+    if attr.type == SapnsAttribute.TYPE_DATE:
+        date_ = _strtodate(value)
+        if date_ is not None:
+            value_ = '%.4d-%.2d-%.2d' % (date_.year, date_.month, date_.day)
+
+        else:
+            value_ = process_date_constants(value)
+
+    if operator in [OPERATOR_CONTAIN, OPERATOR_NOT_CONTAIN]:
+
+        def no_accents(text_value):
+            result = text_value
+            result = re.sub(r'(a|á|à|ä)', u'(a|á|à|ä)', result, re.U)
+            result = re.sub(r'(e|é|è|ë)', u'(e|é|è|ë)', result, re.U)
+            result = re.sub(r'(i|í|ì|ï)', u'(i|í|ì|ï)', result, re.U)
+            result = re.sub(r'(o|ó|ò|ö)', u'(o|ó|ò|ö)', result, re.U)
+            result = re.sub(r'(u|ú|ù|ü)', u'(u|ú|ù|ü)', result, re.U)
+            
+            return result
+
+        if attr.type in [SapnsAttribute.TYPE_STRING, SapnsAttribute.TYPE_MEMO]:
+            if operator == OPERATOR_CONTAIN:
+                operator_ = u'SIMILAR TO'
+
+            else:
+                operator_ = u'NOT SIMILAR TO'
+
+            sql = u"UPPER(%s) %s UPPER('%%%s%%')" % (attribute, operator_, no_accents(value))
+
+    elif operator in [OPERATOR_EQUAL, OPERATOR_NOT_EQUAL]:
+
+        if operator == OPERATOR_EQUAL:
+            operator_ = u'='
+
+        elif operator == OPERATOR_NOT_EQUAL:
+            operator_ = u'!='
+
+        if attr.type in [SapnsAttribute.TYPE_STRING, SapnsAttribute.TYPE_MEMO]:
+            if value:
+                sql = u"%s IS NOT NULL AND UPPER(%s) %s UPPER(TRIM('%s'))" % (attribute, attribute, operator_, value)
+
+            else:
+                sql = u"TRIM(COALESCE(%s, '')) %s ''" % (attribute, operator_)
+
+        elif attr.type == SapnsAttribute.TYPE_DATE:
+            if value:
+                sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
+
+            else:
+                if operator == OPERATOR_EQUAL:
+                    sql = u"%s IS NULL" % attribute
+
+                elif operator == OPERATOR_NOT_EQUAL:
+                    sql = u"%s IS NOT NULL" % attribute
+
+        elif attr.type == SapnsAttribute.TYPE_TIME:
+            if value:
+                sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value)
+
+            else:
+                if operator == OPERATOR_EQUAL:
+                    sql = u"%s IS NULL" % attribute
+
+                else:
+                    sql = u"%s IS NOT NULL" % attribute
+
+        else:
+            if value:
+                sql = u"%s IS NOT NULL AND %s %s %s" % (attribute, attribute, operator_, value)
+
+            else:
+                if operator == OPERATOR_EQUAL:
+                    sql = u"%s IS NULL" % attribute
+
+                else:
+                    sql = u"%s IS NOT NULL" % attribute
+
+    elif operator in [OPERATOR_LESS_THAN, OPERATOR_GREATER_THAN, 
+                      OPERATOR_LESS_THAN_OR_EQUAL, OPERATOR_GREATER_THAN_OR_EQUAL]:
+
+        if operator == OPERATOR_LESS_THAN:
+            operator_ = u'<'
+
+        elif operator == OPERATOR_GREATER_THAN:
+            operator_ = u'>'
+
+        elif operator == OPERATOR_LESS_THAN_OR_EQUAL:
+            operator_ = u'<='
+
+        elif operator == OPERATOR_GREATER_THAN_OR_EQUAL:
+            operator_ = u'>='
+
+        if attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:
+            sql = u'%s IS NOT NULL AND %s %s %s' % (attribute, attribute, operator_, value)
+
+        elif attr.type == SapnsAttribute.TYPE_DATE:
+            sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
+
+        elif attr.type in [SapnsAttribute.TYPE_STRING, SapnsAttribute.TYPE_MEMO, SapnsAttribute.TYPE_TIME]:
+            sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value)
+
+        else:
+            sql = u"%s IS NOT NULL AND %s %s %s" % (attribute, attribute, operator_, value)
+
+    return sql
+
+def process_date_constants(value):
+
+    logger = logging.getLogger('process_date_constants')
+    logger.info(value)
+    
+    def _sub(m):
+        cons = m.group(1)
+        s = m.group(3)
+        q = int(m.group(4) or 0)
+        t = m.group(5) or _CONSTANT_DAY
+        
+        r = None
+        if cons == _CONSTANT_DATE_TODAY:
+            r = dt.date.today()
+        
+        elif cons == _CONSTANT_DATE_START_WEEK:
+            wd = dt.date.today().weekday()
+            r = dt.date.today() - dt.timedelta(days=wd)
+        
+        elif cons == _CONSTANT_DATE_END_WEEK:
+            wd = 6 - dt.date.today().weekday()
+            r = dt.date.today() + dt.timedelta(days=wd)
+        
+        elif cons == _CONSTANT_DATE_START_MONTH:
+            today = dt.date.today()
+            r = dt.date(today.year, today.month, 1)
+        
+        elif cons == _CONSTANT_DATE_END_MONTH:
+            today = dt.date.today()
+            next_month = today + dt.timedelta(days=30)
+            r = dt.date(next_month.year, next_month.month, 1) - dt.timedelta(days=1)
+        
+        elif cons == _CONSTANT_DATE_START_YEAR:
+            today = dt.date.today()
+            r = dt.date(today.year, 1, 1)
+        
+        elif cons == _CONSTANT_DATE_END_YEAR:
+            today = dt.date.today()
+            r = dt.date(today.year, 12, 31)
+        
+        if r:    
+            if s and q:
+                if t == _CONSTANT_DAY:
+                    if s == '-':
+                        n = -q
+                    else:
+                        n = q
+                    
+                    r = r + dt.timedelta(days=n)
+                        
+                elif t == _CONSTANT_WEEK:
+                    if s == '-':
+                        n = -q*7
+                    else:
+                        n = q*7
+                    
+                    r = r + dt.timedelta(days=n)
+                
+                elif t == _CONSTANT_MONTH:
+                    
+                    r_ = r
+                    
+                    if s == '-':
+                        n = -1
+                    else:
+                        n = +1
+                        
+                    i = 0
+                    while abs(i) != q:
+                        next_month = r_ + dt.timedelta(days=30*n)
+                        r_ = dt.date(next_month.year, next_month.month, r.day)
+                        
+                        i += n
+                        
+                    r = r_
+                        
+                elif t == _CONSTANT_YEAR:
+                    if s == '-':
+                        n = -q
+                        
+                    else:
+                        n = +q
+                        
+                    r = dt.date(r.year + n, r.month, r.day)
+                    
+            return r.strftime('%Y-%m-%d')
+        
+        else:
+            return m.group(0)
+    
+    return re.sub(r'\{\s*(\w+)(\s+([\+\-])\s*(\d+)\s*(\w{0,1}))?\s*\}', _sub, value)

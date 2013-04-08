@@ -1727,7 +1727,7 @@ var __DEFAULT_FILTER = 'default';
                         <div><select class="sp-grid-filter-field"></select></div>\
                     </div>\
                     <div style="float:left;height:40px;margin-right:5px">\
-                        \<div class="sp-grid-filter-label">{{_("Operator")}}</div>\
+                        <div class="sp-grid-filter-label">{{_("Operator")}}</div>\
                         <div><select class="sp-grid-filter-operator">\
                             <option value="co">{{_("Contains")}}</option>\
                             <option value="eq">{{_("Equals to")}}</option>\

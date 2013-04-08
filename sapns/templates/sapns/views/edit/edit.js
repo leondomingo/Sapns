@@ -110,6 +110,7 @@ $(function() {
             data: { view_id: view_id },
             success: function(content) {
                 $('#sp-edit-view-cols').html(content);
+                $('#sp-edit-view-cols .filter').disableSelection();
             },
             error: function() {
                 $('#sp-edit-view-cols').html('<div>Error!</div>');
@@ -193,6 +194,7 @@ $(function() {
     
     $('#sp-edit-view-cols').sortable({
         placeholder: 'placeholder',
+        items: '.column',
         stop: function() {
             var data_ = {};
             $('#sp-edit-view-cols .column').each(function(i) {
@@ -223,9 +225,10 @@ $(function() {
         }
     });
     
-    var s_ = '#sp-edit-view-attr-list .attribute .col-attr.add';
-    $(document).off('click', s_).on('click', s_, function() {
-        var path = $(this).parent().attr('path');
+    // add field
+    var s_add_field = '#sp-edit-view-attr-list .attribute .col-attr.add';
+    $(document).off('click', s_add_field).on('click', s_add_field, function() {
+        var path = $(this).parents('.attribute').attr('path');
         
         $.ajax({
             url: "{{tg.url('/dashboard/views/add_attribute/')}}",
@@ -250,9 +253,73 @@ $(function() {
             }
         });
     });
-    
-    var s_ = '#sp-edit-view-cols .column .title';
-    $(document).off('dblclick', s_).on('dblclick', s_, function() {
+
+    function edit_filter(path, pos) {
+        var on_progress = false;
+
+        $.ajax({
+            url: "{{tg.url('/dashboard/views/edit_filter/')}}",
+            data: { view_id: view_id, view_name: view_name, attribute_path: path, pos: pos },
+            success: function(res) {
+                if (res.status) {
+                    $('#sp-edit-filter-dialog').remove();
+                    $('<div id="sp-edit-filter-dialog" style="display:none"></div>').appendTo('body');
+                    $('#sp-edit-filter-dialog').html(res.content).dialog({
+                        title: "{{_('Advanced filter')}}",
+                        modal: true,
+                        resizable: false,
+                        closeOnEscape: false,
+                        width: 750,
+                        height: 150,
+                        buttons: {
+                            "{{_('Ok')}}": function() {
+                                if (!on_progress) {
+                                    on_progress = true;
+                                    filter_save(function(res) {
+                                        $('#sp-edit-filter-dialog').dialog('close');
+                                        reload_cols();
+
+                                        if (res.view_name !== '') {
+                                            view_name = res.view_name;
+                                            show_grid();
+                                        }
+                                    },
+                                    function() {
+                                        on_progress = false;
+                                    });
+                                }
+                            },
+                            "{{_('Cancel')}}": function() {
+                                if (!on_progress) {
+                                    $('#sp-edit-filter-dialog').dialog('close');
+                                }
+                            }
+                        }
+                    });
+                }
+                else {}
+            },
+            error: function() {}
+        });
+    }
+
+    // add (advanced) filter
+    var s_add_filter = '#sp-edit-view-attr-list .attribute .col-attr.add-filter';
+    $(document).off('click', s_add_filter).on('click', s_add_filter, function() {
+        var path = $(this).parents('.attribute').attr('path');
+        edit_filter(path);
+    });
+
+    // edit filter
+    var s_edit_filter = '#sp-edit-view-cols .filter .title';
+    $(document).off('dblclick', s_edit_filter).on('dblclick', s_edit_filter, function() {
+        var pos = $(this).parents('.filter').attr('pos'), path;
+
+        edit_filter(path, pos);
+    });
+
+    var s_column_edit = '#sp-edit-view-cols .column .title';
+    $(document).off('dblclick', s_column_edit).on('dblclick', s_column_edit, function() {
         var path = $(this).parent().attr('path'),
             on_progress = false;
         
@@ -295,13 +362,39 @@ $(function() {
         });
     });
     
-    var s_ = '#sp-edit-view-cols .column .close';
-    $(document).off('click', s_).on('click', s_, function() {
+    // remove column
+    var s_column_close = '#sp-edit-view-cols .column .close';
+    $(document).off('click', s_column_close).on('click', s_column_close, function() {
         var path = $(this).parent().attr('path');
         
         $.ajax({
             url: "{{tg.url('/dashboard/views/remove_attribute/')}}",
             data: { view_id: view_id, view_name: view_name, path: path },
+            success: function(res) {
+                if (res.status) {
+                    view_name = res.view_name;
+                    
+                    reload_cols();
+                    show_grid();
+                }
+                else {
+                    alert('Error!');
+                }
+            },
+            error: function() {
+                alert('Error!');
+            }
+        });
+    });
+
+    // remove filter
+    var s_filter_close = '#sp-edit-view-cols .filter .close';
+    $(document).off('click', s_filter_close).on('click', s_filter_close, function() {
+        var pos = $(this).parents('.filter').attr('pos');
+        
+        $.ajax({
+            url: "{{tg.url('/dashboard/views/remove_filter/')}}",
+            data: { view_id: view_id, view_name: view_name, pos: pos },
             success: function(res) {
                 if (res.status) {
                     view_name = res.view_name;

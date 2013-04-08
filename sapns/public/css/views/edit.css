@@ -30,24 +30,33 @@ color:#444; margin-bottom:3px; padding:1px 5px; font:bold 14px arial;
 clear:left; height:18px }
 #sp-edit-view-attr-list .attribute span { font-weight:normal; font-size:12px }
 #sp-edit-view-attr-list .attribute .col-attr { float:left }
-#sp-edit-view-attr-list .attribute .col-attr.name { width:485px; margin-right:5px }
-#sp-edit-view-attr-list .attribute .col-attr.add { padding:0 2px; cursor:pointer }
-#sp-edit-view-attr-list .attribute .col-attr.add:hover { background-color:#ddd; color:#fff }
+#sp-edit-view-attr-list .attribute .col-attr.name { width:463px; margin-right:5px }
+#sp-edit-view-attr-list .attribute .col-attr.add,
+#sp-edit-view-attr-list .attribute .col-attr.add-filter { padding:0 2px; cursor:pointer }
+#sp-edit-view-attr-list .attribute .col-attr.add:hover,
+#sp-edit-view-attr-list .attribute .col-attr.add-filter:hover { background-color:#ddd; color:#fff }
 
 #sp-edit-view-attr-list .attribute:hover { background-color:#B4BD3C; color:#fff }
 
 #sp-edit-view-cols { background-color:#B4BD3C; height:60px; clear:left; padding:5px; 
-overflow:auto; margin-top:5px; border-radius:2px }
-#sp-edit-view-cols .column { float:left; margin-right:4px; margin-top:2px; background-color:#f9f9f9;
-border-radius:4px; cursor:default }
-#sp-edit-view-cols .column div { float:left }
-#sp-edit-view-cols .column div.title { text-align:center; font:13px arial; min-width:90px; padding:1px 4px }
-#sp-edit-view-cols .column div.close { font:10px arial; background-color:#ddd; text-align:center;
-width:15px; height:15px; padding-top:2px; border-radius:0 4px 4px 0 }
-#sp-edit-view-cols .column div.close:hover { background-color:#444; color:#f2f2f2 }
+    overflow:auto; margin-top:5px; border-radius:2px }
+#sp-edit-view-cols .column,
+#sp-edit-view-cols .filter { float:left; margin-right:4px; margin-top:2px; background-color:#f9f9f9;
+    border-radius:4px; cursor:default }
+#sp-edit-view-cols .filter { background-color:#ff9670 }
+#sp-edit-view-cols .column div, 
+#sp-edit-view-cols .filter div { float:left }
+#sp-edit-view-cols .column div.title,
+#sp-edit-view-cols .filter div.title { text-align:center; font:13px arial; min-width:90px; padding:1px 4px }
+#sp-edit-view-cols .filter div.title { font-size:10px }
+#sp-edit-view-cols .column div.close,
+#sp-edit-view-cols .filter div.close { font:10px arial; background-color:#ddd; text-align:center;
+    width:15px; height:15px; padding-top:2px; border-radius:0 4px 4px 0 }
+#sp-edit-view-cols .column div.close:hover,
+#sp-edit-view-cols .filter div.close:hover { background-color:#444; color:#f2f2f2 }
 #sp-edit-view-cols .placeholder { float:left; margin-right:4px; margin-top:2px; background-color:#444;
-font:13px arial; padding:1px 4px; width:105px; text-align:center; border-radius:4px; cursor:default;
-height:15px }
+    font:13px arial; padding:1px 4px; width:105px; text-align:center; border-radius:4px; cursor:default;
+    height:15px }
 
 #sp-edit-view-list { height:260px; margin-top:5px; background-color:transparent; border-radius:2px }
 
