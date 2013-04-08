@@ -208,7 +208,7 @@ def translate_view(view_):
     view['attributes'] = attributes
 
     aliases = {}
-    for attribute_detail in view['attributes_detail']:
+    for attribute_detail in view['attributes_detail'] + view.get('advanced_filters', []):
         am = mapped_attributes[attribute_detail['path']]
         logger.debug(am)
 
@@ -228,12 +228,31 @@ def translate_view(view_):
         
         attribute_detail['path'] = mapped_attributes[attribute_detail['path']]
         
+    # attributes_detail
+    logger.debug('Translating attributes')
     for attribute_detail in view['attributes_detail']:
         for old, new in aliases.iteritems():
             # alumnos -> alumnos.
             old_ = '%s.' % old
             new_ = '%s.' % new
+            
+            logger.debug('%s -> %s' % (old_, new_))
+
             attribute_detail['expression'] = attribute_detail['expression'].replace(old_, new_)
+
+    # advanced_filters
+    logger.debug('Translating filters')
+    for af in view.get('advanced_filters'):
+        for old, new in aliases.iteritems():
+            # alumnos -> alumnos.
+            old_ = '%s.' % old
+            new_ = '%s.' % new
+            
+            logger.debug('%s -> %s' % (old_, new_))
+
+            af['attr'] = af['attr'].replace(old_, new_)
+            af['class_alias'] = af['class_alias'].replace(old_, new_)
+            af['expression'] = af['expression'].replace(old_, new_)
             
     return view    
 
@@ -257,7 +276,7 @@ def create_view(view):
     
     # create "class" (if it don't exist already)
     creation = False
-    cls_c = SapnsClass.by_name(view['name'])
+    cls_c = SapnsClass.by_name(view['name'], parent=False)
     if not cls_c:
         logger.debug(u'Creating class "%s" (%s)' % (view['title'], view['name']))
         cls_c = SapnsClass()
@@ -270,15 +289,16 @@ def create_view(view):
     else:
         # drop old "user view"
         mdb.user_views.remove(dict(_id=ObjectId(cls_c.view_id)))
-    
+
+    view['view_name'] = view_name
     view['creation_date'] = dt.datetime.now()
     view_id = mdb.user_views.insert(view)
-    
+
     cls_c.view_id = str(view_id)
     
     dbs.add(cls_c)
     dbs.flush()
-    
+
     # create "list" permission
     if creation:
         logger.info(u'Creating "list" permission')
