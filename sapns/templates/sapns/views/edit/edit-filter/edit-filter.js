@@ -28,5 +28,18 @@ function filter_save(callback, callback_error) {
 }
 
 $(function() {
-    $('#sp-edit-filter-operator').val("{{filter.value or ''}}").focus();
+    $('#sp-edit-filter-operator').val("{{filter.operator or ''}}").focus();
+
+    $('#sp-edit-filter-date-functions').change(function() {
+        $('#sp-edit-filter-value').val($(this).val());
+        $(this).val('');
+    });
+
+    var s_filter_value = '#sp-edit-filter-value';
+    $(document).off('keypress', s_filter_value).on('keypress', s_filter_value, function(e) {
+        if (e.which === 13) {
+            // INTRO
+            $(this).parents('.ui-dialog').find('.ui-dialog-buttonset button:first').click();
+        }
+    });
 });

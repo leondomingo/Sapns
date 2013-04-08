@@ -1,12 +1,12 @@
 <!--{% for c in cols %}-->
 <!--{% if not c.is_filter %}-->
 <div class="column" path="{{c.path}}" title="{{c.expression}}">
-    <div class="title">{{c.title}}</div>
+    <div class="title">{{c.title|escape}}</div>
     <div class="close">X</div>
 </div>
 <!--{% else %}-->
-<div class="filter" pos="{{c.pos}}" title="{{c.expression}}">
-    <div class="title">{{c.title}}</div>
+<div class="filter" pos="{{c.pos}}">
+    <div class="title">{{c.title|escape}}</div>
     <div class="close">X</div>
 </div>
 <!--{% endif %}-->

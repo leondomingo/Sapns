@@ -11,7 +11,7 @@ from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import get_template, pagination
 from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view, \
-    drop_view, translate_view
+    drop_view, translate_view, filter_sql, filter_title
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission, \
     SapnsRepo
@@ -260,13 +260,14 @@ class ViewsController(BaseController):
                              title=attribute['title'],
                              ))
 
-        for i, filter_ in enumerate(view['advanced_filters']):
-            cols.append(dict(path=filter_['path'],
-                             expression=filter_['expression'],
-                             title=filter_['title'],
-                             is_filter=True,
-                             pos=i,
-                             ))
+        if view.get('advanced_filters'):
+            for i, filter_ in enumerate(view['advanced_filters']):
+                cols.append(dict(path=filter_['path'],
+                                 expression=filter_['expression'],
+                                 title=filter_['title'],
+                                 is_filter=True,
+                                 pos=i,
+                                 ))
             
         return dict(cols=cols)
         
@@ -390,8 +391,6 @@ class ViewsController(BaseController):
                               value=None,
                               )
 
-                logger.debug(filter)
-
                 filter_id = mdb.advanced_filters.insert(filter)
 
             else:
@@ -399,8 +398,6 @@ class ViewsController(BaseController):
                 filter = view['advanced_filters'][pos]
                 filter.update(view_id=view_id,
                               view_name=get_paramw(kw, 'view_name', str))
-
-                logger.debug(filter)
 
                 filter_id = mdb.advanced_filters.insert(filter)
 
@@ -434,17 +431,16 @@ class ViewsController(BaseController):
             filter_['value'] = value
 
             # TODO: crear filtro utilizando "expression", "operator" y "value"
-            filter_['expression'] = "%s = '%s'" % (filter_['attr'], value)
+            filter_['expression'] = filter_sql(filter_['path'], filter_['attr'], operator, value)
+            filter_['title'] = filter_title(filter_)
 
             pos = get_paramw(kw, 'pos', int, opcional=True)
             if pos is None:
-                mdb.user_views.update(dict(_id=filter_['view_id']),
-                                      {'$push': dict(advanced_filters=filter_)})
+                mdb.user_views.update(dict(_id=filter_['view_id']), {'$push': dict(advanced_filters=filter_)})
 
             else:
                 key = 'advanced_filters.%d' % pos
-                mdb.user_views.update(dict(_id=ObjectId(filter_['view_id'])),
-                                      {'$set': { key: filter_}})
+                mdb.user_views.update(dict(_id=ObjectId(filter_['view_id'])), {'$set': { key: filter_ }})
             
             # create SQL view
             view_name = self.create_view(filter_['view_id'], get_paramw(kw, 'view_name', str, opcional=True))
