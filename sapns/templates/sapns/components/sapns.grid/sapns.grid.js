@@ -202,12 +202,19 @@ var __DEFAULT_FILTER = 'default';
         var exportable_formats = [{
             id: 'csv',
             title: 'CSV',
-            url: "{{tg.url('/dashboard/tocsv/')}}"
+            url: "{{tg.url('/dashboard/to_csv/')}}"
         },
         {
             id: 'excel',
             title: 'Excel',
-            url: "{{tg.url('/dashboard/toxls/')}}"
+            url: "{{tg.url('/dashboard/to_xls/')}}"
+        },
+        {
+            id: 'pdf',
+            title: 'PDF',
+            url: "{{tg.url('/dashboard/to_pdf/')}}",
+            export_url: "{{tg.url('/dashboard/to_pdf_/')}}",
+            modal: true
         }];
         
         // default "pager_options"
@@ -1482,25 +1489,84 @@ var __DEFAULT_FILTER = 'default';
                 }
             }
 
-            var url = '';
+            var url = '', selected_format;
             for (var i=0, l=formats.length; i < l; i++) {
                 if (formats[i].id == fmt) {
-                    url = formats[i].url;
+                    selected_format = formats[i];
+                    // url = formats[i].url;
                     break;
                 }
             }
-            
-            var form_export = '<form action="' + url + '" method="get">\
-                <input type="hidden" name="cls" value="' + self.cls + '">\
-                <input type="hidden" name="q" value="' + self.query() + '">\
-                <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
-                <input type="hidden" name="parent_id" value="' + self.parent_id + '">' + 
-                extra_params + '</form>';
 
-            $(form_export).appendTo('body').submit().remove();
+            if (selected_format.modal) {
+                // reset the select
+                $(this).find('option:first').prop('selected', true);
 
-            // reset the select
-            $(this).find('option:first').prop('selected', true);
+                $.ajax({
+                    url: selected_format.url,
+                    data: {
+                        cls: self.cls,
+                        q: self.query(),
+                        ch_attr: self.ch_attr,
+                        parent_id: self.parent_id
+                    },
+                    success: function(res) {
+                        var on_progress = false;
+
+                        if (res.status) {
+                            $('#sp-grid-export-dialog').remove();
+                            $('<div id="sp-grid-export-dialog" style="display:none"></div>').appendTo('body');
+                            $('#sp-grid-export-dialog').html(res.content).dialog({
+                                title: "{{_('Export view to PDF')}}",
+                                modal: true,
+                                resizable: false,
+                                width: selected_format.width || 700,
+                                height: selected_format.height || 'auto',
+                                buttons: {
+                                    "{{_('Ok')}}": function() {
+                                        if (!on_progress) {
+                                            on_progress = true;
+
+                                            // /dashboard/topdf -> /dashboard/topdf_
+                                            var form_export = '<form action="' + selected_format.export_url + '" method="get">\
+                                                <input type="hidden" name="cls" value="' + self.cls + '">\
+                                                <input type="hidden" name="q" value="' + self.query() + '">\
+                                                <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
+                                                <input type="hidden" name="parent_id" value="' + self.parent_id + '">' + 
+                                                extra_params + '</form>';
+
+                                            $(form_export).appendTo('body').submit().remove();
+
+                                            setTimeout(function() {
+                                                on_progress = false;
+                                                $('#sp-grid-export-dialog').dialog('close');
+                                            }, 500);
+                                        }
+                                    },
+                                    "{{_('Cancel')}}": function() {
+                                        if (!on_progress) {
+                                            $('#sp-grid-export-dialog').dialog('close');
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }
+            else {
+                var form_export = '<form action="' + selected_format.url + '" method="get">\
+                    <input type="hidden" name="cls" value="' + self.cls + '">\
+                    <input type="hidden" name="q" value="' + self.query() + '">\
+                    <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
+                    <input type="hidden" name="parent_id" value="' + self.parent_id + '">' + 
+                    extra_params + '</form>';
+
+                $(form_export).appendTo('body').submit().remove();
+
+                // reset the select
+                $(this).find('option:first').prop('selected', true);
+            }
         });
     }
 
