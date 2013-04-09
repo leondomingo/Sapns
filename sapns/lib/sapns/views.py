@@ -180,7 +180,6 @@ def drop_view(view_name):
 def translate_view(view_):
     
     logger = logging.getLogger('sapns.lib.sapns.views.translate_view')
-    logger.debug('starting')
     
     view = deepcopy(view_)
     
@@ -242,7 +241,7 @@ def translate_view(view_):
 
     # advanced_filters
     logger.debug('Translating filters')
-    for af in view.get('advanced_filters'):
+    for af in view.get('advanced_filters', []):
         for old, new in aliases.iteritems():
             # alumnos -> alumnos.
             old_ = '%s.' % old
