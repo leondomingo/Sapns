@@ -835,7 +835,7 @@ class ViewsController(BaseController):
             # generate attributes "translation"
             view['attributes_map'] = {}
             attributes = view['attributes']
-            for af in view.get('advanced_filters'):
+            for af in view.get('advanced_filters', []):
                 if af['path'] not in attributes:
                     attributes.append(af['path'])
 
