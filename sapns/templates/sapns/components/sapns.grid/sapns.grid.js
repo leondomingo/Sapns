@@ -2054,7 +2054,20 @@ var __DEFAULT_FILTER = 'default';
                                 if (!on_progress) {
                                     on_progress = true;
                                     
-                                    var filter_name = $('.sp-grid-filter-name[grid-id=' + g_id + ']').val().replace(/[^A-Za-z0-9_]/g, '_');
+                                    var filter_name = $('.sp-grid-filter-name[grid-id=' + g_id + ']').val()
+                                        .replace(/(á|ä|à|â)/g, 'a')
+                                        .replace(/(Á|Ä|À|Â)/g, 'A')
+                                        .replace(/(é|ë|è|ê)/g, 'e')
+                                        .replace(/(É|Ë|È|Ê)/g, 'E')
+                                        .replace(/(í|ï|ì|î)/g, 'i')
+                                        .replace(/(Í|Ï|Ì|Î)/g, 'I')
+                                        .replace(/(ó|ö|ò|ô)/g, 'o')
+                                        .replace(/(Ó|Ö|Ò|Ô)/g, 'O')
+                                        .replace(/(ú|ü|ù|û)/g, 'u')
+                                        .replace(/(Ú|Ü|Ù|Û)/g, 'U')
+                                        .replace(/ñ/g, 'n')
+                                        .replace(/Ñ/g, 'N')
+                                        .replace(/[^A-Za-z0-9_]/g, '_');
                                     
                                     // Web service to create/modify this filter
                                     $.ajax({
