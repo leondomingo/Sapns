@@ -165,7 +165,7 @@ def drop_view(view_name):
     try:
         # drop "old" view
         if _exists_view(view_name):
-            logger.info(u'Dropping view [%s]' % view_name)
+            logger.debug(u'Dropping view [%s]' % view_name)
             dbs.execute('DROP VIEW %s' % view_name)
             dbs.flush()
             
@@ -301,7 +301,7 @@ def create_view(view):
 
     # create "list" permission
     if creation:
-        logger.info(u'Creating "list" permission')
+        logger.debug(u'Creating "list" permission')
         list_p = SapnsPermission()
         list_p.permission_name = u'%s#list' % cls_c.name
         list_p.display_name = u'List'
@@ -351,7 +351,7 @@ def filter_sql(path, attribute, operator, value):
 
     logger = logging.getLogger('filter_sql')
 
-    attribute_id = int(path.split('#')[-1])
+    attribute_id = int(re.findall(r'#%s?(\d+)' % COLLECTION_CHAR, path)[-1])
     attr = dbs.query(SapnsAttribute).get(attribute_id)
 
     value_ = None
@@ -464,7 +464,6 @@ def filter_sql(path, attribute, operator, value):
 def process_date_constants(value):
 
     logger = logging.getLogger('process_date_constants')
-    logger.info(value)
     
     def _sub(m):
         cons = m.group(1)
