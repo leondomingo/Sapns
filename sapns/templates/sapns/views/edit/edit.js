@@ -282,7 +282,7 @@ $(function() {
                         modal: true,
                         resizable: false,
                         closeOnEscape: false,
-                        width: 750,
+                        width: 850,
                         height: 150,
                         buttons: {
                             "{{_('Ok')}}": function() {

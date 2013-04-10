@@ -1,8 +1,10 @@
 <style>
 #sp-edit-filter-field,
 #sp-edit-filter-operator,
-#sp-edit-filter-value { background-color:#E6E6E6; border:0 none; border-radius:4px 4px 4px 4px;
-    font:15px arial; height:21px; padding-top:1px; width:190px }
+#sp-edit-filter-value,
+#sp-edit-filter-null-value { background-color:#E6E6E6; border:0 none; border-radius:4px 4px 4px 4px;
+    font:15px arial; height:21px; padding-top:1px; width:215px }
+#sp-edit-filter-value, #sp-edit-filter-null-value { width:115px }
 #sp-edit-filter-date-functions { font: 11px arial; text-align: center; width: 120px }
 </style>
 
@@ -29,6 +31,11 @@
     <div class="sp-field">
         <div class="label">{{_('Value')}}</div>
         <input id="sp-edit-filter-value" type="text" value="{{filter.value or ''}}">
+    </div>
+
+    <div class="sp-field">
+        <div class="label">{{_('Null value')}}</div>
+        <input id="sp-edit-filter-null-value" type="text" value="{{filter.null_value or ''}}">
     </div>
 
     <div class="sp-field">

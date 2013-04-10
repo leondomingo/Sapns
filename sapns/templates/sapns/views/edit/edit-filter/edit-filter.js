@@ -1,6 +1,7 @@
 function filter_save(callback, callback_error) {
     var operator = $('#sp-edit-filter-operator').val(),
-        value = $('#sp-edit-filter-value').val();
+        value = $('#sp-edit-filter-value').val(),
+        null_value = $('#sp-edit-filter-null-value').val();
 
     $.ajax({
         url: "{{tg.url('/dashboard/views/edit_filter_/')}}",
@@ -9,6 +10,7 @@ function filter_save(callback, callback_error) {
             filter_id: "{{filter.id}}",
             operator: operator,
             value: value,
+            null_value: null_value,
             pos: "{{filter.pos}}"
         },
         success: function(res) {
