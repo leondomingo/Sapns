@@ -344,9 +344,13 @@ def filter_title(filter_):
                   OPERATOR_NOT_EQUAL: _(u'Not equals to'),
                 }
 
-    return u'<%s> %s "%s"' % (filter_['field'], operators[filter_['operator']], filter_['value'])
+    null_value = ''
+    if filter_['null_value']:
+        null_value = u' (%s)' % filter_['null_value']
 
-def filter_sql(path, attribute, operator, value):
+    return u'<%s>%s %s "%s"' % (filter_['field'], null_value, operators[filter_['operator']], filter_['value'])
+
+def filter_sql(path, attribute, operator, value, null_value):
 
     logger = logging.getLogger('filter_sql')
 
@@ -354,13 +358,24 @@ def filter_sql(path, attribute, operator, value):
     attr = dbs.query(SapnsAttribute).get(attribute_id)
 
     value_ = None
+    null_value_ = None
     if attr.type == SapnsAttribute.TYPE_DATE:
+
+        # value
         date_ = _strtodate(value)
         if date_ is not None:
             value_ = '%.4d-%.2d-%.2d' % (date_.year, date_.month, date_.day)
 
         else:
             value_ = process_date_constants(value)
+
+        # null_value
+        null_date_ = _strtodate(null_value)
+        if null_date_ is not None:
+            null_value_ = '%.4d-%.2d-%.2d' % (null_date_.year, null_date_.month, null_date_.day)
+
+        else:
+            null_value_ = process_date_constants(null_value)
 
     if operator in [OPERATOR_CONTAIN, OPERATOR_NOT_CONTAIN]:
 
@@ -391,44 +406,75 @@ def filter_sql(path, attribute, operator, value):
         elif operator == OPERATOR_NOT_EQUAL:
             operator_ = u'!='
 
+        # string, memo
         if attr.type in [SapnsAttribute.TYPE_STRING, SapnsAttribute.TYPE_MEMO]:
             if value:
-                sql = u"%s IS NOT NULL AND UPPER(%s) %s UPPER(TRIM('%s'))" % (attribute, attribute, operator_, value)
+                if not null_value:
+                    # foo IS NOT NULL AND UPPER(foo) = UPPER(TRIM('bar'))
+                    sql = u"%s IS NOT NULL AND UPPER(%s) %s UPPER(TRIM('%s'))" % (attribute, attribute, operator_, value)
+
+                else:
+                    # UPPER(COALESCE(foo, 'bar') = UPPER(TRIM('bar'))
+                    sql = u"UPPER(COALESCE(%s, '%s')) %s UPPER(TRIM('%s'))" % (attribute, null_value, operator_, value)
 
             else:
                 sql = u"TRIM(COALESCE(%s, '')) %s ''" % (attribute, operator_)
 
+        # date
         elif attr.type == SapnsAttribute.TYPE_DATE:
             if value:
-                sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
+                if not null_value:
+                    # foo IS NOT NULL AND foo != '2001-01-01'
+                    sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
+                else:
+                    # COALESCE(foo, '1900-01-01') != '2001-01-01'
+                    sql = u"COALESCE(%s, '%s') %s '%s'" % (attribute, null_value_, operator_, value_)
 
             else:
                 if operator == OPERATOR_EQUAL:
+                    # foo IS NULL
                     sql = u"%s IS NULL" % attribute
 
                 elif operator == OPERATOR_NOT_EQUAL:
+                    # foo IS NOT NULL
                     sql = u"%s IS NOT NULL" % attribute
 
+        # time
         elif attr.type == SapnsAttribute.TYPE_TIME:
             if value:
-                sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value)
+                if not null_value:
+                    # foo IS NOT NULL AND foo = '12:30'
+                    sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value)
+                else:
+                    # COALESCE(foo, '00:00') = '12:30'
+                    sql = u"COALESCE(%s, '%s') %s '%s'" % (attribute, null_value, operator_, value)
 
             else:
                 if operator == OPERATOR_EQUAL:
+                    # foo IS NULL
                     sql = u"%s IS NULL" % attribute
 
                 else:
+                    # foo IS NOT NULL
                     sql = u"%s IS NOT NULL" % attribute
 
+        # everything else (int, float, ...)
         else:
             if value:
-                sql = u"%s IS NOT NULL AND %s %s %s" % (attribute, attribute, operator_, value)
+                if not null_value:
+                    # foo IS NOT NULL AND foo = 123
+                    sql = u"%s IS NOT NULL AND %s %s %s" % (attribute, attribute, operator_, value)
+                else:
+                    # COALESCE(foo, 0) = 123
+                    sql = u"COALESCE(%s, %s) %s %s" % (attribute, null_value, operator_, value)
 
             else:
                 if operator == OPERATOR_EQUAL:
+                    # foo IS NULL
                     sql = u"%s IS NULL" % attribute
 
                 else:
+                    # foo IS NOT NULL
                     sql = u"%s IS NOT NULL" % attribute
 
     elif operator in [OPERATOR_LESS_THAN, OPERATOR_GREATER_THAN, 
@@ -446,17 +492,32 @@ def filter_sql(path, attribute, operator, value):
         elif operator == OPERATOR_GREATER_THAN_OR_EQUAL:
             operator_ = u'>='
 
-        if attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:
-            sql = u'%s IS NOT NULL AND %s %s %s' % (attribute, attribute, operator_, value)
+        # date
+        if attr.type == SapnsAttribute.TYPE_DATE:
+            if null_value:
+                # foo IS NOT NULL AND foo > '2001-01-01'
+                sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
+            else:
+                # COALESCE(foo, '1900-01-01') > '2001-01-01'
+                sql = u"COALESCE(%s, '%s') %s '%s'" % (attribute, null_value_, operator_, value_)
 
-        elif attr.type == SapnsAttribute.TYPE_DATE:
-            sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
-
+        # string, memo, time
         elif attr.type in [SapnsAttribute.TYPE_STRING, SapnsAttribute.TYPE_MEMO, SapnsAttribute.TYPE_TIME]:
-            sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value)
+            if not null_value:
+                # foo IS NOT NULL AND foo > 'hola'
+                sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value)
+            else:
+                # COALESCE(foo, 'aaa') > 'hola'
+                sql = u"COALESCE(%s, '%s') %s '%s'" % (attribute, null_value, operator_, value)
 
+        # everything else (int, float, ...)
         else:
-            sql = u"%s IS NOT NULL AND %s %s %s" % (attribute, attribute, operator_, value)
+            if not null_value:
+                # foo IS NOT NULL AND foo < 123
+                sql = u'%s IS NOT NULL AND %s %s %s' % (attribute, attribute, operator_, value)
+            else:
+                # COALESCE(foo, 0) < 123
+                sql = u'COALESCE(%s, %s) %s %s' % (attribute, null_value, operator_, value)
 
     return sql
 

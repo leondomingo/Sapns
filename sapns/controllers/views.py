@@ -374,38 +374,40 @@ class ViewsController(BaseController):
                         else:
                             title.append(attr.title)
                         
-                filter = dict(title='.'.join(title),
-                              field=attr.title,
-                              path=attribute_path,
-                              attr='%s_%s.%s' % (attr.class_.name, prefix, attr.name),
-                              class_name=attr.class_.name,
-                              class_alias='%s_%s' % (attr.class_.name, prefix),
-                              view_id=ObjectId(view_id),
-                              is_filter=True,
-                              view_name=get_paramw(kw, 'view_name', str),
-                              operator=None,
-                              value=None,
-                              )
+                filter_ = dict(title='.'.join(title),
+                               field=attr.title,
+                               path=attribute_path,
+                               attr='%s_%s.%s' % (attr.class_.name, prefix, attr.name),
+                               class_name=attr.class_.name,
+                               class_alias='%s_%s' % (attr.class_.name, prefix),
+                               view_id=ObjectId(view_id),
+                               is_filter=True,
+                               view_name=get_paramw(kw, 'view_name', str),
+                               operator=None,
+                               value=None,
+                               null_value=None,
+                               )
 
-                logger.debug(filter)
+                logger.debug(filter_)
 
-                filter_id = mdb.advanced_filters.insert(filter)
+                filter_id = mdb.advanced_filters.insert(filter_)
 
             else:
                 view = mdb.user_views.find_one(dict(_id=ObjectId(view_id)))
-                filter = view['advanced_filters'][pos]
-                filter.update(view_id=view_id,
-                              view_name=get_paramw(kw, 'view_name', str))
+                filter_ = view['advanced_filters'][pos]
+                filter_.update(view_id=view_id,
+                               view_name=get_paramw(kw, 'view_name', str))
 
-                filter_id = mdb.advanced_filters.insert(filter)
+                filter_id = mdb.advanced_filters.insert(filter_)
 
             tmpl = get_template('sapns/views/edit/edit-filter/edit-filter.html')
             content = tmpl.render(tg=tg, _=_, filter=dict(id=str(filter_id),
                                                           pos=pos if pos is not None else '',
-                                                          field=filter['field'],
-                                                          field_title=filter['title'],
-                                                          operator=filter['operator'],
-                                                          value=filter['value'])).encode('utf-8')
+                                                          field=filter_['field'],
+                                                          field_title=filter_['title'],
+                                                          operator=filter_['operator'],
+                                                          value=filter_['value'],
+                                                          null_value=filter_['null_value'])).encode('utf-8')
     
             return dict(status=True, content=content)
     
@@ -419,6 +421,7 @@ class ViewsController(BaseController):
         try:
             operator = get_paramw(kw, 'operator', str)
             value = get_paramw(kw, 'value', unicode, opcional=True)
+            null_value = get_paramw(kw, 'null_value', unicode, opcional=True)
             filter_id = get_paramw(kw, 'filter_id', str)
 
             mdb = Mongo().db
@@ -433,9 +436,10 @@ class ViewsController(BaseController):
             del filter_['_id']
             filter_['operator'] = operator
             filter_['value'] = value
+            filter_['null_value'] = null_value
 
             # SQL and title for the filter
-            filter_['expression'] = filter_sql(filter_['path'], filter_['attr'], operator, value)
+            filter_['expression'] = filter_sql(filter_['path'], filter_['attr'], operator, value, null_value)
             filter_['title'] = filter_title(filter_)
 
             pos = get_paramw(kw, 'pos', int, opcional=True)
