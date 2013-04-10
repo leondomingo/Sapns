@@ -10,7 +10,7 @@ from sapns.lib.sapns.forgot_password import EUserDoesNotExist
 from sapns.lib.sapns.util import add_language, save_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
-from tg import expose, require, url, request, redirect, config, predicates
+from tg import expose, require, url, request, response, redirect, config, predicates
 from tg.decorators import use_custom_format
 from tg.i18n import set_lang
 import logging
@@ -39,6 +39,8 @@ class RootController(BaseController):
     @expose('sapns/index.html', custom_format='home')
     @add_language
     def index(self, **kw):
+
+        _logger = logging.getLogger('RootController.index')
         
         came_from = kw.get('came_from')
         
@@ -67,8 +69,25 @@ class RootController(BaseController):
             
         else:
             login_counter = kw.get('login_counter', '0')
-            
-            return dict(login_counter=login_counter, came_from=came_from or url('/'))
+            logout = kw.get('logout', '0')
+
+            # read "origin_url" cookie
+            origin = request.cookies.get('origin_url')
+            if logout == '1' and origin:
+                # set "origin_url" cookie to empty string
+                response.set_cookie('origin_url', value='', max_age=60*60*24*30*365) # 1 year
+
+                # redirect to "origin_url"
+                redirect(url(origin))
+
+            else:
+                # get "origin" param
+                origin = kw.get('origin', '')
+
+                # save "origin_url" cookie
+                response.set_cookie('origin_url', value=origin, max_age=60*60*24*30*365) # 1 year
+
+            return dict(login_counter=login_counter, came_from=came_from or url('/'), origin=origin)
         
     @expose()
     def login(self, **kw):
@@ -101,17 +120,17 @@ class RootController(BaseController):
         """
         if not request.identity:
             login_counter = request.environ['repoze.who.logins'] + 1
-            redirect('/', dict(login_counter=login_counter, came_from=came_from))
+            origin = request.cookies.get('origin_url')
+            redirect('/', dict(login_counter=login_counter, came_from=came_from, origin=origin))
             
         redirect(came_from)
 
     @expose()
     def post_logout(self, came_from=url('/')):
         """
-        Redirect the user to the initially requested page on logout and say
-        goodbye as well.
+        Redirect the user to the initially requested page on logout
         """
-        redirect('/', dict(came_from=came_from))
+        redirect('/', dict(came_from=came_from, logout=1))
 
     @expose()
     def setlang(self, lang='en'):
