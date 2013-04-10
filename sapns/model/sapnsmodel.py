@@ -81,8 +81,6 @@ class SapnsRole(Group):
     
     def copy_privileges_from(self, id_from_role):
         
-        #logger = logging.getLogger('SapnsRole.copy_privileges_from')
-
         # class privileges
         for old_p in dbs.query(SapnsPrivilege).\
                 filter(SapnsPrivilege.role_id == id_from_role):
@@ -156,18 +154,6 @@ class SapnsRole(Group):
                         
                 dbs.flush()
                    
-#    def add_act_privilege(self, id_action):
-#        return SapnsActPrivilege.add_privilege(id_action, id_role=self.group_id)
-#
-#    def act_privilege(self, id_action):
-#        return SapnsActPrivilege.get_privilege(id_action, id_role=self.group_id)
-#
-#    def has_act_privilege(self, id_action):
-#        return self.act_privilege(id_action) != None
-#
-#    def remove_act_privilege(self, id_action):
-#        SapnsActPrivilege.remove_privilege(id_action, id_role=self.group_id)
-
 class SapnsUserRole(DeclarativeBase):
     
     __tablename__ = 'sp_user_role'
@@ -270,7 +256,7 @@ class SapnsUser(User):
         logger = logging.getLogger('SapnsUser.copy_from')
         try:
             # shortcuts
-            logger.info('Copying shortcuts')
+            logger.debug('Copying shortcuts')
             parents = {}
             for sc in dbs.query(SapnsShortcut).\
                     filter(SapnsShortcut.user_id == other_id):
@@ -287,7 +273,7 @@ class SapnsUser(User):
                 
                 parents[sc.shortcut_id] = sc_copy.shortcut_id
                 
-            logger.info('Updating parents')
+            logger.debug('Updating parents')
             for sc_copy in dbs.query(SapnsShortcut).\
                     filter(and_(SapnsShortcut.user_id == self.user_id,
                                 SapnsShortcut.parent_id != None)):
@@ -298,7 +284,7 @@ class SapnsUser(User):
                 dbs.flush()
                 
             # privileges (on classes)
-            logger.info('Copying privileges')
+            logger.debug('Copying privileges')
             for priv in dbs.query(SapnsPrivilege).\
                     filter(SapnsPrivilege.user_id == other_id):
 
@@ -310,7 +296,7 @@ class SapnsUser(User):
                 dbs.flush()
             
             # attribute privileges
-            logger.info('Copying attribute privileges')
+            logger.debug('Copying attribute privileges')
             for ap in dbs.query(SapnsAttrPrivilege).\
                     filter(SapnsAttrPrivilege.user_id == other_id):
                 
@@ -322,7 +308,7 @@ class SapnsUser(User):
                 dbs.add(ap_copy)
                 dbs.flush()
                 
-            logger.info('Copying roles')
+            logger.debug('Copying roles')
             cond = user_group_table.c.id_user == other_id #@UndefinedVariable
             for rl in dbs.execute(user_group_table.select(cond)):
                 copy_rl = dict(id_user=self.user_id, id_role=rl.id_role)
@@ -405,32 +391,20 @@ class SapnsUser(User):
                         SapnsPermission.permission_name == name)).\
             first() != None
             
-#    def act_privilege(self, id_action):
-#        return SapnsActPrivilege.get_privilege(id_action, id_user=self.user_id)
-#            
-#    def add_act_privilege(self, id_action):
-#        SapnsActPrivilege.add_privilege(id_action, id_user=self.user_id)
-#            
-#    def has_act_privilege(self, id_action):
-#        return SapnsActPrivilege.has_privilege(self.user_id, id_action)
-#    
-#    def remove_act_privilege(self, id_action):
-#        SapnsActPrivilege.remove_privilege(id_action, id_user=self.user_id)
-    
     def get_view_name(self, cls):
         
-        #logger = logging.getLogger('get_view_name')
+        logger = logging.getLogger('SapnsUser.get_view_name')
         
         def _get_view_name():
             
-            #logger.info('getting view name...')
+            logger.debug('getting view name...')
             
             meta = MetaData(bind=dbs.bind)
             prefix = config.get('views_prefix', '_view_')
             try:
                 # user's view
                 # "_view_alumnos_1"
-                view_name = '%s%s_%d' % (prefix, cls, self.user_id)
+                view_name = '%s%s_$%d' % (prefix, cls, self.user_id)
                 Table(view_name, meta, autoload=True)
                 view = view_name
             
@@ -544,7 +518,7 @@ class SapnsShortcut(DeclarativeBase):
         """Return a 'child' shortcut (of this) with the indicated 'order'"""
         
         logger = logging.getLogger('SapnsShortcut.by_order')
-        logger.info('order=%d' % order)
+        logger.debug('order=%d' % order)
         
         if comp == -1:
             cond = SapnsShortcut.order <= order
@@ -613,7 +587,7 @@ class SapnsShortcut(DeclarativeBase):
             for child in dbs.query(SapnsShortcut).\
                     filter(SapnsShortcut.parent_id == id_shortcut):
                 
-                _logger.info(child.title)
+                _logger.debug(child.title)
                 new_sc.add_child(child.shortcut_id)
         
         return new_sc
@@ -624,7 +598,7 @@ class SapnsShortcut(DeclarativeBase):
     def reorder(self, type_='up'):
         
         logger = logging.getLogger('SapnsShortcut.reorder')
-        logger.info(unicode(self))
+        logger.debug(unicode(self))
         
         def _reorder(this, that):
             aux = that.order
@@ -649,7 +623,7 @@ class SapnsShortcut(DeclarativeBase):
             else:
                 raise Exception('It is not possible to go deeper')
             
-        logger.info(next_sc.title)
+        logger.debug(next_sc.title)
             
         _reorder(self, next_sc)
 
@@ -748,7 +722,7 @@ class SapnsClass(DeclarativeBase):
                     
                 for r in cls.reference():
                     
-                    logger.info(r['name'])
+                    logger.debug(r['name'])
                     
                     if not r['related_class_id']:
                         names.append(tbl.c[r['name']])
@@ -775,7 +749,7 @@ class SapnsClass(DeclarativeBase):
                 order_by(*tuple(names[1:])).\
                 limit(MAX_VALUES)
                 
-        logger.info(sel)
+        logger.debug(sel)
         
         titles = []
         for row in dbs.execute(sel):
@@ -864,7 +838,7 @@ class SapnsClass(DeclarativeBase):
         if id_object and not _title:
             cls = SapnsClass.by_name(class_name)
             _title = '[%s: %s]' % (cls.title, id_object)
-            logger.info(u'no_title: %s' % _title)
+            logger.debug(u'no_title: %s' % _title)
             
         return _title
     
@@ -1234,7 +1208,7 @@ class SapnsPrivilege(DeclarativeBase):
         
         def _has_privilege():
             
-            #logger.info('> class=%s' % cls)
+            #logger.debug('> class=%s' % cls)
             
             # role based
             priv = dbs.query(SapnsPrivilege).\
@@ -1536,9 +1510,6 @@ class SapnsPermission(Permission):
     def __str__(self):
         return unicode(self).encode('utf-8')
     
-#    def has_privilege(self, id_user):
-#        return SapnsRolePermission.has_privilege(id_user, self.action_id)
-
 class SapnsRolePermission(DeclarativeBase):
 
     __tablename__ = 'sp_role_permission'
@@ -2196,9 +2167,7 @@ class SapnsLog(DeclarativeBase):
     table_name = Column(Unicode(100))
     row_id = Column(BigInteger)
     when_ = Column(DateTime, default=dt.datetime.now())
-    who = Column(Integer, 
-                 ForeignKey('sp_users.id',
-                            onupdate='CASCADE', ondelete='SET NULL'))
+    who = Column(Integer, ForeignKey('sp_users.id', onupdate='CASCADE', ondelete='SET NULL'))
     what = Column(Unicode(100))
     description = Column(Text)
     auto = Column(Boolean, default=False)
@@ -2216,7 +2185,7 @@ class SapnsLog(DeclarativeBase):
         """
         
         #logger = logging.getLogger('SapnsLog.register')
-        #logger.info(kw)
+        #logger.debug(kw)
         
         log = SapnsLog()
         

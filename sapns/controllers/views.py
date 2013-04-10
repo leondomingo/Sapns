@@ -42,10 +42,6 @@ class ViewsController(BaseController):
                         p_.has_permission('views'),
                         )
     
-#    @expose('sapns/views/index.html')
-#    def index(self, came_from='/'):
-#        return dict(page='views', came_from=url(came_from))
-    
     @expose('sapns/views/edit/edit.html')
     def edit(self, id_=None, **kw):
         
@@ -568,7 +564,13 @@ class ViewsController(BaseController):
         logger = logging.getLogger('ViewsController.view_save')
         try:
             title = get_paramw(kw, 'title', unicode)
-            name = re.sub(r'[^a-z0-9_]', '_', title.lower())
+            name = re.sub(u'(á|ä|à|â)', 'a', title.lower())
+            name = re.sub(u'(é|ë|è|ê)', 'e', name)
+            name = re.sub(u'(í|ï|ì|î)', 'i', name)
+            name = re.sub(u'(ó|ö|ò|ô)', 'o', name)
+            name = re.sub(u'(ú|ü|ù|û)', 'u', name)
+            name = re.sub(u'ñ', 'n', name)
+            name = re.sub(r'[^a-z0-9_\$]', '_', name)
             
             user_id = get_paramw(kw, 'user_id', int, opcional=True)
             if user_id:
@@ -823,7 +825,7 @@ class ViewsController(BaseController):
             if view.get('create_date'):
                 del view['create_date']
 
-            for af in view.get('advanced_filters'):
+            for af in view.get('advanced_filters', []):
               if af.get('view_id'):
                 del af['view_id']
 

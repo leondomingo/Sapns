@@ -3,6 +3,8 @@ $(function() {
     var view_id = "{{view.view_id}}",
         view_name = '',
         query = '{{view.query or ""}}';
+
+    var sbm = new SidebarMessages();
         
     function return_() {
         var f = '<form method="post" action="{{came_from}}"></form>';
@@ -30,10 +32,8 @@ $(function() {
         var user_id = '', //$('#sp-view-user').sapnsSelector('getValue');
             query = $('#sp-edit-view-list .grid').sapnsGrid('getQuery');
         
-        console.log(query);
-        
-        // TODO: mostrar sidebar-message modal=true 
-        
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
+
         $.ajax({
             url: "{{tg.url('/dashboard/views/view_save/')}}",
             data: {
@@ -47,7 +47,8 @@ $(function() {
                 query: query
             },
             success: function(res) {
-                // TODO: ocultar sidebar-message 
+                sbm.hide({ id: id_message });
+
                 if (res.status) {
                     return_();
                 }
@@ -81,6 +82,7 @@ $(function() {
     });
     
     function reload_attributes(class_id, path, rel) {
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
         $.ajax({
             url: "{{tg.url('/dashboard/views/attributes_list/')}}",
             data: {
@@ -89,6 +91,8 @@ $(function() {
                 rel: rel
             },
             success: function(res) {
+                sbm.hide({ id: id_message });
+
                 if (res.status) {
                     $('#sp-edit-view-attr-list').html(res.attributes);
                     $('#sp-edit-view-attr-list .attribute').disableSelection();
@@ -104,11 +108,14 @@ $(function() {
     }
     
     function reload_cols() {
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
         $('#sp-edit-view-cols').html('');
         $.ajax({
             url: "{{tg.url('/dashboard/views/view_cols/')}}",
             data: { view_id: view_id },
             success: function(content) {
+                sbm.hide({ id: id_message });
+
                 $('#sp-edit-view-cols').html(content);
                 $('#sp-edit-view-cols .filter').disableSelection();
             },
@@ -230,10 +237,13 @@ $(function() {
     $(document).off('click', s_add_field).on('click', s_add_field, function() {
         var path = $(this).parents('.attribute').attr('path');
         
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
         $.ajax({
             url: "{{tg.url('/dashboard/views/add_attribute/')}}",
             data: { view_id: view_id, attribute_path: path, view_name: view_name },
             success: function(res) {
+                sbm.hide({ id: id_message });
+
                 if (res.status) {
                     if (res.attribute.title) {
                         reload_cols();
@@ -257,10 +267,13 @@ $(function() {
     function edit_filter(path, pos) {
         var on_progress = false;
 
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
         $.ajax({
             url: "{{tg.url('/dashboard/views/edit_filter/')}}",
             data: { view_id: view_id, view_name: view_name, attribute_path: path, pos: pos },
             success: function(res) {
+                sbm.hide({ id: id_message });
+
                 if (res.status) {
                     $('#sp-edit-filter-dialog').remove();
                     $('<div id="sp-edit-filter-dialog" style="display:none"></div>').appendTo('body');
@@ -323,10 +336,13 @@ $(function() {
         var path = $(this).parent().attr('path'),
             on_progress = false;
         
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
         $.ajax({
             url: "{{tg.url('/dashboard/views/edit_attribute/')}}",
             data: { view_id: view_id, view_name: view_name, path: path },
             success: function(content) {
+                sbm.hide({ id: id_message });
+                
                 $('#sp-edit-view-dialog').remove();
                 $('<div id="sp-edit-view-dialog" style="display:none"></div>').appendTo('body');
                 $('#sp-edit-view-dialog').html(content).dialog({
