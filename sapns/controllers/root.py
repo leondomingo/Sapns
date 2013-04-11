@@ -13,6 +13,7 @@ from sapns.model.sapnsmodel import SapnsUser
 from tg import expose, require, url, request, response, redirect, config, predicates
 from tg.decorators import use_custom_format
 from tg.i18n import set_lang
+from tg.configuration import config
 import logging
 
 __all__ = ['RootController']
@@ -34,6 +35,10 @@ class RootController(BaseController):
     error = ErrorController()
     dashboard = DashboardController()
     docs = DocsController()
+
+    def __init__(self, *args, **kwargs):
+        super(RootController, self).__init__(*args, **kwargs)
+        config['pylons.app_globals'].jinja2_env.autoescape = False
     
     @expose('sapns/login.html')
     @expose('sapns/index.html', custom_format='home')
