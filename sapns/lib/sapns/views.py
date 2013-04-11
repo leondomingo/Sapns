@@ -134,11 +134,11 @@ def get_query(view_id):
             nagg_columns.append(col_title)
             
     group_by = None
-    if not len(agg_columns):
-        columns.insert(0, '%s_0.id' % view['base_class'])
-        
-    else:
+    if len(agg_columns):
+        nagg_columns.insert(0, '%s_0.id' % view['base_class'])
         group_by = 'GROUP BY %s' % (', '.join(nagg_columns))
+
+    columns.insert(0, '%s_0.id' % view['base_class'])
         
     query =  u'SELECT %s\n' % (',\n'.join(columns))
     query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
