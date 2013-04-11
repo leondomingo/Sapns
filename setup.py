@@ -9,13 +9,13 @@ except ImportError:
 
 setup(
     name='sapns',
-    version='0.4',
+    version='0.5',
     description='Web platform by Ender',
     author='León Domingo',
     author_email='leon.domingo@ender.es',
     url='http://www.ender.es',
     install_requires=[
-        "TurboGears2 >= 2.2.0",
+        "TurboGears2 >= 2.2.2",
         "Genshi",
         "Jinja2",
         "zope.sqlalchemy >= 0.4",
@@ -58,7 +58,7 @@ setup(
     main = pylons.util:PylonsInstaller
     """,
     dependency_links=[
-        "http://tg.gy/220"
+        "http://tg.gy/222"
         ],
     zip_safe=False
 )
