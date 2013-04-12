@@ -12,6 +12,7 @@ import logging
 import re
 from copy import deepcopy
 import simplejson as sj
+from sqlalchemy import and_
 
 # might be anything except a number (0, 1, 2, ...) or # (sharp symbol)
 COLLECTION_CHAR = 'c'
@@ -139,6 +140,15 @@ def get_query(view_id):
         group_by = 'GROUP BY %s' % (', '.join(nagg_columns))
 
     columns.insert(0, '%s_0.id' % view['base_class'])
+
+    # add id_ columns
+    for attr_ in dbs.query(SapnsAttribute).\
+            join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
+            filter(and_(SapnsClass.name == view['base_class'],
+                        SapnsAttribute.related_class_id != None,
+                        )):
+
+        columns.append('%s_0.%s as "%s$"' % (view['base_class'], attr_.name, attr_.name))
         
     query =  u'SELECT %s\n' % (',\n'.join(columns))
     query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
