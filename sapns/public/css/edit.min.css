@@ -7,7 +7,7 @@
 #edit_buttons button{width:100px}#edit-back{z-index:100}#back-button,#save-button{cursor:pointer}
 #back-button:hover,#save-button:hover,#action-go:hover,#rel-classes-show:hover{color:white}
 .sp-save-button{width:70px}#edit_fields{overflow:auto;height:443px;width:100%}.sp-edit-field.required .sp-label-field{font-weight:bold}
-.sp-edit-field.readonly .sp-label-field{color:#999}.sp-label-field{margin:4px 0 2px 10px;font:12px arial;color:#605b7c}
+.sp-edit-field.readonly .sp-label-field{color:#999}.sp-label-field{margin:4px 0 2px 10px;font:13px arial;color:#605b7c}
 .sp-text-field{width:97%;max-width:97%;min-width:97%;margin-left:1%;font-family:sans-serif}
 .sp-label-field-must{font-weight:bold}.url_field_text{width:85%;max-width:85%;min-width:85%;margin-left:1%;font-family:Courier;font-weight:bold}
 .sp-select-field{width:97%;margin-left:1%}.sp-select-text{width:90%}.sp-checkbox-field{margin-left:1%}

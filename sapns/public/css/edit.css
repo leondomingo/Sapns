@@ -3,7 +3,7 @@
 #rel-classes, #actions { width:700px }
 
 #rel-classes-title, #actions-title { float:left; margin-top:3px; margin-right:5px;
-font-size:11px; width:200px; text-align:left }
+    font-size:11px; width:200px; text-align:left }
 
 .related-classes-count, .actions-count { font-weight:bold; font-size:9px }
 
@@ -11,7 +11,7 @@ font-size:11px; width:200px; text-align:left }
 #rel-classes-show, #action-go { cursor:pointer }
 
 #edit-header { position:relative; border-bottom:1px solid #ccc; border-right:1px solid #ccc;
-margin:10px 10px 10px 10px; height:125px; padding:5px; background-color:#ddd; opacity:0.8; border-radius:3px }
+    margin:10px 10px 10px 10px; height:125px; padding:5px; background-color:#ddd; opacity:0.8; border-radius:3px }
 
 #edit_buttons { position:absolute; right:12px; bottom:3px }
 #edit_buttons div { float:left }
@@ -34,12 +34,12 @@ margin:10px 10px 10px 10px; height:125px; padding:5px; background-color:#ddd; op
 .sp-edit-field {}
 .sp-edit-field.required .sp-label-field { font-weight:bold }
 .sp-edit-field.readonly .sp-label-field { color:#999 }
-.sp-label-field { margin:4px 0 2px 10px; font:12px arial; color:#605B7C }
+.sp-label-field { margin:4px 0 2px 10px; font:13px arial; color:#605B7C }
 .sp-text-field { width:97%; max-width:97%; min-width:97%; margin-left:1%; font-family:sans-serif }
 .sp-label-field-must { font-weight:bold }
 
 .url_field_text { width:85%; max-width:85%; min-width:85%; margin-left:1%;
-font-family:Courier; font-weight:bold }
+    font-family:Courier; font-weight:bold }
 .sp-select-field { width:97%; margin-left:1% }
 .sp-select-text { width:90% }
 .sp-checkbox-field { margin-left:1% }
@@ -50,12 +50,12 @@ font-family:Courier; font-weight:bold }
 .sp-search-text { width:650px }
 
 #right_desc { position:absolute; left:15px; top:0px; padding-right:10px; width:810px;
-background-color:transparent }
+    background-color:transparent }
 #class_title { color:#666; font-size:22px; font-weight:bold; height:31px;
-margin-left:0; margin-top:7px; overflow:hidden }
+    margin-left:0; margin-top:7px; overflow:hidden }
 #reference { margin-left:0; font-size:15px; color:black; background-color:none;
-text-align:left; height:22px; overflow:hidden }
+    text-align:left; height:22px; overflow:hidden }
 #created_updated { height:9px; font-size:9px; cursor:pointer }
 .created { width:120px; border:1px solid #bbb; float:left; margin-right:5px;
-text-align:center; background:#B4BD3C }
+    text-align:center; background:#B4BD3C }
 .created:hover { background-color:#ECEFCC }

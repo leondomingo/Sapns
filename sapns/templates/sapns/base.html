@@ -7,7 +7,7 @@
     {{tg.config.get('app.name', 'Sapns')}} - {{tg.config.get('app.subtitle', 'Web Information System')}}
     [{{tg.request.identity['user'].display_name}}]</title>
 {% endblock %}
-<link rel="stylesheet" href="{{tg.url('/css/style.min.css', dict(v=16))}}">
+<link rel="stylesheet" href="{{tg.url('/css/style.min.css', dict(v=17))}}">
 <!--{% if tg.config.get('app.root_folder') %}-->
   <!--{% set root_folder = tg.config.get('app.root_folder') %}-->
   <link rel="stylesheet" href="{{tg.url('/css/%s/sapns.css' % root_folder, params=dict(v=1))}}">
