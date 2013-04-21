@@ -12,14 +12,19 @@ import re
 import transaction
 _open = encodings.codecs.open
 
-logger = logging.getLogger('Update')
 current_path = os.path.dirname(os.path.abspath(__file__))
 
 class Update(object):
     
-    def __init__(self):
-        logger.info('Loading settings...')
+    def __init__(self, *args):
+        self.logger = logging.getLogger('Update')
+
+        self.args = args
+        self.verbose = '_verbose' in self.args
         
+        if self.verbose:
+            self.logger.info('Loading settings...')
+
         # postgresql://postgres:mypassword@localhost:5432/mydb
         m_session = re.search(r'://(\w+):(\w+)@(\w+)(:\d+)?/(\w+)', unicode(config.get('sqlalchemy.url')))
         if m_session:
@@ -101,17 +106,19 @@ class Update(object):
                                                         raise Exception('[%s] Class "%s.%s" in not callable' % (topid, m.__name__, member[0]))
                                                     
                                                 else:
-                                                    logger.warning(u'[%s] Skipping [%s__%s.%s "%s"]' % (topid, dirname, m.__name__, member[0], code__))
+                                                    if self.verbose:
+                                                        self.logger.warning(u'[%s] Skipping [%s__%s.%s "%s"]' % (topid, dirname, m.__name__, member[0], code__))
                                                 
                                             else:
-                                                logger.warning('[%s] PY: %s.%s lacks of "__code__"' % (topid, m.__name__, member[0]))
+                                                if self.verbose:
+                                                    self.logger.warning('[%s] PY: %s.%s lacks of "__code__"' % (topid, m.__name__, member[0]))
                                         
                                         except Exception, e:
-                                            logger.error(e)
-                                            logger.info(name + ' ' + member[0])
+                                            self.logger.error(e)
+                                            self.logger.info(name + ' ' + member[0])
                                 
                             except ImportError, e:
-                                logger.warning(e)
+                                self.logger.warning(e)
                             
                         elif ext.lower() == '.sql':
                             
@@ -122,7 +129,9 @@ class Update(object):
                                 # -- __ignore__
                                 m_ignore = re.search(r'^--\s*__ignore__\s*$', sql_text, re.M)
                                 if m_ignore:
-                                    logger.warning('[%s] SQL: ignoring "%s"' % (topid, fn))
+                                    if self.verbose:
+                                        self.logger.warning('[%s] SQL: ignoring "%s"' % (topid, fn))
+
                                     continue
                                 
                                 # -- __code__ = put here your code
@@ -137,7 +146,7 @@ class Update(object):
                                         m_desc = re.search(r'^--\s*__desc__\s+=\s+(.+)$', sql_text, re.M)
                                         if m_desc:
                                             desc__ = m_desc.group(1).strip()
-                                            logger.info(desc__)
+                                            self.logger.info(desc__)
                                             
                                         todo.append(dict(type='sql',
                                                          path=os.path.join(dirpath, fn),
@@ -149,10 +158,12 @@ class Update(object):
                                                          ))
                                         
                                     else:
-                                        logger.warning(u'[%s] Skipping [%s__%s "%s"]' % (topid, dirname, fn, code__))
+                                        if self.verbose:
+                                            self.logger.warning(u'[%s] Skipping [%s__%s "%s"]' % (topid, dirname, fn, code__))
     
                                 else:
-                                    logger.warning(u'[%s] SQL: Ignoring [%s__%s] cause lacks of "__code__"' % (topid, dirname, fn))
+                                    if self.verbose:
+                                        self.logger.warning(u'[%s] SQL: Ignoring [%s__%s] cause lacks of "__code__"' % (topid, dirname, fn))
                                     
                             finally:
                                 f_sql.close()
@@ -168,17 +179,17 @@ class Update(object):
                 return cmp(x['path'], y['path'])
             
         if todo:
-            logger.info('TODO'.center(80, '-'))
+            self.logger.info('TODO'.center(80, '-'))
         
         for update in sorted(todo, cmp=_cmp):
             if update['type'] == 'py':
                 transaction.begin()
                 try:
-                    logger.warning(u'[%s] Executing [%s__%s.%s "%s"]' % (update['topid'], 
-                                                                         update['dirname'],
-                                                                         update['module_name'], 
-                                                                         update['class_name'], 
-                                                                         update['code']))
+                    self.logger.warning(u'[%s] Executing [%s__%s.%s "%s"]' % (update['topid'], 
+                                                                              update['dirname'],
+                                                                              update['module_name'], 
+                                                                              update['class_name'], 
+                                                                              update['code']))
                     
                     # execute (call)
                     update['callable']()
@@ -189,7 +200,7 @@ class Update(object):
                     transaction.commit()
                     
                 except Exception, e:
-                    logger.error(e)
+                    self.logger.error(e)
                     transaction.abort()
                     
             elif update['type'] == 'sql':
@@ -197,13 +208,12 @@ class Update(object):
                 try:
                     for script in update['sql_text'].split('--#'):
                         if script.strip():
-                            
-                            logger.warning(u'[%s] Executing [%s__%s "%s"] "%s..."' % (update['topid'], 
-                                                                                      update['dirname'], 
-                                                                                      os.path.basename(update['path']),
-                                                                                      update['code'],
-                                                                                      script.strip()[:30].replace('\n', ' '),
-                                                                                      ))
+                            self.logger.warning(u'[%s] Executing [%s__%s "%s"] "%s..."' % (update['topid'], 
+                                                                                           update['dirname'], 
+                                                                                           os.path.basename(update['path']),
+                                                                                           update['code'],
+                                                                                           script.strip()[:30].replace('\n', ' '),
+                                                                                          ))
                             
                             dbs.execute(script.strip())
                             dbs.flush()
@@ -214,8 +224,5 @@ class Update(object):
                     transaction.commit()
                                 
                 except Exception, e:
-                    logger.error(e)
+                    self.logger.error(e)
                     transaction.abort()
-                    
-                    
-                    

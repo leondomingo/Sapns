@@ -7,3 +7,4 @@ production.ini
 data/
 *.sublime-project
 *.sublime-workspace
+.idea/
