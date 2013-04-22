@@ -9,7 +9,7 @@ from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
-from sapns.lib.sapns.util import get_template, pagination
+from sapns.lib.sapns.util import get_template, pagination, format_float as _format_float
 from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view, \
     drop_view, translate_view, filter_sql, filter_title
 from sapns.model import DBSession as dbs
@@ -702,9 +702,8 @@ class ViewsController(BaseController):
         ds.time_fmt = config.get('formats.time', default='%H:%M')
         ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
         ds.true_const = _('Yes')
-        ds.false_const = _('No')
-        
-        #ds.float_fmt = app_cfg.format_float
+        ds.false_const = _('No')        
+        ds.float_fmt = _format_float
         
         visible_width = 800
         min_width = visible_width / 6

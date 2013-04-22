@@ -45,6 +45,7 @@ views_prefix = _view_
 formats.date = %m/%d/%Y
 formats.time = %H:%M
 formats.datetime = %m/%d/%Y %H:%M
+formats.float = '9.999,99'
 grid.date_format = %m/%d/%Y
 grid.time_format = %H:%M
 grid.datetime_format = %m/%d/%Y %H:%M
