@@ -610,3 +610,6 @@ def strtotime(s):
 def timetostr(t):
     time_fmt = config.get('formats.time')
     return nutil.timetostr(t, fmt=time_fmt)
+
+def format_float(v):
+    return nutil.format_float(v, format=config.get('formats.float', '9.999,99'))

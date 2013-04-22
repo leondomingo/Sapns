@@ -5,7 +5,7 @@ from neptuno.util import get_paramw, strtodate
 from pylons.i18n import ugettext as _
 from sapns.config import app_cfg
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import pagination
+from sapns.lib.sapns.util import pagination, format_float as _format_float
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsPermission
 from sqlalchemy import MetaData, Table
@@ -83,7 +83,7 @@ class LogsController(BaseController):
         ds.true_const = _('Yes')
         ds.false_const = _('No')
         
-        ds.float_fmt = app_cfg.format_float
+        ds.float_fmt = _format_float
         
         cols = []
         for col in ds.labels:

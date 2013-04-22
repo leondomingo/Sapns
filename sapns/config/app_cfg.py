@@ -130,8 +130,3 @@ class CustomConfig(AppConfig):
         config['routes.map'] = map_
     
 base_config = CustomConfig()
-
-# Sapns settings
-def format_float(value):
-    return np_util.format_float(value, thousands_sep=',', decimal_sep='.', 
-                                show_sign=False, n_dec=2)

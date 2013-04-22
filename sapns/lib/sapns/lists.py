@@ -3,7 +3,7 @@
 from neptuno.util import get_paramw, strtodate
 from pylons.i18n import ugettext as _
 from sapns.config import app_cfg
-from sapns.lib.sapns.util import pagination
+from sapns.lib.sapns.util import pagination, format_float as _format_float
 from sapns.model import DBSession as dbs, SapnsUser, SapnsClass, SapnsPermission
 from tg import url, request, config
 import logging
@@ -147,7 +147,7 @@ class List(object):
         ds.true_const = _('Yes')
         ds.false_const = _('No')
         
-        ds.float_fmt = app_cfg.format_float
+        ds.float_fmt = _format_float
         
         visible_width = 800
         min_width = visible_width / 6
