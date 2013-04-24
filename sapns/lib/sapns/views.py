@@ -127,13 +127,14 @@ def get_query(view_id):
         else:
             filters.append(attribute['expression'])
         
-        m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\([\w\,\.]+\)', attribute['expression'].upper())
-        if m_agg:
-            agg_columns.append(col_title)
-            
-        else:
-            nagg_columns.append(col_title)
-            
+        if not attribute.get('is_filter'):
+            m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\([\w\,\.]+\)', attribute['expression'].upper())
+            if m_agg:
+                agg_columns.append(col_title)
+                
+            else:
+                nagg_columns.append(col_title)
+
     group_by = None
     if len(agg_columns):
         nagg_columns.insert(0, '%s_0.id' % view['base_class'])
@@ -142,13 +143,14 @@ def get_query(view_id):
     columns.insert(0, '%s_0.id' % view['base_class'])
 
     # add id_ columns
-    for attr_ in dbs.query(SapnsAttribute).\
-            join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
-            filter(and_(SapnsClass.name == view['base_class'],
-                        SapnsAttribute.related_class_id != None,
-                        )):
+    if not group_by:
+        for attr_ in dbs.query(SapnsAttribute).\
+                join((SapnsClass, SapnsClass.class_id == SapnsAttribute.class_id)).\
+                filter(and_(SapnsClass.name == view['base_class'],
+                            SapnsAttribute.related_class_id != None,
+                            )):
 
-        columns.append('%s_0.%s as "%s$"' % (view['base_class'], attr_.name, attr_.name))
+            columns.append('%s_0.%s as "%s$"' % (view['base_class'], attr_.name, attr_.name))
         
     query =  u'SELECT %s\n' % (',\n'.join(columns))
     query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
@@ -504,7 +506,7 @@ def filter_sql(path, attribute, operator, value, null_value):
 
         # date
         if attr.type == SapnsAttribute.TYPE_DATE:
-            if null_value:
+            if not null_value:
                 # foo IS NOT NULL AND foo > '2001-01-01'
                 sql = u"%s IS NOT NULL AND %s %s '%s'" % (attribute, attribute, operator_, value_)
             else:
