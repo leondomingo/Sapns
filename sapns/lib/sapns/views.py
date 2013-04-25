@@ -128,7 +128,7 @@ def get_query(view_id):
             filters.append(attribute['expression'])
         
         if not attribute.get('is_filter'):
-            m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\([\w\,\.]+\)', attribute['expression'].upper())
+            m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\(.+\)', attribute['expression'].upper())
             if m_agg:
                 agg_columns.append(col_title)
                 

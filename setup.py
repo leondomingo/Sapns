@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name='sapns',
-    version='0.5',
+    version='0.6',
     description='Web platform by Ender',
     author='León Domingo',
     author_email='leon.domingo@ender.es',
