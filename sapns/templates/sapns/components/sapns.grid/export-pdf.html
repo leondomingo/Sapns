@@ -6,13 +6,76 @@
 {% endblock %}
 <title>{{ title or _('Report')}}</title>
 <style>
-    html { background-color:#fff; }
-    body { width:1200px; margin:0 auto; font:12px arial; background-color:#f2f2f2; }
+    html { background-color:#fff }
+    body { margin:0 auto; font:12px arial;
+        /* {% if orientation == 'Portrait' %} */
+        width:1200px; 
+        /* {% elif orientation == 'Landscape' %} */
+        width:1500px;
+        /* {% endif %} */
+    }
+    table { width:100%; margin-bottom:10px }
+    tr { page-break-after:auto }
+    tr td:first-child { border-left:1px solid #ddd }
+    td { border-bottom:1px solid #ddd; border-right:1px solid #ddd; vertical-align:top; font:11px arial; padding:2px }
+    td.bool { text-align:center }
+    td.int, td.float { text-align:right }
+    td.date, td.time, td.datetime { text-align:right }
+    tr.header { background-color:#f9f9f9 }
+    tr.header td:first-child { border-left:1px solid #444 }
+    tr.header td { font-weight:bold; border-top:1px solid #444; border-bottom:1px solid #444; border-right:1px solid #444 }
 </style>
 </head>
 <body>
-    <!--{% for row in ds %}-->
-    <h1>{{row}}</h1>
-    <!--{% endfor %}-->
+    {% block header %}
+    {% endblock %}
+
+    <table cellpadding="0" cellspacing="0">
+        <tr class="header">
+            <!--{% set i = 0 %}-->
+            <!--{% for label in ds.labels %}-->
+                <!--{% if ds.cols[i] in visible_columns %}-->
+                <td>{{label}}</td>
+                <!--{% endif %}-->
+
+                <!--{% set i = i + 1 %}-->
+            <!--{% endfor %}-->
+        <tr>
+
+        <!--{% for row in ds %}-->
+            <!--{% set i = 0 %}-->
+            <!--{% for item in row %}-->
+                <!--{% if ds.cols[i] in visible_columns %}-->
+                    <!-- bool -->
+                    <!--{% if ds.types[i] == 'bool' %}-->
+                        <!--{% if item %}-->
+                        <td class="bool">{{_('Yes')}}</td>
+                        <!--{% else %}-->
+                        <td class="bool">{{_('No')}}</td>
+                        <!--{% endif %}-->
+                    <!-- int -->
+                    <!--{% elif ds.types[i] == 'int' %}-->
+                        <td class="int">{{item}}</td>
+                    <!-- float -->
+                    <!--{% elif ds.types[i] == 'float' %}-->
+                        <td class="float">{{format_float(item)}}</td>
+                    <!-- date -->
+                    <!--{% elif ds.types[i] == 'date' %}-->
+                        <td class="date">{{datetostr(item)}}</td>
+                    <!-- time -->
+                    <!--{% elif ds.types[i] == 'time' %}-->
+                        <td class="time">{{timetostr(item)}}</td>
+                    <!-- datetime -->
+                    <!--{% elif ds.types[i] == 'datetime' %}-->
+                        <td class="time">{{datetostr(item)}} {{timetostr(item)}}</td>
+                    <!--{% else %}-->
+                        <td>{{item or '&nbsp;'}}</td>
+                    <!--{% endif %}-->
+                <!--{% endif %}-->
+                <!--{% set i = i + 1 %}-->
+            <!--{% endfor %}-->
+            </tr>
+        <!--{% endfor %}-->
+    </table>
 </body>
 </html>

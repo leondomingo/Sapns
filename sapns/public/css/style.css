@@ -54,9 +54,10 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 .sp-logout-user { padding-left:10px; float:left; font-style:italic;
     font-family:Arial; font-size:13px; width:240px; height:18px; opacity:1;
-    border-radius:10px }
+    border-radius:10px; font-weight:normal }
 
-.sp-logout-user { font-weight:normal }
+.sp-logout-user:hover { background-color:#ECEFCC; font-weight:bold }
+
 .sp-logout-user * { float:left; height:16px }
 .sp-logout-user img { width:16px; margin-top:1px; margin-right:5px }
 .sp-logout-user .user-name { margin-top:2px; color:#444 }
@@ -86,8 +87,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 .sp-grid-search-box .sp-grid-select-filter { float:right; width:180px; height:20px; margin-top:3px }
 .sp-grid .sp-col-title:first-child { border-radius:5px 0 0 0 }
 .sp-grid .sp-col-title:last-child { border-radius:0 5px 0 0 }
-.sp-grid-caption { color:#666; font:bold 22px helvetica,arial; height:31px;
-    margin-left:0; margin-top:7px; overflow:hidden; width:100% }
+.sp-grid-caption { color:#666; font:bold 22px helvetica,arial; height:31px; margin-left:0; 
+    margin-top:7px; overflow:hidden; width:100%; text-shadow:1px 2px #ccc }
 
 .sp-grid-dialog .wait-message { font:12px arial; color:#cc0000 }
 

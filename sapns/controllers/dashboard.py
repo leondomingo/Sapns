@@ -15,7 +15,8 @@ from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
 from sapns.lib.sapns.lists import List, EListForbidden
-from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf
+from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
+    format_float, datetostr as _datetostr, timetostr as _timetostr
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -376,7 +377,7 @@ class DashboardController(BaseController):
     def to_pdf(self, **kw):
         logger = logging.getLogger('DashboardController.to_pdf')
         try:
-            # all records
+            # just one record
             kw['rp'] = 1
             cls = get_paramw(kw, 'cls', str)
             del kw['cls']
@@ -408,11 +409,24 @@ class DashboardController(BaseController):
             
             fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
 
-            response.content_type = 'application/pdf'
-            response.headers['Content-Disposition'] = 'attachment;filename=%s.pdf' % fn
+            if not kw.get('html'):
+                response.content_type = 'application/pdf'
+                # response.headers['Content-Disposition'] = 'attachment;filename=%s.pdf' % fn
+                response.headers['Content-Disposition'] = 'inline;filename=%s.pdf' % fn
+            else:
+                response.content_type = 'text/html'
 
             tmpl = get_template('sapns/components/sapns.grid/export-pdf.html')
-            content = topdf(tmpl.render(tg=tg, _=_, url2=url2, ds=ds).encode('utf-8'))
+
+            content = tmpl.render(tg=tg, _=_, url2=url2, 
+                                  format_float=format_float, 
+                                  datetostr=_datetostr, timetostr=_timetostr,
+                                  orientation=kw.get('orientation', 'Portrait') or 'Portrait',
+                                  visible_columns=kw.get('visible_columns'),
+                                  ds=ds, title=fn).encode('utf-8')
+
+            if not kw.get('html'):
+                content = topdf(content, orientation=kw.get('orientation'))
 
             return content
 

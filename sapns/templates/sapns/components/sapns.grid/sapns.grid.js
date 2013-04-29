@@ -208,14 +208,15 @@ var __DEFAULT_FILTER = 'default';
             id: 'excel',
             title: 'Excel',
             url: "{{tg.url('/dashboard/to_xls/')}}"
-        },
-        {
-            id: 'pdf',
-            title: 'PDF',
-            url: "{{tg.url('/dashboard/to_pdf/')}}",
-            export_url: "{{tg.url('/dashboard/to_pdf_/')}}",
-            modal: true
-        }];
+        }
+        // {
+        //     id: 'pdf',
+        //     title: 'PDF',
+        //     url: "{{tg.url('/dashboard/to_pdf/')}}",
+        //     export_url: "{{tg.url('/dashboard/to_pdf_/')}}",
+        //     modal: true
+        // }
+        ];
         
         // default "pager_options"
         var pager_options = settings.pager_options;
@@ -1527,12 +1528,23 @@ var __DEFAULT_FILTER = 'default';
                                         if (!on_progress) {
                                             on_progress = true;
 
+                                            var visible_columns = [];
+                                            $('.export-label.selected').each(function() {
+                                                var column_name = $(this).attr('column-name');
+                                                visible_columns.push(column_name);
+                                            });
+
+                                            var orientation = $('.export-orientation:checked').attr('orientation');
+
                                             // /dashboard/topdf -> /dashboard/topdf_
-                                            var form_export = '<form action="' + selected_format.export_url + '" method="get">\
+                                            var form_export = '<form action="' + selected_format.export_url + '" method="get" target="_blank">\
                                                 <input type="hidden" name="cls" value="' + self.cls + '">\
                                                 <input type="hidden" name="q" value="' + self.query() + '">\
                                                 <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
-                                                <input type="hidden" name="parent_id" value="' + self.parent_id + '">' + 
+                                                <input type="hidden" name="parent_id" value="' + self.parent_id + '">\
+                                                <input type="hidden" name="orientation" value="' + orientation + '">\
+                                                <input type="hidden" name="html" value="">\
+                                                <input type="hidden" name="visible_columns" value=\'' + JSON.stringify(visible_columns) + '\'>' +
                                                 extra_params + '</form>';
 
                                             $(form_export).appendTo('body').submit().remove();

@@ -1,4 +1,82 @@
-Aquí las opciones de exportación
-<!--{% for lbl in ds.labels %}-->
-<div>{{lbl}}</div>
-<!--{% endfor %}-->
+<style>
+.export-title { font:15px arial; background-color:#f2f2f2; border-radius:2px; padding:2px 5px; margin-bottom:2px }
+.export-separator { clear:left }
+.export-label { border-radius:4px; padding:4px; margin-bottom:2px; height:20px;
+    width:155px; font:13px arial; text-align:center; cursor:default; float:left; margin-right:2px }
+.export-label-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
+    width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
+.export-label.selected { background-color:#ECEFCC; font-weight:bold }
+.export-label.selected:hover { color:#b4bd3c }
+.export-label.unselected { background-color:#d5d5d5; color:#777 }
+
+.sp-field-row.orientation .label,
+.sp-field-row.format .label { width:100px }
+</style>
+
+<div class="export-title">{{_('Visible columns')}}</div>
+<div class="export-labels">
+    <!--{% set i = 0 %}-->
+    <!--{% for lbl in ds.labels %}-->
+    <div class="export-label selected" column-name="{{ds.cols[i]}}">{{lbl}}</div>
+    <!--{% set i = i + 1 %}-->
+    <!--{% endfor %}-->
+</div>
+
+<div class="export-separator">&nbsp;</div>
+
+<div class="export-title">{{_('Orientation')}}</div>
+<div class="sp-field-row orientation">
+    <div class="sp-field">
+        <div class="label">{{_('Portrait')}}</div>
+        <input class="export-orientation" orientation="Portrait" type="radio" checked>
+    </div>
+
+    <div class="sp-field">
+        <div class="label">{{_('Landscape')}}</div>
+        <input class="export-orientation" orientation="Landscape" type="radio">
+    </div>
+</div>
+
+{#<div class="export-title">{{_('Format')}}</div>
+<div class="sp-field-row format">
+    <div class="sp-field">
+        <div class="label">{{_('PDF')}}</div>
+        <input class="export-format" format="pdf" type="radio" checked>
+    </div>
+
+    <div class="sp-field">
+        <div class="label">{{_('HTML')}}</div>
+        <input class="export-format" format="html" type="radio">
+    </div>
+</div>#}
+
+<script>
+$(function() {
+    $('.export-labels').sortable({
+        placeholder: 'export-label-ph',
+        stop: function(e, ui) {
+        }
+    });
+
+    $('.export-label').dblclick(function() {
+        if ($(this).hasClass('selected')) {
+            $(this).removeClass('selected').addClass('unselected');
+        }
+        else {
+            $(this).addClass('selected').removeClass('unselected');
+        }
+    });
+
+    $('.export-orientation').click(function() {
+        var orientation = $(this).attr('orientation');
+        $('.export-orientation').prop('checked', false);
+        $('.export-orientation[orientation=' + orientation + ']').prop('checked', true);
+    });
+
+    $('.export-format').click(function() {
+        var format = $(this).attr('format');
+        $('.export-format').prop('checked', false);
+        $('.export-format[format=' + format + ']').prop('checked', true);
+    });
+});
+</script>
