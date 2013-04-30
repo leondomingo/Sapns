@@ -176,8 +176,21 @@ class List(object):
                 view_cols = view_cols_
         
         cols = []
-        for col, w in zip(ds.labels, view_cols):
-            cols.append(dict(title=col, width=w, align='center'))
+        for col, w, type_ in zip(ds.labels, view_cols, ds.types):
+            align = 'center'
+            # int, long, float
+            if type_ == 'int' or type_ == 'long' or type_ == 'float':
+                align = 'right'
+
+            # str
+            elif type_ == '' or type_ == 'str':
+                align = 'left'
+
+            # date, time
+            elif type_ == 'date' or type_ == 'time':
+                align = 'center'
+
+            cols.append(dict(title=col, width=w, align=align))
             
         this_page, total_pag = pagination(self.rp, self.pag_n, ds.count)
         
