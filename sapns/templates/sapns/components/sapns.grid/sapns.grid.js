@@ -207,7 +207,10 @@ var __DEFAULT_FILTER = 'default';
         {
             id: 'excel',
             title: 'Excel',
-            url: "{{tg.url('/dashboard/to_xls/')}}"
+            url: "{{tg.url('/dashboard/to_xls/')}}",
+            func_name: 'to_xls',
+            export_url: "{{tg.url('/dashboard/to_xls_/')}}",
+            modal: true
         }
         // {
         //     id: 'pdf',
@@ -1518,7 +1521,7 @@ var __DEFAULT_FILTER = 'default';
                             $('#sp-grid-export-dialog').remove();
                             $('<div id="sp-grid-export-dialog" style="display:none"></div>').appendTo('body');
                             $('#sp-grid-export-dialog').html(res.content).dialog({
-                                title: "{{_('Export view to PDF')}}",
+                                title: selected_format.title,
                                 modal: true,
                                 resizable: false,
                                 width: selected_format.width || 700,
@@ -1528,31 +1531,15 @@ var __DEFAULT_FILTER = 'default';
                                         if (!on_progress) {
                                             on_progress = true;
 
-                                            var visible_columns = [];
-                                            $('.export-label.selected').each(function() {
-                                                var column_name = $(this).attr('column-name');
-                                                visible_columns.push(column_name);
-                                            });
-
-                                            var orientation = $('.export-orientation:checked').attr('orientation');
-
-                                            // /dashboard/topdf -> /dashboard/topdf_
-                                            var form_export = '<form action="' + selected_format.export_url + '" method="get" target="_blank">\
-                                                <input type="hidden" name="cls" value="' + self.cls + '">\
-                                                <input type="hidden" name="q" value="' + self.query() + '">\
-                                                <input type="hidden" name="ch_attr" value="' + self.ch_attr + '">\
-                                                <input type="hidden" name="parent_id" value="' + self.parent_id + '">\
-                                                <input type="hidden" name="orientation" value="' + orientation + '">\
-                                                <input type="hidden" name="html" value="">\
-                                                <input type="hidden" name="visible_columns" value=\'' + JSON.stringify(visible_columns) + '\'>' +
-                                                extra_params + '</form>';
-
-                                            $(form_export).appendTo('body').submit().remove();
-
-                                            setTimeout(function() {
+                                            window[selected_format.func_name](function() {
                                                 on_progress = false;
-                                                $('#sp-grid-export-dialog').dialog('close');
-                                            }, 500);
+                                                // setTimeout(function() {
+                                                //     on_progress = false;
+                                                //     $('#sp-grid-export-dialog').dialog('close');
+                                                // }, 500);
+                                            }, function() {
+                                                on_progress = false;
+                                            });
                                         }
                                     },
                                     "{{_('Cancel')}}": function() {

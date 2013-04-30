@@ -25,13 +25,14 @@ from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from tg import response, expose, require, url, request, redirect, config, predicates as p
 import tg
-import cStringIO
+from cStringIO import StringIO
 import datetime as dt
 import logging
 import re
 import simplejson as sj
 from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
+import sapns.lib.sapns.to_xls as toxls
 
 # controllers
 __all__ = ['DashboardController']
@@ -351,24 +352,86 @@ class DashboardController(BaseController):
         response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % fn
         
         return ds.to_csv()
+
+    @expose('json')
+    @require(p.not_anonymous())
+    def to_xls(self, **kw):
+        logger = logging.getLogger('DashboardController.to_xls')
+        try:
+            # just one record
+            kw['rp'] = 1
+            cls = get_paramw(kw, 'cls', str)
+            del kw['cls']
+
+            list_ = List(cls, **kw)
+            ds = list_.grid_data()
+
+            kw.update(cls=cls)
+
+            tmpl = get_template('sapns/components/sapns.grid/export-dialog.html')
+            content = tmpl.render(tg=tg, _=_, ds=ds, data=kw)
+
+            return dict(status=True, content=content)
+
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
     
     @expose()
     @require(p.not_anonymous())
-    def to_xls(self, cls, **kw):
+    def to_xls_(self, **kw):
+
+        logger = logging.getLogger('DashboardController.to_xls_')
+        logger.debug(kw)
+
+        visible_columns = sj.loads(kw['visible_columns'])
         
+        # group_by
+        group_by = sj.loads(kw['group_by'])
+        def cmp_(x, y):
+            i = visible_columns.index(x)
+            j = visible_columns.index(y)
+            return cmp(i, j)
+
+        group_by = sorted(group_by, cmp=cmp_)
+
+        totals = sj.loads(kw['totals'])
+
+        # remove "sort" items from "q"
+        if kw['q']:
+            if group_by:
+                q_ = []
+                for item in kw['q'].split(','):
+                    if item.startswith('+') or item.startswith('-'):
+                        continue
+
+                    q_.append(item)
+
+                kw['q'] = ','.join(q_) 
+
+        if group_by:
+            if kw['q']:
+                kw['q'] += ','
+
+            kw['q'] = ','.join(['+%s' % g for g in group_by])
+
         # all records
         kw['rp'] = 0
+
+        cls = get_paramw(kw, 'cls', str)
+        del kw['cls']
+
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
-        fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
+        title = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
 
         response.content_type = 'application/excel'
-        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % fn
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % title
         
         # generate XLS content into "memory file"
-        xl_file = cStringIO.StringIO()
-        ds.to_xls(fn[:25], xl_file)
+        xl_file = StringIO()
+        toxls.to_xls(ds, visible_columns, group_by, totals, title, xl_file)
         
         return xl_file.getvalue()
 

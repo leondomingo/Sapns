@@ -49,8 +49,18 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp-grid-action{min-width:80px;margin:2px}.sp-grid-relatedinfo-title{float:left;color:gray;margin-top:3px;width:150px;font-size:10px;font-weight:bold;text-align:center;margin-top:5px}
 .sp_field_error{background-color:red;color:white}.sp_message{font-size:25px;color:#605b7c;margin-top:20px;padding-left:20px}
 .count-message{padding-left:20px;font-size:10px;color:#777}#sc-container{border:1px solid white;border-radius:10px;height:430px;overflow:auto;margin-top:10px;margin-left:3px;margin-right:3px}
-.sp_messages{font-size:10px;color:navy}#object-title{color:gray;font-size:13px;font-style:italic}
-#delete-question{text-align:left;font-size:20px}#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
+.sp_messages{font-size:10px;color:navy}.export-title{font:15px arial;background-color:#f2f2f2;border-radius:2px;padding:2px 12px;margin-bottom:2px}
+.export-separator{clear:left}.export-label{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;width:155px;font:13px arial;text-align:center;cursor:default;float:left;margin-right:2px}
+.export-label-ph{border:2px solid #999;border-radius:4px;padding:4px;margin-bottom:2px;height:16px;width:151px;font:13px arial;text-align:center;margin-right:2px;float:left}
+.export-label.selected{background-color:#ecefcc;font-weight:bold}.export-label.selected:hover{color:#b4bd3c}
+.export-label.unselected{background-color:#d5d5d5;color:#777}.export-group{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;float:left;width:155px;font:13px arial;text-align:center;cursor:default;margin-right:2px}
+.export-group.selected{background-color:#ecefcc;font-weight:bold}.export-group.selected:hover{color:#b4bd3c}
+.export-group.unselected{background-color:#d5d5d5;color:#777}.export-group-ph{border:2px solid #999;border-radius:4px;padding:4px;margin-bottom:2px;height:16px;width:151px;font:13px arial;text-align:center;margin-right:2px;float:left}
+.export-total{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;float:left;width:155px;font:13px arial;text-align:center;cursor:default;margin-right:2px}
+.export-total.selected{background-color:#ecefcc;font-weight:bold}.export-total.selected:hover{color:#b4bd3c}
+.export-total.unselected{background-color:#d5d5d5;color:#777}.sp-field-row.orientation .label,.sp-field-row.format .label{width:100px}
+#object-title{color:gray;font-size:13px;font-style:italic}#delete-question{text-align:left;font-size:20px}
+#delete-error-title{text-align:left;font-size:20px;color:#d62a2a;font-weight:bold}
 #delete-error-message{text-align:justify;font-size:15px;font-family:arial;padding:3px}
 .inline_action{border-radius:3px;cursor:pointer;float:left;width:20px;height:20px;margin:3px 1px 0 0;padding:0 2px}
 .inline_action:hover{background-color:#fff}.nonstd_actions{width:22px;height:20px;float:left;font-size:10px;margin-top:3px;background-color:#faca6a}

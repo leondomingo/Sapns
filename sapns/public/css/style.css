@@ -156,6 +156,40 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 .sp_messages { font-size:10px; color:navy }
 
+/*Excel export*/
+.export-title { font:15px arial; background-color:#f2f2f2; border-radius:2px; padding:2px 12px; margin-bottom:2px }
+/*.export-title.disabled { font-style:italic; color:#666 }*/
+.export-separator { clear:left }
+
+/*visible columns*/
+.export-label { border-radius:4px; padding:4px; margin-bottom:2px; height:20px;
+    width:155px; font:13px arial; text-align:center; cursor:default; float:left; margin-right:2px }
+.export-label-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
+    width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
+.export-label.selected { background-color:#ECEFCC; font-weight:bold }
+.export-label.selected:hover { color:#b4bd3c }
+.export-label.unselected { background-color:#d5d5d5; color:#777 }
+
+/*groups*/
+.export-group { border-radius:4px; padding:4px; margin-bottom:2px; height:20px; float:left;
+    width:155px; font:13px arial; text-align:center; cursor:default; margin-right:2px }
+.export-group.selected { background-color:#ECEFCC; font-weight:bold }
+.export-group.selected:hover { color:#b4bd3c }
+.export-group.unselected { background-color:#d5d5d5; color:#777 }
+
+.export-group-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
+    width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
+
+/*totals*/
+.export-total { border-radius:4px; padding:4px; margin-bottom:2px; height:20px; float:left;
+    width:155px; font:13px arial; text-align:center; cursor:default; margin-right:2px }
+.export-total.selected { background-color:#ECEFCC; font-weight:bold }
+.export-total.selected:hover { color:#b4bd3c }
+.export-total.unselected { background-color:#d5d5d5; color:#777 }
+
+.sp-field-row.orientation .label,
+.sp-field-row.format .label { width:100px }
+
 /* Standard deletion */
 
 #object-title { color:gray; font-size:13px; font-style:italic }

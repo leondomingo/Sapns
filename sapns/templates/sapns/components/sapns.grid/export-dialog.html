@@ -1,56 +1,87 @@
-<style>
-.export-title { font:15px arial; background-color:#f2f2f2; border-radius:2px; padding:2px 5px; margin-bottom:2px }
-.export-separator { clear:left }
-.export-label { border-radius:4px; padding:4px; margin-bottom:2px; height:20px;
-    width:155px; font:13px arial; text-align:center; cursor:default; float:left; margin-right:2px }
-.export-label-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
-    width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
-.export-label.selected { background-color:#ECEFCC; font-weight:bold }
-.export-label.selected:hover { color:#b4bd3c }
-.export-label.unselected { background-color:#d5d5d5; color:#777 }
-
-.sp-field-row.orientation .label,
-.sp-field-row.format .label { width:100px }
-</style>
-
 <div class="export-title">{{_('Visible columns')}}</div>
 <div class="export-labels">
     <!--{% set i = 0 %}-->
     <!--{% for lbl in ds.labels %}-->
-    <div class="export-label selected" column-name="{{ds.cols[i]}}">{{lbl}}</div>
-    <!--{% set i = i + 1 %}-->
+        <div class="export-label {% if lbl != 'id' %} selected {% else %} unselected {% endif %}" 
+            column-name="{{ds.cols[i]}}">{{lbl}}</div>
+        <!--{% set i = i + 1 %}-->
     <!--{% endfor %}-->
 </div>
 
 <div class="export-separator">&nbsp;</div>
 
-<div class="export-title">{{_('Orientation')}}</div>
-<div class="sp-field-row orientation">
-    <div class="sp-field">
-        <div class="label">{{_('Portrait')}}</div>
-        <input class="export-orientation" orientation="Portrait" type="radio" checked>
-    </div>
-
-    <div class="sp-field">
-        <div class="label">{{_('Landscape')}}</div>
-        <input class="export-orientation" orientation="Landscape" type="radio">
-    </div>
+<div class="export-title">{{_('Group by')}}</div>
+<div class="export-groups">
+    <!--{% set i = 0 %}-->
+    <!--{% for lbl in ds.labels %}-->
+        <!--{% if lbl != 'id' %}-->
+        <div class="export-group unselected" column-name="{{ds.cols[i]}}"
+            title="{{_('Double-click to select/unselect')}}">{{lbl}}</div>
+        <!--{% endif %}-->
+        <!--{% set i = i + 1 %}-->
+    <!--{% endfor %}-->
 </div>
 
-{#<div class="export-title">{{_('Format')}}</div>
-<div class="sp-field-row format">
-    <div class="sp-field">
-        <div class="label">{{_('PDF')}}</div>
-        <input class="export-format" format="pdf" type="radio" checked>
-    </div>
+<div class="export-separator">&nbsp;</div>
 
-    <div class="sp-field">
-        <div class="label">{{_('HTML')}}</div>
-        <input class="export-format" format="html" type="radio">
-    </div>
-</div>#}
+<!--{% set show_totals = False %}-->
+<!--{% for type_ in ds.types %}-->
+    <!--{% if type_ == 'int' or type_ == 'float' %}-->
+        <!--{% set show_totals = True %}-->
+    <!--{% endif %}-->
+<!--{% endfor %}-->
+
+<div class="export-title {% if not show_totals %} disabled {% endif %}">{{_('Totals')}}</div>
+<div class="export-totals">
+    <!--{% set i = 0 %}-->
+    <!--{% for lbl in ds.labels %}-->
+        <!--{% if lbl != 'id' and ds.types[i] == 'int' or ds.types[i] == 'long' or ds.types[i] == 'float' %}-->
+        <div class="export-total unselected" column-name="{{ds.cols[i]}}"
+            title="{{_('Double-click to select/unselect')}}">{{lbl}}</div>
+        <!--{% endif %}-->
+        <!--{% set i = i + 1 %}-->
+    <!--{% endfor %}-->
+</div>
 
 <script>
+
+function to_xls(callback, callback_error) {
+
+    var visible_columns = [];
+    $('.export-label.selected').each(function() {
+        var column_name = $(this).attr('column-name');
+        visible_columns.push(column_name);
+    });
+
+    //var orientation = $('.export-orientation:checked').attr('orientation');
+
+    var group_by = [];
+    $('.export-group.selected').each(function() {
+        var column_name = $(this).attr('column-name');
+        group_by.push(column_name);
+    });
+
+    var totals = [];
+    $('.export-total.selected').each(function() {
+        var column_name = $(this).attr('column-name');
+        totals.push(column_name);
+    });
+
+    // /dashboard/topdf -> /dashboard/topdf_
+    var form_export = '<form action="{{tg.url("/dashboard/to_xls_/")}}" method="post" target="">' +
+        '<input type="hidden" name="cls" value="{{data.cls}}">' +
+        '<input type="hidden" name="q" value="{{data.query}}">' + 
+        '<input type="hidden" name="ch_attr" value="{{data.ch_attr}}">' +
+        '<input type="hidden" name="parent_id" value="{{data.parent_id}}">' +
+        '<input type="hidden" name="visible_columns" value=\'' + JSON.stringify(visible_columns) + '\'>' +
+        '<input type="hidden" name="group_by" value=\'' + JSON.stringify(group_by) + '\'>' +
+        '<input type="hidden" name="totals" value=\'' + JSON.stringify(totals) + '\'>' +
+        '</form>';
+
+    $(form_export).appendTo('body').submit().remove();
+    callback();
+}
+
 $(function() {
     $('.export-labels').sortable({
         placeholder: 'export-label-ph',
@@ -58,14 +89,20 @@ $(function() {
         }
     });
 
-    $('.export-label').dblclick(function() {
+    $('.export-label, .export-group, .export-total').dblclick(function() {
         if ($(this).hasClass('selected')) {
             $(this).removeClass('selected').addClass('unselected');
+            if ($(this).hasClass('export-label')) {
+                var column_name = $(this).attr('column-name');
+                $('.export-group[column-name=' + column_name + ']').removeClass('selected').addClass('unselected');
+            }
         }
         else {
             $(this).addClass('selected').removeClass('unselected');
         }
     });
+
+    $('.export-label, .export-group, .export-total').disableSelection();
 
     $('.export-orientation').click(function() {
         var orientation = $(this).attr('orientation');
