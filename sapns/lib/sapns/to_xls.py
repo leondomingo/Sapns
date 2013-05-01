@@ -2,8 +2,7 @@
 
 import xlwt
 import logging
-# import tg
-# from decimal import Decimal
+import tg
 
 def to_xls(ds, visible_columns, group_by, totals, title, fn):
 
@@ -43,16 +42,16 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
     xfs_general.num_format_str = 'General'
 
     xfs_date = xlwt.XFStyle()
-    xfs_date.num_format_str = 'dd/mm/yyyy'
+    xfs_date.num_format_str = tg.config.get('formats.date.xls', 'dd/mm/yyyy')
 
     xfs_time = xlwt.XFStyle()
-    xfs_time.num_format_str = 'hh:mm'
+    xfs_time.num_format_str = tg.config.get('formats.time.xls', 'hh:mm')
 
     xfs_float = xlwt.XFStyle()
-    xfs_float.num_format_str = '0.00'
+    xfs_float.num_format_str = tg.config.get('formats.float.xls', '0.00')
 
     xfs_total = xlwt.easyxf('font: bold on;')
-    xfs_total.num_format_str = '0.00'
+    xfs_total.num_format_str = tg.config.get('formats.float.xls', '0.00')
 
     def end_sheet(ws, row, sheet_n, reset=True):
         # total
@@ -112,9 +111,10 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
                             for t in totals:
                                 if totals_[group_by[j]][t] is not None:
                                     ws.write(row, pos[t][0], totals_[group_by[j]][t], xfs_total)
-                                    row += 1
                                     if row >= MAX_ROW:
                                         ws, row, sheet_n = end_sheet(ws, row, sheet_n)
+                            
+                            row += 1
 
                         # reset totals
                         for j in xrange(i, len(group_by)):

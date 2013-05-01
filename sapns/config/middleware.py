@@ -36,6 +36,6 @@ def make_app(global_conf, full_stack=True, **app_conf):
     app = make_base_app(global_conf, full_stack=True, **app_conf)
     
     # Wrap your base TurboGears 2 application with custom middleware here
-    app = HtmlToPdfMiddleware(app, app_conf)
+    # app = HtmlToPdfMiddleware(app, app_conf)
     
     return app

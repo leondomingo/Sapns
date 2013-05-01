@@ -16,6 +16,7 @@ error_email_from = paste@localhost
 
 [server:main]
 use = egg:Paste#http
+# use = egg:gunicorn#main
 host = 0.0.0.0
 port = 8081
 
@@ -25,7 +26,6 @@ cookie_secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
 [app:main]
 use = egg:sapns
 full_stack = true
-#lang = ru
 cache_dir = %(here)s/data
 beaker.session.key = sapns
 beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
@@ -43,9 +43,12 @@ beaker.cache.type = memory
 pg_path = /usr/bin
 views_prefix = _view_
 formats.date = %m/%d/%Y
+formats.date.xls = mm/dd/yyyy
 formats.time = %H:%M
+formats.time.xls = hh:mm
 formats.datetime = %m/%d/%Y %H:%M
-formats.float = '9.999,99'
+formats.float = 9.999,99
+formats.float.xls = #.##0,00
 grid.date_format = %m/%d/%Y
 grid.time_format = %H:%M
 grid.datetime_format = %m/%d/%Y %H:%M
@@ -63,14 +66,15 @@ js.first_day = 1
 app.name = Sapns
 app.subtitle = Web Information System
 app.company_url = http://www.sapns.org
-#app.root_folder = 
+# app.root_folder = 
+# app.update_folder =
 app.home = /dashboard
 app.repo_base = %(here)s/sapns/public/repo
 app.url = http://localhost:8081/
 app.language_cookie = sp_language
 app.languages = en#English,es#Español
 
-htmltopdf.path = /complete/path/to/wkhtmltopdf/
+htmltopdf.path = /path/to/wkhtmltopdf/
 
 # scheduler
 app.scheduler.limit_task = 10
@@ -83,30 +87,15 @@ app.mailsender.login = sapns@domain.com
 app.mailsender.password = ****
 app.mailsender.smtp = smtp.domain.com
 
-# pick the form for your database
-# %(here) may include a ':' character on Windows environments; this can
-# invalidate the URI when specifying a SQLite db via path name
-# sqlalchemy.url=postgresql://username:password@hostname:port/databasename
-sqlalchemy.url=postgresql://postgres:pswd@localhost/sapns
-
-#echo shouldn't be used together with the logging module.
+# sqlalchemy
+sqlalchemy.url = postgresql://postgres:pswd@localhost/sapns
 sqlalchemy.echo = false
 sqlalchemy.echo_pool = false
 sqlalchemy.pool_recycle = 3600
 
-# WARNING: *THE LINE BELOW MUST BE UNCOMMENTED ON A PRODUCTION ENVIRONMENT*
-# Debug mode will enable the interactive debugging tool, allowing ANYONE to
-# execute malicious code after an exception is raised.
-#set debug = false
-
-# Logging configuration
-# Add additional loggers, handlers, formatters here
-# Uses python's logging config file format
-# http://docs.python.org/lib/logging-config-fileformat.html
-
 #turn this setting to "min" if you would like tw to produce minified
 #javascript files (if your library supports that)
-toscawidgets.framework.resource_variant=debug
+toscawidgets.framework.resource_variant = debug
 
 [loggers]
 keys = root, sapns, sqlalchemy, auth
