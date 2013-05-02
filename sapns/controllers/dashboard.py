@@ -14,9 +14,9 @@ from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
-from sapns.lib.sapns.lists import List, EListForbidden
+from sapns.lib.sapns.lists import EListForbidden
 from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
-    format_float, datetostr as _datetostr, timetostr as _timetostr
+    format_float, datetostr as _datetostr, timetostr as _timetostr, get_list
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -146,6 +146,7 @@ class DashboardController(BaseController):
             pass
         
         try:
+            List = get_list()
             list_ = List(cls, **kw)
             return list_()
         except EListForbidden, e:
@@ -159,6 +160,7 @@ class DashboardController(BaseController):
         
         _logger = logging.getLogger('DashboardController.grid')
         
+        List = get_list()
         list_ = List(cls, **kw)
         return list_.grid()
         
@@ -343,6 +345,7 @@ class DashboardController(BaseController):
         
         # all records
         kw['rp'] = 0
+        List = get_list()
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
@@ -363,15 +366,16 @@ class DashboardController(BaseController):
             cls = get_paramw(kw, 'cls', str)
             del kw['cls']
 
+            List = get_list()
             list_ = List(cls, **kw)
             ds = list_.grid_data()
 
             kw.update(cls=cls)
 
             tmpl = get_template('sapns/components/sapns.grid/export-dialog.html')
-            content = tmpl.render(tg=tg, _=_, ds=ds, data=kw)
+            content = tmpl.render(tg=tg, _=_, ds=ds, data=kw).encode('utf-8')
 
-            return dict(status=True, content=content).encode('utf-8')
+            return dict(status=True, content=content)
 
         except Exception, e:
             logger.error(e)
@@ -394,26 +398,29 @@ class DashboardController(BaseController):
             return cmp(i, j)
 
         group_by = sorted(group_by, cmp=cmp_)
+        group_by_ = [g.replace('_', '') for g in group_by]
 
         totals = sj.loads(kw['totals'])
 
-        # remove "sort" items from "q"
+        # remove "sorting" items from "q"
+        q_ = []
         if kw['q']:
             if group_by:
-                q_ = []
                 for item in kw['q'].split(','):
-                    if item.startswith('+') or item.startswith('-'):
-                        continue
+                    m = re.search(r'^(\+|\-)(\w+)$', item.strip())
+                    if m:
+                        if m.group(2) in group_by_:
+                            continue
 
                     q_.append(item)
 
-                kw['q'] = ','.join(q_) 
-
         if group_by:
-            if kw['q']:
-                kw['q'] += ','
+            kw['q'] = ','.join(['+%s' % g for g in group_by_])
+            if len(q_) > 0:
+                if kw['q']:
+                    kw['q'] += ','
 
-            kw['q'] = ','.join(['+%s' % g for g in group_by])
+                kw['q'] += ','.join(q_)
 
         # all records
         kw['rp'] = 0
@@ -421,6 +428,7 @@ class DashboardController(BaseController):
         cls = get_paramw(kw, 'cls', str)
         del kw['cls']
 
+        List = get_list()
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
@@ -445,6 +453,7 @@ class DashboardController(BaseController):
             cls = get_paramw(kw, 'cls', str)
             del kw['cls']
 
+            List = get_list()
             list_ = List(cls, **kw)
             ds = list_.grid_data()
 
@@ -467,6 +476,7 @@ class DashboardController(BaseController):
             cls = get_paramw(kw, 'cls', str)
             del kw['cls']
 
+            List = get_list()
             list_ = List(cls, **kw)
             ds = list_.grid_data()
             

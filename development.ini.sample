@@ -68,6 +68,7 @@ app.subtitle = Web Information System
 app.company_url = http://www.sapns.org
 # app.root_folder = 
 # app.update_folder =
+# app.custom_list = sapns.lib.foo.lists.ListFoo
 app.home = /dashboard
 app.repo_base = %(here)s/sapns/public/repo
 app.url = http://localhost:8081/

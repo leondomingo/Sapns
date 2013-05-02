@@ -110,13 +110,14 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
                     if break_:
                         # show totals
                         for j in xrange(len(group_by)-1, i-1, -1):
-                            for t in totals:
-                                if totals_[group_by[j]][t] is not None:
-                                    ws.write(row, pos[t][0], totals_[group_by[j]][t], xfs_total)
-                                    if row >= MAX_ROW:
-                                        ws, row, sheet_n = end_sheet(ws, row, sheet_n)
-                            
-                            row += 1
+                            if len(totals) > 0:
+                                for t in totals:
+                                    if totals_[group_by[j]][t] is not None:
+                                        ws.write(row, pos[t][0], totals_[group_by[j]][t], xfs_total)
+                                        if row >= MAX_ROW:
+                                            ws, row, sheet_n = end_sheet(ws, row, sheet_n)
+                                            
+                                row += 1
 
                         # reset totals
                         for j in xrange(i, len(group_by)):

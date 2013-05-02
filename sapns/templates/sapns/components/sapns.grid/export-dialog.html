@@ -70,7 +70,7 @@ function to_xls(callback, callback_error) {
     // /dashboard/topdf -> /dashboard/topdf_
     var form_export = '<form action="{{tg.url("/dashboard/to_xls_/")}}" method="post" target="">' +
         '<input type="hidden" name="cls" value="{{data.cls}}">' +
-        '<input type="hidden" name="q" value="{{data.query}}">' + 
+        '<input type="hidden" name="q" value="{{data.q}}">' + 
         '<input type="hidden" name="ch_attr" value="{{data.ch_attr}}">' +
         '<input type="hidden" name="parent_id" value="{{data.parent_id}}">' +
         '<input type="hidden" name="visible_columns" value=\'' + JSON.stringify(visible_columns) + '\'>' +

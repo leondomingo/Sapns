@@ -595,6 +595,20 @@ def get_template(tmpl_name, default_tmpl=None):
         else:
             raise
 
+def get_list():
+    try:
+        custom_list = config.get('app.custom_list', 'sapns.lib.%s.lists.CustomList' % config.get('app.root_folder'))
+        p = '.'.join(custom_list.split('.')[:-1])
+        cls = custom_list.split('.')[-1]
+        m = __import__(p, fromlist=[cls])
+        l = m.CustomList
+
+    except:
+        m = __import__('sapns.lib.sapns.lists', fromlist=['List'])
+        l = m.List
+
+    return l
+
 # date/time functions (from and to string)
 def strtodate(s):
     date_fmt = config.get('formats.date')
