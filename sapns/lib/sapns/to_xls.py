@@ -47,11 +47,13 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
     xfs_time = xlwt.XFStyle()
     xfs_time.num_format_str = tg.config.get('formats.time.xls', 'hh:mm')
 
+    format_float_xls = tg.config.get('formats.float.xls', '0.00')
+
     xfs_float = xlwt.XFStyle()
-    xfs_float.num_format_str = tg.config.get('formats.float.xls', '0.00')
+    xfs_float.num_format_str = format_float_xls
 
     xfs_total = xlwt.easyxf('font: bold on;')
-    xfs_total.num_format_str = tg.config.get('formats.float.xls', '0.00')
+    xfs_total.num_format_str = format_float_xls
 
     def end_sheet(ws, row, sheet_n, reset=True):
         # total
