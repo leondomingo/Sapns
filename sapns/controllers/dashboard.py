@@ -371,7 +371,7 @@ class DashboardController(BaseController):
             tmpl = get_template('sapns/components/sapns.grid/export-dialog.html')
             content = tmpl.render(tg=tg, _=_, ds=ds, data=kw)
 
-            return dict(status=True, content=content)
+            return dict(status=True, content=content).encode('utf-8')
 
         except Exception, e:
             logger.error(e)
