@@ -578,7 +578,7 @@ def _add_language(f, *args, **kw):
     return result
 
 # decorator for add "lang" and "languages" to the resulting dict
-def add_language(f): #, lang='lang', languages='languages'):
+def add_language(f):
     f.lang_key = 'lang'
     f.languages_key = 'languages'
     return decorator(_add_language, f)
@@ -596,14 +596,17 @@ def get_template(tmpl_name, default_tmpl=None):
             raise
 
 def get_list():
+    logger = logging.getLogger('get_list')
     try:
         custom_list = config.get('app.custom_list', 'sapns.lib.%s.lists.CustomList' % config.get('app.root_folder'))
         p = '.'.join(custom_list.split('.')[:-1])
         cls = custom_list.split('.')[-1]
-        m = __import__(p, fromlist=[cls])
-        l = m.CustomList
 
-    except:
+        m = __import__(p, fromlist=[cls])
+        l = getattr(m, cls)
+
+    except Exception, e:
+        logger.debug(e)
         m = __import__('sapns.lib.sapns.lists', fromlist=['List'])
         l = m.List
 
