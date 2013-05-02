@@ -15,7 +15,8 @@ from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
 from sapns.lib.sapns.lists import List, EListForbidden
-from sapns.lib.sapns.util import add_language, init_lang, get_languages
+from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
+    format_float, datetostr as _datetostr, timetostr as _timetostr
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -23,13 +24,15 @@ from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
 from tg import response, expose, require, url, request, redirect, config, predicates as p
-import cStringIO
+import tg
+from cStringIO import StringIO
 import datetime as dt
 import logging
 import re
 import simplejson as sj
 from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
+import sapns.lib.sapns.to_xls as toxls
 
 # controllers
 __all__ = ['DashboardController']
@@ -336,7 +339,7 @@ class DashboardController(BaseController):
     
     @expose()
     @require(p.not_anonymous())
-    def tocsv(self, cls, **kw):
+    def to_csv(self, cls, **kw):
         
         # all records
         kw['rp'] = 0
@@ -349,27 +352,153 @@ class DashboardController(BaseController):
         response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % fn
         
         return ds.to_csv()
+
+    @expose('json')
+    @require(p.not_anonymous())
+    def to_xls(self, **kw):
+        logger = logging.getLogger('DashboardController.to_xls')
+        try:
+            # just one record
+            kw['rp'] = 1
+            cls = get_paramw(kw, 'cls', str)
+            del kw['cls']
+
+            list_ = List(cls, **kw)
+            ds = list_.grid_data()
+
+            kw.update(cls=cls)
+
+            tmpl = get_template('sapns/components/sapns.grid/export-dialog.html')
+            content = tmpl.render(tg=tg, _=_, ds=ds, data=kw)
+
+            return dict(status=True, content=content)
+
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
     
     @expose()
     @require(p.not_anonymous())
-    def toxls(self, cls, **kw):
+    def to_xls_(self, **kw):
+
+        logger = logging.getLogger('DashboardController.to_xls_')
+        logger.debug(kw)
+
+        visible_columns = sj.loads(kw['visible_columns'])
         
+        # group_by
+        group_by = sj.loads(kw['group_by'])
+        def cmp_(x, y):
+            i = visible_columns.index(x)
+            j = visible_columns.index(y)
+            return cmp(i, j)
+
+        group_by = sorted(group_by, cmp=cmp_)
+
+        totals = sj.loads(kw['totals'])
+
+        # remove "sort" items from "q"
+        if kw['q']:
+            if group_by:
+                q_ = []
+                for item in kw['q'].split(','):
+                    if item.startswith('+') or item.startswith('-'):
+                        continue
+
+                    q_.append(item)
+
+                kw['q'] = ','.join(q_) 
+
+        if group_by:
+            if kw['q']:
+                kw['q'] += ','
+
+            kw['q'] = ','.join(['+%s' % g for g in group_by])
+
         # all records
         kw['rp'] = 0
+
+        cls = get_paramw(kw, 'cls', str)
+        del kw['cls']
+
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
-        fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
+        title = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
 
         response.content_type = 'application/excel'
-        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % fn
+        response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % title
         
         # generate XLS content into "memory file"
-        xl_file = cStringIO.StringIO()
-        ds.to_xls(fn[:25], xl_file)
+        xl_file = StringIO()
+        toxls.to_xls(ds, visible_columns, group_by, totals, title, xl_file)
         
         return xl_file.getvalue()
-    
+
+    @expose('json')
+    @require(p.not_anonymous())
+    def to_pdf(self, **kw):
+        logger = logging.getLogger('DashboardController.to_pdf')
+        try:
+            # just one record
+            kw['rp'] = 1
+            cls = get_paramw(kw, 'cls', str)
+            del kw['cls']
+
+            list_ = List(cls, **kw)
+            ds = list_.grid_data()
+
+            tmpl = get_template('sapns/components/sapns.grid/export-dialog.html')
+            content = tmpl.render(tg=tg, _=_, ds=ds)
+
+            return dict(status=True, content=content)
+
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+
+    @expose()
+    @require(p.not_anonymous())
+    def to_pdf_(self, **kw):
+        logger = logging.getLogger('DashboardController.to_pdf_')
+        try:
+            # all records
+            kw['rp'] = 0
+            cls = get_paramw(kw, 'cls', str)
+            del kw['cls']
+
+            list_ = List(cls, **kw)
+            ds = list_.grid_data()
+            
+            fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
+
+            if not kw.get('html'):
+                response.content_type = 'application/pdf'
+                # response.headers['Content-Disposition'] = 'attachment;filename=%s.pdf' % fn
+                response.headers['Content-Disposition'] = 'inline;filename=%s.pdf' % fn
+            else:
+                response.content_type = 'text/html'
+
+            tmpl = get_template('sapns/components/sapns.grid/export-pdf.html')
+
+            content = tmpl.render(tg=tg, _=_, url2=url2, 
+                                  format_float=format_float, 
+                                  datetostr=_datetostr, timetostr=_timetostr,
+                                  orientation=kw.get('orientation', 'Portrait') or 'Portrait',
+                                  visible_columns=kw.get('visible_columns'),
+                                  ds=ds, title=fn).encode('utf-8')
+
+            if not kw.get('html'):
+                content = topdf(content, orientation=kw.get('orientation'))
+
+            return content
+
+        except Exception, e:
+            logger.error(e)
+            response.content_type = 'plain/text'
+            response.headers['Content-Disposition'] = 'attachment;filename=error'
+            return 'error'
+
     @expose('json')
     @require(p.not_anonymous())
     def title(self, cls, id):

@@ -54,9 +54,10 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 .sp-logout-user { padding-left:10px; float:left; font-style:italic;
     font-family:Arial; font-size:13px; width:240px; height:18px; opacity:1;
-    border-radius:10px }
+    border-radius:10px; font-weight:normal }
 
-.sp-logout-user { font-weight:normal }
+.sp-logout-user:hover { background-color:#ECEFCC; font-weight:bold }
+
 .sp-logout-user * { float:left; height:16px }
 .sp-logout-user img { width:16px; margin-top:1px; margin-right:5px }
 .sp-logout-user .user-name { margin-top:2px; color:#444 }
@@ -86,8 +87,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 .sp-grid-search-box .sp-grid-select-filter { float:right; width:180px; height:20px; margin-top:3px }
 .sp-grid .sp-col-title:first-child { border-radius:5px 0 0 0 }
 .sp-grid .sp-col-title:last-child { border-radius:0 5px 0 0 }
-.sp-grid-caption { color:#666; font:bold 22px helvetica,arial; height:31px;
-    margin-left:0; margin-top:7px; overflow:hidden; width:100% }
+.sp-grid-caption { color:#666; font:bold 22px helvetica,arial; height:31px; margin-left:0; 
+    margin-top:7px; overflow:hidden; width:100%; text-shadow:1px 2px #ccc }
 
 .sp-grid-dialog .wait-message { font:12px arial; color:#cc0000 }
 
@@ -154,6 +155,40 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
     overflow:auto; margin-top:10px; margin-left:3px; margin-right:3px }
 
 .sp_messages { font-size:10px; color:navy }
+
+/*Excel export*/
+.export-title { font:15px arial; background-color:#f2f2f2; border-radius:2px; padding:2px 12px; margin-bottom:2px }
+/*.export-title.disabled { font-style:italic; color:#666 }*/
+.export-separator { clear:left }
+
+/*visible columns*/
+.export-label { border-radius:4px; padding:4px; margin-bottom:2px; height:20px;
+    width:155px; font:13px arial; text-align:center; cursor:default; float:left; margin-right:2px }
+.export-label-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
+    width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
+.export-label.selected { background-color:#ECEFCC; font-weight:bold }
+.export-label.selected:hover { color:#b4bd3c }
+.export-label.unselected { background-color:#d5d5d5; color:#777 }
+
+/*groups*/
+.export-group { border-radius:4px; padding:4px; margin-bottom:2px; height:20px; float:left;
+    width:155px; font:13px arial; text-align:center; cursor:default; margin-right:2px }
+.export-group.selected { background-color:#ECEFCC; font-weight:bold }
+.export-group.selected:hover { color:#b4bd3c }
+.export-group.unselected { background-color:#d5d5d5; color:#777 }
+
+.export-group-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
+    width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
+
+/*totals*/
+.export-total { border-radius:4px; padding:4px; margin-bottom:2px; height:20px; float:left;
+    width:155px; font:13px arial; text-align:center; cursor:default; margin-right:2px }
+.export-total.selected { background-color:#ECEFCC; font-weight:bold }
+.export-total.selected:hover { color:#b4bd3c }
+.export-total.unselected { background-color:#d5d5d5; color:#777 }
+
+.sp-field-row.orientation .label,
+.sp-field-row.format .label { width:100px }
 
 /* Standard deletion */
 
