@@ -324,13 +324,13 @@ class ViewsController(BaseController):
                                  )
                 
                 logger.debug(attribute)
-                
+
                 mdb.user_views.update(dict(_id=ObjectId(view_id)),
                                       {'$set': dict(base_class=base_class),
                                        '$push': dict(attributes_detail=attribute,
-                                                     attributes=attribute_path)
-                                       })
-                
+                                                     attributes=attribute_path),
+                                      })
+
                 view_name = self.create_view(view_id, get_paramw(kw, 'view_name', str, opcional=True))
                 
             return dict(status=True, attribute=attribute, view_name=view_name)
@@ -407,7 +407,7 @@ class ViewsController(BaseController):
                                                           field_title=filter_['title'],
                                                           operator=filter_['operator'],
                                                           value=filter_['value'],
-                                                          null_value=filter_['null_value'])).encode('utf-8')
+                                                          null_value=filter_.get('null_value'))).encode('utf-8')
     
             return dict(status=True, content=content)
     

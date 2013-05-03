@@ -199,11 +199,7 @@ var __DEFAULT_FILTER = 'default';
             settings.actions = settings.actions();
         }
 
-        var exportable_formats = [{
-            id: 'csv',
-            title: 'CSV',
-            url: "{{tg.url('/dashboard/to_csv/')}}"
-        },
+        var exportable_formats = [
         {
             id: 'excel',
             title: 'Excel',
@@ -211,6 +207,11 @@ var __DEFAULT_FILTER = 'default';
             func_name: 'to_xls',
             export_url: "{{tg.url('/dashboard/to_xls_/')}}",
             modal: true
+        },
+        {
+            id: 'csv',
+            title: 'CSV',
+            url: "{{tg.url('/dashboard/to_csv/')}}"
         }
         // {
         //     id: 'pdf',
@@ -1527,7 +1528,7 @@ var __DEFAULT_FILTER = 'default';
                                 width: selected_format.width || 700,
                                 height: selected_format.height || 'auto',
                                 buttons: {
-                                    "{{_('Ok')}}": function() {
+                                    "{{_('Export')}}": function() {
                                         if (!on_progress) {
                                             on_progress = true;
 
@@ -1542,7 +1543,7 @@ var __DEFAULT_FILTER = 'default';
                                             });
                                         }
                                     },
-                                    "{{_('Cancel')}}": function() {
+                                    "{{_('Close')}}": function() {
                                         if (!on_progress) {
                                             $('#sp-grid-export-dialog').dialog('close');
                                         }
