@@ -16,7 +16,7 @@ from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission, \
     SapnsRepo
 from sqlalchemy.sql.expression import and_
-from tg import expose, redirect, url, predicates as p_, config, response
+from tg import expose, redirect, url, predicates as p_, config, response, request
 import tg
 import copy
 import datetime as dt
@@ -436,10 +436,18 @@ class ViewsController(BaseController):
             del filter_['_id']
             filter_['operator'] = operator
             filter_['value'] = value
+            
+            # variable filters
+            m = re.search(r'\{[\w\s\+\-]+\}', value)
+            filter_['variable'] = m is not None
+            
             filter_['null_value'] = null_value
 
             # SQL and title for the filter
-            filter_['expression'] = filter_sql(filter_['path'], filter_['attr'], operator, value, null_value)
+            filter_['expression'] = None
+            if not filter_['variable']:
+                filter_['expression'] = filter_sql(filter_['path'], filter_['attr'], operator, value, null_value)
+            
             filter_['title'] = filter_title(filter_)
 
             pos = get_paramw(kw, 'pos', int, opcional=True)
@@ -683,50 +691,103 @@ class ViewsController(BaseController):
            total_pag: <int>
           }
         """
-        
-        cls = get_paramw(kw, 'cls', unicode)
-        q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
-        rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
-        pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
-        
-        pos = (pag_n-1) * rp
-        
-        # get dataset
-        _search = Search(dbs, cls) #, strtodatef=_strtodate)
-        _search.apply_qry(q.encode('utf-8'))
-        
-        ds = _search(rp=rp, offset=pos, no_count=True)
-        
-        # Reading global settings
-        ds.date_fmt = config.get('formats.date', default='%m/%d/%Y')
-        ds.time_fmt = config.get('formats.time', default='%H:%M')
-        ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
-        ds.true_const = _('Yes')
-        ds.false_const = _('No')        
-        ds.float_fmt = _format_float
-        
-        visible_width = 800
-        min_width = visible_width / 6
-        
-        default_width = visible_width / len(ds.labels)
-        if default_width < min_width:
-            default_width = min_width
-        
-        cols = []
-        for col in ds.labels:
-            w = default_width
-            if col == 'id':
-                w = 60
-                
-            cols.append(dict(title=col, width=w, align='center'))
+
+        logger = logging.getLogger('ViewsController.grid')
+        try:
+            cls = get_paramw(kw, 'cls', unicode)
+            q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
+            rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+            pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
             
-        this_page, total_pag = pagination(rp, pag_n, ds.count)
-        
-        if ds.count == rp:
-            total_pag = pag_n + 1
-        
-        return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
-                    this_page=this_page, total_count=ds.count, total_pag=total_pag)
+            pos = (pag_n-1) * rp
+            
+            # get dataset
+            s = Search(dbs, cls)
+            s.apply_qry(q.encode('utf-8'))
+
+            view_id = get_paramw(kw, 'view_id', str)
+
+            mdb = Mongo().db
+            view = mdb.user_views.find_one(dict(_id=ObjectId(view_id)))
+
+            if view:
+                # apply "deferred" (variable) filters
+                logger.debug('"deferred" filters')
+                deferred_filters = []
+                for af in view.get('advanced_filters', []):
+                    if af.get('variable'):
+                        expression = filter_sql(af['path'], u'"id_%s"' % af['attr'], 
+                                                af['operator'], af['value'], af['null_value'])
+
+                        logger.debug(expression)
+                        deferred_filters.append((expression,))
+
+                s.apply_filters(deferred_filters)
+            
+            ds = s(rp=rp, offset=pos, no_count=True)
+            
+            # Reading global settings
+            ds.date_fmt = config.get('formats.date', default='%m/%d/%Y')
+            ds.time_fmt = config.get('formats.time', default='%H:%M')
+            ds.datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
+            ds.true_const = _('Yes')
+            ds.false_const = _('No')        
+            ds.float_fmt = _format_float
+            
+            visible_width = 800
+            min_width = visible_width / 6
+            
+            default_width = visible_width / len(ds.labels)
+            if default_width < min_width:
+                default_width = min_width
+
+            view_cols = [default_width]*len(ds.labels)
+            if view:
+                #view_cols = [default_width]
+                for i, a in enumerate(sorted(view.get('attributes_detail', []), cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0)))):
+                    view_cols[i] = a.get('width', default_width)
+                    
+                # user - col_widths
+                user_id = request.identity['user'].user_id
+                if view.get('col_widths', {}).get(str(user_id)):
+                    view_cols_ = [default_width]
+                    for w, w_ in zip(view['col_widths'][str(user_id)], view_cols):
+                        if w:
+                            view_cols_.append(w)
+                            
+                        else:
+                            view_cols_.append(w_)
+                        
+                    view_cols = view_cols_
+            
+            cols = []
+            for col, w, type_ in zip(ds.labels, view_cols, ds.types):
+                align = 'center'
+                # int, long, float
+                if type_ == 'int' or type_ == 'long' or type_ == 'float':
+                    align = 'right'
+
+                # str
+                elif type_ == '' or type_ == 'str':
+                    align = 'left'
+
+                # date, time
+                elif type_ == 'date' or type_ == 'time':
+                    align = 'center'
+
+                cols.append(dict(title=col, width=w, align=align))
+                
+            this_page, total_pag = pagination(rp, pag_n, ds.count)
+            
+            if ds.count == rp:
+                total_pag = pag_n + 1
+            
+            return dict(status=True, cols=cols, data=ds.to_data(), styles=[],
+                        this_page=this_page, total_count=ds.count, total_pag=total_pag)
+
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
         
     @expose('sapns/views/copy_view/copy_view.html')
     def copy(self, **kw):
@@ -780,7 +841,7 @@ class ViewsController(BaseController):
             dbs.add(list_p)
             dbs.flush()
             
-            self.create_view(view_id, '', new_name=cls_c.name)            
+            create_view(view_id, '', new_name=cls_c.name)            
             
             return dict(status=True)
             

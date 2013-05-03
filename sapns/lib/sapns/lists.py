@@ -4,6 +4,7 @@ from neptuno.util import get_paramw, strtodate
 from pylons.i18n import ugettext as _
 from sapns.config import app_cfg
 from sapns.lib.sapns.util import pagination, format_float as _format_float
+from sapns.lib.sapns.views import filter_sql
 from sapns.model import DBSession as dbs, SapnsUser, SapnsClass, SapnsPermission
 from tg import url, request, config
 import logging
@@ -138,7 +139,7 @@ class List(object):
           }
         """
         
-        ds = self.grid_data(**kw)        
+        ds = self.grid_data(**kw)
         
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -201,38 +202,54 @@ class List(object):
                     this_page=this_page, total_count=ds.count, total_pag=total_pag)
         
     def grid_data(self, **kw):
-        
-        _logger = logging.getLogger('DashboardController.grid_data')
-
-        pos = (self.pag_n-1) * self.rp
-        
-        # filters
-        filters = get_paramw(self.kw, 'filters', sj.loads, opcional=True)
-
-        cls_ = SapnsClass.by_name(self.cls)
-        ch_cls_ = SapnsClass.by_name(self.cls, parent=False)        
+        try:
+            pos = (self.pag_n-1) * self.rp
             
-        # does this user have permission on this table?
-        user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        permissions = request.identity['permissions']
-             
-        if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
-        not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_LIST) in permissions or \
-             '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions):
-            return dict(status=False, 
-                        message=_('Sorry, you do not have privilege on this class'))
-        
-        # get view name
-        view_name = user.get_view_name(ch_cls_.name)
-        
-        # collection
-        col = None
-        if self.ch_attr and self.parent_id:
-            col = (self.cls, self.ch_attr, self.parent_id,)
+            # filters
+            filters = get_paramw(self.kw, 'filters', sj.loads, opcional=True)
 
-        # get dataset
-        _search = Search(dbs, view_name, strtodatef=_strtodate)
-        _search.apply_qry(self.q.encode('utf-8'))
-        _search.apply_filters(filters)
-        
-        return _search(rp=self.rp, offset=pos, collection=col, no_count=True)        
+            cls_ = SapnsClass.by_name(self.cls)
+            ch_cls_ = SapnsClass.by_name(self.cls, parent=False)        
+                
+            # does this user have permission on this table?
+            user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
+            permissions = request.identity['permissions']
+                 
+            if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
+            not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_LIST) in permissions or \
+                 '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions):
+                return dict(status=False, 
+                            message=_('Sorry, you do not have privilege on this class'))
+            
+            # get view name
+            view_name = user.get_view_name(ch_cls_.name)
+            
+            # collection
+            col = None
+            if self.ch_attr and self.parent_id:
+                col = (self.cls, self.ch_attr, self.parent_id,)
+
+            # get dataset
+            s = Search(dbs, view_name, strtodatef=_strtodate)
+            s.apply_qry(self.q.encode('utf-8'))
+            s.apply_filters(filters)
+
+            # "deferred" (variable) filters
+            if self.view:
+                self.logger.debug('"deferred" filters')
+                deferred_filters = []
+                for af in self.view.get('advanced_filters', []):
+                    if af.get('variable'):
+                        expression = filter_sql(af['path'], u'"id_%s"' % af['attr'], 
+                                                af['operator'], af['value'], af['null_value'])
+
+                        self.logger.debug(expression)
+                        deferred_filters.append((expression,))
+                
+                self.logger.debug('Applying deferred filters (%d)' % len(deferred_filters))
+                s.apply_filters(deferred_filters)
+
+            return s(rp=self.rp, offset=pos, collection=col, no_count=True)
+
+        except Exception, e:
+            self.logger.error(e)

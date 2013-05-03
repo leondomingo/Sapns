@@ -123,9 +123,15 @@ def get_query(view_id):
         
         if not attribute.get('is_filter'):
             col_title = '"%s"' % attribute['title']    
-            columns.append(u'%s as %s' % (attribute['expression'], col_title))
+            columns.append(u'%s AS %s' % (attribute['expression'], col_title))
         else:
-            filters.append(attribute['expression'])
+            if not attribute.get('variable'):
+                filters.append(attribute['expression'])
+
+            else:
+                # these filters will be applied when the user ask for the view
+                logger.debug(u'variable filter=%s' % attribute['value'])
+                columns.append(u'%s AS "id_%s"' % (attribute['attr'], attribute['attr']))
         
         if not attribute.get('is_filter'):
             m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\(.+\)', attribute['expression'].upper())
