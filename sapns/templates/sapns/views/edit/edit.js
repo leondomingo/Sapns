@@ -186,7 +186,8 @@ $(function() {
             q: query,
             rp: 25,
             search_params: {
-                url: "{{tg.url('/dashboard/views/grid/')}}"
+                url: "{{tg.url('/dashboard/views/grid/')}}",
+                data: { view_id: view_id }
             },
             hide_check: true,
             height: parseInt($('#sp-edit-view-list').css('height').replace('px', '')) - 65,
