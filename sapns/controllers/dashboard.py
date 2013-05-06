@@ -432,7 +432,7 @@ class DashboardController(BaseController):
         list_ = List(cls, **kw)
         ds = list_.grid_data()
         
-        title = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
+        title = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')[:25]
 
         response.content_type = 'application/excel'
         response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % title
