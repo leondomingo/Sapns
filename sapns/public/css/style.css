@@ -361,6 +361,7 @@ a.sp-shortcut.process { background:#eee url('/images/sapns/icons/process.png') n
 .ui-widget-header,
 .ui-dialog .ui-dialog-buttonpane button { background:#B4BD3C }
 .ui-datepicker-trigger { margin-left:2px; font:bold 10px arial; height:20px }
+.ui-widget { font-family:arial }
 
 button, select { border:0; border-radius:2px; background-color:#faca6a }
 button:hover { background-color:#666; color:#fff }

@@ -126,4 +126,5 @@ a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-
 .sidebar-messages .sbm-message{position:relative;padding:5px;border-radius:5px;min-height:50px;opacity:.7;margin-bottom:5px}
 .sbm-message-std{background-color:#ffb328;font:bold 13px arial}.sp-field-error{color:red}
 .ui-widget-header,.ui-dialog .ui-dialog-buttonpane button{background:#b4bd3c}.ui-datepicker-trigger{margin-left:2px;font:bold 10px arial;height:20px}
-button,select{border:0;border-radius:2px;background-color:#faca6a}button:hover{background-color:#666;color:#fff}
+.ui-widget{font-family:arial}button,select{border:0;border-radius:2px;background-color:#faca6a}
+button:hover{background-color:#666;color:#fff}
