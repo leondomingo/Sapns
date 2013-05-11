@@ -1,6 +1,6 @@
 html { background:#fff; text-align:center; margin:0; padding:0 }
 body { text-align:left; width:1200px; margin:0 auto; padding:0;
-    font-size:12px; font-family:"Lucida Grande","Lucida Sans Unicode",geneva,verdana,sans-serif }
+    font-size:13px; font-family:helvetica,arial,sans-serif }
 
 a { color:#797C33; font-weight:bold; text-decoration:none }
 
@@ -54,7 +54,7 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 .sp-logout-user { padding-left:10px; float:left; font-style:italic;
     font-family:Arial; font-size:13px; width:240px; height:18px; opacity:1;
-    border-radius:10px; font-weight:normal }
+    border-radius:10px; font-weight:normal; transition:background-color 0.5s }
 
 .sp-logout-user:hover { background-color:#ECEFCC; font-weight:bold }
 
@@ -63,7 +63,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 .sp-logout-user .user-name { margin-top:2px; color:#444 }
 
 .sp-logout-btn { text-align:center; background-color:white; border:2px solid gray;
-    border-radius:10px; width:90px; margin-left:250px; font-family:Arial; height:14px }
+    border-radius:10px; width:90px; margin-left:250px; font-family:Arial; height:14px;
+    transition:background-color 0.2s }
 
 .sp-logout-btn a { font-weight:normal }
 
@@ -102,7 +103,7 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 .sp-col-title { color:#F9F9F9; background-color:#B4BD3C; font-weight:bold;
     text-align:center; font-family:arial; font-size:11px; height:29px;
     min-width:20px; border:1px solid #d3d3d3; float:left; margin-right:-1px; margin-bottom:-1px;
-    padding:2px; overflow:hidden }
+    padding:2px; overflow:hidden; transition-duration:0.5s }
 
 .sp-col-title-sortable { cursor:pointer }
 .sp-col-title-sortable:hover { background-color:#444 }
@@ -213,9 +214,9 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 .icon_sb { width:25px; height:25px; cursor:pointer; float:left }
 .return_sb { margin-left:5px }
-.text_sb { font-size:12px; padding-top:3px; margin-left:5px; float:left; width:130px; margin-bottom:3px }
+.text_sb { font-size:13px; padding-top:3px; margin-left:5px; float:left; width:130px; margin-bottom:3px }
 
-.text_sb, .subaction { padding:3px; cursor:pointer; width:150px } 
+.text_sb, .subaction { padding:3px; cursor:pointer; width:150px; transition-duration:0.3s } 
 .text_sb:hover, .subaction:hover { background-color:#b4bd3c; border-radius:3px }
 
 .text_sb a { font-weight:bold; color:#333 }
@@ -244,7 +245,7 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus { border-colo
 .sp-empty-button:disabled:hover { color:#fff }
 #sp-user-menu { width:330px; display:none; margin-top:5px; padding-bottom:5px }
 .sp-user-option { padding:2px 2px 2px 10px; color:#000; border-radius:3px;
-    cursor:pointer; margin-left:1px; width:99% }
+    cursor:pointer; margin-left:1px; width:99%; transition:background-color 0.3s }
 .sp-user-option:hover { background-color:#FFA900; color:#fff }
 .sp-user-option img { width:20px; height:20px; margin-right:5px }
 
@@ -258,7 +259,7 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus { border-colo
 #sp-exploration-head .title { float:left; font:15px "lucida grande",verdana,arial; color:#9ea634; margin:5px 30px 0 0 }
 #sp-exploration-head .button { float:right; border:1px solid #f2f2f2; border-color:#f2f2f2 #999 #999 #f2f2f2; cursor:pointer;
     border-radius:5px 3px 3px 0; padding:5px 2px 2px; width:30px; height:20px; background-color:#B4BD3C; font:13px arial; color:#444;
-    text-align:center; margin-right:5px }
+    text-align:center; margin-right:5px; transition-duration:0.3s }
 #sp-exploration-head .button:hover { background-color:#666; color:#f2f2f2 }
 
 #sp-shortcut-new img, #sp-shortcut-sort img, .sp-shortcut-up img { width:20px; height:20px }
@@ -363,5 +364,6 @@ a.sp-shortcut.process { background:#eee url('/images/sapns/icons/process.png') n
 .ui-datepicker-trigger { margin-left:2px; font:bold 10px arial; height:20px }
 .ui-widget { font-family:arial }
 
-button, select { border:0; border-radius:2px; background-color:#faca6a }
+button, select { border:0; border-radius:2px; background-color:#faca6a; transition:background-color 0.3s }
 button:hover { background-color:#666; color:#fff }
+select:hover { background-color:#ffaf1e }

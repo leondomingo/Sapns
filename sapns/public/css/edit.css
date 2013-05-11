@@ -15,7 +15,8 @@
 
 #edit_buttons { position:absolute; right:12px; bottom:3px }
 #edit_buttons div { float:left }
-#edit_buttons img { border:1px solid transparent; border-radius:4px; border-width:1px 2px 2px 1px; width:40px; height:40px }
+#edit_buttons img { border:1px solid transparent; border-radius:4px; border-width:1px 2px 2px 1px; 
+    width:40px; height:40px; transition-duration:0.4s }
 #edit_buttons #save-button { margin-right:5px }
 #edit_buttons img:hover { border-color:#ccc #888 #888 #ccc }
 #edit_buttons #back-button { }
@@ -57,5 +58,5 @@
     text-align:left; height:22px; overflow:hidden }
 #created_updated { height:9px; font-size:9px; cursor:pointer }
 .created { width:120px; border:1px solid #bbb; float:left; margin-right:5px;
-    text-align:center; background:#B4BD3C }
+    text-align:center; background:#B4BD3C; transition:background-color 0.4s }
 .created:hover { background-color:#ECEFCC }
