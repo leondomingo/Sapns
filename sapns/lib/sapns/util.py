@@ -612,6 +612,35 @@ def get_list():
 
     return l
 
+def get_module(module_name, class_name=None, default_module_name=None):
+
+    def _get_module(package_module_class):
+        package_module_class_ = package_module_class.split('.')
+        module_name = '.'.join(package_module_class_[:-1])
+        class_name = package_module_class_[-1]
+
+        return module_name, class_name
+
+    try:
+        # module_name='sapns.lib.foo.bar', class_name='Baz'
+        if not class_name:
+            # module_name = 'sapns.lib.foo.bar.Baz', class_name=None
+            module_name, class_name = _get_module(module_name)
+
+        module = __import__(module_name, fromlist=[class_name])
+
+    except ImportError:
+        if default_module_name:
+            if not class_name:
+                default_module_name, class_name = _get_module(default_module_name)
+
+            module = __import__(default_module_name, fromlist=[class_name])
+
+        else:
+            raise
+
+    return module
+
 # date/time functions (from and to string)
 def strtodate(s):
     date_fmt = config.get('formats.date')
