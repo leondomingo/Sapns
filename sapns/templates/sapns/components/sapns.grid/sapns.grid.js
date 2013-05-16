@@ -1907,7 +1907,7 @@ var __DEFAULT_FILTER = 'default';
                             modal: true,
                             resizable: false,
                             width: 700,
-                            height: 150,
+                            height: 'auto',
                             open: function() {
                                 if (filter) {
                                     $(this).find('.sp-grid-filter-field').val(filter.field);
