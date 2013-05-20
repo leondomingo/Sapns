@@ -743,15 +743,18 @@ class ViewsController(BaseController):
 
             view_cols = [default_width]*len(ds.labels)
             if view:
-                #view_cols = [default_width]
                 for i, a in enumerate(sorted(view.get('attributes_detail', []), cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0)))):
                     view_cols[i] = a.get('width', default_width)
                     
                 # user - col_widths
                 user_id = request.identity['user'].user_id
                 if view.get('col_widths', {}).get(str(user_id)):
+                    col_widths = view['col_widths'][str(user_id)]
+                    if len(col_widths) < len(view_cols):
+                        col_widths += [default_width] * (len(view_cols) - len(col_widths))
+
                     view_cols_ = [default_width]
-                    for w, w_ in zip(view['col_widths'][str(user_id)], view_cols):
+                    for w, w_ in zip(col_widths, view_cols):
                         if w:
                             view_cols_.append(w)
                             

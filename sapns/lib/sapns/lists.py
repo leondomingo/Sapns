@@ -156,24 +156,28 @@ class List(object):
         default_width = visible_width / len(ds.labels)
         if default_width < min_width:
             default_width = min_width
-            
+
         view_cols = [default_width]*len(ds.labels)
         if self.view:
-            #view_cols = [default_width]
             for i, a in enumerate(sorted(self.view.get('attributes_detail', []), cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0)))):
                 view_cols[i] = a.get('width', default_width)
-                
+
             # user - col_widths
             user_id = request.identity['user'].user_id
             if self.view.get('col_widths', {}).get(str(user_id)):
+                
+                col_widths = self.view['col_widths'][str(user_id)]
+                if len(col_widths) < len(view_cols):
+                    col_widths += [default_width] * (len(view_cols) - len(col_widths))
+
                 view_cols_ = [default_width]
-                for w, w_ in zip(self.view['col_widths'][str(user_id)], view_cols):
+                for w, w_ in zip(col_widths, view_cols):
                     if w:
                         view_cols_.append(w)
                         
                     else:
                         view_cols_.append(w_)
-                    
+
                 view_cols = view_cols_
         
         cols = []
@@ -181,15 +185,15 @@ class List(object):
             align = 'center'
             # int, long, float
             if type_ == 'int' or type_ == 'long' or type_ == 'float':
-                align = 'right'
+                align = config.get('alignment.number', 'right')
 
             # str
             elif type_ == '' or type_ == 'str':
-                align = 'left'
+                align = config.get('alignment.text', 'left')
 
             # date, time
             elif type_ == 'date' or type_ == 'time':
-                align = 'center'
+                align = config.get('alignment.date_time', 'center')
 
             cols.append(dict(title=col, width=w, align=align))
             

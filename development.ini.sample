@@ -42,6 +42,7 @@ beaker.cache.type = memory
 # Sapns settings
 pg_path = /usr/bin
 views_prefix = _view_
+# formats
 formats.date = %m/%d/%Y
 formats.date.xls = mm/dd/yyyy
 formats.time = %H:%M
@@ -49,6 +50,10 @@ formats.time.xls = hh:mm
 formats.datetime = %m/%d/%Y %H:%M
 formats.float = 9.999,99
 formats.float.xls = #,##0.00
+# alignment
+alignment.number = right
+alignment.text = left
+alignment.date_time = center
 
 # JavaScript options
 js.date_format = mm/dd/yy
