@@ -21,7 +21,7 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 #forgot_password { text-align:center }
 #forgot_password label { font-weight:normal; font-size:11px; color:#FFB835; cursor:pointer }
 #forgot_password label:hover { color:#000 }
-#username_or_email { width:100% }        
+#username_or_email { width:615px }
 
 .sp_header_top { position:fixed; left:0; top:0; width:100%; height:30px;
     background-color:#B4BD3C; color:white; z-index:1000 }

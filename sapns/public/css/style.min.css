@@ -5,7 +5,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 #loginform .line *{float:left}#loginform .line .label{width:170px;font:15px helvetica;margin-left:6px;text-align:center;font-weight:bold}
 #loginform input{font:15px arial;width:180px}#loginform .line.rememberme .label{font:12px arial;margin-top:3px}
 #forgot_password{text-align:center}#forgot_password label{font-weight:normal;font-size:11px;color:#ffb835;cursor:pointer}
-#forgot_password label:hover{color:#000}#username_or_email{width:100%}.sp_header_top{position:fixed;left:0;top:0;width:100%;height:30px;background-color:#b4bd3c;color:white;z-index:1000}
+#forgot_password label:hover{color:#000}#username_or_email{width:615px}.sp_header_top{position:fixed;left:0;top:0;width:100%;height:30px;background-color:#b4bd3c;color:white;z-index:1000}
 .sp_header{position:relative;width:1200px;height:100%;margin:0 auto;z-index:200}
 #you-are-in{padding-left:5px;padding-top:5px}.sp_footer{background-color:#b4bd3c;color:white;height:80px;text-align:right;border-radius:0 0 5px 5px}
 .sp_middle{position:relative;height:600px;margin-top:30px}.sp_sidebar{position:absolute;width:180px;height:580px;overflow:auto;left:0;top:0;padding:10px;font-size:16px;background:#ecefcc}
