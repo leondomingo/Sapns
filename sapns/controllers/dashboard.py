@@ -372,6 +372,10 @@ class DashboardController(BaseController):
 
             kw.update(cls=cls)
 
+            # q: replace " with &quot;
+            if kw.get('q'):
+                kw['q'] = kw['q'].replace('"', '&quot;')
+
             tmpl = get_template('sapns/components/sapns.grid/export-dialog.html')
             content = tmpl.render(tg=tg, _=_, ds=ds, data=kw).encode('utf-8')
 
