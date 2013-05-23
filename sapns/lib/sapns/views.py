@@ -132,6 +132,7 @@ def get_query(view_id):
                 # these filters will be applied when the user ask for the view
                 logger.debug(u'variable filter=%s' % attribute['value'])
                 columns.append(u'%s AS "id_%s"' % (attribute['attr'], attribute['attr']))
+                nagg_columns.append('"id_%s"' % attribute['attr'])
         
         if not attribute.get('is_filter'):
             m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\(.+\)', attribute['expression'].upper())
