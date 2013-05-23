@@ -284,7 +284,7 @@ $(function() {
                         resizable: false,
                         closeOnEscape: false,
                         width: 850,
-                        height: 150,
+                        height: 'auto',
                         buttons: {
                             "{{_('Ok')}}": function() {
                                 if (!on_progress) {
