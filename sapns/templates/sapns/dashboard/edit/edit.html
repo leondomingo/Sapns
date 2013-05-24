@@ -36,7 +36,7 @@
     <!--{% endif %}-->
     
     <!-- _created / _updated -->
-    <!--{% if id and h.predicates.in_group('managers') %}-->
+    <!--{% if id and h.predicates.in_group(h.ROLE_MANAGERS) %}-->
     <div id="created_updated">
         <div title="{{_('Created')}}" class="created">{{_created or '&nbsp;'}}</div>
         <div title="{{_('Updated')}}" class="created">{{_updated or '&nbsp;'}}</div>

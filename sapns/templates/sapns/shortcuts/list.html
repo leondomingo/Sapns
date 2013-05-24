@@ -30,7 +30,7 @@
         <!--{% endif %}-->
     <!--{% endif %}-->
 
-    <!--{% if h.predicates.in_group('managers') or h.predicates.has_permission('dashboard-management') %}-->    
+    <!--{% if h.predicates.in_group(h.ROLE_MANAGERS) or h.predicates.has_permission('dashboard-management') %}-->    
     <div id="sp-shortcut-sort" class="button" title="{{_('Click here to place your shortcuts')}}"><img src="{{tg.url('/images/sapns/icons/place_icons.png')}}"></div>
     <div id="sp-shortcut-new" class="button" title="{{_('New')}}"><img src="{{tg.url('/images/sapns/icons/new.png')}}"></div>
     <!--{% if (sc_parent or '') != '' %}-->
@@ -72,7 +72,7 @@
                 success: function(content) {
                     $('#sp-shortcut-list').html(content).removeClass('sort-mode');
                     
-                    // {% if h.predicates.in_group('managers') or h.predicates.has_permission('dashboard-management') %} 
+                    // {% if h.predicates.in_group(h.ROLE_MANAGERS) or h.predicates.has_permission('dashboard-management') %} 
                     if (!sort_mode) {
                         $('.sp-shortcut').draggable({
                             helper: 'clone',

@@ -4,6 +4,7 @@
 
 from webhelpers import date, feedgenerator, html, number, misc, text
 from tg import predicates
+from sapns.util import ROLE_MANAGERS
 
 def url2(url):
     from tg import config
