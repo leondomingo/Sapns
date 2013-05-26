@@ -7,10 +7,10 @@
     <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=1')}}"></script>
     <script>
         var _loader = new sapnsLoader({
-            log: true,
+            log: false,
             no_injection: true,
             then: function() {
-                console.log('redirecting to {{came_from}}');
+                // console.log('redirecting to {{came_from}}');
                 window.location = "{{came_from}}";
             }
         });

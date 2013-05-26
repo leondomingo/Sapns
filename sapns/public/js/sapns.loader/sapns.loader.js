@@ -35,7 +35,7 @@ var sapnsLoader = (function(global_settings) {
             var head = document.head || document.getElementsByTagName('head')[0],
                 script = document.createElement('script');
 
-            script.defer = true;
+            script.async = true;
             script.id = id;
             script.text = text;
             head.appendChild(script);
@@ -63,6 +63,7 @@ var sapnsLoader = (function(global_settings) {
                     $.ajax({
                         url: settings.url,
                         cache: false,
+                        async: false,
                         success: function(res) {
                             if (res.status) {
                                 save_to_storage(settings, res.content);
@@ -82,6 +83,7 @@ var sapnsLoader = (function(global_settings) {
                     $.ajax({
                         url: settings.url,
                         cache: false,
+                        async: false,
                         success: function(content) {
                             save_to_storage(settings, content);
 

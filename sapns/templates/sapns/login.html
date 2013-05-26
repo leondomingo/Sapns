@@ -60,12 +60,12 @@
 
 <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=1')}}"></script>
 <script>
-    $(function() {
-        var _loader = new sapnsLoader({ log: true });
-        _loader.load(
-            { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" }
-        );
+    var _loader = new sapnsLoader({ log: false });
+    _loader.load(
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" }
+    );
 
+    $(function() {
         $('#loginusername').focus();
         
         $('#forgot_password label').click(function(event) {
