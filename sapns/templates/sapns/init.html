@@ -1,0 +1,37 @@
+{% extends 'sapns/empty.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=1')}}"></script>
+    <script>
+        var _loader = new sapnsLoader({
+            log: true,
+            no_injection: true,
+            then: function() {
+                console.log('redirecting to {{came_from}}');
+                window.location = "{{came_from}}";
+            }
+        });
+
+        _loader.load({ url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+                     { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" },
+                     { url: "{{tg.url('/js/fields.min.js?v=1')}}" },
+                     { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
+                     { url: "{{tg.url('/js/dateformat.min.js?v=1')}}" },
+                     { url: "{{tg.url('/api/components/grid?v=1')}}", json: true },
+                     { url: "{{tg.url('/api/components/selector?v=1')}}", json: true },
+                     { url: "{{tg.url('/api/components/uploader?v=1')}}", json: true }
+        );
+    </script>
+
+    <style>
+    #wait-message { margin-left:20px; color:#999 }
+    </style>
+{% endblock %}
+
+{% block middle %}
+    {{ super() }}
+    <h2 id="wait-message">{{_('Wait, please...')}}</h2>
+{% endblock %}

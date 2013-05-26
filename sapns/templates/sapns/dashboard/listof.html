@@ -6,6 +6,12 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
+    <script>
+        _loader.load(
+            { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+            { url: "{{tg.url('/api/components/grid?v=1')}}", json: true }
+        );
+    </script>
 {% endblock %}
 
 {% block middle %}
@@ -24,7 +30,6 @@
     </div>
     <!--{% endif %}-->
 
-    <script src="{{tg.url('/js/sprintf/sprintf.min.js')}}"></script>
     <script>
         {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
         $(function() {

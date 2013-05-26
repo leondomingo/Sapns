@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+{% block head %}
+<meta charset="UTF-8">
+<title>{{tg.config.get('app.name', 'Sapns')}} - {{tg.config.get('app.subtitle', 'Web Information System')}}</title>
+{% endblock %}
+<link rel="stylesheet" href="{{tg.url('/css/style.min.css', params=dict(v=20))}}">
+</head>
+<body>
+{% block middle %}
+{% endblock middle %}
+</body>
+</html>

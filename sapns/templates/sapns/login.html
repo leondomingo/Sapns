@@ -58,9 +58,14 @@
 <div id="wrong-login">{{_('<span>Wrong login</span>. Please, verify your username or password')}}</div>
 <!--{% endif %}-->
 
-<script src="{{tg.url('/js/sidebar-messages.min.js')}}"></script>
+<script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=1')}}"></script>
 <script>
     $(function() {
+        var _loader = new sapnsLoader({ log: true });
+        _loader.load(
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" }
+        );
+
         $('#loginusername').focus();
         
         $('#forgot_password label').click(function(event) {

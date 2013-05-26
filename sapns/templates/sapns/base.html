@@ -6,6 +6,10 @@
 <title>{% if page %} {{page}} -{% endif %}
     {{tg.config.get('app.name', 'Sapns')}} - {{tg.config.get('app.subtitle', 'Web Information System')}}
     [{{tg.request.identity['user'].display_name}}]</title>
+<script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=1')}}"></script>
+<script>
+    var _loader = new sapnsLoader({ log: true });
+</script>
 {% endblock %}
 <link rel="stylesheet" href="{{tg.url('/css/style.min.css', dict(v=21))}}">
 <!--{% if h.root_folder() %}-->
