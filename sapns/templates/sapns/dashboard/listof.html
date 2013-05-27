@@ -24,9 +24,12 @@
     </div>
     <!--{% endif %}-->
 
-    <script src="{{tg.url('/js/sprintf/sprintf.min.js')}}"></script>
     <script>
-        {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+        _loader.load(
+            { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+            { url: "{{tg.url('/api/components/grid?v=1')}}", json: true }
+        );
+
         $(function() {
         	$('#grid').sapnsGrid({
         	    cls: "{{grid.cls}}",

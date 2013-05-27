@@ -16,9 +16,7 @@ var SidebarMessages = function(args) {
         var sb = '<div class="sidebar-messages" style="width:' + self.width + 'px;"></div>';
         $(sb).appendTo('body');
         
-        $('<div id="sidebar-messages-modal" style="display:none; position:fixed; \
-                left:0; top:0; width:100%; height:100%; opacity:0.4; \
-                background-color:#666; z-index:999"></div>').appendTo('body');
+        $('<div id="sidebar-messages-modal"></div>').appendTo('body');
     }
     
     // show

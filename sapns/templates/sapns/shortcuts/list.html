@@ -55,8 +55,11 @@
     <div class="option delete">{{_('Delete')}}</div>
 </div>
 
-<script src="{{tg.url('/js/sidebar-messages.min.js', params=dict(v=1))}}"></script>
 <script>
+    _loader.load(
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" }
+    );
+    
     $(function() {
         
         var sbm = new SidebarMessages(),

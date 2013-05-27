@@ -5,6 +5,7 @@ from pylons.i18n import ugettext as _
 from sapns.controllers.dashboard import DashboardController
 from sapns.controllers.docs import DocsController
 from sapns.controllers.error import ErrorController
+from sapns.controllers.api import APIController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.forgot_password import EUserDoesNotExist
 from sapns.lib.sapns.util import add_language, save_language
@@ -35,6 +36,7 @@ class RootController(BaseController):
     error = ErrorController()
     dashboard = DashboardController()
     docs = DocsController()
+    api = APIController()
 
     def __init__(self, *args, **kwargs):
         super(RootController, self).__init__(*args, **kwargs)
@@ -55,20 +57,27 @@ class RootController(BaseController):
             
             if came_from:
                 # redirect to the place before logout
-                redirect(came_from)
+                #redirect(came_from)
+                redirect(url('/init', params=dict(came_from=came_from)))
                 
             else:
+                redirection = None
+
                 # redirect to user's entry-point
                 user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
                 ep = user.entry_point()
                 if ep and ep != '/':
-                    redirect(url(ep))
+                    # redirect(url(ep))
+                    redirection = url(ep)
                     
                 else:
                     # there is no "entry_point" defined, redirect to default entry-point (app.home)
                     home = config.get('app.home')
                     if home and home != '/':
-                        redirect(url(home))
+                        # redirect(url(home))
+                        redirection = url(home)
+
+                redirect(url('/init', params=dict(came_from=redirection)))
                 
             return dict()
             
@@ -99,9 +108,10 @@ class RootController(BaseController):
         # simply redirects to index
         redirect('/', **kw)
             
-    @expose()
-    def init(self):
-        redirect(url('/dashboard/util/init'))
+    @expose('sapns/init.html')
+    @require(predicates.not_anonymous())
+    def init(self, **kw):
+        return dict(came_from=kw.get('came_from', '/'))
         
     @expose('sapns/message.html')
     @require(predicates.not_anonymous())
@@ -110,12 +120,6 @@ class RootController(BaseController):
                     no_header=kw.get('no_header', False),
                     no_footer=kw.get('no_footer', False),
                     )
-
-    @expose('sapns/environ.html')
-    @require(predicates.has_permission('manage'))
-    def environ(self):
-        """This method showcases TG's access to the wsgi environment."""
-        return dict(environment=request.environ)
 
     @expose()
     def post_login(self, came_from='/'):
@@ -128,7 +132,7 @@ class RootController(BaseController):
             origin = request.cookies.get('origin_url')
             redirect('/', dict(login_counter=login_counter, came_from=came_from, origin=origin))
             
-        redirect(came_from)
+        redirect(url('/init', params=dict(came_from=came_from)))
 
     @expose()
     def post_logout(self, came_from=url('/')):
