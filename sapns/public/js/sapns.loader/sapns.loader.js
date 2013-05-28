@@ -126,15 +126,33 @@ var sapnsLoader = (function(global_settings) {
         }
     }
 
-    self.clear = function() {
-        var r = new RegExp('^'+PREFIX);
+    self.clear = function(key) {
+        if (key === undefined) {
+            var r = new RegExp('^'+PREFIX);
+
+            for (var i=localStorage.length-1; i>=0; i--) {
+                var k = localStorage.key(i);
+                if (r.test(k)) {
+                    localStorage.removeItem(k);
+                }
+            }
+        }
+        else {
+            localStorage.removeItem(PREFIX+key);
+        }
+    }
+
+    self.keys = function() {
+        var keys = [],
+            r = new RegExp('^'+PREFIX);
         for (var i=localStorage.length-1; i>=0; i--) {
             var k = localStorage.key(i);
             if (r.test(k)) {
-                localStorage.removeItem(k);
+                keys.push(k.replace(PREFIX, ''));
             }
-
         }
+
+        return keys;
     }
 
     self.refresh = function() {

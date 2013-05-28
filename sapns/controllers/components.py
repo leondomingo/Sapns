@@ -12,7 +12,7 @@ class ComponentsController(BaseController):
     @expose('json')
     @require(p_.not_anonymous())
     def grid(self, **kw):
-        logger = logging.getLogger('.grid')
+        logger = logging.getLogger('ComponentsController.grid')
         try:
             tmpl = get_template('sapns/components/sapns.grid/sapns.grid.min.js')
     
@@ -27,9 +27,9 @@ class ComponentsController(BaseController):
     @expose('json')
     @require(p_.not_anonymous())
     def selector(self, **kw):
-        logger = logging.getLogger('.selector')
+        logger = logging.getLogger('ComponentsController.selector')
         try:
-            tmpl = get_template('sapns/components/sapns.selector.min.js')
+            tmpl = get_template('sapns/components/sapns.selector/sapns.selector.min.js')
     
             content = tmpl.render(tg=tg, _=_,).encode('utf-8')
     
@@ -42,9 +42,9 @@ class ComponentsController(BaseController):
     @expose('json')
     @require(p_.not_anonymous())
     def uploader(self, **kw):
-        logger = logging.getLogger('.uploader')
+        logger = logging.getLogger('ComponentsController.uploader')
         try:
-            tmpl = get_template('sapns/components/sapns.uploader.min.js')
+            tmpl = get_template('sapns/components/sapns.uploader/sapns.uploader.min.js')
     
             content = tmpl.render(tg=tg, _=_,).encode('utf-8')
     

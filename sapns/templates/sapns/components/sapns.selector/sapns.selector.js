@@ -18,7 +18,7 @@
             onClick: null,
             dialog: {
                 width: 1100,
-                height: 'auto',
+                height: 'auto'
             },
             grid: {
                 cls: settings.rc,
@@ -214,6 +214,38 @@
                         $(sapnsSelector.dialog_name()).remove();
                         $('<div id="' + dialog_name_ + '"><div class="sapnsGrid"></div></div>').appendTo('body');
                         $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid(sapnsSelector.grid);
+
+                        var dialog_buttons = {
+                            "{{_('Ok')}}": function() {
+                                // get the id of the selected row
+                                var new_value = $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0],
+                                    current_value = sapnsSelector.getValue();
+                                
+                                sapnsSelector.setValue(new_value);
+                                if (current_value != new_value) {
+                                    sapnsSelector.setTitle();
+                                }
+                                
+                                $(sapnsSelector.dialog_name()).dialog('destroy').remove();
+                            }
+                        };
+
+                        // add extra buttons
+                        if (sapnsSelector.dialog.extra_buttons) {
+                            for (var i=0, l=sapnsSelector.dialog.extra_buttons.length; i<l; i++) {
+                                var eb = sapnsSelector.dialog.extra_buttons[i];
+                                dialog_buttons[eb.label] = function() {
+                                    var selected_id = $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0];
+                                    return eb.click(selected_id, function() {
+                                        $(sapnsSelector.dialog_name()).dialog('destroy').remove();
+                                    });
+                                }
+                            }
+                        }
+
+                        dialog_buttons["{{_('Cancel')}}"] = function() {
+                            $(sapnsSelector.dialog_name()).dialog('destroy').remove();
+                        }
                         
                         // show search dialog
                         $(sapnsSelector.dialog_name()).dialog({
@@ -222,23 +254,7 @@
                             height: sapnsSelector.dialog.height,
                             resizable: false,
                             modal: true,
-                            buttons: {
-                                "{{_('Ok')}}": function() {
-                                    // get the id of the selected row
-                                    var new_value = $(sapnsSelector.dialog_name() + ' .sapnsGrid').sapnsGrid('getSelectedIds')[0],
-                                        current_value = sapnsSelector.getValue();
-                                    
-                                    sapnsSelector.setValue(new_value);
-                                    if (current_value != new_value) {
-                                        sapnsSelector.setTitle();
-                                    }
-                                    
-                                    $(sapnsSelector.dialog_name()).dialog('destroy').remove();
-                                },
-                                "{{_('Cancel')}}": function() {
-                                    $(sapnsSelector.dialog_name()).dialog('destroy').remove();
-                                }
-                            }
+                            buttons: dialog_buttons
                         });
                     }
                 }

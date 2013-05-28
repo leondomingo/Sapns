@@ -4,7 +4,7 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
-    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=1')}}"></script>
+    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=2')}}"></script>
     <script>
         var _loader = new sapnsLoader({
             log: false,
@@ -21,7 +21,7 @@
                      { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
                      { url: "{{tg.url('/js/dateformat.min.js?v=1')}}" },
                      { url: "{{tg.url('/api/components/grid?v=1')}}", json: true },
-                     { url: "{{tg.url('/api/components/selector?v=1')}}", json: true },
+                     { url: "{{tg.url('/api/components/selector?v=2')}}", json: true },
                      { url: "{{tg.url('/api/components/uploader?v=1')}}", json: true }
         );
     </script>
