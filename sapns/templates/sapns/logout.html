@@ -18,11 +18,17 @@
 <script>
 $(function() {
     $('#sp-user-data').click(function() {
-        var f = '<form action="{{tg.url("/dashboard/users/edit/_/%d" % tg.request.identity["user"].user_id)}}">\
-            <input type="hidden" name="came_from" value="' + encodeURI(window.location.href) + '">\
-        </form>';
-        
-        $(f).appendTo('body').submit().remove();
+        var f = $('<form/>', {
+            action: "{{tg.url('/dashboard/users/edit/_/%d' % tg.request.identity['user'].user_id)}}"
+        });
+
+        var came_from = $('<input/>', {
+            type: 'hidden',
+            name: 'came_from',
+            value: encodeURI(window.location.href)
+        });
+
+        $(f).append(came_from).appendTo('body').submit().remove();
     });
 });
 </script>
