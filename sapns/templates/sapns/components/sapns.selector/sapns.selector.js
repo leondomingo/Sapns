@@ -166,19 +166,31 @@
                         id = sapnsSelector.getValue();
                     if (id != '') {
                         var url_edit = sapnsSelector.edit_url;
-                        
-                        if (url_edit[url_edit.length-1] != '/') {
-                            url_edit += '/';
-                        }
-                        
-                        url_edit += sprintf('%s/%s', cls, id);
-                        
-                        var form_edit =
-                            '<form action="' + url_edit + '" method="post" target="_blank">\
-                                <input type="hidden" name="came_from" value="">\
-                            </form>';
+
+                        if (typeof(url_edit) === 'string') {
+                            if (url_edit[url_edit.length-1] != '/') {
+                                url_edit += '/';
+                            }
                             
-                        $(form_edit).appendTo('body').submit().remove();
+                            url_edit += sprintf('%s/%s', cls, id);
+                            
+                            var form_edit = $('<form/>', { 
+                                action: url_edit,
+                                method: 'post',
+                                target: '_blank'
+                            });
+
+                            var came_from = $('<input/>', {
+                                name: 'came_from',
+                                type: 'hidden',
+                                value: ''
+                            });
+
+                            form_edit.append(came_from).appendTo('body').submit().remove();
+                        }
+                        else if (typeof(url_edit) === 'function') {
+                            url_edit();
+                        }
                     }
                 }
             });
