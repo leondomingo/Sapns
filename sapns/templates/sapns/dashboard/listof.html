@@ -56,18 +56,31 @@
         	$('#rel-classes-show').click(function() {
         	    var ids = $('#grid').sapnsGrid('getSelectedIds');
         	    if (ids.length > 0) {
-        	        var opt = $('#rel-classes-sel option:selected');
-        	        var cls = opt.attr('cls');
-        	        var ch_attr = opt.attr('ch_attr');
-        	        var action = "{{tg.url('/dashboard/list/')}}" + cls;
-        	        
-        	        var form_ = 
-        	            '<form id="rel-classes-form" method="get" action="' + action + '" target="_blank">\
-        	                <input type="hidden" name="ch_attr" value="' + ch_attr + '">\
-        	                <input type="hidden" name="parent_id" value="' + ids[0] + '">\
-        	            </form>';
-        	            
-        	        $(form_).appendTo('body').submit().remove();
+        	        var opt = $('#rel-classes-sel option:selected'),
+                        cls = opt.attr('cls'),
+                        ch_attr = opt.attr('ch_attr'),
+                        action = "{{tg.url('/dashboard/list/')}}" + cls;
+
+                    var form_ = $('<form/>', {
+                        id: 'rel-classes-form',
+                        method: 'get',
+                        action: action,
+                        target: '_blank'
+                    });
+
+                    var ch_attr_ = $('<input/>', {
+                        type: 'hidden',
+                        name: 'ch_attr',
+                        value: ch_attr
+                    });
+
+                    var parent_id_ = $('<input/>', {
+                        type: 'hidden',
+                        name: 'parent_id',
+                        value: ids[0]
+                    });
+
+                    form_.append(ch_attr_).append(parent_id_).appendTo('body').submit().remove();
         	    }
         	});
         });
