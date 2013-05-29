@@ -1724,7 +1724,7 @@ var __DEFAULT_FILTER = 'default';
                         }
                     }
                     else {
-                        s = 'No hay filtros';
+                        s = "{{_('There are not filters')}}";
                     }
                     
                     return s;
@@ -1892,7 +1892,7 @@ var __DEFAULT_FILTER = 'default';
                             }
                         }
                         else {
-                            s = '<p class="sp-grid-no-filters">{{_("There are no filters")}}</p>';
+                            s = '<p class="sp-grid-no-filters">{{_("There are not filters")}}</p>';
                         }
                         
                         $(g_id + ' .sp-grid-filters').html(s);
