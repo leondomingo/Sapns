@@ -15,14 +15,15 @@
             }
         });
 
-        _loader.load({ url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
-                     { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" },
-                     { url: "{{tg.url('/js/fields.min.js?v=1')}}" },
-                     { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
-                     { url: "{{tg.url('/js/dateformat.min.js?v=1')}}" },
-                     { url: "{{tg.url('/api/components/grid?v=2')}}", json: true },
-                     { url: "{{tg.url('/api/components/selector?v=3')}}", json: true },
-                     { url: "{{tg.url('/api/components/uploader?v=1')}}", json: true }
+        _loader.load(
+            { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/fields.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/dateformat.min.js?v=1')}}" },
+            { url: "{{tg.url('/api/components/grid?v=2')}}", json: true },
+            { url: "{{tg.url('/api/components/selector?v=3')}}", json: true },
+            { url: "{{tg.url('/api/components/uploader?v=1')}}", json: true }
         );
     </script>
 

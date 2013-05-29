@@ -5,9 +5,11 @@
 </div>
 
 <script>
-    {% include 'sapns/components/sapns.grid/sapns.grid.min.js' %}
+    _loader.load(
+        { url: "{{tg.url('/api/components/grid?v=2')}}", json: true }
+    );
+
     $(function() {
-        
         $('#logs').sapnsGrid({
             search_params: {
                 url: "{{tg.url('/dashboard/logs/grid')}}",
