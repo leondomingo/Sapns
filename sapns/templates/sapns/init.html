@@ -4,7 +4,7 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
-    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=2')}}"></script>
+    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=3')}}"></script>
     <script>
         var _loader = new sapnsLoader({
             log: false,
@@ -17,7 +17,7 @@
 
         _loader.load(
             { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
-            { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
             { url: "{{tg.url('/js/fields.min.js?v=1')}}" },
             { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
             { url: "{{tg.url('/js/dateformat.min.js?v=1')}}" },

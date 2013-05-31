@@ -9,7 +9,7 @@ except ImportError:
 
 setup(
     name='sapns',
-    version='0.6',
+    version='0.7',
     description='Web platform by Ender',
     author='León Domingo',
     author_email='leon.domingo@ender.es',
@@ -30,6 +30,7 @@ setup(
         "Neptuno2",
         "argparse",
         "pymongo",
+        "slimit",
     ],
     setup_requires=['PasteScript >= 1.7'],
     paster_plugins=['PasteScript', 'Pylons', 'TurboGears2', 'tg.devtools'],

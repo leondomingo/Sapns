@@ -13,11 +13,24 @@ var SidebarMessages = function(args) {
     
     // create sidebar
     if ($('.sidebar-messages').length === 0) {
-        var sb = '<div class="sidebar-messages" style="width:' + self.width + 'px;"></div>';
-        $(sb).appendTo('body');
-        
-        $('<div id="sidebar-messages-modal"></div>').appendTo('body');
+        $('<div/>', {
+            "class": 'sidebar-messages',
+            style: 'width:' + self.width + 'px'
+        }).appendTo('body');
+
+        $('<div/>', {
+            id: 'sidebar-messages-modal'
+        }).appendTo('body');
     }
+
+    // a message dissapears when you click on it
+    var message_ = '.sidebar-messages .sbm-message';
+    $(document).off('click', message_).on('click', message_, function() {
+        var the_message = $(this);
+        the_message.fadeOut('slow', function() {
+            the_message.remove();
+        });
+    });
     
     // show
     self.show = function(args) {
@@ -30,8 +43,13 @@ var SidebarMessages = function(args) {
         
         self.messages[args_.id] = true;
         
-        var message = '<div id="' + args_.id + '" class="sbm-message ' + args_.styles + '">' + args_.message + '</div>';
-        $('.sidebar-messages').append(message);
+        $('<div/>', {
+            id: args_.id,
+            "class": 'sbm-message ' + args_.styles,
+            html: args_.message
+        }).appendTo('.sidebar-messages');
+
+        // $('.sidebar-messages').append(message);
         if (self.after_show_message) {
             self.after_show_message(args_.id);
         }
@@ -64,8 +82,9 @@ var SidebarMessages = function(args) {
         }
         
         $('#sidebar-messages-modal').hide();
-        $('#' + args_.id).fadeOut(args_.velocity, function() {
-            $('#' + args_.id).remove();
+        var the_message = $('#' + args_.id);
+        the_message.fadeOut(args_.velocity, function() {
+            the_message.remove();
             
             delete self.messages[args_.id];
             
