@@ -58,11 +58,11 @@
 <div id="wrong-login">{{_('<span>Wrong login</span>. Please, verify your username or password')}}</div>
 <!--{% endif %}-->
 
-<script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=2')}}"></script>
+<script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=3')}}"></script>
 <script>
     var _loader = new sapnsLoader({ log: false });
     _loader.load(
-        { url: "{{tg.url('/js/sidebar-messages.min.js?v=1')}}" }
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" }
     );
 
     $(function() {

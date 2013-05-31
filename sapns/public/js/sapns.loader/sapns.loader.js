@@ -8,7 +8,7 @@ var sapnsLoader = (function(global_settings) {
     var PREFIX = 'sapns-loader-';
 
     function remove_version(url) {
-        return url.replace(/\?v=[\d\.]+$/, '', 'g');
+        return url.replace(/\?v=[\d\.]+.*$/, '', 'g');
     }
 
     function save_to_storage(settings, text) {
@@ -54,7 +54,7 @@ var sapnsLoader = (function(global_settings) {
                 item = localStorage.getItem(PREFIX + settings.url);
             }
 
-            if (item === null) {
+            if (item === null || settings.refresh) {
                 if (global_settings.log) {
                     console.log('Loading from ' + settings.url);
                 }

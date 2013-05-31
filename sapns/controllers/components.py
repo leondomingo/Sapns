@@ -53,3 +53,26 @@ class ComponentsController(BaseController):
         except Exception, e:
             logger.error(e)
             return dict(status=False)
+
+    @expose('json')
+    @require(p_.not_anonymous())
+    def load(self, tmpl, **kw):
+        try:
+            from slimit import minify
+        except ImportError:
+            def minify(text, **kwargs):
+                return text
+
+        logger = logging.getLogger('ComponentsController.uploader')
+        try:
+            tmpl_ = get_template(tmpl.replace('$', '/').replace('__', '.'))
+            content = tmpl_.render(tg=tg, _=_,).encode('utf-8')
+
+            if kw.get('min'):
+                content = minify(content, mangle=True)
+        
+            return dict(status=True, content=content)
+        
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)

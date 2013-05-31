@@ -6,12 +6,12 @@
 <title>{% if page %} {{page}} -{% endif %}
     {{tg.config.get('app.name', 'Sapns')}} - {{tg.config.get('app.subtitle', 'Web Information System')}}
     [{{tg.request.identity['user'].display_name}}]</title>
-<script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=2')}}"></script>
+<script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=3')}}"></script>
 <script>
     var _loader = new sapnsLoader({ log: false });
 </script>
 {% endblock %}
-<link rel="stylesheet" href="{{tg.url('/css/style.min.css', dict(v=22))}}">
+<link rel="stylesheet" href="{{tg.url('/css/style.min.css', dict(v=23))}}">
 <!--{% if h.root_folder() %}-->
     <link rel="stylesheet" href="{{tg.url('/css/%s/sapns.css' % h.root_folder(), params=dict(v=1))}}">
     <link rel="stylesheet" href="{{tg.url('/css/%s/style.css' % h.root_folder(), params=dict(v=1))}}">
