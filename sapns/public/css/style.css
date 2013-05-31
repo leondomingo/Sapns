@@ -103,7 +103,7 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 .sp-col-title { color:#F9F9F9; background-color:#B4BD3C; font-weight:bold;
     text-align:center; font-family:arial; font-size:11px; height:29px;
     min-width:20px; border:1px solid #d3d3d3; float:left; margin-right:-1px; margin-bottom:-1px;
-    padding:2px; overflow:hidden; transition-duration:0.5s }
+    padding:2px; overflow:hidden; transition:background-color 0.5s ease 0s }
 
 .sp-col-title-sortable { cursor:pointer }
 .sp-col-title-sortable:hover { background-color:#444 }
