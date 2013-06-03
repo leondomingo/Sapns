@@ -129,4 +129,4 @@ a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-
 .sp-field-error{color:red}.ui-widget-header,.ui-dialog .ui-dialog-buttonpane button{background:#b4bd3c}
 .ui-datepicker-trigger{margin-left:2px;font:bold 10px arial;height:20px}.ui-widget{font-family:arial}
 button,select{border:0;border-radius:2px;background-color:#faca6a;transition:background-color .3s}
-button:hover{background-color:#666;color:#fff}select:hover{background-color:#ffaf1e}
+button{box-shadow:1px 1px #999}button:hover{background-color:#666;color:#fff}select:hover{background-color:#ffaf1e}

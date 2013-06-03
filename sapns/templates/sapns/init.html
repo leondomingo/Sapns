@@ -4,7 +4,7 @@
 {% block head %}
     {{ super() }}
     {{ util.jquery() }}
-    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=3')}}"></script>
+    <script src="{{tg.url('/js/sapns.loader/sapns.loader.min.js?v=4')}}"></script>
     <script>
         var _loader = new sapnsLoader({
             log: false,
@@ -15,21 +15,19 @@
             }
         });
 
+        // _loader.clear();
         _loader.load(
-            { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+            { url: "{{tg.url('/css/init.css?v=1')}}", type: 'css' },
+            { url: "{{tg.url('/js/sprintf/sprintf.min.js?a=123&v=1&b=321')}}" },
             { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
             { url: "{{tg.url('/js/fields.min.js?v=1')}}" },
             { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
             { url: "{{tg.url('/js/dateformat.min.js?v=1')}}" },
-            { url: "{{tg.url('/api/components/grid?v=2')}}", json: true },
-            { url: "{{tg.url('/api/components/selector?v=3')}}", json: true },
-            { url: "{{tg.url('/api/components/uploader?v=1')}}", json: true }
+            { url: "{{tg.url('/api/components/grid?v=2')}}" },
+            { url: "{{tg.url('/api/components/selector?v=3')}}" },
+            { url: "{{tg.url('/api/components/uploader?v=1')}}" }
         );
     </script>
-
-    <style>
-    #wait-message { margin-left:20px; color:#999 }
-    </style>
 {% endblock %}
 
 {% block middle %}

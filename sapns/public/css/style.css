@@ -367,5 +367,6 @@ a.sp-shortcut.process { background:#eee url('/images/sapns/icons/process.png') n
 .ui-widget { font-family:arial }
 
 button, select { border:0; border-radius:2px; background-color:#faca6a; transition:background-color 0.3s }
+button { box-shadow:1px 1px #999 }
 button:hover { background-color:#666; color:#fff }
 select:hover { background-color:#ffaf1e }

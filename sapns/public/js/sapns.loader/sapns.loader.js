@@ -8,7 +8,7 @@ var sapnsLoader = (function(global_settings) {
     var PREFIX = 'sapns-loader-';
 
     function remove_version(url) {
-        return url.replace(/\?v=[\d\.]+.*$/, '', 'g');
+        return url.replace(/[\?\&]v=[\d\.]+.*$/, '', 'g');
     }
 
     function save_to_storage(settings, text) {
@@ -47,6 +47,23 @@ var sapnsLoader = (function(global_settings) {
         }
     }
 
+    function injectStyle(id, text) {
+        var style = document.getElementById(id);
+        if (!style) {
+            var head = document.head || document.getElementsByTagName('head')[0],
+                style = document.createElement('style');
+
+            style.id = id;
+            style.innerHTML = text;
+            head.appendChild(style);
+        }
+        else {
+            if (global_settings.log) {
+                console.log(id + ' already exists in the document');
+            }
+        }
+    }
+
     self.load = function() {
         function _load(settings, callback) {
             var item = null;
@@ -62,14 +79,22 @@ var sapnsLoader = (function(global_settings) {
                 if (settings.json === true) {
                     $.ajax({
                         url: settings.url,
+                        type: 'get',
                         cache: false,
                         async: false,
                         success: function(res) {
                             if (res.status) {
-                                save_to_storage(settings, res.content);
+                                if (!settings.no_cache) {
+                                    save_to_storage(settings, res.content);
+                                }
 
                                 if (!global_settings.no_injection) {
-                                    injectScript(settings.url, res.content);
+                                    if (settings.type === 'css') {
+                                        injectStyle(settings.url, res.content);
+                                    }
+                                    else {
+                                        injectScript(settings.url, res.content);
+                                    }
                                 }
 
                                 if (callback) {
@@ -82,13 +107,21 @@ var sapnsLoader = (function(global_settings) {
                 else {
                     $.ajax({
                         url: settings.url,
+                        type: 'get',
                         cache: false,
                         async: false,
                         success: function(content) {
-                            save_to_storage(settings, content);
+                            if (!settings.no_cache) {
+                                save_to_storage(settings, content);
+                            }
 
                             if (!global_settings.no_injection) {
-                                injectScript(settings.url, content);
+                                if (settings.type === 'css') {
+                                    injectStyle(settings.url, content);
+                                }
+                                else {
+                                    injectScript(settings.url, content);
+                                }
                             }
 
                             if (callback) {
@@ -106,7 +139,12 @@ var sapnsLoader = (function(global_settings) {
                 item = JSON.parse(item);
 
                 if (!global_settings.no_injection) {
-                    injectScript(settings.url, item.text);
+                    if (settings.type === 'css') {
+                        injectStyle(settings.url, item.text);
+                    }
+                    else {
+                        injectScript(settings.url, item.text);    
+                    }
                 }
 
                 if (callback) {
