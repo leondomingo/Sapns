@@ -20,6 +20,7 @@ from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_tem
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
+from zope.sqlalchemy import mark_changed
 from sqlalchemy import Table
 from sqlalchemy.exc import NoSuchTableError
 from sqlalchemy.schema import MetaData
@@ -695,8 +696,7 @@ class DashboardController(BaseController):
                 r = dbs.execute(ins)
                 is_insert = True
                 
-            ch_cls.name = ch_cls.name
-            dbs.add(ch_cls)
+            mark_changed(dbs())
             dbs.flush()
 
             if not update.get('id'):

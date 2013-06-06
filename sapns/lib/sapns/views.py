@@ -12,6 +12,7 @@ import logging
 import re
 from copy import deepcopy
 import simplejson as sj
+from zope.sqlalchemy import mark_changed
 from sqlalchemy import and_
 
 # might be anything except a number (0, 1, 2, ...) or # (sharp symbol)
@@ -187,11 +188,7 @@ def drop_view(view_name):
             logger.debug(u'Dropping view [%s]' % view_name)
             dbs.execute('DROP VIEW %s' % view_name)
             dbs.flush()
-            
-            c = SapnsClass.by_name('sp_classes')
-            c.class_id = c.class_id
-            dbs.add(c)
-            dbs.flush()
+            mark_changed(dbs())
         
     except Exception, e:
         logger.error(e)
