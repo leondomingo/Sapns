@@ -109,7 +109,7 @@ class DashboardController(BaseController):
                 else:
                     fin = True
             
-        return dict(page=' / '.join(parents),
+        return dict(page=' / '.join(parents), came_from=kw.get('came_from', user.entry_point()),
                     user=dict(id=user_id, display_name=user.display_name),
                     this_shortcut=this_shortcut, sc_parent=sc_parent)
 
