@@ -9,12 +9,18 @@
 
 <script>
 function export_view(callback, callback_error) {
-    var form_ = '<form action="{{tg.url("/dashboard/views/export_/")}}">' +
-        '<input type="hidden" name="class_id" value="{{cls.id}}">' +  
-        '</form>';
+    var form_ = $('<form/>', {
+        method: 'post',
+        action: "{{tg.url('/dashboard/views/export_/')}}"
+    });
+
+    form_.append($('<input/>', {
+        type: 'hidden',
+        name: 'class_id',
+        value: "{{cls.id}}"
+    }))
         
-    $(form_).appendTo('body').submit().remove();
-    
+    form_.appendTo('body').submit().remove();
     setTimeout(callback, 500);
 }
 </script>

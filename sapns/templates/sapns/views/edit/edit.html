@@ -50,6 +50,7 @@
             { url: "{{tg.url('/api/components/selector?v=3')}}" }
         );
 
-        {% include 'sapns/views/edit/edit.js' %}
+        {#{% include 'sapns/views/edit/edit.js' %}#}
+        {{ h.load('sapns/views/edit/edit.js', view=view, came_from=came_from)}}
     </script>
 {% endblock %}

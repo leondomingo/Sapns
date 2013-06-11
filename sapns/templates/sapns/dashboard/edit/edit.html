@@ -185,6 +185,7 @@
         { url: "{{tg.url('/api/components/selector?v=3')}}" }
     );
 
-    {% include 'sapns/dashboard/edit/edit.min.js' %}
+    {#{% include 'sapns/dashboard/edit/edit.min.js' %}#}
+    {{ h.load('sapns/dashboard/edit/edit.js', cls=cls, id=id)}}
 </script>
 {% endblock %}

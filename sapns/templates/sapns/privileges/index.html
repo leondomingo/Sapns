@@ -37,7 +37,8 @@
     </div>
 
     <script>
-        {% include 'sapns/privileges/privileges.min.js' %}
+        {#{% include 'sapns/privileges/privileges.js' %}#}
+        {{ h.load('sapns/privileges/privileges.js', id_role=id_role, id_user=id_user) }}
     </script>
 </div>
 {% endblock %}

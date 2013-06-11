@@ -79,6 +79,7 @@
         { url: "{{tg.url('/api/components/selector?v=3')}}" }
     );
 
-    {% include 'sapns/users/edit/edit.js' %}
+    {#{% include 'sapns/users/edit/edit.js' %}#}
+    {{ h.load('sapns/users/edit/edit.js', came_from=came_from, user=user)}}
 </script>
 {% endblock %}

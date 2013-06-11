@@ -57,5 +57,6 @@
 </div>
 
 <script>
-    {% include 'sapns/views/edit/edit-filter/edit-filter.js' %}
+    {#{% include 'sapns/views/edit/edit-filter/edit-filter.js' %}#}
+    {{ h.load('sapns/views/edit/edit-filter/edit-filter.js', filter=filter)}}
 </script>
