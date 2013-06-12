@@ -6,6 +6,7 @@ from bson.objectid import ObjectId
 from neptuno.postgres.search import Search
 from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
+import sapns.lib.helpers as h
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
@@ -401,13 +402,14 @@ class ViewsController(BaseController):
                 filter_id = mdb.advanced_filters.insert(filter_)
 
             tmpl = get_template('sapns/views/edit/edit-filter/edit-filter.html')
-            content = tmpl.render(tg=tg, _=_, filter=dict(id=str(filter_id),
-                                                          pos=pos if pos is not None else '',
-                                                          field=filter_['field'],
-                                                          field_title=filter_['title'],
-                                                          operator=filter_['operator'],
-                                                          value=filter_['value'],
-                                                          null_value=filter_.get('null_value'))).encode('utf-8')
+            content = tmpl.render(tg=tg, _=_, h=h,
+                                  filter=dict(id=str(filter_id),
+                                              pos=pos if pos is not None else '',
+                                              field=filter_['field'],
+                                              field_title=filter_['title'],
+                                              operator=filter_['operator'],
+                                              value=filter_['value'],
+                                              null_value=filter_.get('null_value'))).encode('utf-8')
     
             return dict(status=True, content=content)
     
