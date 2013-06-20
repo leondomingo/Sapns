@@ -3,7 +3,7 @@
 
 from neptuno.postgres.search import Search
 from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
-from pylons.i18n import lazy_ugettext as l_,  ugettext as _
+from pylons.i18n import ugettext as _
 from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
 from sapns.controllers.privileges import PrivilegesController

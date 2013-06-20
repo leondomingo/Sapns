@@ -1,9 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from neptuno.util import get_paramw, strtodate
+from neptuno.util import get_paramw
 from pylons.i18n import ugettext as _
-from sapns.config import app_cfg
-from sapns.lib.sapns.util import pagination, format_float as _format_float
+from sapns.lib.sapns.util import pagination, format_float as _format_float, strtodate as _strtodate
 from sapns.lib.sapns.views import filter_sql
 from sapns.model import DBSession as dbs, SapnsUser, SapnsClass, SapnsPermission
 from tg import url, request, config
@@ -14,7 +13,6 @@ from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
 
 date_fmt = config.get('formats.date', default='%m/%d/%Y')
-_strtodate = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
 
 class EListForbidden(Exception):
     pass
