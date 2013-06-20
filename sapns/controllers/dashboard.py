@@ -16,7 +16,7 @@ from sapns.lib.base import BaseController
 from sapns.lib.sapns.htmltopdf import url2
 from sapns.lib.sapns.lists import EListForbidden
 from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
-    format_float, datetostr as _datetostr, timetostr as _timetostr, get_list
+    format_float, datetostr as _datetostr, timetostr as _timetostr, get_list, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -72,6 +72,7 @@ class DashboardController(BaseController):
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
     @add_language
+    @log_access('data exploration')
     def data_exploration(self, **kw):
         
         sc_parent = this_shortcut = get_paramw(kw, 'sc_parent', int, opcional=True)
@@ -116,6 +117,7 @@ class DashboardController(BaseController):
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
     @add_language
+    @log_access('dashboard')
     def index(self, **kw):
         user_id = get_paramw(kw, 'user_id', int, opcional=True)
         if not user_id:
@@ -130,6 +132,7 @@ class DashboardController(BaseController):
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
     @add_language
+    @log_access('list')
     def list(self, cls, **kw):
         
         _logger = logging.getLogger('DashboardController.list')
@@ -157,6 +160,7 @@ class DashboardController(BaseController):
     
     @expose('json')
     @require(p.not_anonymous())
+    @log_access('list search')
     def grid(self, cls, **kw):
         
         _logger = logging.getLogger('DashboardController.grid')
@@ -342,6 +346,7 @@ class DashboardController(BaseController):
     
     @expose()
     @require(p.not_anonymous())
+    @log_access('to_csv')
     def to_csv(self, cls, **kw):
         
         # all records
@@ -388,6 +393,7 @@ class DashboardController(BaseController):
     
     @expose()
     @require(p.not_anonymous())
+    @log_access('to_xls')
     def to_xls_(self, **kw):
 
         logger = logging.getLogger('DashboardController.to_xls_')
@@ -537,6 +543,7 @@ class DashboardController(BaseController):
     
     @expose('json')
     @require(p.not_anonymous())
+    @log_access('save record')
     def save(self, cls, **params):
         """
         IN
@@ -731,6 +738,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
+    @log_access('create record')
     def new(self, cls, came_from='/', **kw):
         
         if not kw:
@@ -742,6 +750,7 @@ class DashboardController(BaseController):
         
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
+    @log_access('edit record')
     def edit(self, cls, id='', **params):
         
         logger = logging.getLogger('DashboardController.edit')
@@ -921,6 +930,7 @@ class DashboardController(BaseController):
     @expose('sapns/dashboard/delete.html')
     @expose('json')
     @require(p.not_anonymous())
+    @log_access('delete record')
     def delete(self, cls, id_, **kw):
         
         logger = logging.getLogger('DashboardController.delete')

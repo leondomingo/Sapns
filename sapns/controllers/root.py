@@ -8,7 +8,7 @@ from sapns.controllers.error import ErrorController
 from sapns.controllers.api import APIController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.forgot_password import EUserDoesNotExist
-from sapns.lib.sapns.util import add_language, save_language
+from sapns.lib.sapns.util import add_language, save_language, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
 from tg import expose, require, url, request, response, redirect, config, predicates
@@ -45,6 +45,7 @@ class RootController(BaseController):
     @expose('sapns/login.html')
     @expose('sapns/index.html', custom_format='home')
     @add_language
+    @log_access('root')
     def index(self, **kw):
 
         _logger = logging.getLogger('RootController.index')

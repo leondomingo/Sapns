@@ -1,17 +1,21 @@
 # -*- coding: utf-8 -*-
 
 from neptuno.postgres.search import Search
+from sapns.lib.sapns.mongo import Mongo
+from bson.objectid import ObjectId
 from neptuno.util import get_paramw, strtodate
 from pylons.i18n import ugettext as _
 from sapns.config import app_cfg
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import pagination, format_float as _format_float
+from sapns.lib.sapns.util import pagination, format_float as _format_float, get_user, \
+    datetostr as _datetostr, timetostr as _timetostr
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsPermission
 from sqlalchemy import MetaData, Table
 from sqlalchemy.sql.expression import and_, desc
-from tg import expose, require, request, config, predicates as p
+from tg import expose, require, request, config, url, predicates as p_
 import logging
+import simplejson as sj
 
 __all__ = ['LogsControllers']
 
@@ -19,16 +23,62 @@ date_fmt = config.get('formats.date')
 _strtodate = lambda s: strtodate(s, fmt=date_fmt)
 
 class LogsController(BaseController):
+
+    @expose('sapns/logs/access_logs/index.html')
+    @require(p_.Any(p_.has_permission('access-logs'),
+                    p_.in_group('managers')))
+    def index(self, **kw):
+        u = get_user()
+        return dict(page=u'Access logs', came_from=kw.get('came_from', url(u.entry_point())))
+
+    @expose('sapns/logs/access_logs/list.html')
+    @require(p_.Any(p_.has_permission('access-logs'),
+                    p_.in_group('managers')))
+    def logs_list(self, **kw):
+        logger = logging.getLogger('LogsController.logs_list')
+
+        mdb = Mongo().db
+        logs = []
+        search = {}
+        fields = get_paramw(kw, 'fields', sj.loads)
+        for f in fields:
+
+            col = f['field_name']
+
+            _id = ObjectId(f['log_id'])
+            log = mdb['access'].find_one(dict(_id=_id))
+
+            value = log.copy()
+            for col_ in col.split('.'):
+                value = value.get(col_)
+
+            logger.info(value)
+            search[col] = value
+
+        logger.info(search)
+
+        for item in mdb['access'].find(search).sort([('when', -1)]):
+            logs.append(dict(id=item['_id'],
+                             when=dict(date=_datetostr(item['when'].date()),
+                                       time=_timetostr(item['when'].time())),
+                             who=dict(id=item['who']['id'],
+                                      display_name=item['who']['display_name'],
+                                      user_name=item['who']['name'],
+                                      roles=item['who']['roles']),
+                             what=item['what'],
+                             ))
+
+        return dict(logs=logs)
     
     @expose('sapns/logs/search.html')
-    @require(p.not_anonymous())
+    @require(p_.not_anonymous())
     def search(self, **kw):
         #logger = logging.getLogger('DashboardController.search')
         return dict(table_name=kw.get('table_name'), 
                     row_id=kw.get('row_id'))
         
     @expose('json')
-    @require(p.not_anonymous())
+    @require(p_.not_anonymous())
     def grid(self, cls, **params):
         
         #logger = logging.getLogger('DashboardController.grid')

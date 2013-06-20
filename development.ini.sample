@@ -8,28 +8,28 @@
 # and generally should not be modified by end users.
 
 [DEFAULT]
-debug = true
+debug            = true
 # Uncomment and replace with the address which should receive any error reports
 #email_to = you@yourdomain.com
-smtp_server = localhost
+smtp_server      = localhost
 error_email_from = paste@localhost
 
 [server:main]
-use = egg:Paste#http
-# use = egg:gunicorn#main
+use  = egg:Paste#http
+# use  = egg:gunicorn#main
 host = 0.0.0.0
 port = 8081
 
 [sa_auth]
-cookie_secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
+cookie_secret         = s4pn5-c00k13-s3cr3t
 
 [app:main]
-use = egg:sapns
-full_stack = true
-cache_dir = %(here)s/data
-beaker.session.key = sapns
-beaker.session.secret = 04e6453b-f5d7-4f7d-868e-a9f338760d9a
-beaker.cache.type = memory
+use                   = egg:sapns
+full_stack            = true
+cache_dir             = %(here)s/data
+beaker.session.key    = sapns
+beaker.session.secret = s3ss10n-s3cR3T
+beaker.cache.type     = memory
 
 # If you'd like to fine-tune the individual locations of the cache data dirs
 # for the Cache data, or the Session saves, un-comment the desired settings
@@ -40,58 +40,64 @@ beaker.cache.type = memory
 #auto_reload_templates = false
 
 # Sapns settings
-pg_path = /usr/bin
-views_prefix = _view_
+pg_path             = /opt/PostgreSQL/9.1/bin
+views_prefix        = _view_
 # formats
-formats.date = %m/%d/%Y
-formats.date.xls = mm/dd/yyyy
-formats.time = %H:%M
-formats.time.xls = hh:mm
-formats.datetime = %m/%d/%Y %H:%M
-formats.float = 9.999,99
-formats.float.xls = #,##0.00
+formats.date        = %m/%d/%Y
+formats.date.xls    = mm/dd/yyyy
+formats.time        = %H:%M
+formats.time.xls    = hh:mm
+formats.datetime    = %m/%d/%Y %H:%M
+formats.float       = 9.999,99
+formats.float.xls   = #,##0.00
 # alignment
-alignment.number = right
-alignment.text = left
+alignment.number    = right
+alignment.text      = left
 alignment.date_time = center
 
 # JavaScript options
-js.date_format = mm/dd/yy
-js.date_format2 = mm/dd/yyyy
+js.date_format       = mm/dd/yy
+js.date_format2      = mm/dd/yyyy
 js.date_format2_long = dddd, mmmm dd yyyy
 # 0-sunday, 1-monday, ..., 6-saturday
-js.first_day = 1
+js.first_day         = 1
 
 # TODO: Application's settings here
-app.name = Sapns
-app.subtitle = Web Information System
-app.company_url = http://www.sapns.org
+app.name            = Sapns
+app.subtitle        = Web Information System
+app.company_url     = http://www.sapns.org
 # app.root_folder = 
 # app.update_folder =
 # app.custom_list = sapns.lib.foo.lists.ListFoo
-app.home = /dashboard
-app.repo_base = %(here)s/sapns/public/repo
-app.url = http://localhost:8081/
+app.home            = /dashboard
+app.repo_base       = %(here)s/sapns/public/repo
+app.url             = http://localhost:8081/
 app.language_cookie = sp_language
-app.languages = en#English,es#Español
+app.languages       = en#English,es#Español
 
-htmltopdf.path = /path/to/wkhtmltopdf/
+htmltopdf.path      = /path/to/wkhtmltopdf/
+
+# log_access
+# 1=active, (anything else)=not active
+app.settings.log_access     = 1
+# ttl for "access" collection in seconds (default=86400)
+app.settings.log_access.ttl = 10
 
 # scheduler
 app.scheduler.limit_task = 10
-app.scheduler.lock_path = /tmp/sapns_scheduler.lock
+app.scheduler.lock_path  = /tmp/sapns_scheduler.lock
 
 # mailsender
-app.mailsender.mail = sapns@domain.com
-app.mailsender.name = Sapns
-app.mailsender.login = sapns@domain.com
+app.mailsender.mail     = sapns@domain.com
+app.mailsender.name     = Sapns
+app.mailsender.login    = sapns@domain.com
 app.mailsender.password = ****
-app.mailsender.smtp = smtp.domain.com
+app.mailsender.smtp     = smtp.domain.com
 
 # sqlalchemy
-sqlalchemy.url = postgresql://postgres:pswd@localhost/sapns
-sqlalchemy.echo = false
-sqlalchemy.echo_pool = false
+sqlalchemy.url          = postgresql://postgres:pswd@localhost/sapns
+sqlalchemy.echo         = false
+sqlalchemy.echo_pool    = false
 sqlalchemy.pool_recycle = 3600
 
 #turn this setting to "min" if you would like tw to produce minified
