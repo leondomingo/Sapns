@@ -14,7 +14,6 @@ from sapns.model.sapnsmodel import SapnsUser
 from tg import expose, require, url, request, response, redirect, config, predicates
 from tg.decorators import use_custom_format
 from tg.i18n import set_lang
-from tg.configuration import config
 import logging
 
 __all__ = ['RootController']
@@ -123,6 +122,7 @@ class RootController(BaseController):
                     )
 
     @expose()
+    @log_access('login')
     def post_login(self, came_from='/'):
         """
         Redirect the user to the initially requested page on successful
