@@ -1,16 +1,29 @@
 #access-logs-main { padding:3px }
 #access-logs-main .title { font-size:18px; margin-left:10px }
 #access-logs-main .filters { margin:0 5px; height:50px; background-color:#eee; padding:5px; border-radius:3px }
-#access-logs-main .filters .filter { float:left; margin-right:5px; padding:2px 4px; background-color:#fcd890; border-radius:5px;
-    min-width:100px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; box-shadow:1px 1px #888;
-    color:#444; cursor:pointer }
-#access-logs-main .list { margin:5px; height:400px; background-color:#f2f2f2; padding:5px; border-radius:5px; overflow:auto }
+#access-logs-main .filters .filter { float:left; margin-right:5px; padding:2px 4px; background-color:#fcd890; 
+    border-radius:5px; min-width:100px; max-width:150px; overflow:hidden; text-overflow:ellipsis; 
+    white-space:nowrap; text-align:center; box-shadow:1px 1px #888; color:#444; cursor:pointer }
+#access-logs-main .list { margin:5px; height:455px; background-color:#f2f2f2; padding:5px; border-radius:5px; overflow:auto }
 #access-logs-main .list .item { clear:left; height:20px; padding:2px 4px; margin-bottom:5px;
-    box-shadow:2px 2px #444; background-color:#cad16f; border-radius:5px; cursor:default }
+    box-shadow:2px 2px #444; background-color:#cad16f; border-radius:5px; cursor:default; transition:height 0.5s; }
+#access-logs-main .list .item.open { height:80px; background-color:#FEE1AD }
 #access-logs-main .list .item .col { border:1px solid transparent; border-radius:2px; float:left; margin-right:5px; overflow:hidden; 
     text-overflow:ellipsis; white-space:nowrap }
 #access-logs-main .list .item .col:hover { border:1px solid #888; background-color:#888; color:#fff }
 #access-logs-main .list .item .col.when-date { width:70px; text-align:center }
 #access-logs-main .list .item .col.when-time { width:40px; text-align:center }
 #access-logs-main .list .item .col.who { width:200px }
+#access-logs-main .list .item .col.who-roles { width:90px; text-align:center }
 #access-logs-main .list .item .col.what { width:150px; text-align:center }
+#access-logs-main .list .item .col.details { width:40px; text-align:center; background-color:#ccc;
+    color:#444; cursor:pointer; font-weight:bold }
+
+#access-logs-main .footer { clear:left; margin:0 10px; height:25px; background-color:#eee; padding-top:5px; padding-left:20px; border-radius:5px }
+#access-logs-main .footer .col { float:left; margin-right:20px }
+#access-logs-main .rp { width:100px; text-align:center }
+#access-logs-main .footer .col.space { width:170px }
+#access-logs-main .footer .page-number { font-weight:bold; width:60px; background-color:#fee1ad;
+    text-align:center; border-radius:10px; box-shadow:1px 1px #999 }
+#access-logs-main .footer .col button { width:100px; font-weight:bold; font-family:verdana,arial }
+

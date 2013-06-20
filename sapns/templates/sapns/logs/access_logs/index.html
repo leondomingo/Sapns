@@ -13,6 +13,22 @@
         <div class="title">{{_('Access logs')}}</div>
         <div class="filters"></div>
         <div class="list"></div>
+        <div class="footer">
+            <div class="col">
+                <select class="rp">
+                    <option value="25">25</option>
+                    <option value="100" selected>100</option>
+                    <option value="500">500</option>
+                    <option value="1000">1000</option>
+                </select>
+            </div>
+
+            <div class="col space">&nbsp;</div>
+
+            <div class="col rew-pag"><button>&lt;</button></div>
+            <div class="col page-number">1</div>
+            <div class="col fwd-pag"><button>&gt;</button></div>
+        </div>
     </div>
 
     <script>
