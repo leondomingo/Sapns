@@ -1,15 +1,30 @@
 <!--{% for log in logs %}-->
 <div class="item" log-id="{{log.id}}" who-id="{{log.who.id}}">
-    <div class="col when-date" field-name="">{{log.when.date}}</div>
-    <div class="col when-time" field-name="when-time">{{log.when.time}}</div>
+    <div class="col when-date" field-name="when.date">{{log.when.date}}</div>
+    <div class="col when-time" field-name="when.time" title="{{log.when.time}}">{{log.when.time}}</div>
     <div class="col who" field-name="who.id" title="{{log.who.display_name or ''}}">{{log.who.display_name}} ({{log.who.user_name}})</div>
     
     <!--{% for r in log.who.roles %}-->
     <div class="col who-roles" field-name="who.roles">{{r}}</div>
     <!--{% endfor %}-->
 
-    <div class="col what" field-name="what" title="{{log.what}}">{{log.what}}</div>
+    <div class="col what" field-name="what" title="{{log.what}}">{{ log.what }}</div>
+    <div class="col ip-address" field-name="request.remote_addr">{{ log.request.remote_addr }}</div>
+    <div class="col user-agent" field-name="request.user-agent"
+        title="{{log.request.user_agent}}">{{ log.request.user_agent }}</div>
     <div class="col details">?</div>
+
+    <div class="details-area">
+        <div>{{ log.request.user_agent }}</div>
+        <div>{{ log.request.referer }}</div>
+        <!--{% for a in log.args_ %}-->
+        <div>{{ a }}</div>
+        <!--{% endfor %}-->
+
+        <!--{% for k in log.kwargs_ %}-->
+        <div>{{ k }} = <span class="value">{{ log.kwargs_[k] }}</span></div>
+        <!--{% endfor %}-->
+    </div>
 </div>
 <!--{% else %}-->
 <div class="item">{{_('There are not logs')}}</div>
