@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from sapns.model import DBSession as dbs, SapnsPermission, SapnsClass, SapnsRole
+from sapns.model import DBSession as dbs, SapnsPermission, SapnsRole
 from sapns.lib.atenea.const_datos import ROLE_MANAGERS
 
 class AccessLogs(object):

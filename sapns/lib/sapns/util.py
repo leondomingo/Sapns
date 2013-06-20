@@ -614,33 +614,38 @@ class SapnsAccess(object):
                                                 name=self.user.user_name,
                                                 display_name=self.user.display_name,
                                                 roles=[r.group_name for r in self.user.roles]),
-                                       when=self.moment,
+                                       when_=self.moment,
+                                       when=dict(date=str(self.moment.date()),
+                                                 time=str(self.moment.time())),
                                        what=what_,
                                        **self.kwargs))
 
 def log_access(*dargs, **dkwargs):
     def _log_access(f):
         def __log_access(self, *args, **kwargs):
-            if config.get('app.settings.log_access', '') == '1':
-                u = request.identity
-                if u:
-                    request_ = dict(user_agent=request.user_agent,
-                                    remote_addr=request.remote_addr,
-                                    referer=request.referer)
+            try:
+                if config.get('app.settings.log_access', '') == '1':
+                    u = request.identity
+                    if u:
+                        request_ = dict(user_agent=request.user_agent,
+                                        remote_addr=request.remote_addr,
+                                        referer=request.referer)
 
-                    if len(dargs) > 0:
-                        now_ = dt.datetime.now()
-                        if isinstance(dargs[0], str):
-                            SapnsAccess(u['user'].user_id, now_, *dargs, args_=args, kwargs_=kwargs, 
+                        if len(dargs) > 0:
+                            now_ = dt.datetime.now()
+                            if isinstance(dargs[0], str):
+                                SapnsAccess(u['user'].user_id, now_, *dargs, args_=args, kwargs_=kwargs, 
+                                            request=request_, **dkwargs)()
+                                
+                            elif isinstance(dargs[0], type):
+                                cls = dargs[0]
+                                cls(u['user'].user_id, now_, *dargs[1:], **dkwargs)()
+
+                        else:
+                            SapnsAccess(u['user'].user_id, now_, *dargs[1:], args_=args, kwargs_=kwargs, 
                                         request=request_, **dkwargs)()
-                            
-                        elif isinstance(dargs[0], type):
-                            cls = dargs[0]
-                            cls(u['user'].user_id, now_, *dargs[1:], **dkwargs)()
-
-                    else:
-                        SapnsAccess(u['user'].user_id, now_, *dargs[1:], args_=args, kwargs_=kwargs, 
-                                    request=request_, **dkwargs)()
+            except Exception, e:
+                logging.getLogger('log_access').error(e)
 
             return f(self, *args, **kwargs)
 

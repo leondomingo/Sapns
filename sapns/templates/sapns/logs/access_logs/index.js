@@ -89,6 +89,10 @@ $(function() {
         reload_logs();
     });
 
+    $('#access-logs-main .reload button').click(function() {
+        reload_logs();
+    });
+
     $('#access-logs-main .footer .rew-pag').click(function() {
         if (pag > 1) {
             pag--;

@@ -17,6 +17,7 @@ import tg
 import sapns.lib.helpers as h
 import logging
 import simplejson as sj
+import re
 
 __all__ = ['LogsController']
 
@@ -57,6 +58,12 @@ class LogsController(BaseController):
                 for col_ in col.split('.'):
                     value = value.get(col_)
 
+                if col == 'when.time':
+                    m_time = re.search(r'(\d{2}:\d{2})', value)
+                    if m_time:
+                        time_ = m_time.group(1)
+                        value = re.compile(r'^%s' % time_)
+
                 logger.debug(value)
                 search[col] = value
 
@@ -64,13 +71,16 @@ class LogsController(BaseController):
 
             for item in mdb['access'].find(search).sort([('when', -1)]).limit(rp).skip(pos):
                 logs.append(dict(id=item['_id'],
-                                 when=dict(date=_datetostr(item['when'].date()),
-                                           time=_timetostr(item['when'].time())),
+                                 when=dict(date=_datetostr(item['when_'].date()),
+                                           time=_timetostr(item['when_'].time())),
                                  who=dict(id=item['who']['id'],
                                           display_name=item['who']['display_name'],
                                           user_name=item['who']['name'],
                                           roles=item['who']['roles']),
                                  what=item['what'],
+                                 request=item['request'],
+                                 args_=item['args_'],
+                                 kwargs_=item['kwargs_'],
                                  ))
 
             tmpl = get_template('sapns/logs/access_logs/list.html')
