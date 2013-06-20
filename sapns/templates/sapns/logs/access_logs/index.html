@@ -1,0 +1,27 @@
+{% extends 'sapns/base.html' %}
+{% import 'sapns/dashboard/util.html' as util %}
+
+{% block head %}
+    {{ super() }}
+    {{ util.jquery() }}
+    {{ util.jquery_ui() }}
+    <link rel="stylesheet" href="{{tg.url('/css/logs/access_logs.css', params=dict(v=1))}}">
+{% endblock %}
+
+{% block middle %}
+    <div id="access-logs-main">
+        <div class="title">{{_('Access logs')}}</div>
+        <div class="filters"></div>
+        <div class="list"></div>
+    </div>
+
+    <script>
+        _loader.load(
+            { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
+            { url: "{{tg.url('/api/components/selector?v=3')}}" }
+        );
+
+        {{ h.load('sapns/logs/access_logs/index.js') }}
+    </script>
+{% endblock %}

@@ -6,7 +6,7 @@ from neptuno.util import get_paramw, strtobool
 from pylons import cache
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import add_language
+from sapns.lib.sapns.util import add_language, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsRole, \
     SapnsAttrPrivilege, SapnsPermission
@@ -23,6 +23,7 @@ class PrivilegesController(BaseController):
     
     @expose('sapns/privileges/index.html')
     @add_language
+    @log_access('privileges management')
     def index(self, **kw):
         
         logger = logging.getLogger('PrivilegesController.index')
@@ -59,7 +60,6 @@ class PrivilegesController(BaseController):
             id_user = get_paramw(kw, 'id_user', int, opcional=True)
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
             if id_role:
-                logger.info('role')
                 who = dbs.query(SapnsRole).get(id_role)
                 def has_privilege(id_class):
                     return who.has_privilege(id_class, no_cache=True)
@@ -96,6 +96,7 @@ class PrivilegesController(BaseController):
             logger.error(e)
     
     @expose('json')
+    @log_access('privileges management: class update')
     def classp_update(self, **kw):
         
         logger = logging.getLogger('PrivilegesController.classp_update')
@@ -105,7 +106,6 @@ class PrivilegesController(BaseController):
             
             id_role = get_paramw(kw, 'id_role', int, opcional=True)
             if id_role:
-                logger.info('role=%d' % id_role)
                 who = dbs.query(SapnsRole).get(id_role)
                 
             else:
@@ -233,12 +233,11 @@ class PrivilegesController(BaseController):
             return dict(status=False)
     
     @expose('json')
+    @log_access('privileges management: attribute update')
     def attrp_update(self, **kw):
         
         logger = logging.getLogger('PrivilegesController.attrp_update')
         try:
-            logger.info(kw)
-            
             id_attribute = get_paramw(kw, 'id_attribute', int)
             access = get_paramw(kw, 'access', str)
             
@@ -265,6 +264,7 @@ class PrivilegesController(BaseController):
         
         
     @expose('json')
+    @log_access('privileges management: action update')
     def actionp_update(self, **kw):
         
         logger = logging.getLogger('PrivilegesController.actionp_update')
@@ -283,11 +283,11 @@ class PrivilegesController(BaseController):
             action = dbs.query(SapnsPermission).get(id_action)
                 
             if granted:
-                logger.info('Creating action privilege')
+                logger.debug('Creating action privilege')
                 who.permissions_.append(action)
                 
             else:
-                logger.info('Deleting action privilege')
+                logger.debug('Deleting action privilege')
                 who.permissions_.remove(action)
                 
             dbs.flush()
@@ -326,6 +326,7 @@ class PrivilegesController(BaseController):
                     page=_('Role privileges copy'), came_from=came_from)
         
     @expose('json')
+    @log_access('privileges copy')
     def _copy(self, **kw):
         
         logger = logging.getLogger('PrivilegesController._copy')

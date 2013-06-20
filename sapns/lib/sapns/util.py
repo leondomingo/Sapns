@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from decorator import decorator
+from sapns.lib.sapns.mongo import Mongo
 from pylons.i18n import lazy_ugettext as l_
 from pylons.templating import pylons_globals
 from sapns.model import DBSession as dbs
@@ -19,6 +20,7 @@ import os
 import re
 import subprocess as sp
 import tempfile
+import datetime as dt
 
 ROLE_MANAGERS = u'managers'
 
@@ -582,6 +584,69 @@ def add_language(f):
     f.lang_key = 'lang'
     f.languages_key = 'languages'
     return decorator(_add_language, f)
+
+def get_user(cls=None):
+    if cls is None:
+        cls = SapnsUser
+        
+    return dbs.query(cls).get(request.identity['user'].user_id)
+
+class SapnsAccess(object):
+    def __init__(self, id_user, moment, *args, **kwargs):
+        self.user = dbs.query(SapnsUser).get(id_user)
+        self.moment = moment
+        self.args = args
+        self.kwargs = kwargs
+        self.logger = logging.getLogger('SapnsAccess')
+
+        # mongoDB
+        self.mdb = Mongo().db
+        ttl = int(config.get('app.settings.log_access.ttl', 86400))
+        self.mdb['access'].ensure_index([('when', -1)], expireAfterSeconds=ttl)
+
+    def __call__(self):
+        what_ = None
+        if len(self.args) > 0:
+            what_ = self.args[0]
+
+        # save log into mongoDB
+        self.mdb['access'].insert(dict(who=dict(id=self.user.user_id,
+                                                name=self.user.user_name,
+                                                display_name=self.user.display_name,
+                                                roles=[r.group_name for r in self.user.roles]),
+                                       when=self.moment,
+                                       what=what_,
+                                       **self.kwargs))
+
+def log_access(*dargs, **dkwargs):
+    def _log_access(f):
+        def __log_access(self, *args, **kwargs):
+            if config.get('app.settings.log_access', '') == '1':
+                u = request.identity
+                if u:
+                    request_ = dict(user_agent=request.user_agent,
+                                    remote_addr=request.remote_addr,
+                                    referer=request.referer)
+
+                    if len(dargs) > 0:
+                        now_ = dt.datetime.now()
+                        if isinstance(dargs[0], str):
+                            SapnsAccess(u['user'].user_id, now_, *dargs, args_=args, kwargs_=kwargs, 
+                                        request=request_, **dkwargs)()
+                            
+                        elif isinstance(dargs[0], type):
+                            cls = dargs[0]
+                            cls(u['user'].user_id, now_, *dargs[1:], **dkwargs)()
+
+                    else:
+                        SapnsAccess(u['user'].user_id, now_, *dargs[1:], args_=args, kwargs_=kwargs, 
+                                    request=request_, **dkwargs)()
+
+            return f(self, *args, **kwargs)
+
+        return __log_access
+
+    return _log_access
 
 def get_template(tmpl_name, default_tmpl=None):
     globs = {}

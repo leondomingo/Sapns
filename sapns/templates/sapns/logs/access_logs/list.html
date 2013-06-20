@@ -1,0 +1,15 @@
+<!--{% for log in logs %}-->
+<div class="item" log-id="{{log.id}}" who-id="{{log.who.id}}">
+    <div class="col when-date" field-name="">{{log.when.date}}</div>
+    <div class="col when-time" field-name="when-time">{{log.when.time}}</div>
+    <div class="col who" field-name="who.id" title="{{log.who.display_name or ''}}">{{log.who.display_name}} ({{log.who.user_name}})</div>
+    
+    <!--{% for r in log.who.roles %}-->
+    <div class="col who-roles" field-name="who.roles">{{r}}</div>
+    <!--{% endfor %}-->
+
+    <div class="col what" field-name="what" title="{{log.what}}">{{log.what}}</div>
+</div>
+<!--{% else %}-->
+<div class="item">{{_('There are not logs')}}</div>
+<!--{% endfor %}-->

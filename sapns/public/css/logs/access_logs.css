@@ -1,0 +1,16 @@
+#access-logs-main { padding:3px }
+#access-logs-main .title { font-size:18px; margin-left:10px }
+#access-logs-main .filters { margin:0 5px; height:50px; background-color:#eee; padding:5px; border-radius:3px }
+#access-logs-main .filters .filter { float:left; margin-right:5px; padding:2px 4px; background-color:#fcd890; border-radius:5px;
+    min-width:100px; max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; text-align:center; box-shadow:1px 1px #888;
+    color:#444; cursor:pointer }
+#access-logs-main .list { margin:5px; height:400px; background-color:#f2f2f2; padding:5px; border-radius:5px; overflow:auto }
+#access-logs-main .list .item { clear:left; height:20px; padding:2px 4px; margin-bottom:5px;
+    box-shadow:2px 2px #444; background-color:#cad16f; border-radius:5px; cursor:default }
+#access-logs-main .list .item .col { border:1px solid transparent; border-radius:2px; float:left; margin-right:5px; overflow:hidden; 
+    text-overflow:ellipsis; white-space:nowrap }
+#access-logs-main .list .item .col:hover { border:1px solid #888; background-color:#888; color:#fff }
+#access-logs-main .list .item .col.when-date { width:70px; text-align:center }
+#access-logs-main .list .item .col.when-time { width:40px; text-align:center }
+#access-logs-main .list .item .col.who { width:200px }
+#access-logs-main .list .item .col.what { width:150px; text-align:center }
