@@ -15,14 +15,15 @@
     <div class="col details">?</div>
 
     <div class="details-area">
-        <div>{{ log.request.user_agent }}</div>
-        <div>{{ log.request.referer }}</div>
+        <div class="request-field user-agent">{{ log.request.user_agent }}</div>
+        <div class="request-field referer"><a href="{{ log.request.referer }}" target="_blank">{{ log.request.referer }}</a></div>
+        
         <!--{% for a in log.args_ %}-->
-        <div>{{ a }}</div>
+        <div class="item_">{{ a }}</div>
         <!--{% endfor %}-->
 
         <!--{% for k in log.kwargs_ %}-->
-        <div>{{ k }} = <span class="value">{{ log.kwargs_[k] }}</span></div>
+        <div class="item_">{{ k }} = <span class="value">{{ log.kwargs_[k] }}</span></div>
         <!--{% endfor %}-->
     </div>
 </div>

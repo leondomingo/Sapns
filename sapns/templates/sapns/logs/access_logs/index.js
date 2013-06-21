@@ -37,13 +37,25 @@ $(function() {
             val = $(this).text();
 
         if (field_name) {
-            var f = { field_name: field_name, log_id: log_id, id: Math.floor(Math.random()*999999999) };
-            filters.push(f);
+            var f = { field_name: field_name, log_id: log_id, id: Math.floor(Math.random()*999999999), val: val };
+            var encontrado = false;
+            for (var i=0, l=filters.length; i<l; i++) {
+                var f_ = filters[i];
+                encontrado = field_name === f_.field_name && val === f_.val;
+                if (encontrado) {
+                    break;
+                }
+            }
 
-            var filter = '<div class="filter" filter-id="' + f.id + '" title="' + val + '">' + val + '</div>'
-            $('#access-logs-main .filters').append(filter);
+            if (!encontrado) {
+                filters.push(f);
 
-            reload_logs();
+                var filter = '<div class="filter" filter-id="' + f.id + '" title="' + val + '">' + val + '</div>'
+                $('#access-logs-main .filters').append(filter);
+
+                pag = 1
+                reload_logs();
+            }
         }
     });
 
@@ -79,6 +91,7 @@ $(function() {
 
                 $(this).remove();
 
+                pag = 1
                 reload_logs();
                 break;
             }
