@@ -602,7 +602,7 @@ class SapnsAccess(object):
         # mongoDB
         self.mdb = Mongo().db
         ttl = int(config.get('app.settings.log_access.ttl', 86400))
-        self.mdb['access'].ensure_index([('when', -1)], expireAfterSeconds=ttl)
+        self.mdb['access'].ensure_index([('when_', -1)], expireAfterSeconds=ttl)
 
     def __call__(self):
         what_ = None
