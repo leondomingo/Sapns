@@ -7,7 +7,7 @@ from neptuno.util import get_paramw, strtodate
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import pagination, format_float as _format_float, get_user, \
-    datetostr as _datetostr, timetostr as _timetostr, get_template
+    datetostr as _datetostr, timetostr as _timetostr, get_template, add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsClass, SapnsPermission
 from sqlalchemy import MetaData, Table
@@ -29,6 +29,7 @@ class LogsController(BaseController):
     @expose('sapns/logs/access_logs/index.html')
     @require(p_.Any(p_.has_permission('access-logs'),
                     p_.in_group('managers')))
+    @add_language
     def index(self, **kw):
         u = get_user()
         return dict(page=u'Access logs', came_from=kw.get('came_from', url(u.entry_point())))
@@ -69,7 +70,7 @@ class LogsController(BaseController):
 
             logger.debug(search)
 
-            for item in mdb['access'].find(search).sort([('when', -1)]).limit(rp).skip(pos):
+            for item in mdb['access'].find(search).sort([('when_', -1)]).limit(rp).skip(pos):
                 logs.append(dict(id=item['_id'],
                                  when=dict(date=_datetostr(item['when_'].date()),
                                            time=_timetostr(item['when_'].time())),
