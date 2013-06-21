@@ -854,7 +854,7 @@ class SapnsClass(DeclarativeBase):
             "type":       <unicode>}, ...]
         """
         
-        _logger = logging.getLogger('SapnsClass.sorted_actions')
+        # _logger = logging.getLogger('SapnsClass.sorted_actions')
         
         def _sorted_actions():
             
@@ -897,6 +897,10 @@ class SapnsClass(DeclarativeBase):
                     elif ac.type == SapnsPermission.TYPE_DOCS:
                         require_id = True
                         pos = 4
+
+                    elif ac.type == SapnsPermission.TYPE_MERGE:
+                        require_id = True
+                        pos = 5
                         
                     p_name = re.search(r'^\w+#(\w+)', ac.permission_name, re.I)
                     if p_name:
@@ -1494,6 +1498,7 @@ class SapnsPermission(Permission):
     TYPE_VIEW =    u'view'
     TYPE_OBJECT =  u'object'
     TYPE_GROUP =   u'group'
+    TYPE_MERGE =   u'merge'
     
     # default URL
     URL_NEW =    u'/dashboard/new/'

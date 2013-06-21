@@ -68,7 +68,7 @@ class LogsController(BaseController):
                 logger.debug(value)
                 search[col] = value
 
-            logger.debug(search)
+            logger.info(search)
 
             for item in mdb['access'].find(search).sort([('when_', -1)]).limit(rp).skip(pos):
                 logs.append(dict(id=item['_id'],

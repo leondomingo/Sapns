@@ -34,6 +34,7 @@ import simplejson as sj
 from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
 import sapns.lib.sapns.to_xls as toxls
+import sapns.lib.sapns.merge as sapns_merge
 
 # controllers
 __all__ = ['DashboardController']
@@ -185,6 +186,7 @@ class DashboardController(BaseController):
                                   SapnsPermission.TYPE_DELETE,
                                   SapnsPermission.TYPE_DOCS,
                                   SapnsPermission.TYPE_PROCESS,
+                                  SapnsPermission.TYPE_MERGE,
                                   ]:
                 
                 actions_[action['name']] = action
@@ -196,6 +198,7 @@ class DashboardController(BaseController):
                                      SapnsPermission.TYPE_DELETE,
                                      SapnsPermission.TYPE_DOCS,
                                      SapnsPermission.TYPE_PROCESS,
+                                     SapnsPermission.TYPE_MERGE,
                                      ]:
                 
                 actions_.update({action_ch['name']: action_ch})
@@ -1029,7 +1032,45 @@ class DashboardController(BaseController):
         except Exception, e:
             logger.error(e)
             return dict(status=False, message=str(e), rel_tables=rel_tables)
-        
+
+    @expose('sapns/merge/merge.html')
+    @require(p.not_anonymous())
+    @log_access('merge records (1)')
+    def merge(self, **kw):
+        cls = get_paramw(kw, 'cls', str)
+        id_ = get_paramw(kw, 'id_', int)
+
+        cls_ = SapnsClass.by_name(cls)
+
+        # TODO: check permission "<cls>#merge"
+
+        return dict(cls=dict(name=cls, title=cls_.title), id_=id_)
+
+    @expose('json')
+    @require(p.not_anonymous())
+    @log_access('merge records (2)')
+    def merge_(self, **kw):
+        logger = logging.getLogger('DashboardController.merge_')
+        try:
+            cls = get_paramw(kw, 'cls', str)
+            id_ = get_paramw(kw, 'id_', int)
+            from_id = get_paramw(kw, 'from_id', int)
+
+            # not_included
+            not_included = get_paramw(kw, 'not_included', str, opcional=True)
+            if not_included:
+                not_included = not_included.split(',')
+
+            # TODO: check permission "<cls>#merge"
+
+            sapns_merge.merge(cls, id_, [from_id], not_included=not_included)
+
+            return dict(status=True)
+
+        except Exception, e:
+            logger.error(e)
+            return dict(status=False)
+
     @expose('sapns/order/insert.html')
     @require(p.in_group(u'managers'))
     @add_language

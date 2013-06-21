@@ -1,0 +1,79 @@
+<style>
+#sapns-merge .sp-select-text { width:450px }
+</style>
+
+<div id="sapns-merge">
+    <div class="sp-field-row">
+        <div class="sp-field">
+            <div class="label">{{_('Origin')}}</div>
+            <div class="origin"></div>
+        </div>
+    </div>
+
+    <div class="sp-field-row">
+        <div class="sp-field">
+            <div class="label">{{_('Extra')}}</div>
+            <div class="extra"></div>
+        </div>
+    </div>
+</div>
+
+<script>
+    _loader.load(
+        { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
+        { url: "{{tg.url('/api/components/selector?v=3')}}" }
+    );
+
+    function merge(callback, callback_error) {
+        var from_id = $('#sapns-merge .extra').sapnsSelector('getValue');
+        if (!from_id) {
+            alert("{{_('You have to specify another record')}}");
+            callback_error();
+            return;
+        }
+
+        var id_ = "{{id_}}"*1;
+
+        if (from_id === id_) {
+            alert("{{_('You have to specify a different record')}}");
+            callback_error();
+            return;   
+        }
+
+        var sbm = new SidebarMessages();
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0 });
+
+        $.ajax({
+            url: "{{tg.url('/dashboard/merge_/')}}",
+            data: { cls: "{{cls.name}}", id_: id_, from_id: from_id },
+            success: function(res) {
+                sbm.hide({ id: id_message });
+                if (res.status) {
+                    callback();
+                }
+                else {
+                    callback_error();    
+                    alert('Error!');
+                }
+            },
+            error: function() {
+                sbm.hide({ id: id_message });
+                callback_error();
+                alert('Error!');
+            }
+        })
+    }
+
+    $(function() {
+        $('#sapns-merge .origin').sapnsSelector({
+            rc: "{{cls.name}}", rc_title: "{{cls.title}}",
+            value: "{{id_}}",
+            read_only: true
+        });
+
+        $('#sapns-merge .extra').sapnsSelector({
+            rc: "{{cls.name}}", rc_title: "{{cls.title}}"
+        });
+    });
+</script>

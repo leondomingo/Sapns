@@ -3,7 +3,7 @@
 
 from sapns.config.app_cfg import base_config
 from sapns.config.environment import load_environment
-from sapns.lib.sapns.htmltopdf import HtmlToPdfMiddleware
+# from sapns.lib.sapns.htmltopdf import HtmlToPdfMiddleware
 
 
 __all__ = ['make_app']
