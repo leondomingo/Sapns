@@ -15,7 +15,8 @@
 #access-logs-main .list .item .col.when-date { width:70px; text-align:center }
 #access-logs-main .list .item .col.when-time { width:40px; text-align:center }
 #access-logs-main .list .item .col.who { width:200px }
-#access-logs-main .list .item .col.who-roles { width:90px; text-align:center }
+#access-logs-main .list .item .col.roles { width:90px; text-align:center }
+#access-logs-main .list .item .col.who-roles { width:19px; margin-right:1px; text-align:center; background-color:#ffc151; text-transform:lowercase }
 #access-logs-main .list .item .col.what { width:150px; text-align:center }
 #access-logs-main .list .item .col.ip-address { width:100px; text-align:center }
 #access-logs-main .list .item .col.user-agent { width:200px; text-align:center }

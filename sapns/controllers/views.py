@@ -10,7 +10,7 @@ import sapns.lib.helpers as h
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
-from sapns.lib.sapns.util import get_template, pagination, format_float as _format_float
+from sapns.lib.sapns.util import get_template, pagination, format_float as _format_float, log_access
 from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view, \
     drop_view, translate_view, filter_sql, filter_title
 from sapns.model import DBSession as dbs
@@ -27,11 +27,10 @@ import os.path
 import random
 import re
 import simplejson as sj
-import transaction
 
 __all__ = ['ViewsController']
 
-REL_CLASS = 'class'
+REL_CLASS      = 'class'
 REL_COLLECTION = 'collection'
 
 class EViews(Exception):
@@ -44,9 +43,10 @@ class ViewsController(BaseController):
                         )
     
     @expose('sapns/views/edit/edit.html')
+    @log_access('edit view')
     def edit(self, id_=None, **kw):
         
-        _logger = logging.getLogger('ViewsController.edit')
+        # _logger = logging.getLogger('ViewsController.edit')
         
         mdb = Mongo().db
         if id_:
@@ -210,7 +210,7 @@ class ViewsController(BaseController):
         
     def create_view(self, view_id, view_name, new_name=None, old_name=None):
         
-        _logger = logging.getLogger('ViewsController.create_view')
+        # _logger = logging.getLogger('ViewsController.create_view')
         
         if view_name:
             drop_view(view_name)
@@ -269,6 +269,7 @@ class ViewsController(BaseController):
         return dict(cols=cols)
         
     @expose('json')
+    @log_access('views: add attribute')
     def add_attribute(self, **kw):
         logger = logging.getLogger('add_attribute')
         try:
@@ -341,6 +342,7 @@ class ViewsController(BaseController):
             return dict(status=False)
 
     @expose('json')
+    @log_access('views: edit filter (1)')
     def edit_filter(self, **kw):
         logger = logging.getLogger('ViewsController.edit_filter')
         try:
@@ -418,6 +420,7 @@ class ViewsController(BaseController):
             return dict(status=False)
 
     @expose('json')
+    @log_access('views: edit filter (2)')
     def edit_filter_(self, **kw):
         logger = logging.getLogger('ViewsController.edit_filter_')
         try:
@@ -473,6 +476,7 @@ class ViewsController(BaseController):
             return dict(status=False)
         
     @expose('json')
+    @log_access('views: reorder attributes')
     def reorder_attributes(self, **kw):
         logger = logging.getLogger('ViewsController.reorder_attributes')
         try:
@@ -503,6 +507,7 @@ class ViewsController(BaseController):
             return dict(status=False)
         
     @expose('sapns/views/edit/edit-attribute.html')
+    @log_access('views: edit attribute (1)')
     def edit_attribute(self, **kw):
         
         view_id = get_paramw(kw, 'view_id', str)
@@ -522,6 +527,7 @@ class ViewsController(BaseController):
         return dict(view_id=view_id, view_name=kw.get('view_name', ''), attribute=attribute)
     
     @expose('json')
+    @log_access('views: remove attribute')
     def remove_attribute(self, **kw):
         logger = logging.getLogger('ViewsController.remove_attribute')
         try:
@@ -550,6 +556,7 @@ class ViewsController(BaseController):
             return dict(status=False)
 
     @expose('json')
+    @log_access('views: remove filter')
     def remove_filter(self, **kw):
         logger = logging.getLogger('ViewsController.remove_attribute')
         try:
@@ -574,6 +581,7 @@ class ViewsController(BaseController):
             return dict(status=False)
         
     @expose('json')
+    @log_access('save view')
     def view_save(self, **kw):
         logger = logging.getLogger('ViewsController.view_save')
         try:
@@ -652,6 +660,7 @@ class ViewsController(BaseController):
             return dict(status=False)            
     
     @expose('json')
+    @log_access('views: save attribute')
     def attribute_save(self, **kw):
         logger = logging.getLogger('ViewsController.attribute_save')
         try:
@@ -795,6 +804,7 @@ class ViewsController(BaseController):
             return dict(status=False)
         
     @expose('sapns/views/copy_view/copy_view.html')
+    @log_access('copy view (1)')
     def copy(self, **kw):
         id_class = get_paramw(kw, 'id_class', int)
         cls = dbs.query(SapnsClass).get(id_class)
@@ -804,6 +814,7 @@ class ViewsController(BaseController):
                              ))
     
     @expose('json')
+    @log_access('copy view (2)')
     def copy_(self, **kw):
         logger = logging.getLogger('ViewsController.copy_view_')
         try:
@@ -859,6 +870,7 @@ class ViewsController(BaseController):
             return dict(status=False)
         
     @expose('sapns/views/export_view/export_view.html')
+    @log_access('export view (1)')
     def export(self, **kw):
         id_class = get_paramw(kw, 'id_class', int)
         cls = dbs.query(SapnsClass).get(id_class)
@@ -869,6 +881,7 @@ class ViewsController(BaseController):
                              ))
         
     @expose()
+    @log_access('export view (2)')
     def export_(self, **kw):
         
         logger = logging.getLogger('ViewsController.export_')
@@ -927,10 +940,12 @@ class ViewsController(BaseController):
             return ''
         
     @expose('sapns/views/import_view/import_view.html')
+    @log_access('import view (1)')
     def import_view(self, _class_id=None, **kw):
         return {}
         
     @expose('json')
+    @log_access('import view (2)')
     def import_view_(self, **kw):
         logger = logging.getLogger('ViewsController.import_view_')
         import transaction
@@ -948,7 +963,7 @@ class ViewsController(BaseController):
                 view = sj.load(f)
 
             # translate and create view
-            view_id = create_view(translate_view(view))
+            create_view(translate_view(view))
 
             # remove view file
             if os.path.exists(file_path):

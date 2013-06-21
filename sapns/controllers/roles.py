@@ -9,7 +9,7 @@ from tg import expose, require, predicates as p
 import logging
 from sapns.lib.sapns.util import add_language
 
-__all__ = ['RolesControllers']
+__all__ = ['RolesController']
 
 class RolesController(BaseController):
     

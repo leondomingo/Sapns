@@ -7,7 +7,7 @@ from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser
 from tg import expose, request, predicates
 
-__all__ = ['ShortcutsController']
+__all__ = ['MessagesController']
 
 class MessagesController(BaseController):
     

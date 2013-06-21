@@ -47,7 +47,7 @@ class RootController(BaseController):
     @log_access('root')
     def index(self, **kw):
 
-        _logger = logging.getLogger('RootController.index')
+        # _logger = logging.getLogger('RootController.index')
         
         came_from = kw.get('came_from')
         

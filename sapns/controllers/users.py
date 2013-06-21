@@ -5,7 +5,7 @@ from neptuno.util import get_paramw, strtobool
 from pylons import cache
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import add_language
+from sapns.lib.sapns.util import add_language, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsRole, SapnsUserRole
 from sqlalchemy.sql.expression import and_
@@ -13,7 +13,7 @@ from tg import expose, url, redirect, require, request, predicates as p_
 import logging
 import simplejson as sj
 
-__all__ = ['UsersControllers']
+__all__ = ['UsersController']
 
 class EUser(Exception):
     pass
@@ -25,6 +25,7 @@ class UsersController(BaseController):
     @expose('sapns/users/edit/edit.html')
     @require(p_.not_anonymous())
     @add_language
+    @log_access('edit user')
     def edit(self, cls, id_, **params):
         
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -40,12 +41,14 @@ class UsersController(BaseController):
     
     @expose('sapns/users/edit/edit.html')
     @require(p_.has_any_permission('manage', 'users'))
+    @log_access('new user')
     def new(self, cls, **params):
         came_from = params.get('came_from', '/dashboard/users')
         return dict(user={}, came_from=url(came_from))
     
     @expose('json')
     @require(p_.has_any_permission('manage', 'users'))
+    @log_access('edit user')
     def save(self, **params):
         
         logger = logging.getLogger('UsersController.save')
@@ -209,6 +212,7 @@ class UsersController(BaseController):
     
     @expose('sapns/users/dashboard/dashboard.html')
     @require(p_.in_group(u'managers'))
+    @log_access('user dashboard')
     def dashboard(self, user_id, **kw):
         user_id = int(user_id)
         user = dbs.query(SapnsUser).get(user_id)
