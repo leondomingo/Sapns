@@ -5,7 +5,7 @@ from neptuno.util import get_paramw
 from pylons import cache
 from pylons.i18n import lazy_ugettext as l_, ugettext as _
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import ROLE_MANAGERS
+from sapns.lib.sapns.util import ROLE_MANAGERS, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsPermission, SapnsPrivilege, SapnsRole
@@ -43,6 +43,7 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('delete shortcut')
     def delete(self, id_shortcut, **params):
         
         logger = logging.getLogger('ShortcutsController.delete')
@@ -69,6 +70,7 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('bookmark shortcut')
     def bookmark(self, id_shortcut, **kw):
         logger = logging.getLogger('ShortcutsController.bookmark')
         try:
@@ -100,6 +102,7 @@ class ShortcutsController(BaseController):
         
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('move shortcut')
     def move(self, **kw):
         logger = logging.getLogger('ShortcutsController.move')
         try:
@@ -144,6 +147,7 @@ class ShortcutsController(BaseController):
         
     @expose('sapns/shortcuts/share/users.html')
     @require(p_.not_anonymous())
+    @log_access('share shortcut with users (1)')
     def share_users(self, **kw):
         
         shortcut_id = get_paramw(kw, 'shortcut_id', int)
@@ -155,6 +159,7 @@ class ShortcutsController(BaseController):
         
     @expose('sapns/shortcuts/share/roles.html')
     @require(p_.not_anonymous())
+    @log_access('share shortcut with roles (1)')
     def share_roles(self, **kw):
         
         shortcut_id = get_paramw(kw, 'shortcut_id', int)
@@ -166,6 +171,7 @@ class ShortcutsController(BaseController):
         
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('share shortcut (2)')
     def share(self, **kw):
         logger = logging.getLogger('ShortcutsController.share')
         try:
@@ -215,6 +221,7 @@ class ShortcutsController(BaseController):
         
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('reorder shorcuts')
     def reorder(self, **kw):
         
         logger = logging.getLogger('ShortcutsController.reorder')
@@ -248,6 +255,7 @@ class ShortcutsController(BaseController):
         
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('boomark shortcut')
     def bookmark_(self, **kw):
         
         logger = logging.getLogger('ShortcutsController.add_to_sidebar')
@@ -295,6 +303,7 @@ class ShortcutsController(BaseController):
         
     @expose('sapns/shortcuts/new.html')
     @require(p_.not_anonymous())
+    @log_access('edit shortcut')
     def edit(self, **kw):
         
         # user
@@ -392,6 +401,7 @@ class ShortcutsController(BaseController):
     
     @expose('json')
     @require(p_.not_anonymous())
+    @log_access('save shortcut')
     def save(self, **kw):
         logger = logging.getLogger('ShortcutsController.save')
         try:

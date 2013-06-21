@@ -34,7 +34,7 @@ $(function() {
     $(document).off('click', s_col).on('click', s_col, function() {
         var field_name = $(this).attr('field-name'),
             log_id = $(this).parents('.item').attr('log-id'),
-            val = $(this).text();
+            val = $(this).attr('value') || $(this).text();
 
         if (field_name) {
             var f = { field_name: field_name, log_id: log_id, id: Math.floor(Math.random()*999999999), val: val };

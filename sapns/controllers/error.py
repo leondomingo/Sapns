@@ -2,6 +2,7 @@
 """Error controller"""
 
 from tg import request, expose
+from sapns.lib.sapns.util import log_access
 
 __all__ = ['ErrorController']
 
@@ -19,6 +20,7 @@ class ErrorController(object):
     """
 
     @expose('sapns/error.html')
+    @log_access('error')
     def document(self, *args, **kwargs):
         """Render the error document"""
         resp = request.environ.get('pylons.original_response')

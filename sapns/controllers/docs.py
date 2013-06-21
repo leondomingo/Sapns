@@ -7,7 +7,7 @@ from neptuno.postgres.search import search
 from neptuno.util import get_paramw, datetostr
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
-from sapns.lib.sapns.util import init_lang
+from sapns.lib.sapns.util import init_lang, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
 from tg import expose, config, request, require, response, predicates as p
@@ -23,6 +23,7 @@ class DocsController(BaseController):
     allow_only = p.not_anonymous()
     
     @expose('sapns/docs/index.html')
+    @log_access('documents')
     def _default(self, cls, id_, **kw):
         
         # TODO: comprobar permisos
@@ -94,6 +95,7 @@ class DocsController(BaseController):
     
     @expose('sapns/docs/edit.html')
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    @log_access('edit document')
     def edit(self, **kw):
         id_doc = get_paramw(kw, 'id_doc', int, opcional=True)
         #id_class = get_paramw(kw, 'id_class', int)
@@ -126,6 +128,7 @@ class DocsController(BaseController):
     
     @expose('json')
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    @log_access('save document')
     def save(self, **kw):
 
         logger = logging.getLogger('DocsController.save')
@@ -175,6 +178,7 @@ class DocsController(BaseController):
         
     @expose('json')
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    @log_access('delete document')
     def delete(self, id_doc):
 
         logger = logging.getLogger('DocsController.delete')        
@@ -196,6 +200,7 @@ class DocsController(BaseController):
 
     @expose()
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    @log_access('upload file')
     def upload_file(self, f, **kw):
         
         logger = logging.getLogger('DocsController.upload_file')
@@ -215,6 +220,7 @@ class DocsController(BaseController):
         
     @expose()
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    @log_access('download file')
     def download(self, id_doc):
         """
         IN
@@ -266,6 +272,7 @@ class DocsController(BaseController):
         
     @expose('json')
     @require(p.Any(p.in_group('managers'), p.has_any_permission('manage', 'docs')))
+    @log_access('remove file')
     def remove_file(self, **kw):
         """
         IN

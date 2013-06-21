@@ -4,9 +4,11 @@
     <div class="col when-time" field-name="when.time" title="{{log.when.time}}">{{log.when.time}}</div>
     <div class="col who" field-name="who.id" title="{{log.who.display_name or ''}}">{{log.who.display_name}} ({{log.who.user_name}})</div>
     
-    <!--{% for r in log.who.roles %}-->
-    <div class="col who-roles" field-name="who.roles">{{r}}</div>
-    <!--{% endfor %}-->
+    <div class="col roles">
+        <!--{% for r in log.who.roles %}-->
+        <div class="col who-roles" field-name="who.roles" title="{{r}}" value="{{r}}">{{r[:2]}}</div>
+        <!--{% endfor %}-->
+    </div>
 
     <div class="col what" field-name="what" title="{{log.what}}">{{ log.what }}</div>
     <div class="col ip-address" field-name="request.remote_addr">{{ log.request.remote_addr }}</div>
@@ -16,8 +18,10 @@
 
     <div class="details-area">
         <div class="request-field user-agent">{{ log.request.user_agent }}</div>
+        <!--{% if log.request.referer %}-->
         <div class="request-field referer"><a href="{{ log.request.referer }}" target="_blank">{{ log.request.referer }}</a></div>
-        
+        <!--{% endif %}-->
+
         <!--{% for a in log.args_ %}-->
         <div class="item_">{{ a }}</div>
         <!--{% endfor %}-->
