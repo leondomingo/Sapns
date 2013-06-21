@@ -16,6 +16,7 @@ import logging
 import os
 import re
 import transaction
+import simplejson as sj
 
 ROLE_MANAGERS = u'managers'
 current_path = os.path.dirname(os.path.abspath(__file__))
@@ -196,7 +197,7 @@ class InitSapns(object):
             klass = tables_id[tbl['name']]
                 
             # create an action
-            def create_action(name, type_):
+            def create_action(name, type_, url=None, data=None):
                 action = dbs.query(SapnsPermission).\
                     filter(and_(SapnsPermission.class_id == klass.class_id,
                                 SapnsPermission.type == type_)).\
@@ -208,6 +209,8 @@ class InitSapns(object):
                     action.display_name = name
                     action.type = type_
                     action.class_id = klass.class_id
+                    action.url = url
+                    action.data = sj.dumps(data)
                     
                     dbs.add(action)
                     dbs.flush()
@@ -228,7 +231,19 @@ class InitSapns(object):
             create_action(u'Delete', SapnsPermission.TYPE_DELETE)
             create_action(u'List', SapnsPermission.TYPE_LIST)
             create_action(u'Docs', SapnsPermission.TYPE_DOCS)
-                
+            create_action(u'Merge', SapnsPermission.TYPE_MERGE,
+                          url='/dashboard/merge/',
+                          data=dict(param_name='id_',
+                                    button_title=u'Merge',
+                                    callback='merge',
+                                    width=700,
+                                    height='auto',
+                                    refresh=True,
+                                    extra_params=dict(cls=klass.name, not_included='')))
+            # {"param_name": "id_", "button_title": "Merge", 
+            # "callback": "merge", "width": 700, "refresh": true, 
+            # "height": "auto", "extra_params": { "cls": "personal", "not_included": "" } }
+
             log_attributes = Dict(created=False, updated=False)
             log_cols = []
             first_ref = False

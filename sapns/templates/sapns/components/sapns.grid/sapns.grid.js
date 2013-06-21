@@ -1205,7 +1205,7 @@ var __DEFAULT_FILTER = 'default';
         }
         
         function _run_action(id, ids, act, ctrl, shift) {
-            
+
             if (typeof(act.type) === 'string') {
                 
                 if (shift && self.shift_enabled) {
@@ -1227,7 +1227,7 @@ var __DEFAULT_FILTER = 'default';
                         act = self._docs_default;
                     }
                 }
-                
+
                 var a = act.url;
                 if (a[a.length - 1] != '/') {
                     a += '/';
@@ -1297,6 +1297,13 @@ var __DEFAULT_FILTER = 'default';
                     var refresh = true;
                     if (data.refresh !== undefined) {
                         refresh = data.refresh;
+                    }
+
+                    // extra_params
+                    if (data.extra_params !== undefined) {
+                        for (ep in data.extra_params) {
+                            params[ep] = data.extra_params[ep];
+                        }
                     }
                     
                     // init dialog
