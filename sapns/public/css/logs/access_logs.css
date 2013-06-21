@@ -8,7 +8,7 @@
 #access-logs-main .list .item { clear:left; height:20px; padding:2px 4px; margin-bottom:5px;
     box-shadow:2px 2px #444; background-color:#cad16f; border-radius:5px; cursor:default;
     transition:height 0.5s; overflow:hidden }
-#access-logs-main .list .item.open { height:100px; background-color:#FEE1AD }
+#access-logs-main .list .item.open { height:150px; background-color:#FEE1AD }
 #access-logs-main .list .item .col { border:1px solid transparent; border-radius:2px; float:left; margin-right:3px; overflow:hidden; 
     text-overflow:ellipsis; white-space:nowrap; margin-bottom:5px }
 #access-logs-main .list .item .col:hover { border:1px solid #888; background-color:#888; color:#fff }
@@ -23,8 +23,14 @@
 #access-logs-main .list .item .col.details { width:40px; text-align:center; background-color:#ccc;
     color:#444; cursor:pointer; font-weight:bold }
 #access-logs-main .list .item .details-area { background-color:#fdcb71; border-radius:2px;
-    clear:left; height:68px; margin:0 5px; overflow:auto; padding:3px }
+    clear:left; height:119px; margin:0 5px; overflow:auto; padding:3px }
 #access-logs-main .list .item .details-area span.value { font-style:italic }
+#access-logs-main .list .item .details-area .request-field { margin-bottom:3px; background-color:#ffa70a; padding:1px 3px; cursor:text; border-radius:2px }
+#access-logs-main .list .item .details-area .user-agent { }
+#access-logs-main .list .item .details-area .referer { }
+#access-logs-main .list .item .details-area .item_ { background-color:#B4BD3C; border-radius:3px 3px 3px 3px;
+    box-shadow:1px 1px #999999; color:#fff; float:left; margin-bottom:3px; margin-right:3px; margin-left:10px;
+    padding:1px 3px; width:285px }
 
 #access-logs-main .footer { clear:left; margin:0 10px; height:25px; background-color:#eee; padding-top:5px; padding-left:20px; border-radius:5px }
 #access-logs-main .footer .col { float:left; margin-right:20px }
