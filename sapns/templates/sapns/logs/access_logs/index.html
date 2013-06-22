@@ -5,13 +5,24 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    <link rel="stylesheet" href="{{tg.url('/css/logs/access_logs.css', params=dict(v=6))}}">
+    <link rel="stylesheet" href="{{tg.url('/css/logs/access_logs.css', params=dict(v=7))}}">
 {% endblock %}
 
 {% block middle %}
     <div id="access-logs-main">
         <div class="title">{{_('Access logs')}}</div>
         <div class="filters"></div>
+        
+        <div class="list-title">
+            <div class="col date">{{_('Date')}}</div>
+            <div class="col time">{{_('Time')}}</div>
+            <div class="col user">{{_('User')}}</div>
+            <div class="col roles">{{_('Roles')}}</div>
+            <div class="col action">{{_('Action')}}</div>
+            <div class="col ip-address">{{_('IP address')}}</div>
+            <div class="col user-agent">{{_('Browser')}}</div>
+        </div>
+
         <div class="list"></div>
         <div class="footer">
             <div class="col">

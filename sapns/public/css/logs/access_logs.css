@@ -4,7 +4,16 @@
 #access-logs-main .filters .filter { float:left; margin-right:5px; padding:2px 4px; background-color:#fcd890; 
     border-radius:5px; min-width:100px; max-width:150px; overflow:hidden; text-overflow:ellipsis; 
     white-space:nowrap; text-align:center; box-shadow:1px 1px #888; color:#444; cursor:pointer }
-#access-logs-main .list { margin:5px; height:455px; background-color:#f2f2f2; padding:5px; border-radius:5px; overflow:auto }
+#access-logs-main .list-title { clear:left; height:20px; padding:2px 4px; margin:5px 10px; border-radius:5px; background-color:#ffc151 }
+#access-logs-main .list-title .col { float:left; margin-right:3px; text-align:center; font-weight:bold }
+#access-logs-main .list-title .col.date { width:70px }
+#access-logs-main .list-title .col.time { width:40px }
+#access-logs-main .list-title .col.user { width:200px }
+#access-logs-main .list-title .col.roles { width:90px }
+#access-logs-main .list-title .col.action { width:150px }
+#access-logs-main .list-title .col.ip-address { width:100px }
+#access-logs-main .list-title .col.user-agent { width:200px }
+#access-logs-main .list { margin:5px; height:430px; background-color:#f2f2f2; padding:5px; border-radius:5px; overflow:auto }
 #access-logs-main .list .item { clear:left; height:20px; padding:2px 4px; margin-bottom:5px;
     box-shadow:2px 2px #444; background-color:#cad16f; border-radius:5px; cursor:default;
     transition:height 0.5s; overflow:hidden }
