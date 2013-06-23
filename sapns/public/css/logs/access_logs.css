@@ -33,7 +33,7 @@
 #access-logs-main .list .item .col.details { width:40px; text-align:center; background-color:#ccc;
     color:#444; cursor:pointer; font-weight:bold }
 #access-logs-main .list .item .details-area { background-color:#fdcb71; border-radius:2px;
-    clear:left; height:119px; margin:0 5px; overflow:auto; padding:3px }
+    clear:left; height:110px; margin:0 5px; overflow:auto; padding:3px }
 #access-logs-main .list .item .details-area span.value { font-style:italic }
 #access-logs-main .list .item .details-area .request-field { margin-bottom:3px; background-color:#ffa70a; padding:1px 3px; cursor:text; border-radius:2px }
 #access-logs-main .list .item .details-area .user-agent { }
