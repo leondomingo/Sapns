@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: sapns 0.1\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-06-22 22:06+0200\n"
+"POT-Creation-Date: 2013-06-23 23:06+0200\n"
 "PO-Revision-Date: 2011-05-29 09:15+0200\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -1361,7 +1361,4 @@ msgstr "Fichero de vista"
 #: sapns/templates/sapns/views/import_view/import_view.html:21
 msgid "A file must be specified"
 msgstr "Tienes que indicar un fichero"
-
-#~ msgid "There are no filters"
-#~ msgstr "No hay filtros"
 
