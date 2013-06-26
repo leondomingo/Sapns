@@ -210,7 +210,8 @@ class InitSapns(object):
                     action.type = type_
                     action.class_id = klass.class_id
                     action.url = url
-                    action.data = sj.dumps(data)
+                    if data:
+                        action.data = sj.dumps(data)
                     
                     dbs.add(action)
                     dbs.flush()
