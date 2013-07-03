@@ -12,10 +12,12 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
     ws = wb.add_sheet(title, True)
 
     MAX_ROW = 65500
+    MAX_INT = 65535
     sheet_n = 1
 
-    pos = {}
-    widths = {}
+    pos     = {}
+    widths  = {}
+    heights = {}
 
     group_by_ = {}
     for g in group_by:
@@ -63,8 +65,8 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
                     total = totals_[g][t]
                     if total is not None:
                         ws.write(row, pos[t][0], total, xfs_total)
-                        
-                        width_ = len(unicode(total))
+
+                        width_ = max([len(line) for line in unicode(total).split('\n')])
                         if width_ > widths[pos[t][0]]:
                             widths[pos[t][0]] = width_
 
@@ -75,7 +77,11 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
             if col_w < 10:
                 col_w += 2
 
-            ws.col(col).width = col_w*256
+            ws.col(col).width = min(col_w * 256, MAX_INT)
+
+        # row height
+        for row_, row_h in heights.iteritems():
+            ws.row(row_).height = min((row_h or 1) * 256, MAX_INT)
 
         if reset:
             sheet_n += 1
@@ -137,9 +143,15 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
 
                     p = pos[col][0]
 
-                    width_ = len(unicode(data[col]))
+                    # max width
+                    width_ = max([len(line) for line in unicode(data[col]).split('\n')])
                     if width_ > widths[p]:
                         widths[p] = width_
+
+                    # max height
+                    height_ = len(unicode(data[col]).split('\n'))
+                    if height_ > heights.get(row, 0):
+                        heights[row] = height_
 
                     style = xfs_general
                     if type_ == 'date':
