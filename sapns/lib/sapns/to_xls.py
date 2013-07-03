@@ -63,8 +63,9 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
                     total = totals_[g][t]
                     if total is not None:
                         ws.write(row, pos[t][0], total, xfs_total)
-                        
-                        width_ = len(unicode(total))
+
+                        # width_ = len(unicode(total))
+                        width_ = max([len(line) for line in unicode(total).split('\n')])
                         if width_ > widths[pos[t][0]]:
                             widths[pos[t][0]] = width_
 
@@ -75,7 +76,7 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
             if col_w < 10:
                 col_w += 2
 
-            ws.col(col).width = col_w*256
+            ws.col(col).width = min(col_w*256, 65536)
 
         if reset:
             sheet_n += 1
@@ -137,7 +138,8 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
 
                     p = pos[col][0]
 
-                    width_ = len(unicode(data[col]))
+                    # width_ = len(unicode(data[col]))
+                    width_ = max([len(line) for line in unicode(data[col]).split('\n')])
                     if width_ > widths[p]:
                         widths[p] = width_
 
