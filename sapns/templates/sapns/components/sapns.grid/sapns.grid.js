@@ -1,5 +1,4 @@
 /* Sapns grid */
-
 var __DEFAULT_FILTER = 'default';
 (function($) {
     
@@ -2212,18 +2211,12 @@ var __DEFAULT_FILTER = 'default';
                         '<button class="sp-button sp-grid-page-forth" style="float:left">&gt;&gt</button>';
 
                 g_pager += '</div>';
-                
-                var select_all = g_id + ' .sp-grid-select-all',
-                    rp = g_id + ' .sp-grid-rp',
-                    first_page = g_id + ' .sp-grid-first-page',
-                    page_back = g_id + ' .sp-grid-page-back',
-                    page_forth = g_id + ' .sp-grid-page-forth',
-                    last_page = g_id + ' .sp-grid-last-page';
-                    
-                $(document).off('click', select_all).on('click', select_all, function() {
-                    var chk = $(this).prop('checked');
-                    g.selectAll(chk);
-                });
+
+                var rp         = sprintf('%s .sp-grid-rp', g_id),
+                    first_page = sprintf('%s .sp-grid-first-page', g_id),
+                    page_back  = sprintf('%s .sp-grid-page-back', g_id),
+                    page_forth = sprintf('%s .sp-grid-page-forth', g_id),
+                    last_page  = sprintf('%s .sp-grid-last-page', g_id);
 
                 $(document).off('change', rp).on('change', rp, function() {
                     g.rp = $(this).val();
@@ -2256,6 +2249,14 @@ var __DEFAULT_FILTER = 'default';
                     g.search(g.q);
                 });
             }
+
+            // select-all
+            var select_all = sprintf('%s .sp-grid-select-all', g_id);
+
+            $(document).off('click', select_all).on('click', select_all, function() {
+                var chk = $(this).prop('checked');
+                g.selectAll(chk);
+            });
             
             var col_sortable = g_id + ' .sp-col-title-sortable';
             
