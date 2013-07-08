@@ -16,7 +16,7 @@ var __DEFAULT_FILTER = 'default';
         s = s.replace(/[íïì]/g, 'i');
         s = s.replace(/[óöò]/g, 'o');
         s = s.replace(/[úüù]/g, 'u');
-        s = s.replace(/[^a-z]/g, '');
+        s = s.replace(/[^a-z0-9]/g, '');
             
         return s;
     }
