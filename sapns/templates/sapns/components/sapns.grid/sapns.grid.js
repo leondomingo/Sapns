@@ -249,15 +249,20 @@ var __DEFAULT_FILTER = 'default';
         if (settings.rp === undefined) {
             settings.rp = 10;
         }
-        
-        var i = $.inArray(settings.rp*1, [10, 50, 100, 0]);
+
+        var rp_values = [];
+        for (var i=0, l=pager_options.length; i<l; i++) {
+            rp_values.push(pager_options[i].val);
+        }
+
+        var i = $.inArray(settings.rp*1, rp_values);
         if (i === -1) {
             pager_options.push({ val: settings.rp*1, desc: settings.rp, sel: true });
         }
         else {
             pager_options[i].sel = true;
         }
-        
+
         pager_options.sort(function(x, y) {
             // 0=all
             if (x.val === 0) {
