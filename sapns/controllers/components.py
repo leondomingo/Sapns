@@ -19,7 +19,13 @@ class ComponentsController(BaseController):
     def grid(self, **kw):
         logger = logging.getLogger('ComponentsController.grid')
         try:
-            return self._get_content('sapns/components/sapns.grid/sapns.grid.min.js')
+            if kw.get('min', '') == '0':
+                tmpl = 'sapns/components/sapns.grid/sapns.grid.js'
+                
+            else:
+                tmpl = 'sapns/components/sapns.grid/sapns.grid.min.js'
+
+            return self._get_content(tmpl)
         except Exception, e:
             logger.error(e)
             return ''
