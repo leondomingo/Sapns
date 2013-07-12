@@ -25,7 +25,7 @@ class RolesController(BaseController):
             role = dbs.query(SapnsRole).get(int(id_role))
             
             users = []
-            for u in dbs.query(SapnsUser):
+            for u in dbs.query(SapnsUser).order_by(SapnsUser.user_name):
                 
                 has_role = dbs.query(SapnsUserRole).\
                     filter(and_(SapnsUserRole.role_id == role.group_id,

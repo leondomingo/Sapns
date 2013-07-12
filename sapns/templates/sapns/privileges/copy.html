@@ -5,8 +5,7 @@
     {{ super() }}
     {{ u.jquery() }}
     {{ u.jquery_ui() }}
-    {#<link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.copy.css">#}
-    <link rel="stylesheet" type="text/css" media="screen" href="/css/privileges/privileges.copy.min.css">
+    <link rel="stylesheet" href="{{tg.url('/css/privileges/privileges.copy.css', params=dict(v=1))}}">
 {% endblock %}
 
 {% block middle %}
@@ -14,49 +13,52 @@
         <div id="title">{{_('Select the roles you want to copy their privileges from into ')}}
             <span class="role_title">{{this_role.name}}</span>:</div>
         <div id="roles_list">
-        {% if roles %}
-        {% for r in roles %}
+        <!-- {% for r in roles %} -->
         <div class="role_row">
             <div class="role_name">{{r.name}}</div>
             <input type="checkbox" id_role="{{r.id}}">
         </div> 
-        {% endfor %}
-        {% else %}
-        <div style="color: maroon;">{{_('There is no other role in the system besides <span style="font-weight: bold;">%s</span>'|format(this_role.name))}}</div>
-        {% endif %}
+        <!-- {% else %} -->
+        <div class="no-roles">{{_('There is no other role in the system besides <span>%s</span>' % this_role.name)}}</div>
+        <!--{% endfor %}-->
         </div>
         
-        <div>
-            {% if roles %}
-            <button id="copy" style="float: left;">{{_('Copy')}}</button>
-            {% endif %}
-            <form id="cancel_form" action="{{came_from}}">
-                <input type="submit" value="{{_('Cancel')}}">
-            </form>
+        <div id="buttons">
+            <button id="cancel">{{_('Cancel')}}</button>
+            <!-- {% if roles %} -->
+            <button id="copy">{{_('Copy')}}</button>
+            <!-- {% endif %} -->
         </div>
     </div>
-    <div id="msg" style="display: none;">
-        <p style="font-size: 15px;">{{_('Copying privileges')}}</p>
-        <p style="font-size: 9px;">{{_('Please, wait')}}...</p>
-    </div>
     
-    <script type="text/javascript">
-        $(document).ready(function() {
+    <script>
+        _loader.load(
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" }
+        );
+
+        $(function() {
+            var sbm = new SidebarMessages();
+
+            function cancel() {
+                var form_ = $('<form/>', {
+                    method: 'post',
+                    action: "{{came_from}}"
+                });
+
+                form_.appendTo('body').submit().remove();
+            }
+
             $('#copy').click(function() {
-                var roles = $('input[type=checkbox]:checked');
-                var selected_roles = [];
+                var roles = $('.role_row input[type=checkbox]:checked'),
+                    selected_roles = [];
                 for (var i=0, l=roles.length; i<l; i++) {
                     var r = $(roles[i]);
                     selected_roles.push(r.attr('id_role'));
                 }
                 
                 if (selected_roles.length > 0) {
-                    $('#msg').dialog({
-                        resizable: false,
-                        modal: true
-                    });
-                    
-                    $('.ui-dialog-titlebar').hide();
+
+                    var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
                     
                     $.ajax({
                         url: "{{tg.url('/dashboard/privileges/_copy')}}",
@@ -65,12 +67,12 @@
                             from: JSON.stringify(selected_roles)
                         },
                         success: function(data) {
+                            sbm.hide({ id: id_message });
+
                             if (data.status) {
-                                $('#msg').dialog('close');
-                                $('#cancel_form').submit();
+                                cancel();
                             }
                             else {
-                                $('#msg').dialog('close');
                                 alert('Error!');
                             }
                         }
@@ -79,6 +81,10 @@
                 else {
                     alert("{{_('You have to select one role at least')}}");
                 }
+            });
+
+            $('#cancel').click(function() {
+                cancel();
             });
         });
     </script>
