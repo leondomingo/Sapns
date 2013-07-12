@@ -1,10 +1,20 @@
-"{% import 'sapns/dashboard/datefield.js' as df %}";
 $(function() {
+
+    var sbm = new SidebarMessages();
+
+    function go_back() {
+        var form_ = $('<form/>', {
+            method: 'post',
+            action: "{{came_from}}",
+        });
+
+        form_.appendTo('body').submit().remove();
+    }
     
     $('#sp-back').hide();
     
     $('#back-button').click(function() {
-        $('#form_back').submit();
+        go_back();
     });
     
     $('.sp-edit-field:first').find('input:first').focus();      
@@ -21,7 +31,7 @@ $(function() {
             var name = $(this).parent().parent().attr('name'),
                 required = $(this).parent().parent().hasClass('required'),
                 value = $(this).val(),
-                ok = $(this).attr('_ok');
+                ok = !$(this).hasClass('sp-field-error');
             if (ok === undefined) {
                 ok = true;
             }
@@ -38,7 +48,7 @@ $(function() {
             var name = $(this).parent().parent().attr('name'),
                 required = $(this).parent().parent().hasClass('required'),
                 value = $(this).val(),
-                ok = $(this).attr('_ok');
+                ok = !$(this).hasClass('sp-field-error');
                     
             if (required && value == '' || !ok) {
                 required_attrs.push($(this));
@@ -52,7 +62,7 @@ $(function() {
             var name = $(this).parent().parent().attr('name'),
                 required = $(this).parent().parent().hasClass('required'),
                 value = $(this).val(),
-                ok = $(this).attr('_ok');
+                ok = !$(this).hasClass('sp-field-error');
                     
             if (required && value == '' || !ok) {
                 required_attrs.push($(this));
@@ -112,7 +122,7 @@ $(function() {
             var name = $(this).parent().parent().attr('name'),
                 required = $(this).parent().parent().hasClass('required'),
                 value = $(this).val(),
-                ok = $(this).attr('_ok');
+                ok = !$(this).hasClass('sp-field-error');
                     
             if (required && value == '' || !ok) {
                 required_attrs.push($(this));
@@ -173,30 +183,36 @@ $(function() {
         }
         else {
             // save
+            var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
+
             $.ajax({
                 url: "{{tg.url('/dashboard/save/%s/' % cls)}}",
                 type: "post",
                 data: params,
-                success: function(data) {
-                    if (data.status) {
-                        $('#form_back').submit();
+                success: function(res) {
+                    sbm.hide({ id: id_message });
+
+                    if (res.status) {
+                        go_back();
                     }
                     else {
-                        if (data.message) {
-                            alert(data.message);
+                        if (res.message) {
+                            alert(res.message);
                         }
                         else {
                             alert('Error!');
                         }
                     }
+                },
+                error: function() {
+                    sbm.hide({ id: id_message });
+                    alert('Error!');
                 }
             });
         }
     });
     
-    // {# create datepickers 
-    // with specific date format and options #} 
-    {{ df.date_field(tg, _, '.sp-date-field') }}
+    sapns_date_field('.sp-date-field');
     
     // show related class
     $('#rel-classes-show').click(function() {
@@ -246,9 +262,7 @@ $(function() {
         });
     }
     
-    $('.sp_integer_field, .sp_float_field, .sp-text-field, .sp-time-field').change(function() {
-        fields.check_regex($(this));
-    });
+    SapnsFields.init('.sp_integer_field, .sp_float_field, .sp-text-field, .sp-time-field', 'blur');
     
     $('.url_field_btn').click(function() {
         var url = $(this).parent().find('.url_field_text').val();
