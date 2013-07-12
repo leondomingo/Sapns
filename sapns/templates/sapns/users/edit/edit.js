@@ -1,4 +1,6 @@
 $(function() {
+    var sbm = new SidebarMessages();
+
     $('#copy_from').sapnsSelector({
         rc: 'sp_users', rc_title: "{{_('Users')}}"
     });
@@ -6,25 +8,18 @@ $(function() {
     $('#display_name').focus();
     
     SapnsFields.init('#user_name, #email_address, #password', 'change');
+
+    function return_() {
+        var form_ = $('<form/>', {
+            method: 'post',
+            action: "{{came_from}}"
+        });
+
+        form_.appendTo('body').submit().remove();
+    }
     
     $('#cancel_user_btn').click(function() {
-        var came_from = "{{came_from}}",
-            url = came_from.split('?')[0],
-            params = (came_from.split('?')[1] || '').split('&');
-        
-        var params_ = '';
-        for (var i=0, l=params.length; i<l; i++) {
-            var p = params[i];
-            if (p !== '') {
-                p_name = p.split('=')[0],
-                p_value = p.split('=')[1];
-            
-                params_ += '<input type="hidden" name="' + p_name + '" value="' + p_value + '">';
-            }
-        }
-        
-        var f = '<form action="' + url + '">' + params_ + '</form>';
-        $(f).appendTo('body').submit().remove();
+        return_();
     });
     
     $('#save_user_btn').click(function() {
@@ -87,6 +82,8 @@ $(function() {
                 return;
             }
             // {% endif %}
+
+            var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
             
             $.ajax({
                 url: "{{tg.url('/dashboard/users/save/')}}",
@@ -98,18 +95,21 @@ $(function() {
                     password: password,
                     copy_from: copy_from,
                 },
-                success: function(data) {
-                    if (data.status) {
-                        $('#form_exit').submit();
+                success: function(res) {
+                    sbm.hide({ id: id_message });
+
+                    if (res.status) {
+                        return_();
                     }
-                    else if (data.message) {
-                        alert(data.message);
+                    else if (res.message) {
+                        alert(res.message);
                     }
                     else {
                         alert('Error!');
                     }
                 },
                 error: function() {
+                    sbm.hide({ id: id_message });
                     alert('Error!');
                 }
             });

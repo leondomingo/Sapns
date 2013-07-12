@@ -10,76 +10,68 @@
 {% endblock %}
 
 {% block middle %}
-<div id="user-dialog"></div>
-<input type="hidden" name="id" value="{{user.user_id}}">
-<input type="hidden" name="came_from" value="{{came_from or ''}}">
-<div id="edit-user">
-    <div class="sp-field-row">
-        <div class="sp-field">
-            <div class="label required">{{_('Display name')}}</div>
-            <input type="text" id="display_name" value="{{user.display_name or ''}}">
+    <div id="edit-user">
+        <div class="sp-field-row">
+            <div class="sp-field">
+                <div class="label required">{{_('Display name')}}</div>
+                <input type="text" id="display_name" value="{{user.display_name or ''}}">
+            </div>
         </div>
-    </div>
-    
-    <div class="sp-field-row"> 
-        <div class="sp-field">
-            <div class="label required">{{_('User name')}}</div>
-            <input id="user_name" type="text" value="{{user.user_name}}" 
-                regex="^[\w\-\.@]{4,50}$">
+        
+        <div class="sp-field-row"> 
+            <div class="sp-field">
+                <div class="label required">{{_('User name')}}</div>
+                <input id="user_name" type="text" value="{{user.user_name}}" 
+                    regex="^[\w\-\.@]{4,50}$">
+            </div>
+        </div>
+
+        <div class="sp-field-row"> 
+            <div class="sp-field">
+                <div class="label required">{{_('E-mail address')}}</div>
+                <input id="email_address" type="text" value="{{user.email_address}}"
+                    regex="^[\w\-\.]+@[\w\-\.]+$">
+            </div>
+        </div>
+        
+        <div class="sp-field-row">
+            <div class="sp-field">
+                <div class="label required">{{_('Password')}}</div>
+                <input id="password" type="password" regex="^[\w\-\.@]{4,}$" value="">
+            </div>
+        </div>
+
+        <div class="sp-field-row">    
+            <div class="sp-field">
+                <div class="label required">{{_('Re-type password')}}</div>
+                <input id="password2" type="password" value="">
+            </div>
+        </div>
+        
+        <!--{% if not user.user_id %}-->
+        <div class="sp-field-row">
+            <div class="sp-field">
+                <div class="label required">{{_('Copy from')}}</div>
+                <div id="copy_from"></div>
+            </div>
+        </div>
+        <!--{% endif %}-->
+        
+        <div id="user-buttons">
+            <button id="cancel_user_btn">{{_('Cancel')}}</button>
+            <button id="save_user_btn">{{_('Ok')}}</button>
         </div>
     </div>
 
-    <div class="sp-field-row"> 
-        <div class="sp-field">
-            <div class="label required">{{_('E-mail address')}}</div>
-            <input id="email_address" type="text" value="{{user.email_address}}"
-                regex="^[\w\-\.]+@[\w\-\.]+$">
-        </div>
-    </div>
-    
-    <div class="sp-field-row">
-        <div class="sp-field">
-            <div class="label required">{{_('Password')}}</div>
-            <input id="password" type="password" regex="^[\w\-\.@]{4,}$" value="">
-        </div>
-    </div>
+    <script>
+        _loader.load(
+            { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
+            { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
+            { url: "{{tg.url('/api/components/grid?v=6')}}" },
+            { url: "{{tg.url('/api/components/selector?v=3')}}" }
+        );
 
-    <div class="sp-field-row">    
-        <div class="sp-field">
-            <div class="label required">{{_('Re-type password')}}</div>
-            <input id="password2" type="password" value="">
-        </div>
-    </div>
-    
-    <!--{% if not user.user_id %}-->
-    <div class="sp-field-row">
-        <div class="sp-field">
-            <div class="label required">{{_('Copy from')}}</div>
-            <div id="copy_from"></div>
-        </div>
-    </div>
-    <!--{% endif %}-->
-    
-    <div id="user-buttons">
-        <button id="cancel_user_btn">{{_('Cancel')}}</button>
-        <button id="save_user_btn">{{_('Ok')}}</button>
-    </div>
-</div>
-
-<form id="form_exit" method="post"
-    action="{% if came_from %}{{came_from}}
-            {%else%}{{tg.url('/message', dict(message=_('Update was completed successfully'), came_from=''))}}{%endif%}">
-</form>
-
-<script>
-    _loader.load(
-        { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
-        { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
-        { url: "{{tg.url('/api/components/grid?v=6')}}" },
-        { url: "{{tg.url('/api/components/selector?v=3')}}" }
-    );
-
-    {#{% include 'sapns/users/edit/edit.js' %}#}
-    {{ h.load('sapns/users/edit/edit.js', came_from=came_from, user=user)}}
-</script>
+        {{ h.load('sapns/users/edit/edit.js', came_from=came_from, user=user)}}
+    </script>
 {% endblock %}

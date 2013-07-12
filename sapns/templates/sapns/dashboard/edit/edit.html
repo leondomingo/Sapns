@@ -14,15 +14,6 @@
 {% block middle %}
 <div id="edit-dialog" style="display:none"></div>
 
-<!--{% if came_from %}-->
-<form id="form_back" method="post" action="{{came_from}}"></form>
-<!--{% else %}-->
-<form id="form_back" method="post" action="{{tg.url('/message')}}">
-    <input type="hidden" name="message" value="{{_('The record has been successfully saved')}}">
-    <input type="hidden" name="came_from" value="">
-</form>
-<!--{% endif %}-->
-
 <div class="sp-edit-panel">
     <div id="edit-header">
     
@@ -81,13 +72,11 @@
     
     <div id="edit_buttons">
         <div>
-            <!--<button id="save-button" class="sp-button">{{_('Save')}}</button>-->
             <img id="save-button" src="{{tg.url('/images/sapns/icons/save.png')}}" title="{{_('Save')}}">
         </div>
         
         <!--{% if came_from %}-->
         <div id="edit-back">
-            <!--<button id="back-button" class="sp-button">{{_('return')}}</button>-->
             <img id="back-button" src="{{tg.url('/images/sapns/icons/return.png')}}" title="{{_('return')}}">
         </div>
         <!--{% endif %}-->
@@ -111,7 +100,7 @@
         
         <!-- {# Integer #} -->
         <!--{% if attr.type == 'int' and attr.related_class == None %}-->
-        <input class="sp_integer_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
+        <input class="sp_integer_field" type="text" regex="{{attr.field_regex or ''}}"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value != None %}
             value="{{attr.value}}"
@@ -119,7 +108,7 @@
             
         <!-- {# Float #} -->
         <!--{% elif attr.type == 'float' %}-->
-        <input class="sp_float_field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
+        <input class="sp_float_field" type="text" regex="{{attr.field_regex or ''}}"
             {% if attr.read_only %} disabled {% endif %}
             {% if attr.value != None %}
             value="{{attr.value}}"
@@ -139,7 +128,7 @@
         
         <!-- {# Time #} -->
         <!--{%- elif attr.type == 'time' %}-->
-        <input class="sp-time-field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
+        <input class="sp-time-field" type="text" regex="{{attr.field_regex or ''}}"
             {% if attr.read_only %} disabled {% endif %} 
             value="{{attr.value}}">            
         
@@ -166,7 +155,7 @@
             attr_rc_title="{{attr.related_class_title}}"></div>
         <!--{%- else %}-->
         <!-- {# Everything else #} -->
-        <input class="sp-text-field" type="text" regex="{{attr.field_regex or ''}}" _ok="1"
+        <input class="sp-text-field" type="text" regex="{{attr.field_regex or ''}}"
             value="{{attr.value|escape}}"
             {% if attr.read_only %} disabled {% endif %}>
         <!--{% endif %}-->
@@ -179,13 +168,14 @@
 
 <script>
     _loader.load(
-        { url: "{{tg.url('/js/fields.min.js?v=1')}}" },
+        { url: "{{tg.url('/js/fields2.min.js?v=1')}}" },
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
         { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
+        { url: "{{tg.url('/api/components/load?tmpl=sapns/dashboard/datefield/datefield.js&v=1&min=1')}}" },
         { url: "{{tg.url('/api/components/grid?v=6')}}" },
         { url: "{{tg.url('/api/components/selector?v=3')}}" }
     );
 
-    {#{% include 'sapns/dashboard/edit/edit.min.js' %}#}
-    {{ h.load('sapns/dashboard/edit/edit.js', cls=cls, id=id)}}
+    {{ h.load('sapns/dashboard/edit/edit.js', cls=cls, id=id, came_from=came_from)}}
 </script>
 {% endblock %}
