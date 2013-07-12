@@ -12,6 +12,7 @@ from sqlalchemy.sql.expression import and_
 from tg import expose, url, redirect, require, request, predicates as p_
 import logging
 import simplejson as sj
+from webob.exc import HTTPForbidden
 
 __all__ = ['UsersController']
 
@@ -27,14 +28,13 @@ class UsersController(BaseController):
     @add_language
     @log_access('edit user')
     def edit(self, cls, id_, **params):
-        
-        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+
         id_user = int(id_)
         
         is_manager = u'managers' in request.identity['groups']
         
-        if user.user_id != id_user and not is_manager:
-            redirect(url('/error'))
+        if request.identity['user'].user_id != id_user and not is_manager:
+            raise HTTPForbidden()
         
         user = dbs.query(SapnsUser).get(id_user)
         return dict(user=user, came_from=params.get('came_from'))
@@ -47,13 +47,18 @@ class UsersController(BaseController):
         return dict(user={}, came_from=url(came_from))
     
     @expose('json')
-    @require(p_.has_any_permission('manage', 'users'))
-    @log_access('edit user')
+    @require(p_.not_anonymous())
+    @log_access('save user')
     def save(self, **params):
         
         logger = logging.getLogger('UsersController.save')
         try:
             id_ = get_paramw(params, 'id', int, opcional=True)
+
+            is_manager = u'managers' in request.identity['groups']
+            if request.identity['user'].user_id != id_ and not is_manager:
+                raise HTTPForbidden()
+
             display_name = get_paramw(params, 'display_name', unicode)
             user_name = get_paramw(params, 'user_name', unicode)
             email_address = get_paramw(params, 'email_address', unicode)

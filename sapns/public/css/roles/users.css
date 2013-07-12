@@ -1,0 +1,11 @@
+#main { position:relative; height:600px; }
+#users { padding:10px }
+#role_name { font-size:20px; font-weight:bold; padding-left:10px; 
+    background-color:#444; color:#fff; margin:3px 10px 0; border-radius:5px; }
+#title { height:26px; font-size:15px; padding:3px }
+#users_list { height:515px; margin-bottom:10px; background-color:#f2f2f2; border-radius:5px; padding:5px; overflow:auto }
+
+.user_row { height: 25px; width:500px; border-radius:3px; padding-top: 5px; 
+    padding-left: 10px; font-size: 12px; margin-bottom:4px; background-color:#d6db8e; color:#444; box-shadow:1px 1px #999 }
+
+.user_name { float: left; font-weight: bold; width:430px }
