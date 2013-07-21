@@ -1,13 +1,15 @@
 # -*- coding: utf-8 -*-
 
+from sapns.lib.sapns.const_sapns import ROLE_MANAGERS
 from sapns.model import DBSession as dbs, SapnsClass, SapnsPermission, SapnsRole
 
+
 class SpUsersDashboard(object):
-    
+
     __code__ = u'sp_users#dashboard'
-    
+
     def __call__(self):
-        
+
         dashboard = SapnsPermission()
         dashboard.permission_name = u'sp_users#dashboard'
         dashboard.display_name = u'Dashboard'
@@ -16,10 +18,10 @@ class SpUsersDashboard(object):
         dashboard.type = SapnsPermission.TYPE_PROCESS
         dashboard.class_id = SapnsClass.by_name(u'sp_users').class_id
         dashboard.requires_id = True
-        
+
         dbs.add(dashboard)
         dbs.flush()
-        
-        managers = SapnsRole.by_name(u'managers')
+
+        managers = SapnsRole.by_name(ROLE_MANAGERS)
         managers.permissions_.append(dashboard)
         dbs.flush()

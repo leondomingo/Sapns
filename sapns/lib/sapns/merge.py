@@ -7,8 +7,10 @@ import logging
 import transaction
 from zope.sqlalchemy import mark_changed
 
+
 class EMerge(Exception):
     pass
+
 
 def merge(cls, id_to, from_ids, not_included=None):
     """
@@ -17,10 +19,10 @@ def merge(cls, id_to, from_ids, not_included=None):
       id_to        <int>
       from_ids     [<int>, ...]
       not_included [<str>, ...] (optional)
-      
+
       merge('clientes', 31, [118399, 70110])
     """
-    
+
     logger = logging.getLogger('merge')
 
     class_ = SapnsClass.by_name(cls)
@@ -45,10 +47,7 @@ def merge(cls, id_to, from_ids, not_included=None):
                     continue
 
                 t_ = Table(r_cls, meta, autoload=True)
-
-                values = {}
-                values[r_atr.name.encode('utf-8')] = id_to
-
+                values = {r_atr.name.encode('utf-8'): id_to}
                 update_ = t_.update(t_.c[r_atr.name.encode('utf-8')] == id_another, values=values)
 
                 dbs.execute(update_)
@@ -59,11 +58,11 @@ def merge(cls, id_to, from_ids, not_included=None):
             delete_ = t.delete(t.c.id == id_another)
             dbs.execute(delete_)
             dbs.flush()
-            
+
         mark_changed(dbs())
-            
+
         transaction.commit()
-        
+
     except Exception, e:
         logger.error(e)
         transaction.abort()

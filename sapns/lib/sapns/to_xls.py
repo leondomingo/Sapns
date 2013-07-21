@@ -4,10 +4,11 @@ import xlwt
 import logging
 import tg
 
+
 def to_xls(ds, visible_columns, group_by, totals, title, fn):
 
     logger = logging.getLogger('to_xls')
-    
+
     wb = xlwt.Workbook()
     ws = wb.add_sheet(title, True)
 
@@ -23,7 +24,7 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
     for g in group_by:
         group_by_[str(g)] = None
 
-    totals_ = { '_': {} }
+    totals_ = {'_': {}}
     for g in group_by + ['_']:
         totals_[str(g)] = {}
         for t in totals:
@@ -122,7 +123,7 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
                                         ws.write(row, pos[t][0], totals_[group_by[j]][t], xfs_total)
                                         if row >= MAX_ROW:
                                             ws, row, sheet_n = end_sheet(ws, row, sheet_n)
-                                            
+
                                 row += 1
 
                         # reset totals
@@ -159,7 +160,7 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
 
                     elif type_ == 'time':
                         style = xfs_time
-                    
+
                     elif type_ == 'float':
                         style = xfs_float
 

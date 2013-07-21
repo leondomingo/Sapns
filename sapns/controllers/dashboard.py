@@ -13,6 +13,7 @@ from sapns.controllers.users import UsersController
 from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
 from sapns.lib.base import BaseController
+from sapns.lib.sapns.const_sapns import ROLE_MANAGERS
 from sapns.lib.sapns.htmltopdf import url2
 from sapns.lib.sapns.lists import EListForbidden
 from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
@@ -49,7 +50,7 @@ class ECondition(Exception):
 
 class DashboardController(BaseController):
     """DashboardController manage raw-data editing"""
-    
+
     views = ViewsController()
     util = UtilController()
     users = UsersController()
@@ -58,45 +59,45 @@ class DashboardController(BaseController):
     messages = MessagesController()
     privileges = PrivilegesController()
     logs = LogsController()
-    
+
     @expose('sapns/sidebar.html')
     def sidebar(self, **kw):
-        
+
         # connected user
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        
+
         # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
         shortcuts = user.get_shortcuts(id_parent=None)
-        
+
         return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''), home=url(user.entry_point() or '/dashboard'))
-    
+
     @expose('sapns/shortcuts/list.html')
     @require(p.not_anonymous())
     @add_language
     @log_access('data exploration')
     def data_exploration(self, **kw):
-        
+
         sc_parent = this_shortcut = get_paramw(kw, 'sc_parent', int, opcional=True)
-        
+
         if this_shortcut:
             ts = dbs.query(SapnsShortcut).get(this_shortcut)
             this_shortcut = dict(id=ts.shortcut_id, title=_(ts.title))
-            
+
         else:
             this_shortcut = dict(id=None, title='')
-        
+
         user_id = get_paramw(kw, 'user_id', int, opcional=True)
         if not user_id:
             user_id = request.identity['user'].user_id
-            
+
         user = dbs.query(SapnsUser).get(user_id)
-        
+
         root = user.get_dashboard().shortcut_id
         if this_shortcut['id'] == root:
             redirect(url('/dashboard/?user_id=%d' % user_id))
-        
+
         sc_parent = dbs.query(SapnsShortcut).get(sc_parent).parent_id
-        
+
         fin = False
         parents = []
         shortcut_id_ = this_shortcut['id']
@@ -107,10 +108,10 @@ class DashboardController(BaseController):
                 if parent:
                     parents.insert(0, _(parent.title))
                     shortcut_id_ = parent.shortcut_id
-                    
+
                 else:
                     fin = True
-            
+
         return dict(page=' / '.join(parents), came_from=kw.get('came_from', user.entry_point()),
                     user=dict(id=user_id, display_name=user.display_name),
                     this_shortcut=this_shortcut, sc_parent=sc_parent)
@@ -123,21 +124,21 @@ class DashboardController(BaseController):
         user_id = get_paramw(kw, 'user_id', int, opcional=True)
         if not user_id:
             user_id =  request.identity['user'].user_id
-        
+
         user = dbs.query(SapnsUser).get(user_id)
-        
-        return dict(came_from=kw.get('came_from'), 
+
+        return dict(came_from=kw.get('came_from'),
                     this_shortcut={}, user=dict(id=user_id, display_name=user.display_name),
                     _came_from=url(user.entry_point() or '/dashboard/'))
-      
+
     @expose('sapns/dashboard/listof.html')
     @require(p.not_anonymous())
     @add_language
     @log_access('list')
     def list(self, cls, **kw):
-        
+
         _logger = logging.getLogger('DashboardController.list')
-        
+
         try:
             proj_name = config.get('app.root_folder')
             if proj_name:
@@ -146,10 +147,10 @@ class DashboardController(BaseController):
                 if r:
                     _logger.debug('Redirecting to...%s' % r)
                     redirect(r, params=kw)
-                
+
         except ImportError:
             pass
-        
+
         try:
             List = get_list()
             list_ = List(cls, **kw)
@@ -158,27 +159,27 @@ class DashboardController(BaseController):
             _logger.error(e)
             redirect(url('/message', params=dict(message=str(e), came_from=kw.get('came_from'))))
 
-    
+
     @expose('json')
     @require(p.not_anonymous())
     @log_access('list search')
     def grid(self, cls, **kw):
-        
+
         _logger = logging.getLogger('DashboardController.grid')
-        
+
         List = get_list()
         list_ = List(cls, **kw)
         return list_.grid()
-        
+
     @expose('json')
     @require(p.not_anonymous())
     def grid_actions(self, cls, **kw):
-        
+
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
-        
+
         # actions for this class
         cls_ = SapnsClass.by_name(cls)
-        
+
         actions_ = {}
         for action in cls_.sorted_actions(user.user_id):
             if action['type'] in [SapnsPermission.TYPE_NEW,
@@ -188,9 +189,9 @@ class DashboardController(BaseController):
                                   SapnsPermission.TYPE_PROCESS,
                                   SapnsPermission.TYPE_MERGE,
                                   ]:
-                
+
                 actions_[action['name']] = action
-        
+
         ch_cls_ = SapnsClass.by_name(cls, parent=False)
         for action_ch in ch_cls_.sorted_actions(user.user_id):
             if action_ch['type'] in [SapnsPermission.TYPE_NEW,
@@ -200,18 +201,18 @@ class DashboardController(BaseController):
                                      SapnsPermission.TYPE_PROCESS,
                                      SapnsPermission.TYPE_MERGE,
                                      ]:
-                
+
                 actions_.update({action_ch['name']: action_ch})
-                
+
         def cmp_act(x, y):
             if x.pos == y.pos:
                 return cmp(x.title, y.title)
-            
+
             else:
                 return cmp(x.pos, y.pos)
-            
+
         return dict(status=True, actions=sorted(actions_.values(), cmp=cmp_act))
-    
+
     @expose('json')
     @require(p.not_anonymous())
     def save_user_filter(self, **kw):
@@ -220,55 +221,55 @@ class DashboardController(BaseController):
             cls = get_paramw(kw, 'cls', unicode)
             filter_name = get_paramw(kw, 'filter_name', unicode)
             query = get_paramw(kw, 'query', unicode)
-            
+
             user_id = request.identity['user'].user_id
-            
+
             mdb = Mongo().db
-            
+
             cls_ = SapnsClass.by_name(cls, parent=False)
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
             create_view = False
             if not view:
                 create_view = True
                 view = dict(user_filters={})
-                
+
             USER_FILTERS = 'user_filters'
-            
+
             if not view.get(USER_FILTERS):
                 view[USER_FILTERS] = {}
-                
+
             if not view[USER_FILTERS].get(str(user_id)):
                 view[USER_FILTERS][str(user_id)] = []
-                
+
             found = False
             for filter_ in view[USER_FILTERS][str(user_id)]:
                 if filter_['name'] == filter_name:
                     found = True
                     filter_['query'] = query
-                    
+
             if not found:
                 if filter_name == 'default':
                     view[USER_FILTERS][str(user_id)].insert(0, dict(name=filter_name, query=query))
                 else:
                     view[USER_FILTERS][str(user_id)].append(dict(name=filter_name, query=query))
-                
+
             if create_view:
                 view_id = mdb.user_views.insert(view)
-                
+
                 cls_.view_id = str(view_id)
                 dbs.add(cls_)
                 dbs.flush()
-                
+
             else:
                 mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
                                       {'$set': dict(user_filters=view[USER_FILTERS])})
 
             return dict(status=True)
-        
+
         except Exception, e:
             logger.error(e)
             return dict(status=False, msg=str(e))
-    
+
     @expose('json')
     @require(p.not_anonymous())
     def delete_user_filter(self, **kw):
@@ -276,29 +277,29 @@ class DashboardController(BaseController):
         try:
             cls = get_paramw(kw, 'cls', unicode)
             filter_name = get_paramw(kw, 'filter_name', unicode)
-            
+
             user_id = request.identity['user'].user_id
-            
+
             mdb = Mongo().db
-            
+
             cls_ = SapnsClass.by_name(cls, parent=False)
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
             user_filters = []
             for f in view['user_filters'][str(user_id)]:
                 if f['name'] != filter_name:
                     user_filters.append(f)
-                    
+
             view['user_filters'][str(user_id)] = user_filters
 
             mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
                                       {'$set': dict(user_filters=view['user_filters'])})
 
-            
+
             return dict(status=True)
-        
+
         except Exception, e:
             logger.error(e)
-            
+
     @expose('json')
     @require(p.not_anonymous())
     def save_col_width(self, **kw):
@@ -308,61 +309,61 @@ class DashboardController(BaseController):
             length = get_paramw(kw, 'length', int)
             col_num = get_paramw(kw, 'col_num', int)
             width = get_paramw(kw, 'width', int)
-            
+
             user_id = request.identity['user'].user_id
-            
+
             mdb = Mongo().db
-            
+
             cls_ = SapnsClass.by_name(cls, parent=False)
             view = mdb.user_views.find_one(dict(_id=ObjectId(cls_.view_id)))
             create_view = False
             if not view:
                 create_view = True
                 view = dict(user_filters={})
-                
+
             COL_WIDTHS = 'col_widths'
-                
+
             if not view.get(COL_WIDTHS):
                 view[COL_WIDTHS] = {}
-                
+
             if not view[COL_WIDTHS].get(str(user_id)):
                 view[COL_WIDTHS][str(user_id)] = [0]*length
-                
+
             view[COL_WIDTHS][str(user_id)][col_num-1] = width
-            
+
             if create_view:
                 view_id = mdb.user_views.insert(view)
-                
+
                 cls_.view_id = str(view_id)
                 dbs.add(cls_)
                 dbs.flush()
-                
+
             else:
                 mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
                                       {'$set': dict(col_widths=view[COL_WIDTHS])})
 
             return dict(status=True)
-        
+
         except Exception, e:
             logger.error(e)
-            return dict(status=False, msg=str(e))            
-    
+            return dict(status=False, msg=str(e))
+
     @expose()
     @require(p.not_anonymous())
     @log_access('to_csv')
     def to_csv(self, cls, **kw):
-        
+
         # all records
         kw['rp'] = 0
         List = get_list()
         list_ = List(cls, **kw)
         ds = list_.grid_data()
-        
+
         fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
-        
+
         response.content_type = 'text/csv'
         response.headers['Content-Disposition'] = 'attachment;filename=%s.csv' % fn
-        
+
         return ds.to_csv()
 
     @expose('json')
@@ -393,7 +394,7 @@ class DashboardController(BaseController):
         except Exception, e:
             logger.error(e)
             return dict(status=False)
-    
+
     @expose()
     @require(p.not_anonymous())
     @log_access('to_xls')
@@ -403,7 +404,7 @@ class DashboardController(BaseController):
         logger.debug(kw)
 
         visible_columns = sj.loads(kw['visible_columns'])
-        
+
         # group_by
         group_by = sj.loads(kw['group_by'])
         def cmp_(x, y):
@@ -445,16 +446,16 @@ class DashboardController(BaseController):
         List = get_list()
         list_ = List(cls, **kw)
         ds = list_.grid_data()
-        
+
         title = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')[:25]
 
         response.content_type = 'application/excel'
         response.headers['Content-Disposition'] = 'attachment;filename=%s.xls' % title
-        
+
         # generate XLS content into "memory file"
         xl_file = StringIO()
         toxls.to_xls(ds, visible_columns, group_by, totals, title, xl_file)
-        
+
         return xl_file.getvalue()
 
     @expose('json')
@@ -493,7 +494,7 @@ class DashboardController(BaseController):
             List = get_list()
             list_ = List(cls, **kw)
             ds = list_.grid_data()
-            
+
             fn = re.sub(r'[^a-zA-Z0-9]', '_', cls.capitalize()).encode('utf-8')
 
             if not kw.get('html'):
@@ -505,8 +506,8 @@ class DashboardController(BaseController):
 
             tmpl = get_template('sapns/components/sapns.grid/export-pdf.html')
 
-            content = tmpl.render(tg=tg, _=_, url2=url2, 
-                                  format_float=format_float, 
+            content = tmpl.render(tg=tg, _=_, url2=url2,
+                                  format_float=format_float,
                                   datetostr=_datetostr, timetostr=_timetostr,
                                   orientation=kw.get('orientation', 'Portrait') or 'Portrait',
                                   visible_columns=kw.get('visible_columns'),
@@ -530,20 +531,20 @@ class DashboardController(BaseController):
         try:
             try:
                 _title = SapnsClass.object_title(cls, int(id))
-                
-            except Exception, e:                
+
+            except Exception, e:
                 ids = sj.loads(id)
                 _title = []
                 ot = SapnsClass.ObjectTitle(cls)
                 for id_ in ids:
                     _title.append(ot.title(id_))
-            
+
             return dict(status=True, title=_title)
-        
+
         except Exception, e:
             logger.error(e)
             return dict(status=False, message=str(e).decode('utf-8'))
-    
+
     @expose('json')
     @require(p.not_anonymous())
     @log_access('save record')
@@ -556,32 +557,32 @@ class DashboardController(BaseController):
             came_from  <unicode>
             fld_*      ???        Fields to be saved
         """
-        
+
         logger = logging.getLogger('DashboardController.save')
         try:
             ch_cls = SapnsClass.by_name(cls, parent=False)
             cls = SapnsClass.by_name(cls)
             id_ = get_paramw(params, 'id', int, opcional=True)
-            
+
             # does this user have permission on this table?
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             permissions = request.identity['permissions']
-            
+
             if not user.has_privilege(cls.name) or \
             not '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT) in permissions:
                 return dict(status=False)
-    
+
             # init "update" dictionary
             update = {}
-            
+
             if id_:
                 update['id'] = int(id_)
-                
-            READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, 
+
+            READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY,
                                SapnsAttrPrivilege.ACCESS_DENIED]
-            
+
             def _strtodatetime(s, fmt):
-                
+
                 # build regex
                 regex = r'^\s*%s\s*$' % (fmt.replace('%d', r'(?P<day>([0-2]?[1-9]|3[0-1]))').\
                                          replace('%m', r'(?P<month>(0?[1-9]|1[0-2]))').\
@@ -590,7 +591,7 @@ class DashboardController(BaseController):
                                          replace('%M', r'(?P<minute>[0-5][0-9])').\
                                          replace('%S', r'(?P<second>[0-5][0-9])').\
                                          replace(' ', r'\s'))
-                
+
                 m1 = re.search(regex, s)
                 if m1:
                     try:
@@ -600,35 +601,35 @@ class DashboardController(BaseController):
                         hour = int(m1.groupdict().get('hour') or 0)
                         min_ = int(m1.groupdict().get('minute') or 0)
                         sec = int(m1.groupdict().get('second') or 0)
-                        
+
                         return dt.datetime(year, month, day, hour, min_, sec)
-                    
+
                     except Exception, e:
                         logger.error(e)
                         raise
                 else:
                     raise Exception('Invalid type')
-            
+
             for field_name, field_value in params.iteritems():
                 m_field = re.search(r'^fld_(.+)', field_name)
                 if m_field:
-                    field_name_ = m_field.group(1) 
+                    field_name_ = m_field.group(1)
                     attr = cls.attr_by_name(field_name_)
                     if not attr:
                         update[field_name_] = field_value
                         continue
-                    
+
                     #logger.debug(field_name_)
-                    
+
                     # skipping "read-only" and "denied" attributes
                     acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
                     if acc in READONLY_DENIED:
                         continue
-                    
+
                     # null values
                     if field_value == 'null':
                         field_value = None
-                        
+
                     else:
                         # integer
                         if attr.type == SapnsAttribute.TYPE_INTEGER:
@@ -636,43 +637,43 @@ class DashboardController(BaseController):
                                 field_value = None
                             else:
                                 field_value = int(field_value)
-                        
+
                         # numeric
                         elif attr.type == SapnsAttribute.TYPE_FLOAT:
                             if field_value == '':
                                 field_value = None
                             else:
                                 field_value = float(field_value)
-                        
+
                         # boolean
                         elif attr.type == SapnsAttribute.TYPE_BOOLEAN:
                             field_value = strtobool(field_value)
-                            
+
                         # date
                         elif attr.type == SapnsAttribute.TYPE_DATE:
                             if field_value == '':
                                 field_value = None
                             else:
                                 field_value = strtodate(field_value, fmt='%Y-%m-%d')
-                        
+
                         # time
                         elif attr.type == SapnsAttribute.TYPE_TIME:
                             if field_value == '':
                                 field_value = None
                             else:
                                 field_value = strtotime(field_value)
-                                
+
                         # datetime
                         elif attr.type == SapnsAttribute.TYPE_DATETIME:
                             if field_value == '':
                                 field_value = None
                             else:
                                 field_value = _strtodatetime(field_value, datetime_fmt)
-                        
-                        # string types        
+
+                        # string types
                         else:
                             field_value = field_value.strip()
-                    
+
                     update[field_name_] = field_value
                     #logger.debug('%s=%s' % (field_name, field_value))
 
@@ -685,33 +686,33 @@ class DashboardController(BaseController):
                         if hasattr(c, method_name):
                             f = getattr(c, method_name)
                             f(moment, update)
-                            
+
                     except ImportError:
                         pass
-                        
+
             _exec_post_conditions('before', 'sapns', update)
             _exec_post_conditions('before', config.get('app.root_folder'), update)
-                    
+
             meta = MetaData(bind=dbs.bind)
             tbl = Table(cls.name, meta, autoload=True)
-            
+
             is_insert = False
             if update.get('id'):
                 logger.debug('Updating object [%d] of "%s"' % (update['id'], cls.name))
                 dbs.execute(tbl.update(whereclause=tbl.c.id == update['id'], values=update))
-                
+
             else:
                 logger.debug('Inserting new object in "%s"' % cls.name)
                 ins = tbl.insert(values=update).returning(tbl.c.id)
                 r = dbs.execute(ins)
                 is_insert = True
-                
+
             mark_changed(dbs())
             dbs.flush()
 
             if not update.get('id'):
                 update['id'] = r.fetchone().id
-                
+
             _exec_post_conditions('after', 'sapns', update)
             _exec_post_conditions('after', config.get('app.root_folder'), update)
 
@@ -721,52 +722,52 @@ class DashboardController(BaseController):
             if is_insert:
                 _desc = _('creating a new record')
                 _what = _('create')
-                
+
             SapnsLog.register(table_name=ch_cls.name,
                               row_id=update['id'],
                               who=user.user_id,
                               what=_what,
                               description=_desc,
                               )
-            
+
             return dict(status=True)
-        
+
         except ECondition, e:
             logger.error(e)
             return dict(status=False, message=unicode(e))
-    
+
         except Exception, e:
             logger.error(e)
             return dict(status=False)
-        
+
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
     @log_access('create record')
     def new(self, cls, came_from='/', **kw):
-        
+
         if not kw:
             kw = {}
-            
+
         kw['came_from'] = came_from
-            
+
         redirect(url('/dashboard/edit/%s' % cls), params=kw)
-        
+
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
     @log_access('edit record')
     def edit(self, cls, id='', **params):
-        
+
         logger = logging.getLogger('DashboardController.edit')
-        
+
         came_from = get_paramw(params, 'came_from', unicode, opcional=True,
                                por_defecto='/')
-        
+
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         permissions = request.identity['permissions']
-        
+
         class_ = SapnsClass.by_name(cls)
         ch_class_ = SapnsClass.by_name(cls, parent=False)
-        
+
         # log
         _what = _('edit record')
         if not id:
@@ -774,7 +775,7 @@ class DashboardController(BaseController):
             _id = None
         else:
             _id = int(id)
-            
+
         SapnsLog.register(table_name=ch_class_.name,
                           row_id=_id,
                           who=user.user_id,
@@ -785,39 +786,39 @@ class DashboardController(BaseController):
             id = int(id)
             perm = '%s#%s' % (ch_class_.name, SapnsPermission.TYPE_EDIT) in permissions or \
                    '%s#%s' % (class_.name, SapnsPermission.TYPE_EDIT) in permissions
-        
+
         else:
             perm = '%s#%s' % (class_.name, SapnsPermission.TYPE_NEW) in permissions or \
                    '%s#%s' % (class_.name, SapnsPermission.TYPE_NEW) in permissions
-        
+
         if not (user.has_privilege(ch_class_.name) or user.has_privilege(class_.name)) or not perm:
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
 
         # actions
-        actions = [action for action in class_.sorted_actions(user.user_id) 
+        actions = [action for action in class_.sorted_actions(user.user_id)
                    if action['type']  == 'process']
-            
+
         meta = MetaData(dbs.bind)
         try:
             tbl = Table(class_.name, meta, autoload=True)
-            
+
         except NoSuchTableError:
             redirect(url('/message',
                          params=dict(message=_('This class does not exist'),
                                      came_from=came_from)))
-            
+
         default_values_ro = {}
         default_values = {}
         for field_name, value in params.iteritems():
-            
+
             # default read-only values (_xxxx)
             m = re.search(r'^_([a-z]\w+)$', field_name, re.I | re.U)
             if m:
                 #logger.debug('Default value (read-only): %s = %s' % (m.group(1), params[field_name]))
                 default_values_ro[m.group(1)] = params[field_name]
-                
+
             else:
                 # default read/write values (__xxxx)
                 # depends on privilege of this attribute
@@ -825,10 +826,10 @@ class DashboardController(BaseController):
                 if m:
                     #logger.debug('Default value (read/write*): %s = %s' % (m.group(1), params[field_name]))
                     default_values[m.group(1)] = params[field_name]
-                    
+
         _created = None
         _updated = None
-                    
+
         ref = None
         row = None
         if id:
@@ -838,74 +839,74 @@ class DashboardController(BaseController):
                 redirect(url('/message',
                              params=dict(message=_('Record does not exist'),
                                          came_from=came_from)))
-                
+
             # reference
             ref = SapnsClass.object_title(class_.name, id)
-            
+
             if class_.name != u'sp_logs':
                 _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
                 _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
-                
+
         #logger.debug(row)
-        
+
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
-            
+
             #logger.debug('%s [%s]' % (attr.name, attr_priv.access))
-            
+
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
             if attr.name in default_values_ro:
                 value = default_values_ro[attr.name]
                 read_only = True
-                
+
             elif attr.name in default_values:
                 value = default_values[attr.name]
 
             elif row:
                 #logger.debug(row[attr.name])
                 #logger.debug(attr)
-                if row[attr.name] != None: 
+                if row[attr.name] != None:
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
                         value = datetostr(row[attr.name], fmt=date_fmt)
-                        
+
                     # datetime
                     elif attr.type == SapnsAttribute.TYPE_DATETIME:
                         value = row[attr.name].strftime(datetime_fmt) if row[attr.name] else ''
-                        
+
                     # numeric (int, float)
-                    elif attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:                                       
+                    elif attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:
                         value = row[attr.name]
-                    
+
                     # rest of types
                     else:
                         value = row[attr.name] or ''
-                        
+
             attribute = dict(name=attr.name, title=attr.title,
                              type=attr.type, value=value, required=attr.required,
                              related_class=None, related_class_title='',
                              read_only=read_only, vals=None, field_regex=attr.field_regex,)
-            
+
             #logger.debug('%s = %s' % (attr.name, repr(value)))
-            
+
             attributes.append(attribute)
-            
+
             if attr.related_class_id:
                 # vals
                 try:
                     rel_class = dbs.query(SapnsClass).get(attr.related_class_id)
-                    
+
                     # related_class
                     attribute['related_class'] = rel_class.name
                     attribute['related_class_title'] = rel_class.title
                     attribute['related_title'] = SapnsClass.object_title(rel_class.name, value)
-                    
+
                 except Exception, e:
                     logger.error(e)
                     attribute['vals'] = None
-        
+
         def _exec_pre_conditions(app_name):
             if app_name:
                 try:
@@ -916,26 +917,26 @@ class DashboardController(BaseController):
                     if hasattr(c, method_name):
                         f = getattr(c, method_name)
                         f(id, attributes)
-                    
+
                 except ImportError:
                     pass
-                
+
         _exec_pre_conditions('sapns')
         _exec_pre_conditions(config.get('app.root_folder'))
-                    
-        return dict(cls=cls, title=ch_class_.title, id=id, 
+
+        return dict(cls=cls, title=ch_class_.title, id=id,
                     related_classes=class_.related_classes(),
                     attributes=attributes, reference=ref,
                     _created=_created, _updated=_updated,
                     actions=actions, came_from=url(came_from),
                     lang=init_lang(), languages=get_languages())
-    
+
     @expose('sapns/dashboard/delete.html')
     @expose('json')
     @require(p.not_anonymous())
     @log_access('delete record')
     def delete(self, cls, id_, **kw):
-        
+
         logger = logging.getLogger('DashboardController.delete')
         rel_tables = []
         try:
@@ -943,30 +944,30 @@ class DashboardController(BaseController):
             permissions = request.identity['permissions']
             cls_ = SapnsClass.by_name(cls)
             ch_cls_ = SapnsClass.by_name(cls, parent=False)
-            
+
             # check privilege on this class
             if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
             not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or \
                  '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
-            
+
             # does the record exist?
             meta = MetaData(dbs.bind)
             tbl = Table(cls_.name, meta, autoload=True)
-            
+
             try:
                 id_ = int(id_)
-                
+
             except:
                 id_ = sj.loads(id_)
-                
+
             if isinstance(id_, int):
                 # int
                 this_record = dbs.execute(tbl.select(tbl.c.id == id_)).fetchone()
                 if not this_record:
                     return dict(status=False, message=_('Record does not exist'))
-                
+
             else:
                 # array of ints
                 these_records = dbs.execute(tbl.select(tbl.c.id.in_(id_))).fetchall()
@@ -974,48 +975,48 @@ class DashboardController(BaseController):
                     return dict(status=False, message=_('Some records do not exist'))
 
             # look for objects in other classes that are related with this
-            
+
             rel_classes = cls_.related_classes()
             for rcls in rel_classes:
-                
+
                 logger.debug('Related class: "%s.%s"' % (rcls['name'], rcls['attr_name']))
                 rtbl = Table(rcls['name'], meta, autoload=True)
                 attr_name = rcls['attr_name']
-                
+
                 if isinstance(id_, int):
                     # int
                     i = id_
-                    
+
                 else:
                     # array of ints
                     i = id_[0]
-                
+
                 sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(i))
                 robj = dbs.execute(sel).fetchone()
-                
+
                 if robj != None:
                     rel_tables.append(dict(class_title=rcls['title'],
                                            attr_title=rcls['attr_title']))
-                    
+
                 else:
                     logger.debug('---No related objects have been found')
-                    
+
             # delete record
             if isinstance(id_, int):
                 # int
                 tbl.delete(tbl.c.id == id_).execute()
-                
+
                 # log
                 SapnsLog.register(table_name=cls_.name,
                                   row_id=id_,
                                   who=user.user_id,
                                   what=_('delete'),
                                   )
-            
+
             else:
                 # array of int's
                 tbl.delete(tbl.c.id.in_(id_)).execute()
-                
+
                 for i in id_:
                     # log
                     SapnsLog.register(table_name=cls_.name,
@@ -1028,7 +1029,7 @@ class DashboardController(BaseController):
 
             # success!
             return dict(status=True)
-            
+
         except Exception, e:
             logger.error(e)
             return dict(status=False, message=str(e), rel_tables=rel_tables)
@@ -1072,157 +1073,157 @@ class DashboardController(BaseController):
             return dict(status=False)
 
     @expose('sapns/order/insert.html')
-    @require(p.in_group(u'managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     @add_language
     def ins_order(self, cls, came_from='/'):
-        
+
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        
+
         # check privilege on this class
         if not user.has_privilege(cls):
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
-            
+
         class_ = SapnsClass.by_name(cls)
-        
+
         return dict(page='insertion order', insertion=class_.insertion(),
                     title=class_.title, came_from=url(came_from))
 
     @expose()
-    @require(p.in_group(u'managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     def ins_order_save(self, attributes='', title='', came_from=''):
-        
+
         # save insertion order
         attributes = sj.loads(attributes)
-        
+
         title_saved = False
-        
+
         cls_title = None
         for attr in attributes:
-            
+
             attribute = dbs.query(SapnsAttribute).get(attr['id'])
-            
+
             if not cls_title:
                 cls_title = attribute.class_.title
-            
+
             attribute.title = attr['title']
             attribute.insertion_order = attr['order']
             attribute.required = attr['required']
             attribute.visible = attr['visible']
-            
+
             dbs.add(attribute)
-            
+
             if not title_saved:
                 title_saved = True
                 attribute.class_.title = title
                 dbs.add(attribute.class_)
-            
+
             dbs.flush()
-        
+
         if came_from:
             redirect(url(came_from))
-            
+
         else:
-            redirect(url('/message', 
-                         params=dict(message=_('Insertion order for "%s" has been successfully updated') % cls_title, 
+            redirect(url('/message',
+                         params=dict(message=_('Insertion order for "%s" has been successfully updated') % cls_title,
                                      came_from='')))
-    
+
     @expose('sapns/order/reference.html')
-    @require(p.in_group(u'managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     @add_language
     def ref_order(self, cls, came_from='/'):
-        
+
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
-        
+
         # check privilege on this class
         if not user.has_privilege(cls):
             redirect(url('/message',
                          params=dict(message=_('Sorry, you do not have privilege on this class'),
                                      came_from=came_from)))
-            
+
         class_ = SapnsClass.by_name(cls)
-        
-        return dict(page='reference order', reference=class_.reference(all=True), 
+
+        return dict(page='reference order', reference=class_.reference(all=True),
                     came_from=came_from)
-    
+
     @expose('json')
-    @require(p.in_group(u'managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     def ref_order_save(self, **kw):
-        
+
         logger = logging.getLogger('DashboardController.ref_order_save')
         try:
             # save reference order
             attributes = get_paramw(kw, 'attributes', sj.loads)
-            
+
             cls_title = None
             for attr in attributes:
                 attribute = dbs.query(SapnsAttribute).get(attr['id'])
-                
+
                 if not cls_title:
                     cls_title = attribute.class_.title
-                
+
                 attribute.reference_order = attr['order']
                 dbs.add(attribute)
                 dbs.flush()
-                
+
             return dict(status=True)
-            
+
         except Exception, e:
             logger.error(e)
             return dict(status=False)
-        
+
     @expose('sapns/components/sapns.selector.example.html')
-    @require(p.in_group('managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     def test_selector(self):
         return {}
-    
+
     @expose('sapns/components/sapns.grid/grid_test.html')
-    @require(p.in_group('managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     def test_grid(self, **kw):
         return dict()
-    
+
     @expose('sapns/example_pdf.html')
-    @require(p.in_group('managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     def test_pdf(self):
         request.environ['to_pdf'] = 'example_1.pdf'
         return dict(url2=url2)
-    
+
     @expose('json')
-    @require(p.in_group('managers'))
+    @require(p.in_group(ROLE_MANAGERS))
     def test_search(self, **kw):
         import jinja2
         import random
         random.seed()
-        
+
         s = Search(dbs, '_view_%s' % kw.get('cls'))
         s.apply_qry(kw.get('q').encode('utf-8'))
         ds = s(rp=int(kw.get('rp', 10)))
-        
+
         def r():
             return random.randint(1, 1000) / 1.23
-        
+
         cols = []
         for col in ds.labels:
             cols.append(dict(title=col))
-        
+
         return dict(status=True,
                     esto_es_una_prueba=u'Hola, mundo!',
                     cols_=[dict(title='id', width=30),
-                          dict(title='ABC', align='right', width=100),
-                          dict(title='DEF', width=300),
-                          dict(title='GHI', align='left'),
-                          dict(title='cuATro'),
-                          dict(title='five'),
-                          dict(title='SIX', width=200, align='right'),
-                         ],
+                           dict(title='ABC', align='right', width=100),
+                           dict(title='DEF', width=300),
+                           dict(title='GHI', align='left'),
+                           dict(title='cuATro'),
+                           dict(title='five'),
+                           dict(title='SIX', width=200, align='right'),
+                           ],
                     cols=cols,
                     data=ds.to_data(),
                     data_=[[kw.get('p1'), r(), r(), r()],
-                          [kw.get('p2')],
-                          [3, kw.get('q'), 211, 311, 411, 511, 611],
-                          [kw.get('rp'), 11, None, kw.get('pos')],
-                          [100, u'León', jinja2.escape(u'<!-- -->')],
-                          [200, u'€łđŋ', jinja2.escape(u'<a></a>')],
-                          [300, jinja2.escape(u'<a href="#">Google</a>')],
-                         ])
+                           [kw.get('p2')],
+                           [3, kw.get('q'), 211, 311, 411, 511, 611],
+                           [kw.get('rp'), 11, None, kw.get('pos')],
+                           [100, u'León', jinja2.escape(u'<!-- -->')],
+                           [200, u'€łđŋ', jinja2.escape(u'<a></a>')],
+                           [300, jinja2.escape(u'<a href="#">Google</a>')],
+                           ])

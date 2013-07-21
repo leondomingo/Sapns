@@ -4,15 +4,17 @@ from tg import config
 import pymongo
 import re
 
+
 def _mongo_setting(setting_name):
     return 'mongodb.%s' % setting_name
 
+
 class Mongo(object):
-    
+
     def __init__(self):
-        
+
         DEFAULT_PORT = 27017
-        
+
         mongodb_url = config.get(_mongo_setting('url'))
         m = re.search(r'^([^:]+)(:\d+)?$', mongodb_url)
         if m:
