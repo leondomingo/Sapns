@@ -1086,8 +1086,8 @@ class DashboardController(BaseController):
             if merger:
                 logger.debug('Merging with <%s>' % merger)
 
-                pkg = '.'.join(merger.split('.')[:-1])
-                func_name = merger.split('.')[-1]
+                pkg = '.'.join(merger.split('.')[:-1]).encode('utf-8')
+                func_name = merger.split('.')[-1].encode('utf-8')
 
                 m = __import__(pkg, fromlist=[func_name])
 
