@@ -16,6 +16,7 @@ from sapns.lib.base import BaseController
 from sapns.lib.sapns.const_sapns import ROLE_MANAGERS
 from sapns.lib.sapns.htmltopdf import url2
 from sapns.lib.sapns.lists import EListForbidden
+from sapns.lib.sapns.users import get_user
 from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
     format_float, datetostr as _datetostr, timetostr as _timetostr, get_list, log_access
 from sapns.model import DBSession as dbs
@@ -36,6 +37,7 @@ from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
 import sapns.lib.sapns.to_xls as toxls
 import sapns.lib.sapns.merge as sapns_merge
+from webob.exc import HTTPForbidden
 
 # controllers
 __all__ = ['DashboardController']
@@ -1043,7 +1045,11 @@ class DashboardController(BaseController):
 
         cls_ = SapnsClass.by_name(cls)
 
-        # TODO: check permission "<cls>#merge"
+        # check permission "<cls>#merge"
+        cls_merge = '%s#merge' % cls
+        u = get_user()
+        if not u.has_permission(cls_merge):
+            raise HTTPForbidden(_('You do not have permission'))
 
         return dict(cls=dict(name=cls, title=cls_.title), id_=id_)
 
@@ -1053,24 +1059,55 @@ class DashboardController(BaseController):
     def merge_(self, **kw):
         logger = logging.getLogger('DashboardController.merge_')
         try:
-            cls = get_paramw(kw, 'cls', str)
-            id_ = get_paramw(kw, 'id_', int)
+            cls     = get_paramw(kw, 'cls', str)
+            id_     = get_paramw(kw, 'id_', int)
             from_id = get_paramw(kw, 'from_id', int)
 
+            # check permission "<cls>#merge"
+            cls_merge = '%s#merge' % cls
+            u = get_user()
+            if not u.has_permission(cls_merge):
+                raise HTTPForbidden(_('You do not have permission'))
+
+            # get permission
+            p_merge = SapnsPermission.by_name(cls_merge)
+            not_included = None
+            merger = None
+            if p_merge.data:
+                merge_data = sj.loads(p_merge.data)
+                not_included = merge_data.get('extra_params', {}).get('not_included')
+                merger = merge_data.get('extra_params', {}).get('merger')
+
             # not_included
-            not_included = get_paramw(kw, 'not_included', str, opcional=True)
             if not_included:
                 not_included = not_included.split(',')
 
-            # TODO: check permission "<cls>#merge"
+            # merger
+            if merger:
+                logger.debug('Merging with <%s>' % merger)
 
-            sapns_merge.merge(cls, id_, [from_id], not_included=not_included)
+                pkg = '.'.join(merger.split('.')[:-1])
+                func_name = merger.split('.')[-1]
+
+                m = __import__(pkg, fromlist=[func_name])
+
+                func = getattr(m, func_name)
+                func(cls, id_, [from_id], not_included=not_included)
+
+            else:
+                # default
+                sapns_merge.merge(cls, id_, [from_id], not_included=not_included)
 
             return dict(status=True)
 
         except Exception, e:
             logger.error(e)
-            return dict(status=False)
+            r = dict(status=False)
+
+            if isinstance(e, HTTPForbidden):
+                r.update(msg=str(e))
+
+            return r
 
     @expose('sapns/order/insert.html')
     @require(p.in_group(ROLE_MANAGERS))
