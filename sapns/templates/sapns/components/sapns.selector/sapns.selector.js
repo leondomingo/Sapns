@@ -80,10 +80,11 @@
     SapnsSelector.prototype.setTitle = function() {
         
         var self = this,
-            id = "#st_" + self.name,
+            id = '#st_' + self.name,
             value = self.value;
-        
+
         if (value && self.rc) {
+            $(id).addClass('loading');
             $.ajax({
                 url: self.title_url,
                 data: {
@@ -91,10 +92,14 @@
                     id: self.value
                 },
                 success: function(data) {
+                    $(id).removeClass('loading');
                     if (data.status) {
                         $(id).val(data.title).parent().attr('value', value);
                         self.title = data.title;
                     }
+                },
+                error: function() {
+                    $(id).removeClass('loading');
                 }
             });
         }
