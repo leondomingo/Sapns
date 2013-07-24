@@ -239,6 +239,7 @@ input[type=text]:focus, input[type=password]:focus, textarea:focus { border-colo
 
 /* sapns.selector */
 .sp-select-text { border:1px solid red; border-radius:3px }
+.sp-select-text.loading { background:#eee url('/images/sapns/loading.gif') no-repeat right center; background-size:contain }
 .sp-select-button, .sp-empty-button { height:20px; font:bold 10px arial; margin-left:3px }
 .sp-empty-button { color:#f00 }
 .sp-empty-button:disabled { color:#ff7f50 }

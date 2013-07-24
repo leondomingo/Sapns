@@ -35,7 +35,14 @@ class ComponentsController(BaseController):
     def selector(self, **kw):
         logger = logging.getLogger('ComponentsController.selector')
         try:
-            return self._get_content('sapns/components/sapns.selector/sapns.selector.min.js')
+            if kw.get('min', '') == '0':
+                tmpl = 'sapns/components/sapns.selector/sapns.selector.js'
+
+            else:
+                tmpl = 'sapns/components/sapns.selector/sapns.selector.min.js'
+
+            return self._get_content(tmpl)
+
         except Exception, e:
             logger.error(e)
             return ''
