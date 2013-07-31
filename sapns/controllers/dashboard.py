@@ -1211,6 +1211,7 @@ class DashboardController(BaseController):
             return dict(status=False)
 
     @expose('json')
+    @require(p.in_group(ROLE_MANAGERS))
     def send_mail(self, **kw):
         logger = logging.getLogger('send_mail')
         try:
@@ -1219,8 +1220,13 @@ class DashboardController(BaseController):
             subject = get_paramw(kw, 'subject', unicode)
             message = get_paramw(kw, 'message', unicode)
 
+            from cStringIO import StringIO
             from sapns.lib.sapns.sendmail import send_mail
-            send_mail(to=[(address, name)], subject=subject, message_txt=message, delay=0)
+
+            f = StringIO()
+            f.write('this a test')
+
+            send_mail(to=[(address, name)], subject=subject, message_txt=message, delay=0, files=[('test.txt', f)])
 
         except Exception, e:
             logger.error(e)
