@@ -72,7 +72,7 @@ class MailSender(object):
         try:
             for doc in SapnsDoc.get_docs('sp_scheduled_tasks', task.scheduledtask_id):
                 f = open(doc.full_path(), 'rb')
-                fn = re.sub(r'[^a-z0-9_\-\.]', '_', doc.title.lower().encode('utf-8'))
+                fn = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', doc.title.encode('utf-8'))
                 files.append((f, fn,))
 
                 if kw.get('remove_attachments'):
