@@ -86,7 +86,7 @@ class SendMail(object):
             path = repo.get_new_path()
 
             # split "file_name" into "name" and "ext" (foo-bar.png => foo-bar, .png)
-            name, ext = os.path.splitext(re.sub(r'[^a-z0-9_\-\.]', '_', file_name))
+            name, ext = os.path.splitext(re.sub(r'[^a-zA-Z0-9_\-\.]', '_', file_name))
 
             with open(path, 'wb') as f_:
                 attch = SapnsDoc()

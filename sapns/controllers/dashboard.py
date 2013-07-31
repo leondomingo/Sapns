@@ -1231,7 +1231,7 @@ class DashboardController(BaseController):
                       message_txt=message,
                       delay=0,
                       files=[('this a /text/', f),
-                             ('this a text.txt', f)])
+                             ('This A tExt.txt', f)])
 
         except Exception, e:
             logger.error(e)
