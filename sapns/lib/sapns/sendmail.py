@@ -90,7 +90,7 @@ class SendMail(object):
             with open(path, 'wb') as f_:
                 attch = SapnsDoc()
                 attch.author_id = kw.get('user_id')
-                attch.title = os.path.basename(file_name)
+                attch.title = file_name
                 attch.repo_id = repo.repo_id
                 attch.filename = os.path.basename(path)
                 attch.docformat_id = SapnsDocFormat.by_extension(ext).docformat_id
