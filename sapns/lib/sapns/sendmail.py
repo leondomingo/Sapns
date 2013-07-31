@@ -25,7 +25,7 @@ class SendMail(object):
           message_txt    <str>
           message_html   <str> (opcional)
           to             [(<email>, <name>,), ...]
-          from           {} (optional=<app.mailsender settings>)
+          from_          {} (optional=<app.mailsender settings>)
           reply_to       <str> (opcional)
           files          [(<file_name>, <file-like object>] (optional=[])
         """
@@ -66,7 +66,7 @@ class SendMail(object):
                     message=dict(text=message_txt, html=message_html),
                     remove_attachments=True)
 
-        data['from'] = kw.get('from', from_default)
+        data['from'] = kw.get('from_', from_default)
 
         # reply_to
         reply_to = kw.get('reply_to')
