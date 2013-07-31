@@ -151,4 +151,5 @@ class Scheduler(object):
                     transaction.abort()
         finally:
             f.close()
-            os.remove(lock_path)
+            if os.path.exists(lock_path):
+                os.remove(lock_path)
