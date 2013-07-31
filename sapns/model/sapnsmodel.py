@@ -2086,6 +2086,10 @@ class SapnsDoc(DeclarativeBase):
 
         return id_doc
 
+    def full_path(self):
+        """Returns the full path of this document based on its repo full path"""
+        return os.path.join(self.repo.abs_path(), self.filename).encode('utf-8')
+
 
 class SapnsDocType(DeclarativeBase):
 
