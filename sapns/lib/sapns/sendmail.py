@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 
 from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsScheduledTask, SapnsRepo, SapnsDoc
+from sapns.model.sapnsmodel import SapnsScheduledTask, SapnsRepo, SapnsDoc, SapnsDocFormat
 import datetime as dt
 import simplejson as sj
-# import os
+import os
 from tg import config
 import logging
 
@@ -17,20 +17,18 @@ class SendMail(object):
     def __call__(self, **kw):
         """
         IN
-          task_name    <str> (optional='mail send')
-          max_attempts <int> (optional=3)
-          sender       <str> (optional='sapns.lib.sapns.mailsender.MailSender')
-          delay        <int> (opcional=1)
-          subject      <str>
-          message_txt  <str>
-          message_html <str> (opcional)
-          to           [(<email>, <name>,), ...]
-          from         {} (optional=<app.mailsender settings>)
-          reply_to     <str> (opcional)
-          files        [] (optional=[])
+          task_name      <str> (optional='mail send')
+          max_attempts   <int> (optional=3)
+          sender         <str> (optional='sapns.lib.sapns.mailsender.MailSender')
+          delay          <int> (opcional=1)
+          subject        <str>
+          message_txt    <str>
+          message_html   <str> (opcional)
+          to             [(<email>, <name>,), ...]
+          from           {} (optional=<app.mailsender settings>)
+          reply_to       <str> (opcional)
+          files          [(<file_name>, <file-like object>] (optional=[])
         """
-
-        self.logger.info(kw)
 
         # create "scheduled task" to send mail
         stask = SapnsScheduledTask()
@@ -80,41 +78,46 @@ class SendMail(object):
         dbs.add(stask)
         dbs.flush()
 
-        # repo = dbs.query(SapnsRepo).first()
-        #
-        # for file_name, f in kw.get('files', []):
-        #     # fra adjunta
-        #     path = repo.get_new_path()
-        #
-        #     attch = SapnsDoc()
-        #     attch.author_id = kw.get('user_id')
-        #     attch.title = 'Attachment'
-        #     attch.repo_id = repo.repo_id
-        #     attch.filename = os.path.basename(path)
-        #     attch.docformat_id = df_pdf.docformat_id
-        #
-        #     dbs.add(attch)
-        #     dbs.flush()
-        #
-        #     attch.register('sp_scheduled_tasks', stask.scheduledtask_id)
-        #
-        #     f_.write(f.getvalue())
+        # get the first "repo"
+        repo = dbs.query(SapnsRepo).first()
+
+        for file_name, f in kw.get('files', []):
+            path = repo.get_new_path()
+
+            # split "file_name" into "name" and "ext" (foo-bar.png => foo-bar, .png)
+            name, ext = os.path.splitext(file_name)
+
+            with open(path, 'wb') as f_:
+                attch = SapnsDoc()
+                attch.author_id = kw.get('user_id')
+                attch.title = os.path.basename(file_name)
+                attch.repo_id = repo.repo_id
+                attch.filename = os.path.basename(path)
+                attch.docformat_id = SapnsDocFormat.by_extension(ext).docformat_id
+
+                dbs.add(attch)
+                dbs.flush()
+
+                attch.register('sp_scheduled_tasks', stask.scheduledtask_id)
+
+                f.seek(0)
+                f_.write(f.read())
 
 
 def send_mail(**kwargs):
     """
     IN
-      task_name    <str> (optional='mail send')
-      max_attempts <int> (optional=3)
-      sender       <str> (optional='sapns.lib.sapns.mailsender.MailSender')
-      delay        <int> (opcional=1)
-      subject      <str>
-      message_txt  <str>
-      message_html <str> (opcional)
-      to           [(<email>, <name>,), ...]
-      from         {} (optional=<app.mailsender settings>)
-      reply_to     <str> (opcional)
-      files        [] (optional=[])
+      task_name      <str> (optional='mail send')
+      max_attempts   <int> (optional=3)
+      sender         <str> (optional='sapns.lib.sapns.mailsender.MailSender')
+      delay          <int> (opcional=1)
+      subject        <str>
+      message_txt    <str>
+      message_html   <str> (opcional)
+      to             [(<email>, <name>,), ...]
+      from           {} (optional=<app.mailsender settings>)
+      reply_to       <str> (opcional)
+      files          [(<file_name>, <file-like object>] (optional=[])
     """
     ms = SendMail()
     return ms(**kwargs)
