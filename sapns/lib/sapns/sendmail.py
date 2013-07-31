@@ -7,6 +7,7 @@ import simplejson as sj
 import os
 from tg import config
 import logging
+import re
 
 
 class SendMail(object):
@@ -85,15 +86,16 @@ class SendMail(object):
             path = repo.get_new_path()
 
             # split "file_name" into "name" and "ext" (foo-bar.png => foo-bar, .png)
-            name, ext = os.path.splitext(file_name)
+            name, ext = os.path.splitext(re.sub(r'[^a-z0-9_\-\.]', '_', file_name))
 
             with open(path, 'wb') as f_:
                 attch = SapnsDoc()
                 attch.author_id = kw.get('user_id')
-                attch.title = file_name
+                attch.title = name + ext
                 attch.repo_id = repo.repo_id
                 attch.filename = os.path.basename(path)
-                attch.docformat_id = SapnsDocFormat.by_extension(ext).docformat_id
+                if ext:
+                    attch.docformat_id = SapnsDocFormat.by_extension(ext).docformat_id
 
                 dbs.add(attch)
                 dbs.flush()

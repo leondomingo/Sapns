@@ -1226,7 +1226,12 @@ class DashboardController(BaseController):
             f = StringIO()
             f.write('this a test')
 
-            send_mail(to=[(address, name)], subject=subject, message_txt=message, delay=0, files=[('test.txt', f)])
+            send_mail(to=[(address, name)],
+                      subject=subject,
+                      message_txt=message,
+                      delay=0,
+                      files=[('this a /text/', f),
+                             ('this a text.txt', f)])
 
         except Exception, e:
             logger.error(e)

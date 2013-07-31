@@ -5,7 +5,6 @@ from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsScheduledTask, SapnsDoc
 from tg import config
 import logging
-import os.path
 import re
 
 
@@ -72,9 +71,8 @@ class MailSender(object):
         files_remove = []
         try:
             for doc in SapnsDoc.get_docs('sp_scheduled_tasks', task.scheduledtask_id):
-                f = open(os.path.join(doc.repo.abs_path(), doc.filename).encode('utf-8'), 'rb')
-                fn = (u'%s.%s' % (doc.title, doc.docformat.extension)).encode('utf-8')
-                fn = re.sub(r'[^a-z0-9_\-\.]', '_', fn.lower())
+                f = open(doc.full_path(), 'rb')
+                fn = re.sub(r'[^a-z0-9_\-\.]', '_', doc.title.lower().encode('utf-8'))
                 files.append((f, fn,))
 
                 if kw.get('remove_attachments'):
