@@ -1210,6 +1210,21 @@ class DashboardController(BaseController):
             logger.error(e)
             return dict(status=False)
 
+    @expose('json')
+    def send_mail(self, **kw):
+        logger = logging.getLogger('send_mail')
+        try:
+            name = get_paramw(kw, 'name', unicode)
+            address = get_paramw(kw, 'address', unicode)
+            subject = get_paramw(kw, 'subject', unicode)
+            message = get_paramw(kw, 'message', unicode)
+
+            from sapns.lib.sapns.sendmail import send_mail
+            send_mail(to=[(address, name)], subject=subject, message_txt=message, delay=0)
+
+        except Exception, e:
+            logger.error(e)
+
     @expose('sapns/components/sapns.selector.example.html')
     @require(p.in_group(ROLE_MANAGERS))
     def test_selector(self):
