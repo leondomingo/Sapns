@@ -17,28 +17,27 @@ class MailSender(object):
     APP_MAILSENDER__PASSWORD = 'app.mailsender.password'
     APP_MAILSENDER__SMTP     = 'app.mailsender.smtp'
 
-    def __init__(self, **kw):
+    def __init__(self):
         self.logger = logging.getLogger('MailSender')
-        self.params = kw
 
-    def __call__(self):
+    def __call__(self, **kw):
 
         # scheduled task
-        task = dbs.query(SapnsScheduledTask).get(self.params['stask_id'])
+        task = dbs.query(SapnsScheduledTask).get(kw['stask_id'])
 
         # from / smtp connection
         from_address = config.get(self.APP_MAILSENDER__MAIL)
         from_name    = config.get(self.APP_MAILSENDER__NAME)
         reply_to = None
-        if self.params.get('from'):
-            from_ = (self.params['from'].get('address', from_address).encode('utf-8'),
-                     self.params['from'].get('name', from_name).encode('utf-8'),)
+        if kw.get('from'):
+            from_ = (kw['from'].get('address', from_address).encode('utf-8'),
+                     kw['from'].get('name', from_name).encode('utf-8'),)
 
             # smtp
-            server   = self.params['from'].get('smtp', config.get(self.APP_MAILSENDER__SMTP))
-            login    = self.params['from'].get('login', config.get(self.APP_MAILSENDER__LOGIN))
-            password = self.params['from'].get('password', config.get(self.APP_MAILSENDER__PASSWORD))
-            reply_to = self.params['from'].get('reply_to')
+            server   = kw['from'].get('smtp', config.get(self.APP_MAILSENDER__SMTP))
+            login    = kw['from'].get('login', config.get(self.APP_MAILSENDER__LOGIN))
+            password = kw['from'].get('password', config.get(self.APP_MAILSENDER__PASSWORD))
+            reply_to = kw['from'].get('reply_to')
 
         else:
             from_ = (from_address, from_name,)
@@ -57,16 +56,16 @@ class MailSender(object):
 
         # to, cc, bcc
         to_ = []
-        if self.params.get('to'):
-            to_ = _dst_list(self.params['to'])
+        if kw.get('to'):
+            to_ = _dst_list(kw['to'])
 
         cc = []
-        if self.params.get('cc'):
-            cc = _dst_list(self.params['cc'])
+        if kw.get('cc'):
+            cc = _dst_list(kw['cc'])
 
         bcc = []
-        if self.params.get('bcc'):
-            bcc = _dst_list(self.params['bcc'])
+        if kw.get('bcc'):
+            bcc = _dst_list(kw['bcc'])
 
         # collect attachments
         files = []
@@ -78,14 +77,17 @@ class MailSender(object):
                 fn = re.sub(r'[^a-z0-9_\-\.]', '_', fn.lower())
                 files.append((f, fn,))
 
-                if self.params.get('remove_attachments'):
+                if kw.get('remove_attachments'):
                     files_remove.append(doc.doc_id)
 
-            send_mail(from_, to_, self.params['subject'].encode('utf-8'),
-                      self.params['message']['text'].encode('utf-8'),
+            html_message = kw['message'].get('html')
+            if html_message:
+                html_message = html_message.encode('utf-8')
+
+            send_mail(from_, to_, kw['subject'].encode('utf-8'),
+                      kw['message']['text'].encode('utf-8'),
                       server, login, password, files=files,
-                      html=self.params['message'].get('html').encode('utf-8'),
-                      cc=cc, bcc=bcc, reply_to=reply_to)
+                      html=html_message, cc=cc, bcc=bcc, reply_to=reply_to)
 
             # remove attachments
             for id_doc in files_remove:

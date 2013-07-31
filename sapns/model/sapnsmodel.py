@@ -2279,15 +2279,15 @@ class SapnsScheduledTask(DeclarativeBase):
         dbs.flush()
 
     def execute(self):
-        try:
-            from sapns.exc.executions import EXECUTIONS
-        except ImportError:
-            from sapns.exc.executions_default import EXECUTIONS
+        if self.executable:
+            # sapns.lib.sapns.mailsender.MailSender
+            executable = self.executable.split('.')
 
-        e = EXECUTIONS.get(self.executable)
-        if e:
-            package = e[0]
-            executable = e[1]
+            # sapns.lib.sapns.mailsender
+            pkg = '.'.join(executable[:-1])
+
+            # MailSender
+            cls = executable[-1]
 
             data = {}
             if self.data:
@@ -2295,16 +2295,12 @@ class SapnsScheduledTask(DeclarativeBase):
 
             data.update(stask_id=self.scheduledtask_id)
 
-            m = __import__(package, fromlist=[executable])
-            func = getattr(m, executable)
+            m = __import__(pkg, fromlist=[cls])
+            func = getattr(m, cls)
             if isinstance(func, type):
-                # "func" is a class so arguments are passed to __init__ and then
-                # "func" is executed
-                func(**data)()
+                func = func()
 
-            else:
-                # "func" is a function executed with the passed arguments
-                func(**data)
+            return func(**data)
 
         else:
             raise Exception('It does not exist a script called "%s"' % self.task_name)
