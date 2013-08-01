@@ -696,9 +696,12 @@ def get_module(module_name, class_name=None, default_module_name=None):
         # module_name='sapns.lib.foo.bar', class_name='Baz'
         if not class_name:
             # module_name = 'sapns.lib.foo.bar.Baz', class_name=None
-            module_name, class_name = _get_module(module_name)
+            module_name, class_name_ = _get_module(module_name)
+            
+        else:
+            class_name_ = clase_name
 
-        module = __import__(module_name, fromlist=[class_name])
+        module = __import__(module_name, fromlist=[class_name_])
 
     except ImportError:
         if default_module_name:
