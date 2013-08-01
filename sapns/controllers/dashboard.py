@@ -12,6 +12,7 @@ from sapns.controllers.shortcuts import ShortcutsController
 from sapns.controllers.users import UsersController
 from sapns.controllers.util import UtilController
 from sapns.controllers.views import ViewsController
+from sapns.controllers.tasks import TasksController
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.const_sapns import ROLE_MANAGERS
 from sapns.lib.sapns.htmltopdf import url2
@@ -61,14 +62,16 @@ class DashboardController(BaseController):
     messages   = MessagesController()
     privileges = PrivilegesController()
     logs       = LogsController()
+    tasks      = TasksController()
 
     @expose('sapns/sidebar.html')
+    @require(p.not_anonymous())
     def sidebar(self, **kw):
 
         # connected user
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
 
-        # get children shortcuts (shortcuts.parent_id = sc_parent) of the this user
+        # get children shortcuts (shortcuts.parent_id = sc_parent) of this user
         shortcuts = user.get_shortcuts(id_parent=None)
 
         return dict(shortcuts=shortcuts, came_from=kw.get('came_from', ''), home=url(user.entry_point() or '/dashboard'))
@@ -160,7 +163,6 @@ class DashboardController(BaseController):
         except EListForbidden, e:
             _logger.error(e)
             redirect(url('/message', params=dict(message=str(e), came_from=kw.get('came_from'))))
-
 
     @expose('json')
     @require(p.not_anonymous())
@@ -1183,14 +1185,17 @@ class DashboardController(BaseController):
             f.write('this a test')
 
             send_mail(to=[(address, name)],
-                      subject=subject,
+                      subject=u'%s_%s' % (subject, dt.datetime.now()),
                       message_txt=message,
                       delay=0,
                       files=[('this a /text/', f),
                              ('This A tExt.txt', f)])
 
+            return dict(status=True)
+
         except Exception, e:
             logger.error(e)
+            return dict(status=False, msg=str(e))
 
     @expose('sapns/components/sapns.selector.example.html')
     @require(p.in_group(ROLE_MANAGERS))

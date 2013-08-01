@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
 
+from cStringIO import StringIO
 from neptuno.sendmail import send_mail
-from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsScheduledTask, SapnsDoc
+from sapns.lib.sapns.mongo import Mongo, SCHEDULED_TASKS, SCHEDULED_TASKS_ATTACHMENTS
 from tg import config
-import logging
+import gridfs
 import re
+import logging
 
 
 class MailSender(object):
@@ -18,11 +19,10 @@ class MailSender(object):
 
     def __init__(self):
         self.logger = logging.getLogger('MailSender')
+        self.mdb = Mongo().db
+        self.fs = gridfs.GridFS(self.mdb, collection=SCHEDULED_TASKS_ATTACHMENTS)
 
     def __call__(self, **kw):
-
-        # scheduled task
-        task = dbs.query(SapnsScheduledTask).get(kw['stask_id'])
 
         # from / smtp connection
         from_address = config.get(self.APP_MAILSENDER__MAIL)
@@ -68,29 +68,24 @@ class MailSender(object):
 
         # collect attachments
         files = []
-        files_remove = []
-        try:
-            for doc in SapnsDoc.get_docs('sp_scheduled_tasks', task.scheduledtask_id):
-                f = open(doc.full_path(), 'rb')
-                fn = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', doc.title.encode('utf-8'))
-                files.append((f, fn,))
+        task = self.mdb[SCHEDULED_TASKS].find_one(dict(_id=kw['task_id']))
+        attachments = task.get('attachments')
+        if attachments:
+            names = task.get('attachments_names')
 
-                if kw.get('remove_attachments'):
-                    files_remove.append(doc.doc_id)
+            for attachment_id, attachment_name in zip(attachments, names):
+                f = StringIO(self.fs.get(attachment_id).read())
+                fn = re.sub(r'[^a-zA-Z0-9_\-\.]', '_', attachment_name.encode('utf-8'))
+                files.append((f, fn))
 
-            html_message = kw['message'].get('html')
-            if html_message:
-                html_message = html_message.encode('utf-8')
+                # delete attachment from GridFS (mongodb)
+                self.fs.delete(attachment_id)
 
-            send_mail(from_, to_, kw['subject'].encode('utf-8'),
-                      kw['message']['text'].encode('utf-8'),
-                      server, login, password, files=files,
-                      html=html_message, cc=cc, bcc=bcc, reply_to=reply_to)
+        html_message = kw['message'].get('html')
+        if html_message:
+            html_message = html_message.encode('utf-8')
 
-            # remove attachments
-            for id_doc in files_remove:
-                SapnsDoc.delete_doc(id_doc)
-
-        finally:
-            for f, _ in files:
-                f.close()
+        send_mail(from_, to_, kw['subject'].encode('utf-8'),
+                  kw['message']['text'].encode('utf-8'),
+                  server, login, password, files=files,
+                  html=html_message, cc=cc, bcc=bcc, reply_to=reply_to)
