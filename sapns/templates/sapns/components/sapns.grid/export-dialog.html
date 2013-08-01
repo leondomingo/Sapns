@@ -67,18 +67,41 @@ function to_xls(callback, callback_error) {
         totals.push(column_name);
     });
 
-    // /dashboard/topdf -> /dashboard/topdf_
-    var form_export = '<form action="{{tg.url("/dashboard/to_xls_/")}}" method="post" target="">' +
-        '<input type="hidden" name="cls" value="{{data.cls}}">' +
-        '<input type="hidden" name="q" value="{{data.q}}">' + 
-        '<input type="hidden" name="ch_attr" value="{{data.ch_attr}}">' +
-        '<input type="hidden" name="parent_id" value="{{data.parent_id}}">' +
-        '<input type="hidden" name="visible_columns" value=\'' + JSON.stringify(visible_columns) + '\'>' +
-        '<input type="hidden" name="group_by" value=\'' + JSON.stringify(group_by) + '\'>' +
-        '<input type="hidden" name="totals" value=\'' + JSON.stringify(totals) + '\'>' +
-        '</form>';
+    var form_export = $('<form/>', {
+        action: "{{data.export_url}}",
+        method: 'post'
+    });
 
-    $(form_export).appendTo('body').submit().remove();
+    var params = [['cls',             "{{data.cls}}"],
+                  ['q',               "{{data.q}}"],
+                  ['ch_attr',         "{{data.ch_attr}}"],
+                  ['parent_id',       "{{data.parent_id}}"],
+                  ['visible_columns', JSON.stringify(visible_columns)],
+                  ['group_by',        JSON.stringify(group_by)],
+                  ['totals',          JSON.stringify(totals)]
+                  ]
+
+    /* {% if extra_params %} */
+    var extra_params = JSON.parse('{{extra_params}}');
+
+    for (ep in extra_params) {
+        params.push([ep, extra_params[ep]]);
+    }
+    /* {% endif %} */
+
+    for (var i=0, l=params.length; i<l; i++) {
+        var p = params[i];
+
+        var input_ = $('<input>', {
+            type: 'hidden',
+            name: p[0],
+            value: p[1]
+        });
+
+        input_.appendTo(form_export);
+    }
+
+    form_export.appendTo('body').submit().remove();
     callback();
 }
 

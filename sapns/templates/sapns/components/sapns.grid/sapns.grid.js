@@ -198,29 +198,6 @@ var __DEFAULT_FILTER = 'default';
             settings.actions = settings.actions();
         }
 
-        var exportable_formats = [
-        {
-            id: 'excel',
-            title: 'Excel',
-            url: "{{tg.url('/dashboard/to_xls/')}}",
-            func_name: 'to_xls',
-            export_url: "{{tg.url('/dashboard/to_xls_/')}}",
-            modal: true
-        },
-        {
-            id: 'csv',
-            title: 'CSV',
-            url: "{{tg.url('/dashboard/to_csv/')}}"
-        }
-        // {
-        //     id: 'pdf',
-        //     title: 'PDF',
-        //     url: "{{tg.url('/dashboard/to_pdf/')}}",
-        //     export_url: "{{tg.url('/dashboard/to_pdf_/')}}",
-        //     modal: true
-        // }
-        ];
-        
         // default "pager_options"
         var pager_options = settings.pager_options;
         if (!pager_options) {
@@ -303,7 +280,6 @@ var __DEFAULT_FILTER = 'default';
             select_first: false,
             shift_enabled: false,
             exportable: true,
-            exportable_formats: exportable_formats,
             with_pager: true,
             pag_n: 1,
             rp: 10,
@@ -320,6 +296,33 @@ var __DEFAULT_FILTER = 'default';
         }, settings);
         
         $.extend(true, self, _settings);
+
+        self.exportable_formats = [
+        {
+            id: 'excel',
+            title: 'Excel',
+            url: "{{tg.url('/dashboard/to_xls/')}}",
+            func_name: 'to_xls',
+            export_url: "{{tg.url('/dashboard/to_xls_/')}}",
+            modal: true
+        },
+        {
+            id: 'csv',
+            title: 'CSV',
+            url: "{{tg.url('/dashboard/to_csv/')}}"
+        }
+        // {
+        //     id: 'pdf',
+        //     title: 'PDF',
+        //     url: "{{tg.url('/dashboard/to_pdf/')}}",
+        //     export_url: "{{tg.url('/dashboard/to_pdf_/')}}",
+        //     modal: true
+        // }
+        ];
+
+        if (settings.exportable_formats) {
+            self.exportable_formats = settings.exportable_formats;
+        }
 
         self.pager_options = pager_options;
         self.this_page = 0;
@@ -1518,14 +1521,29 @@ var __DEFAULT_FILTER = 'default';
                 // reset the select
                 $(this).find('option:first').prop('selected', true);
 
+                var data = $.extend({
+                    cls: self.cls,
+                    q: self.query(),
+                    ch_attr: self.ch_attr,
+                    parent_id: self.parent_id,
+                    export_url: selected_format.export_url,
+                }, selected_format.data || {});
+
+                var extra_params = {};
+                for (ep in selected_format.data) {
+                    var value = selected_format.data[ep];
+                    if (typeof(value) === 'function') {
+                        value = value();
+                    }
+
+                    extra_params[ep] = value;
+                }
+
+                data.extra_params = JSON.stringify(extra_params);
+
                 $.ajax({
                     url: selected_format.url,
-                    data: {
-                        cls: self.cls,
-                        q: self.query(),
-                        ch_attr: self.ch_attr,
-                        parent_id: self.parent_id
-                    },
+                    data: data,
                     success: function(res) {
                         var on_progress = false;
 
@@ -1829,12 +1847,20 @@ var __DEFAULT_FILTER = 'default';
                             <option value="{today}">{{_("Today")}}</option>\
                             <option value="{today - 1}">{{_("Yesterday")}}</option>\
                             <option value="{today + 1}">{{_("Tomorrow")}}</option>\
-                            <option value="{start_week}">{{_("Start week")}}</option>\
-                            <option value="{end_week}">{{_("End week")}}</option>\
-                            <option value="{start_month}">{{_("Start month")}}</option>\
-                            <option value="{end_month}">{{_("End month")}}</option>\
-                            <option value="{start_year}">{{_("Start year")}}</option>\
-                            <option value="{end_year}">{{_("End year")}}</option>\
+                            <option value="{start_week}">{{_("Week start")}}</option>\
+                            <option value="{end_week}">{{_("Week end")}}</option>\
+                            <option value="{start_month}">{{_("Month start")}}</option>\
+                            <option value="{end_month}">{{_("Month end")}}</option>\
+                            <option value="{start_month - 1m}">{{_("Previous month start")}}</option>\
+                            <option value="{end_month - 1m}">{{_("Previous month end")}}</option>\
+                            <option value="{start_month + 1m}">{{_("Next month start")}}</option>\
+                            <option value="{end_month + 1m}">{{_("Next month end")}}</option>\
+                            <option value="{start_year}">{{_("Year start")}}</option>\
+                            <option value="{end_year}">{{_("Year end")}}</option>\
+                            <option value="{start_year - 1y}">{{_("Previous year start")}}</option>\
+                            <option value="{end_year - 1y}">{{_("Previous year end")}}</option>\
+                            <option value="{start_year + 1y}">{{_("Next year start")}}</option>\
+                            <option value="{end_year + 1y}">{{_("Next year end")}}</option>\
                         </select>\
                     </div></div>';
                 

@@ -3,6 +3,8 @@
 import xlwt
 import logging
 import tg
+import simplejson as sj
+import re
 
 
 def to_xls(ds, visible_columns, group_by, totals, title, fn):
@@ -173,3 +175,53 @@ def to_xls(ds, visible_columns, group_by, totals, title, fn):
     end_sheet(ws, row, sheet_n, reset=False)
 
     wb.save(fn)
+
+
+def prepare_xls_data(kw):
+    """
+    IN
+      kw  <dict>
+
+    OUT
+      <visible_columns>, <group_by>, <totals>
+    """
+
+    visible_columns = sj.loads(kw['visible_columns'])
+
+    # group_by
+    group_by = sj.loads(kw['group_by'])
+
+    def cmp_(x, y):
+        i = visible_columns.index(x)
+        j = visible_columns.index(y)
+        return cmp(i, j)
+
+    group_by = sorted(group_by, cmp=cmp_)
+    group_by_ = [g.replace('_', '') for g in group_by]
+
+    totals = sj.loads(kw['totals'])
+
+    # remove "sorting" items from "q"
+    q_ = []
+    if kw['q']:
+        if group_by:
+            for item in kw['q'].split(','):
+                m = re.search(r'^(\+|\-)(\w+)$', item.strip())
+                if m:
+                    if m.group(2) in group_by_:
+                        continue
+
+                q_.append(item)
+
+    if group_by:
+        kw['q'] = ','.join(['+%s' % g for g in group_by_])
+        if len(q_) > 0:
+            if kw['q']:
+                kw['q'] += ','
+
+            kw['q'] += ','.join(q_)
+
+    # all records
+    kw['rp'] = 0
+
+    return visible_columns, group_by, totals
