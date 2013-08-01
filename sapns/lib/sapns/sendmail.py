@@ -1,13 +1,8 @@
 # -*- coding: utf-8 -*-
 
-from sapns.model import DBSession as dbs
-from sapns.model.sapnsmodel import SapnsScheduledTask, SapnsRepo, SapnsDoc, SapnsDocFormat
-import datetime as dt
-import simplejson as sj
-import os
 from tg import config
 import logging
-import re
+from sapns.lib.sapns.mongo.scheduled_task import ScheduledTask
 
 
 class SendMail(object):
@@ -31,20 +26,7 @@ class SendMail(object):
           files          [(<file_name>, <file-like object>] (optional=[])
         """
 
-        # create "scheduled task" to send mail
-        stask = SapnsScheduledTask()
-        stask.active = True
-        stask.task_name = kw.get('task_name', 'mail send')
-        stask.max_attempts = int(kw.get('max_attempts', 3) or 3)
-
-        # send mail after 1 minute
-        delay = int(kw.get('delay', 1))
-        momento = dt.datetime.now() + dt.timedelta(minutes=delay)
-
-        stask.task_date = momento.date()
-        stask.task_time = momento.time()
-        stask.executable = kw.get('sender', 'sapns.lib.sapns.mailsender.MailSender')
-
+        # collecting task data
         subject = kw.get('subject')
         message_txt = kw.get('message_txt')
         message_html = kw.get('message_html')
@@ -74,36 +56,16 @@ class SendMail(object):
         if reply_to:
             data['from'].update(reply_to=reply_to)
 
-        stask.data = sj.dumps(data)
+        self.logger.info(u'Creating task')
 
-        dbs.add(stask)
-        dbs.flush()
+        s = ScheduledTask()
+        kw['description'] = kw.get('task_name', 'Mail send')
+        kw['executable'] = kw.get('sender', 'sapns.lib.sapns.mailsender.MailSender')
+        kw.setdefault('delay', 1)
+        kw['data'] = data
 
-        # get the first "repo"
-        repo = dbs.query(SapnsRepo).first()
-
-        for file_name, f in kw.get('files', []):
-            path = repo.get_new_path()
-
-            # split "file_name" into "name" and "ext" (foo-bar.png => foo-bar, .png)
-            name, ext = os.path.splitext(re.sub(r'[^a-zA-Z0-9_\-\.]', '_', file_name))
-
-            with open(path, 'wb') as f_:
-                attch = SapnsDoc()
-                attch.author_id = kw.get('user_id')
-                attch.title = name + ext
-                attch.repo_id = repo.repo_id
-                attch.filename = os.path.basename(path)
-                if ext:
-                    attch.docformat_id = SapnsDocFormat.by_extension(ext).docformat_id
-
-                dbs.add(attch)
-                dbs.flush()
-
-                attch.register('sp_scheduled_tasks', stask.scheduledtask_id)
-
-                f.seek(0)
-                f_.write(f.read())
+        task_id = s.register_task(**kw)
+        s.attach_files(task_id, kw.get('files', []))
 
 
 def send_mail(**kwargs):
