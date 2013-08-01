@@ -43,24 +43,24 @@ from webob.exc import HTTPForbidden
 __all__ = ['DashboardController']
 
 date_fmt = config.get('formats.date', default='%m/%d/%Y')
-_strtodate = lambda s: strtodate(s, fmt=date_fmt, no_exc=True)
-
 datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
+
 
 class ECondition(Exception):
     pass
 
+
 class DashboardController(BaseController):
     """DashboardController manage raw-data editing"""
 
-    views = ViewsController()
-    util = UtilController()
-    users = UsersController()
-    roles = RolesController()
-    sc = ShortcutsController()
-    messages = MessagesController()
+    views      = ViewsController()
+    util       = UtilController()
+    users      = UsersController()
+    roles      = RolesController()
+    sc         = ShortcutsController()
+    messages   = MessagesController()
     privileges = PrivilegesController()
-    logs = LogsController()
+    logs       = LogsController()
 
     @expose('sapns/sidebar.html')
     def sidebar(self, **kw):
@@ -125,7 +125,7 @@ class DashboardController(BaseController):
     def index(self, **kw):
         user_id = get_paramw(kw, 'user_id', int, opcional=True)
         if not user_id:
-            user_id =  request.identity['user'].user_id
+            user_id = request.identity['user'].user_id
 
         user = dbs.query(SapnsUser).get(user_id)
 
@@ -294,8 +294,7 @@ class DashboardController(BaseController):
             view['user_filters'][str(user_id)] = user_filters
 
             mdb.user_views.update(dict(_id=ObjectId(cls_.view_id)),
-                                      {'$set': dict(user_filters=view['user_filters'])})
-
+                                  {'$set': dict(user_filters=view['user_filters'])})
 
             return dict(status=True)
 
@@ -405,44 +404,9 @@ class DashboardController(BaseController):
         logger = logging.getLogger('DashboardController.to_xls_')
         logger.debug(kw)
 
-        visible_columns = sj.loads(kw['visible_columns'])
+        visible_columns, group_by, totals = toxls.prepare_xls_data(kw)
 
-        # group_by
-        group_by = sj.loads(kw['group_by'])
-        def cmp_(x, y):
-            i = visible_columns.index(x)
-            j = visible_columns.index(y)
-            return cmp(i, j)
-
-        group_by = sorted(group_by, cmp=cmp_)
-        group_by_ = [g.replace('_', '') for g in group_by]
-
-        totals = sj.loads(kw['totals'])
-
-        # remove "sorting" items from "q"
-        q_ = []
-        if kw['q']:
-            if group_by:
-                for item in kw['q'].split(','):
-                    m = re.search(r'^(\+|\-)(\w+)$', item.strip())
-                    if m:
-                        if m.group(2) in group_by_:
-                            continue
-
-                    q_.append(item)
-
-        if group_by:
-            kw['q'] = ','.join(['+%s' % g for g in group_by_])
-            if len(q_) > 0:
-                if kw['q']:
-                    kw['q'] += ','
-
-                kw['q'] += ','.join(q_)
-
-        # all records
-        kw['rp'] = 0
-
-        cls = get_paramw(kw, 'cls', str)
+        cls = get_paramw(kw, 'cls', unicode)
         del kw['cls']
 
         List = get_list()
@@ -534,7 +498,7 @@ class DashboardController(BaseController):
             try:
                 _title = SapnsClass.object_title(cls, int(id))
 
-            except Exception, e:
+            except ValueError:
                 ids = sj.loads(id)
                 _title = []
                 ot = SapnsClass.ObjectTitle(cls)
@@ -570,8 +534,9 @@ class DashboardController(BaseController):
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             permissions = request.identity['permissions']
 
-            if not user.has_privilege(cls.name) or \
-            not '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT) in permissions:
+            edit_permission = '%s#%s' % (cls.name, SapnsPermission.TYPE_EDIT)
+
+            if not user.has_privilege(cls.name) or not edit_permission in permissions:
                 return dict(status=False)
 
             # init "update" dictionary
@@ -580,19 +545,18 @@ class DashboardController(BaseController):
             if id_:
                 update['id'] = int(id_)
 
-            READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY,
-                               SapnsAttrPrivilege.ACCESS_DENIED]
+            READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, SapnsAttrPrivilege.ACCESS_DENIED]
 
             def _strtodatetime(s, fmt):
 
                 # build regex
-                regex = r'^\s*%s\s*$' % (fmt.replace('%d', r'(?P<day>([0-2]?[1-9]|3[0-1]))').\
-                                         replace('%m', r'(?P<month>(0?[1-9]|1[0-2]))').\
-                                         replace('%Y', r'(?P<year>\d{4})').\
-                                         replace('%H', r'(?P<hour>([0-1]?[0-9]|2[0-3]))').\
-                                         replace('%M', r'(?P<minute>[0-5][0-9])').\
-                                         replace('%S', r'(?P<second>[0-5][0-9])').\
-                                         replace(' ', r'\s'))
+                regex = r'^\s*%s\s*$' % (fmt.replace('%d', r'(?P<day>([0-2]?[1-9]|3[0-1]))').
+                        replace('%m', r'(?P<month>(0?[1-9]|1[0-2]))').
+                        replace('%Y', r'(?P<year>\d{4})').
+                        replace('%H', r'(?P<hour>([0-1]?[0-9]|2[0-3]))').
+                        replace('%M', r'(?P<minute>[0-5][0-9])').
+                        replace('%S', r'(?P<second>[0-5][0-9])').
+                        replace(' ', r'\s'))
 
                 m1 = re.search(regex, s)
                 if m1:
@@ -677,7 +641,6 @@ class DashboardController(BaseController):
                             field_value = field_value.strip()
 
                     update[field_name_] = field_value
-                    #logger.debug('%s=%s' % (field_name, field_value))
 
             def _exec_post_conditions(moment, app_name, update):
                 if app_name:
@@ -849,13 +812,9 @@ class DashboardController(BaseController):
                 _created = row['_created'].strftime(datetime_fmt) if row['_created'] else None
                 _updated = row['_updated'].strftime(datetime_fmt) if row['_updated'] else None
 
-        #logger.debug(row)
-
         # get attributes
         attributes = []
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
-
-            #logger.debug('%s [%s]' % (attr.name, attr_priv.access))
 
             value = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
@@ -867,9 +826,7 @@ class DashboardController(BaseController):
                 value = default_values[attr.name]
 
             elif row:
-                #logger.debug(row[attr.name])
-                #logger.debug(attr)
-                if row[attr.name] != None:
+                if row[attr.name] is not None:
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
                         value = datetostr(row[attr.name], fmt=date_fmt)
@@ -890,8 +847,6 @@ class DashboardController(BaseController):
                              type=attr.type, value=value, required=attr.required,
                              related_class=None, related_class_title='',
                              read_only=read_only, vals=None, field_regex=attr.field_regex,)
-
-            #logger.debug('%s = %s' % (attr.name, repr(value)))
 
             attributes.append(attribute)
 
@@ -949,8 +904,9 @@ class DashboardController(BaseController):
 
             # check privilege on this class
             if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
-            not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or \
-                 '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
+                not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or
+                     '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
+
                 return dict(status=False,
                             message=_('Sorry, you do not have privilege on this class'))
 
@@ -961,7 +917,7 @@ class DashboardController(BaseController):
             try:
                 id_ = int(id_)
 
-            except:
+            except ValueError:
                 id_ = sj.loads(id_)
 
             if isinstance(id_, int):
