@@ -1295,6 +1295,7 @@ var __DEFAULT_FILTER = 'default';
                     
                     var params = {};
                     params[data.param_name] = id;
+                    params[data.param_name + '$'] = JSON.stringify(ids);
                     
                     var button_title = "{{_('Ok')}}";
                     if (data.button_title) {
@@ -1416,13 +1417,18 @@ var __DEFAULT_FILTER = 'default';
             var act = self.getAction(action_name);
             
             if (typeof(item) !== 'number') {
-                var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row');
+                var id = item.parent().parent().find('.sp-grid-rowid').attr('id_row')*1;
             }
             else {
                 var id = item;
             }
+
+            var ids = self.getSelectedIds();
+            if (ids.length == 0) {
+                ids = [id];
+            }
             
-            _run_action(id, [], act, ctrl, shift);
+            _run_action(id, ids, act, ctrl, shift);
         }
 
         // new
@@ -1442,14 +1448,15 @@ var __DEFAULT_FILTER = 'default';
             // delete
             var delete_selector = sprintf('#%s .delete_inline', self.name);
             $(document).off('click', delete_selector).on('click', delete_selector, function(event) {
-                var ids = self.getSelectedIds();
-                if (ids.length == 0) {
-                    var id = $(this).parent().parent().find('.sp-grid-rowid').attr('id_row');
-                    ids = [id];
-                }
+                // var ids = self.getSelectedIds();
+                // if (ids.length == 0) {
+                //     var id = $(this).parent().parent().find('.sp-grid-rowid').attr('id_row');
+                //     ids = [id];
+                // }
                 
-                var act = self.getAction('delete');
-                self.std_delete(ids, act.url);
+                // var act = self.getAction('delete');
+                // self.std_delete(ids, act.url);
+                run_action($(this), 'delete', false, false);
             });
     
             // docs
@@ -1600,130 +1607,130 @@ var __DEFAULT_FILTER = 'default';
     }
 
     // std_delete
-    SapnsGrid.prototype.std_delete = function(ids, url) {
+    // SapnsGrid.prototype.std_delete = function(ids, url) {
 
-        var self = this,
-            cls = self.cls,
-            in_progress = false;
+    //     var self = this,
+    //         cls = self.cls,
+    //         in_progress = false;
         
-        var id = JSON.stringify(ids);
+    //     var id = JSON.stringify(ids);
 
-        var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
-                "<p id='object-title'></p><div class='wait-message' style='display:none'>{{_('Wait, please')}}...</div>";
+    //     var delete_html = "<p id='delete-question'>{{_('Do you really want to delete this record?')}}</p>" +
+    //             "<p id='object-title'></p><div class='wait-message' style='display:none'>{{_('Wait, please')}}...</div>";
 
-        var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
-                "<div id='delete-error-message'></div>";
+    //     var error_html = "<p id='delete-error-title'>{{_('Oops, something went wrong...')}}</p>" +
+    //             "<div id='delete-error-message'></div>";
 
-        $('#grid-dialog_' + self.name).html(delete_html);
+    //     $('#grid-dialog_' + self.name).html(delete_html);
 
-        // get object's title
-        var title = '';
-        $.ajax({
-            url: "{{tg.url('/dashboard/title/')}}",
-            data: { cls: cls, id: id },
-            success: function(res) {
-                if (res.status) {
-                    var title;
-                    if (typeof (res.title) === 'string') {
-                        title = res.title;
-                    } else {
-                        title = res.title.join(' | ');
-                    }
+    //     // get object's title
+    //     var title = '';
+    //     $.ajax({
+    //         url: "{{tg.url('/dashboard/title/')}}",
+    //         data: { cls: cls, id: id },
+    //         success: function(res) {
+    //             if (res.status) {
+    //                 var title;
+    //                 if (typeof (res.title) === 'string') {
+    //                     title = res.title;
+    //                 } else {
+    //                     title = res.title.join(' | ');
+    //                 }
 
-                    $('#grid-dialog_' + self.name + ' #object-title').html(title);
-                }
-            },
-            error: function() {
-                // alert('error!');
-            }
-        });
+    //                 $('#grid-dialog_' + self.name + ' #object-title').html(title);
+    //             }
+    //         },
+    //         error: function() {
+    //             // alert('error!');
+    //         }
+    //     });
 
-        $('#grid-dialog_' + self.name).dialog({
-            title: "{{_('Delete')}}",
-            modal: true,
-            resizable: false,
-            closeOnEscape: false,
-            width: 650,
-            height: 210,
-            buttons: {
-                "{{_('Ok')}}": function() {
-                    if (!in_progress) {
+    //     $('#grid-dialog_' + self.name).dialog({
+    //         title: "{{_('Delete')}}",
+    //         modal: true,
+    //         resizable: false,
+    //         closeOnEscape: false,
+    //         width: 650,
+    //         height: 210,
+    //         buttons: {
+    //             "{{_('Ok')}}": function() {
+    //                 if (!in_progress) {
                         
-                        in_progress = true;
-                        $('#grid-dialog_' + self.name + ' .wait-message').fadeIn();
+    //                     in_progress = true;
+    //                     $('#grid-dialog_' + self.name + ' .wait-message').fadeIn();
                         
-                        $.ajax({
-                            url: url,
-                            data: { cls: cls, id_: id },
-                            dataType: 'json',
-                            success: function(res) {
-                                in_progress = false;
-                                $('#grid-dialog_' + self.name + ' .wait-message').fadeOut();
+    //                     $.ajax({
+    //                         url: url,
+    //                         data: { cls: cls, id_: id },
+    //                         dataType: 'json',
+    //                         success: function(res) {
+    //                             in_progress = false;
+    //                             $('#grid-dialog_' + self.name + ' .wait-message').fadeOut();
                                 
-                                if (res.status) {
-                                    self.search(self.q, true);
-                                    $('#grid-dialog_' + self.name).dialog('close');
-                                } 
-                                else {
-                                    $('#grid-dialog_' + self.name).dialog('close');
+    //                             if (res.status) {
+    //                                 self.search(self.q, true);
+    //                                 $('#grid-dialog_' + self.name).dialog('close');
+    //                             } 
+    //                             else {
+    //                                 $('#grid-dialog_' + self.name).dialog('close');
     
-                                    var message = "<p style='color:#777'>" + res.message + "</p>";
+    //                                 var message = "<p style='color:#777'>" + res.message + "</p>";
     
-                                    if (res.rel_tables != undefined && res.rel_tables.length > 0) {
-                                        message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
-                                        message += "<ul>";
+    //                                 if (res.rel_tables != undefined && res.rel_tables.length > 0) {
+    //                                     message += "<div>{{_('For your information this object is related with other objects in the following classes:')}}</div>";
+    //                                     message += "<ul>";
     
-                                        for (var i = 0; i < res.rel_tables.length; i++) {
-                                            var title = res.rel_tables[i].class_title;
-                                            var attr_title = res.rel_tables[i].attr_title;
-                                            message += '<li><span style="font-weight:bold">'
-                                                    + title
-                                                    + '</span> (<span style="color:#777">'
-                                                    + attr_title + '</span>)</li>';
-                                        }
+    //                                     for (var i = 0; i < res.rel_tables.length; i++) {
+    //                                         var title = res.rel_tables[i].class_title;
+    //                                         var attr_title = res.rel_tables[i].attr_title;
+    //                                         message += '<li><span style="font-weight:bold">'
+    //                                                 + title
+    //                                                 + '</span> (<span style="color:#777">'
+    //                                                 + attr_title + '</span>)</li>';
+    //                                     }
     
-                                        message += "</ul>";
-                                    }
+    //                                     message += "</ul>";
+    //                                 }
     
-                                    // load message
-                                    $('#grid-dialog_'+ self.name).html(error_html)
-                                        .find('#delete-error-message')
-                                        .html(message);
+    //                                 // load message
+    //                                 $('#grid-dialog_'+ self.name).html(error_html)
+    //                                     .find('#delete-error-message')
+    //                                     .html(message);
     
-                                    // show error dialog
-                                    $('#grid-dialog_'+ self.name).dialog({
-                                        width: 700,
-                                        height: 250,
-                                        buttons: {
-                                            "{{_('Close')}}": function() {
-                                                $('#grid-dialog_'+ self.name).dialog('close');
-                                            }
-                                        }
-                                    });
-                                }
-                            },
-                            error: function() {
-                                in_progress = false;
-                                $('#grid-dialog_'+ self.name).dialog('close');
-                                $('#grid-dialog_'+ self.name).html(error_html).dialog({
-                                    buttons: {
-                                        "{{_('Close')}}": function() {
-                                            $('#grid-dialog_'+ self.name).dialog('close');
-                                        }
-                                    }
-                                });
-                            }
-                        });
-                    }
-                },
-                "{{_('Cancel')}}": function() {
-                    if (!in_progress) {
-                        $('#grid-dialog_' + self.name).dialog('close');
-                    }
-                }
-            }
-        });
-    }
+    //                                 // show error dialog
+    //                                 $('#grid-dialog_'+ self.name).dialog({
+    //                                     width: 700,
+    //                                     height: 250,
+    //                                     buttons: {
+    //                                         "{{_('Close')}}": function() {
+    //                                             $('#grid-dialog_'+ self.name).dialog('close');
+    //                                         }
+    //                                     }
+    //                                 });
+    //                             }
+    //                         },
+    //                         error: function() {
+    //                             in_progress = false;
+    //                             $('#grid-dialog_'+ self.name).dialog('close');
+    //                             $('#grid-dialog_'+ self.name).html(error_html).dialog({
+    //                                 buttons: {
+    //                                     "{{_('Close')}}": function() {
+    //                                         $('#grid-dialog_'+ self.name).dialog('close');
+    //                                     }
+    //                                 }
+    //                             });
+    //                         }
+    //                     });
+    //                 }
+    //             },
+    //             "{{_('Cancel')}}": function() {
+    //                 if (!in_progress) {
+    //                     $('#grid-dialog_' + self.name).dialog('close');
+    //                 }
+    //             }
+    //         }
+    //     });
+    // }
     
     SapnsGrid.prototype.selectAll = function(chk) {
         var self = this;
