@@ -1,2 +1,75 @@
-<div style="font-size: 25px;">{{_('Do you really want to delete this record?')}}</div>
-<div style="font-size: 18px; color: navy;">{{title}}</div>
+<did id="sp-delete-dialog">
+    <!--{% if title|length == 1 %}-->
+    <div class="question">{{_('Do you really want to delete this record?')}}</div>
+    <!--{% else %}-->
+    <div class="question">{{_('Do you really want to delete these records?')}}</div>
+    <!--{% endif %}-->
+    
+    <div class="error-message" style="display:none">
+        <div class="error-title">{{_('Oops, something went wrong...')}}</div>
+        <div>{{_('For your information this object is related with other objects in the following classes:')}}</div>
+        <div class="related-classes"></div>
+    </div>
+
+    <div class="title">
+        <!--{% for t in title %}-->
+        <div class="t">{{t}}</div>
+        <!--{% endfor %}-->
+    </div>
+</did>
+
+<script>
+    _loader.load(
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" }
+    );
+
+    function delete_sp(callback, callback_error) {
+        var sbm = new SidebarMessages();
+
+        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
+
+        $.ajax({
+            url: "{{tg.url('/dashboard/delete_/')}}",
+            data: {
+                cls: "{{cls}}",
+                ids: "{{ids}}"
+            },
+            success: function(res) {
+                sbm.hide({ id: id_message });
+
+                if (res.status) {
+                    callback();
+                }
+                else {
+                    callback_error();
+                    if (res.rel_tables.length > 0) {
+                        var items = '';
+                        for (var i=0, l=res.rel_tables.length; i<l; i++) {
+                            var rt = res.rel_tables[i],
+                                li = '<div class="rc">' + rt.class_title + '</div>';
+
+                            items += li;
+                        }
+
+                        $('#sp-delete-dialog .error-message .related-classes').html(items);
+                        $('#sp-delete-dialog .error-message').show();
+                        $('#sp-delete-dialog .question').hide();
+                        $('#sp-delete-dialog .title').hide();
+                    }
+                    else if(res.message) {
+                        alert(res.message);
+                    }
+                    else {
+                        alert('Error!');
+                    }
+                }
+            },
+            error: function() {
+                sbm.hide({ id: id_message });
+
+                callback_error();
+                alert('Error!');
+            }
+        });
+    }
+</script>

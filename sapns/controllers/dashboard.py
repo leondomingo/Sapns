@@ -726,13 +726,12 @@ class DashboardController(BaseController):
 
         logger = logging.getLogger('DashboardController.edit')
 
-        came_from = get_paramw(params, 'came_from', unicode, opcional=True,
-                               por_defecto='/')
-
-        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        user = get_user()
         permissions = request.identity['permissions']
 
-        class_ = SapnsClass.by_name(cls)
+        came_from = get_paramw(params, 'came_from', unicode, opcional=True, por_defecto=user.entry_point())
+
+        class_    = SapnsClass.by_name(cls)
         ch_class_ = SapnsClass.by_name(cls, parent=False)
 
         # log
@@ -891,51 +890,67 @@ class DashboardController(BaseController):
                     lang=init_lang(), languages=get_languages())
 
     @expose('sapns/dashboard/delete.html')
+    @require(p.not_anonymous())
+    @log_access('delete record')
+    def delete(self, **kw):
+
+        cls     = get_paramw(kw, 'cls', unicode)
+        cls_    = SapnsClass.by_name(cls)
+        ch_cls_ = SapnsClass.by_name(cls, parent=False)
+
+        user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        permissions = request.identity['permissions']
+
+        # check privilege on this class
+        if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
+            not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or
+                 '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
+
+            raise HTTPForbidden(_('Sorry, you do not have privilege on this class').encode('utf-8'))
+
+        # get "title" of these objects
+        ids = get_paramw(kw, 'id_$', sj.loads)
+        title_ = []
+        ot = SapnsClass.ObjectTitle(cls)
+        for id_ in ids:
+            title_.append(ot.title(id_))
+
+        return dict(cls=cls, ids=sj.dumps(ids), title=title_)
+
     @expose('json')
     @require(p.not_anonymous())
     @log_access('delete record')
-    def delete(self, cls, id_, **kw):
+    def delete_(self, **kw):
 
-        logger = logging.getLogger('DashboardController.delete')
+        logger = logging.getLogger('DashboardController.delete_')
         rel_tables = []
         try:
+            cls     = get_paramw(kw, 'cls', unicode)
+            cls_    = SapnsClass.by_name(cls)
+            ch_cls_ = SapnsClass.by_name(cls, parent=False)
+
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
             permissions = request.identity['permissions']
-            cls_ = SapnsClass.by_name(cls)
-            ch_cls_ = SapnsClass.by_name(cls, parent=False)
 
             # check privilege on this class
             if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
                 not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or
                      '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
 
-                return dict(status=False,
-                            message=_('Sorry, you do not have privilege on this class'))
+                raise Exception(_('Sorry, you do not have privilege on this class').encode('utf-8'))
 
             # does the record exist?
             meta = MetaData(dbs.bind)
             tbl = Table(cls_.name, meta, autoload=True)
 
-            try:
-                id_ = int(id_)
+            ids = get_paramw(kw, 'ids', sj.loads)
 
-            except ValueError:
-                id_ = sj.loads(id_)
-
-            if isinstance(id_, int):
-                # int
-                this_record = dbs.execute(tbl.select(tbl.c.id == id_)).fetchone()
-                if not this_record:
-                    return dict(status=False, message=_('Record does not exist'))
-
-            else:
-                # array of ints
-                these_records = dbs.execute(tbl.select(tbl.c.id.in_(id_))).fetchall()
-                if len(these_records) != len(id_):
-                    return dict(status=False, message=_('Some records do not exist'))
+            # array of ints
+            these_records = dbs.execute(tbl.select(tbl.c.id.in_(ids))).fetchall()
+            if len(these_records) != len(ids):
+                return dict(status=False, message=_('Some records do not exist'))
 
             # look for objects in other classes that are related with this
-
             rel_classes = cls_.related_classes()
             for rcls in rel_classes:
 
@@ -943,15 +958,7 @@ class DashboardController(BaseController):
                 rtbl = Table(rcls['name'], meta, autoload=True)
                 attr_name = rcls['attr_name']
 
-                if isinstance(id_, int):
-                    # int
-                    i = id_
-
-                else:
-                    # array of ints
-                    i = id_[0]
-
-                sel = rtbl.select(whereclause=rtbl.c[attr_name] == int(i))
+                sel = rtbl.select(whereclause=rtbl.c[attr_name] == ids[0])
                 robj = dbs.execute(sel).fetchone()
 
                 if robj != None:
@@ -961,29 +968,16 @@ class DashboardController(BaseController):
                 else:
                     logger.debug('---No related objects have been found')
 
-            # delete record
-            if isinstance(id_, int):
-                # int
-                tbl.delete(tbl.c.id == id_).execute()
+            # delete record/s
+            tbl.delete(tbl.c.id.in_(ids)).execute()
 
+            for row_id in ids:
                 # log
                 SapnsLog.register(table_name=cls_.name,
-                                  row_id=id_,
+                                  row_id=row_id,
                                   who=user.user_id,
                                   what=_('delete'),
                                   )
-
-            else:
-                # array of int's
-                tbl.delete(tbl.c.id.in_(id_)).execute()
-
-                for i in id_:
-                    # log
-                    SapnsLog.register(table_name=cls_.name,
-                                      row_id=i,
-                                      who=user.user_id,
-                                      what=_('delete'),
-                                      )
 
             dbs.flush()
 
