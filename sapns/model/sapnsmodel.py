@@ -2233,7 +2233,7 @@ class SapnsLog(DeclarativeBase):
                             )).\
                 first()
 
-            create_log = cls != None
+            create_log = cls is not None
 
         if create_log:
             for k, v in kw.iteritems():
