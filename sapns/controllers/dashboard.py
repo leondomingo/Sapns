@@ -37,6 +37,7 @@ import simplejson as sj
 from sapns.lib.sapns.mongo import Mongo
 from bson.objectid import ObjectId
 import sapns.lib.sapns.to_xls as toxls
+import sapns.lib.sapns.delete as sapns_delete
 import sapns.lib.sapns.merge as sapns_merge
 from webob.exc import HTTPForbidden
 
@@ -891,12 +892,14 @@ class DashboardController(BaseController):
 
     @expose('sapns/dashboard/delete.html')
     @require(p.not_anonymous())
-    @log_access('delete record')
+    @log_access('delete record (1)')
     def delete(self, **kw):
 
         cls     = get_paramw(kw, 'cls', unicode)
         cls_    = SapnsClass.by_name(cls)
         ch_cls_ = SapnsClass.by_name(cls, parent=False)
+
+        ids = get_paramw(kw, 'id_$', sj.loads)
 
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
         permissions = request.identity['permissions']
@@ -909,7 +912,6 @@ class DashboardController(BaseController):
             raise HTTPForbidden(_('Sorry, you do not have privilege on this class').encode('utf-8'))
 
         # get "title" of these objects
-        ids = get_paramw(kw, 'id_$', sj.loads)
         title_ = []
         ot = SapnsClass.ObjectTitle(cls)
         for id_ in ids:
@@ -919,7 +921,7 @@ class DashboardController(BaseController):
 
     @expose('json')
     @require(p.not_anonymous())
-    @log_access('delete record')
+    @log_access('delete record (2)')
     def delete_(self, **kw):
 
         logger = logging.getLogger('DashboardController.delete_')
@@ -929,7 +931,9 @@ class DashboardController(BaseController):
             cls_    = SapnsClass.by_name(cls)
             ch_cls_ = SapnsClass.by_name(cls, parent=False)
 
-            user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+            ids = get_paramw(kw, 'ids', sj.loads)
+
+            user = get_user()
             permissions = request.identity['permissions']
 
             # check privilege on this class
@@ -939,13 +943,10 @@ class DashboardController(BaseController):
 
                 raise Exception(_('Sorry, you do not have privilege on this class').encode('utf-8'))
 
-            # does the record exist?
-            meta = MetaData(dbs.bind)
-            tbl = Table(cls_.name, meta, autoload=True)
+            meta = MetaData(bind=dbs.bind)
+            tbl = Table(cls, meta, autoload=True)
 
-            ids = get_paramw(kw, 'ids', sj.loads)
-
-            # array of ints
+            # check records existence
             these_records = dbs.execute(tbl.select(tbl.c.id.in_(ids))).fetchall()
             if len(these_records) != len(ids):
                 return dict(status=False, message=_('Some records do not exist'))
@@ -961,16 +962,40 @@ class DashboardController(BaseController):
                 sel = rtbl.select(whereclause=rtbl.c[attr_name] == ids[0])
                 robj = dbs.execute(sel).fetchone()
 
-                if robj != None:
+                if robj is not None:
                     rel_tables.append(dict(class_title=rcls['title'],
                                            attr_title=rcls['attr_title']))
 
                 else:
                     logger.debug('---No related objects have been found')
 
-            # delete record/s
-            tbl.delete(tbl.c.id.in_(ids)).execute()
+            # get "deleter"
+            p_delete = SapnsPermission.by_name(u'%s#delete' % cls)
+            deleter = None
+            if p_delete.data:
+                delete_data = sj.loads(p_delete.data)
+                deleter = delete_data.get('extra_params', {}).get('deleter')
 
+            # deleter
+            if deleter:
+                logger.info(u'Deleting records using "%s"' % deleter)
+
+                pkg = '.'.join(deleter.split('.')[:-1]).encode('utf-8')
+                func_name = deleter.split('.')[-1].encode('utf-8')
+
+                m = __import__(pkg, fromlist=[func_name])
+                func = getattr(m, func_name)
+                if isinstance(func, type):
+                    func = func()
+
+                rel_tables = func(cls, ids)
+
+            else:
+                # default
+                logger.info(u'Deleting records with standard function')
+                rel_tables = sapns_delete.delete_(cls, ids)
+
+            # log registration for each row
             for row_id in ids:
                 # log
                 SapnsLog.register(table_name=cls_.name,
@@ -978,8 +1003,6 @@ class DashboardController(BaseController):
                                   who=user.user_id,
                                   what=_('delete'),
                                   )
-
-            dbs.flush()
 
             # success!
             return dict(status=True)
