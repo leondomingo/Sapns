@@ -66,7 +66,7 @@ js.first_day         = 1
 app.name            = Sapns
 app.subtitle        = Web Information System
 app.company_url     = http://www.sapns.org
-# app.root_folder = 
+# app.root_folder =
 # app.update_folder =
 # app.custom_list = sapns.lib.foo.lists.ListFoo
 app.home            = /dashboard
@@ -76,6 +76,8 @@ app.language_cookie = sp_language
 app.languages       = en#English,es#Español
 
 htmltopdf.path      = /path/to/wkhtmltopdf/
+htmltopdf.version   = 0.11
+# htmltopdf.version   = 0.9
 
 # log_access
 # 1=active, (anything else)=not active
@@ -98,7 +100,16 @@ app.mailsender.smtp     = smtp.domain.com
 sqlalchemy.url          = postgresql://postgres:pswd@localhost/sapns
 sqlalchemy.echo         = false
 sqlalchemy.echo_pool    = false
-sqlalchemy.pool_recycle = 3600
+sqlalchemy.pool_recycle = 900
+
+# MongoDB (***following forms are all equivalent***)
+### full URL with user, password, host, port and dbname
+# mongodb.url      = mongodb://user:psswd@localhost:27017/thename
+### partial URL with host, port and dbname
+# mongodb.url      = mongodb://localhost:27017/thename
+### simplest way using only host (plus "dbname", below)
+mongodb.url      = localhost
+mongodb.dbname   = thename
 
 #turn this setting to "min" if you would like tw to produce minified
 #javascript files (if your library supports that)
