@@ -17,19 +17,22 @@ class Mongo(object):
 
     def __init__(self):
 
-        DEFAULT_PORT = 27017
-
         mongodb_url = config.get(self.mongo_setting('url'))
         # localhost
         # localhost:27017
         # 100.100.100.100
         # 100.100.100.100:28987
-        m = re.search(r'^([^:]+)(:\d+)?$', mongodb_url)
-        if m:
-            mongo_host = m.group(1)
-            mongo_port = int(m.group(2) or DEFAULT_PORT)
-            self.conn = pymongo.MongoClient(mongo_host, mongo_port)
-            self.db = self.conn[config.get(self.mongo_setting('dbname'))]
+        # mongodb://foo.bar.com:39768/dbname
+        # mongodb://user:password@foo.bar.com:39768/dbname
+        self.conn = pymongo.MongoClient(mongodb_url)
+        m_dbname = re.search(r'/(\w+)$', mongodb_url)
+        if m_dbname:
+            dbname = m_dbname.group(1)
+
+        else:
+            dbname = config.get(self.mongo_setting('dbname'))
+
+        self.db = self.conn[dbname]
 
     def mongo_setting(self, setting_name):
         return 'mongodb.%s' % setting_name
