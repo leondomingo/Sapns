@@ -1317,7 +1317,7 @@ var __DEFAULT_FILTER = 'default';
                     // init dialog
                     var dialog_id = self.name + '_dialog';
                     $('#'+dialog_id).remove();
-                    $('<div id="' + dialog_id + '" style="display:none"></div>').appendTo('body');
+                    var dlg = $('<div id="' + dialog_id + '" style="display:none"></div>').appendTo('body');
                     
                     // buttons
                     var buttons = [];
@@ -1343,7 +1343,7 @@ var __DEFAULT_FILTER = 'default';
                                         self.search(self.q, true);
                                     }
                                     
-                                    $('#'+dialog_id).dialog('close');
+                                    dlg.dialog('close');
                                 },
                                 function() {
                                     on_progress = false;
@@ -1367,26 +1367,49 @@ var __DEFAULT_FILTER = 'default';
                         text: "{{_('Cancel')}}",
                         click: function() {
                             if (!on_progress) {
-                                $('#'+dialog_id).dialog('close');
+                                dlg.dialog('close');
                             }
-                        
                         }
                     });
                     
                     // load dialog content
+                    var success,
+                        dialog_params = {
+                            title: act.title,
+                            modal: true,
+                            resizable: false,
+                            width: data.width || 'auto',
+                            height: data.height || 'auto',
+                            closeOnEscape: false,
+                            buttons: buttons
+                        };
+
+                    if (data.json_load) {
+                        // res
+                        //    status   <bool>
+                        //    content  <str> (HTML)
+                        success = function(res) {
+                            if (res.status) {
+                                dlg.html(res.content).dialog(dialog_params);
+                            }
+                            else {
+                                alert('Error!');
+                            }
+                        }
+                    }
+                    else {
+                        // "content" contains the HTML itself
+                        success = function(content) {
+                            dlg.html(content).dialog(dialog_params);
+                        }
+                    }
+
                     $.ajax({
                         url: a,
                         data: params,
-                        success: function(content) {
-                            $('#'+dialog_id).html(content).dialog({
-                                title: act.title,
-                                modal: true,
-                                resizable: false,
-                                width: data.width,
-                                height: data.height,
-                                closeOnEscape: false,
-                                buttons: buttons,
-                            });
+                        success: success,
+                        error: function() {
+                            alert('Error!');
                         }
                     });
                 }
