@@ -1264,10 +1264,10 @@ var __DEFAULT_FILTER = 'default';
                     else if (act.type === 'new') {
                         a += sprintf('%s/', self.cls);
                     }
-                    else if (act.type === 'delete') {
-                        self.std_delete(ids, act.url);
-                        return;
-                    }
+                    // else if (act.type === 'delete') {
+                    //     self.std_delete(ids, act.url);
+                    //     return;
+                    // }
                     else {
                         if (act.require_id) {
                             if (id) {
