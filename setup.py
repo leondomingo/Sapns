@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import sys
 try:
     from setuptools import setup, find_packages
 except ImportError:
@@ -9,7 +10,7 @@ except ImportError:
 
 setup(
     name='sapns',
-    version='0.8',
+    version='0.9',
     description='Web platform by Ender',
     author='León Domingo',
     author_email='leon.domingo@ender.es',
@@ -28,7 +29,7 @@ setup(
         "repoze.who.plugins.sa",
         "tw2.forms",
         "Neptuno2",
-        "argparse",
+        "argparse" if sys.version_info < (2, 7) else "",
         "pymongo",
         "slimit",
         "pyScss",
