@@ -45,7 +45,7 @@ class ScheduledTask(object):
                 # cStringIO.StringIO
                 file_data = f.getvalue()
             else:
-                file_data = f.file
+                file_data = f.read()
 
             file_id = self.fs.put(file_data)
 
