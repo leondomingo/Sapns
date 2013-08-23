@@ -45,8 +45,8 @@ class List(object):
 
         self.kw = kw
 
-        self.q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
-        self.rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        self.q     = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
+        self.rp    = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
         self.pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
 
         came_from = kw.get('came_from', '')
@@ -239,7 +239,8 @@ class List(object):
             if not s:
                 s = Search(dbs, view_name, strtodatef=_strtodate)
                 s.apply_qry(self.q.encode('utf-8'))
-                s.apply_filters(filters)
+
+            s.apply_filters(filters)
 
             # "deferred" (variable) filters
             if self.view:
