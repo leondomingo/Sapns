@@ -45,8 +45,8 @@ class List(object):
 
         self.kw = kw
 
-        self.q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
-        self.rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        self.q     = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
+        self.rp    = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
         self.pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
 
         came_from = kw.get('came_from', '')
@@ -125,7 +125,7 @@ class List(object):
                               shift_enabled=shift_enabled_,
                               ))
 
-    def grid(self, **kw):
+    def grid(self, ds=None, **kw):
         """
         OUT
           {
@@ -138,8 +138,8 @@ class List(object):
            total_pag: <int>
           }
         """
-
-        ds = self.grid_data(**kw)
+        if not ds:
+            ds = self.grid_data(**kw)
 
         # Reading global settings
         ds.date_fmt = date_fmt
@@ -157,9 +157,10 @@ class List(object):
         if default_width < min_width:
             default_width = min_width
 
-        view_cols = [default_width]*len(ds.labels)
+        view_cols = [default_width] * len(ds.labels)
         if self.view:
-            for i, a in enumerate(sorted(self.view.get('attributes_detail', []), cmp=lambda x,y: cmp(x.get('order', 0), y.get('order', 0)))):
+            cmp_ = lambda x, y: cmp(x.get('order', 0), y.get('order', 0))
+            for i, a in enumerate(sorted(self.view.get('attributes_detail', []), cmp=cmp_)):
                 view_cols[i] = a.get('width', default_width)
 
             # user - col_widths
@@ -207,7 +208,7 @@ class List(object):
 
     def grid_data(self, **kw):
         try:
-            pos = (self.pag_n-1) * self.rp
+            pos = (self.pag_n - 1) * self.rp
 
             # filters
             filters = get_paramw(self.kw, 'filters', sj.loads, opcional=True)
@@ -234,8 +235,11 @@ class List(object):
                 col = (self.cls, self.ch_attr, self.parent_id,)
 
             # get dataset
-            s = Search(dbs, view_name, strtodatef=_strtodate)
-            s.apply_qry(self.q.encode('utf-8'))
+            s = kw.get('search')
+            if not s:
+                s = Search(dbs, view_name, strtodatef=_strtodate)
+                s.apply_qry(self.q.encode('utf-8'))
+
             s.apply_filters(filters)
 
             # "deferred" (variable) filters
