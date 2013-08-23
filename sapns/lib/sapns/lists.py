@@ -49,6 +49,8 @@ class List(object):
         self.rp    = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
         self.pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
 
+        self.ds = None
+
         came_from = kw.get('came_from', '')
         if came_from:
             came_from = url(came_from)
@@ -141,6 +143,8 @@ class List(object):
         if not ds:
             ds = self.grid_data(**kw)
 
+        self.ds = ds
+
         # Reading global settings
         ds.date_fmt = date_fmt
         ds.time_fmt = config.get('formats.time', default='%H:%M')
@@ -210,9 +214,6 @@ class List(object):
         try:
             pos = (self.pag_n - 1) * self.rp
 
-            # filters
-            filters = get_paramw(self.kw, 'filters', sj.loads, opcional=True)
-
             cls_ = SapnsClass.by_name(self.cls)
             ch_cls_ = SapnsClass.by_name(self.cls, parent=False)
 
@@ -240,7 +241,8 @@ class List(object):
                 s = Search(dbs, view_name, strtodatef=_strtodate)
                 s.apply_qry(self.q.encode('utf-8'))
 
-            s.apply_filters(filters)
+            # filters
+            s.apply_filters(get_paramw(self.kw, 'filters', sj.loads, opcional=True))
 
             # "deferred" (variable) filters
             if self.view:
