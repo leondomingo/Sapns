@@ -146,7 +146,7 @@ def update_metadata():
     pending_attr = {}
     for tbl in tables:
 
-        logger.info('Table: %s' % tbl['name'])
+        logger.info('Table: {name}'.format(tbl['name']))
 
         klass = dbs.query(SapnsClass).\
             filter(SapnsClass.name == tbl['name']).\
@@ -159,7 +159,7 @@ def update_metadata():
             klass.name = tbl['name']
             klass.title = tbl['name'].title()
             desc = unicode(l_('Class: %s'))
-            klass.description =  desc % tbl['name']
+            klass.description = desc % tbl['name']
 
             dbs.add(klass)
             dbs.flush()
@@ -241,7 +241,7 @@ def update_metadata():
                     # col['prec']
                     # col['scale']
                     attr.field_regex = r'^\s*(\+|\-)?\d{1,%d}(\.\d{1,%d})?\s*$' % \
-                        (col['prec']-col['scale'], col['scale'])
+                        (col['prec'] - col['scale'], col['scale'])
 
                 elif attr.type == SapnsAttribute.TYPE_TIME:
                     attr.field_regex = r'^\s*([01][0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?\s*$'
@@ -288,7 +288,7 @@ def create_dashboards(us):
 
     logger = logging.getLogger('lib.sapns.util.create_dashboards')
 
-    logger.info('Creating dashboard for "%s"' % us.display_name)
+    logger.info('Creating dashboard for "{user}"'.format(user=us.display_name))
 
     # user's dashboard
     dboard = us.get_dashboard()
@@ -372,7 +372,8 @@ def create_data_exploration():
 
             if not act_table:
                 act_table = SapnsPermission()
-                act_table.permission_name = '%s#%s' % (cls.name, SapnsPermission.TYPE_LIST)
+                act_table.permission_name = '{class_name}#{list}'.format(class_name=cls.name,
+                                                                         list=SapnsPermission.TYPE_LIST)
                 act_table.display_name = unicode(l_('List'))
                 act_table.type = SapnsPermission.TYPE_LIST
                 act_table.class_id = cls.class_id
@@ -502,10 +503,10 @@ def topdf(html_content, check_call=True, **kw):
 def pagination(rp, pag_n, total):
 
     # total number of pages
-    pos = (pag_n-1)*(rp or 0)
+    pos = (pag_n - 1) * (rp or 0)
     total_pag = 1
     if rp > 0:
-        total_pag = total/rp
+        total_pag = total / rp
 
         if total % rp != 0:
             total_pag += 1
@@ -629,8 +630,8 @@ def log_access(*dargs, **dkwargs):
                                         remote_addr=request.remote_addr,
                                         referer=request.referer)
 
+                        now_ = dt.datetime.now()
                         if len(dargs) > 0:
-                            now_ = dt.datetime.now()
                             if isinstance(dargs[0], str):
                                 SapnsAccess(u['user'].user_id, now_, *dargs, args_=args, kwargs_=kwargs,
                                             request=request_, **dkwargs)()
@@ -668,7 +669,7 @@ def get_template(tmpl_name, default_tmpl=None):
 def get_list():
     logger = logging.getLogger('get_list')
     try:
-        custom_list = config.get('app.custom_list', 'sapns.lib.%s.lists.CustomList' % config.get('app.root_folder'))
+        custom_list = config.get('app.custom_list', 'sapns.lib.{root_folder}.lists.CustomList'.format(root_folder=config.get('app.root_folder')))
         p = '.'.join(custom_list.split('.')[:-1])
         cls = custom_list.split('.')[-1]
 
@@ -697,7 +698,7 @@ def get_module(module_name, class_name=None, default_module_name=None):
         if not class_name:
             # module_name = 'sapns.lib.foo.bar.Baz', class_name=None
             module_name, class_name_ = _get_module(module_name)
-            
+
         else:
             class_name_ = class_name
 

@@ -18,6 +18,10 @@ from sqlalchemy import and_
 COLLECTION_CHAR = 'c'
 
 
+def get_view_name(name):
+    return '{prefix}{name}'.format(prefix=config.get('views_prefix', '_view_'), name=name)
+
+
 def get_query(view_id):
 
     logger = logging.getLogger('sapns.lib.sapns.views.get_query')
@@ -56,7 +60,7 @@ def get_query(view_id):
         alias_ = re.sub(r'_%s?%s$' % (COLLECTION_CHAR, attribute_id), '', alias_)
 
         if not re.search(r'_%s?\d+$' % COLLECTION_CHAR, alias_):
-            alias_ = '%s_0' % alias_
+            alias_ = '{alias}_0'.format(alias=alias_)
 
         logger.debug((alias_, attribute_.name,))
         return alias_, attribute_.name
@@ -84,12 +88,15 @@ def get_query(view_id):
                 relations__ = []
 
                 if re.search(r'\w+_%s\d+$' % COLLECTION_CHAR, attribute['class_alias']):
-                    relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'], attribute['class_alias'],
+                    relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'],
+                                                                                 attribute['class_alias'],
                                                                                  parent_alias,
-                                                                                 attribute['class_alias'], parent_attribute))
+                                                                                 attribute['class_alias'],
+                                                                                 parent_attribute))
 
                 else:
-                    relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'], attribute['class_alias'],
+                    relations__.insert(0, u'LEFT JOIN %s %s ON %s.id = %s.%s' % (attribute['class_name'],
+                                                                                 attribute['class_alias'],
                                                                                  attribute['class_alias'],
                                                                                  parent_alias, parent_attribute,
                                                                                  ))
@@ -127,7 +134,8 @@ def get_query(view_id):
 
         if not attribute.get('is_filter'):
             col_title = '"%s"' % attribute['title']
-            columns.append(u'%s AS %s' % (attribute['expression'], col_title))
+            columns.append(u'{expression} AS "{title}"'.format(expression=attribute['expression'],
+                                                               title=attribute['title']))
         else:
             if not attribute.get('variable'):
                 filters.append(attribute['expression'])
@@ -136,7 +144,7 @@ def get_query(view_id):
                 # these filters will be applied when the user ask for the view
                 logger.debug(u'variable filter=%s' % attribute['value'])
                 columns.append(u'%s AS "id_%s"' % (attribute['attr'], attribute['attr']))
-                nagg_columns.append('"id_%s"' % attribute['attr'])
+                nagg_columns.append('"id_{attr}"'.format(attr=attribute['attr']))
 
         if not attribute.get('is_filter'):
             m_agg = re.search(r'(SUM|COUNT|MIN|MAX|AVG)\(.+\)', attribute['expression'].upper())
@@ -148,7 +156,7 @@ def get_query(view_id):
 
     group_by = None
     if len(agg_columns):
-        nagg_columns.insert(0, '%s_0.id' % view['base_class'])
+        nagg_columns.insert(0, '{base_class}_0.id'.format(base_class=view['base_class']))
         group_by = 'GROUP BY %s' % (', '.join(nagg_columns))
 
     columns.insert(0, '%s_0.id' % view['base_class'])
@@ -161,19 +169,20 @@ def get_query(view_id):
                             SapnsAttribute.related_class_id != None,
                             )):
 
-            columns.append('%s_0.%s as "%s$"' % (view['base_class'], attr_.name, attr_.name))
+            columns.append('{base_class}_0.{attr_name} as "{attr_name}$"'.format(base_class=view['base_class'],
+                                                                                 attr_name=attr_.name))
 
-    query =  u'SELECT %s\n' % (',\n'.join(columns))
-    query += u'FROM %s %s_0\n' % (view['base_class'], view['base_class'])
+    query  = u'SELECT {columns}\n'.format(columns=',\n'.join(columns))
+    query += u'FROM {base_class} {base_class}_0\n'.format(base_class=view['base_class'])
     query += '\n'.join(relations)
 
     if len(filters):
         # TODO: poder indicar OR
         where_ = ' AND\n'.join(filters)
-        query += '\nWHERE %s' % where_
+        query += '\nWHERE {where}'.format(where=where_)
 
     if group_by:
-        query += '\n%s' % group_by
+        query += '\n{group_by}'.format(group_by=group_by)
 
     logger.debug(query)
     return query
@@ -183,19 +192,37 @@ def drop_view(view_name):
     logger = logging.getLogger('sapns.lib.sapns.views.drop_view')
 
     def _exists_view(name):
-        e = dbs.execute("SELECT count(*) FROM pg_views WHERE viewname = '%s' " % name).fetchone()
+        e = dbs.execute("SELECT count(*) FROM pg_views WHERE viewname = '{name}'".format(name=name)).fetchone()
         return e[0] == 1
 
     try:
         # drop "old" view
         if _exists_view(view_name):
-            logger.debug(u'Dropping view [%s]' % view_name)
-            dbs.execute('DROP VIEW %s' % view_name)
+            logger.debug(u'Dropping view [{view_name}]'.format(view_name=view_name))
+            dbs.execute('DROP VIEW {view_name}'.format(view_name=view_name))
             dbs.flush()
             mark_changed(dbs())
 
     except Exception, e:
         logger.error(e)
+
+
+def drop_view_by_id(view_id):
+    """
+    Drop a view specifying "view_id" (id of "user view" in MongoDB)
+    :param view_id:
+    """
+
+    # logger = logging.getLogger('sapns.lib.sapns.views.drop_view')
+
+    if isinstance(view_id, (str, unicode)):
+        view_id = ObjectId(view_id)
+
+    mdb = Mongo().db
+
+    view = mdb.user_views.find_one(dict(_id=view_id))
+    if view is not None:
+        mdb.user_views.remove(dict(_id=view_id))
 
 
 def translate_view(view_):
@@ -215,10 +242,12 @@ def translate_view(view_):
             class_name = m_expresion.group(1)
             attr_name = m_expresion.group(2)
 
-            logger.debug('%s.%s (is_collection=%s)' % (class_name, attr_name, is_collection))
+            logger.debug('{class_name}.{attr_name} (is_collection={0})'.format(is_collection,
+                                                                               class_name=class_name,
+                                                                               attr_name=attr_name))
 
             attr = SapnsAttribute.by_class_and_name(class_name, attr_name)
-            attributes_.append('%s%s' % (COLLECTION_CHAR if is_collection else '', attr.attribute_id))
+            attributes_.append('{0}{1}'.format(COLLECTION_CHAR if is_collection else '', attr.attribute_id))
 
         a = '#' + '#'.join(attributes_)
 
@@ -234,18 +263,18 @@ def translate_view(view_):
 
         attributes_ = []
         for is_collection, attribute_id in re.findall(r'(%s)?(\d+)' % COLLECTION_CHAR, am)[:-1]:
-            attributes_.append('%s%s' % (is_collection, attribute_id))
+            attributes_.append('{0}{attr_id}'.format(is_collection, attr_id=attribute_id))
 
         if len(attributes_) == 0:
             attributes_ = ['0']
 
         old_class_alias = attribute_detail['class_alias']
 
-        class_alias = '%s_%s' % (attribute_detail['class_name'], '_'.join(attributes_))
+        class_alias = '{class_name}_{attributes}'.format(class_name=attribute_detail['class_name'],
+                                                         attributes='_'.join(attributes_))
         aliases[old_class_alias] = class_alias
 
         attribute_detail['class_alias'] = class_alias
-
         attribute_detail['path'] = mapped_attributes[attribute_detail['path']]
 
     # attributes_detail
@@ -253,10 +282,10 @@ def translate_view(view_):
     for attribute_detail in view['attributes_detail']:
         for old, new in aliases.iteritems():
             # alumnos -> alumnos.
-            old_ = '%s.' % old
-            new_ = '%s.' % new
+            old_ = '{0}.'.format(old)
+            new_ = '{0}.'.format(new)
 
-            logger.debug('%s -> %s' % (old_, new_))
+            logger.debug('{0} -> {1}'.format(old_, new_))
 
             attribute_detail['expression'] = attribute_detail['expression'].replace(old_, new_)
 
@@ -265,8 +294,8 @@ def translate_view(view_):
     for af in view.get('advanced_filters', []):
         for old, new in aliases.iteritems():
             # alumnos -> alumnos.
-            old_ = '%s.' % old
-            new_ = '%s.' % new
+            old_ = '{0}.'.format(old)
+            new_ = '{0}.'.format(new)
 
             logger.debug('%s -> %s' % (old_, new_))
 
@@ -285,21 +314,21 @@ def create_view(view):
 
     query = get_query(view)
 
-    view_name = '%s%s' % (config.get('views_prefix', '_view_'), view['name'])
+    view_name = get_view_name(view['name'])
 
     # drop view before is created
     drop_view(view_name)
 
     # create view
-    logger.debug(u'Creating view "%s"' % view_name)
-    dbs.execute('CREATE VIEW %s AS %s' % (view_name, query))
+    logger.debug(u'Creating view "{view_name}"'.format(view_name=view_name))
+    dbs.execute('CREATE VIEW {view_name} AS {query}'.format(view_name=view_name, query=query))
     dbs.flush()
 
-    # create "class" (if it don't exist already)
+    # create "class" (if it doesn't exist already)
     creation = False
     cls_c = SapnsClass.by_name(view['name'], parent=False)
     if not cls_c:
-        logger.debug(u'Creating class "%s" (%s)' % (view['title'], view['name']))
+        logger.debug(u'Creating class "{title}" ({name})'.format(title=view['title'], name=view['name']))
         cls_c = SapnsClass()
         cls_c.name = view['name']
         cls_c.title = view['title']
@@ -324,7 +353,7 @@ def create_view(view):
     if creation:
         logger.debug(u'Creating "list" permission')
         list_p = SapnsPermission()
-        list_p.permission_name = u'%s#list' % cls_c.name
+        list_p.permission_name = u'{class_name}#list'.format(class_name=cls_c.name)
         list_p.display_name = u'List'
         list_p.class_id = cls_c.class_id
         list_p.type = SapnsPermission.TYPE_LIST

@@ -40,6 +40,7 @@ import sapns.lib.sapns.to_xls as toxls
 import sapns.lib.sapns.delete as sapns_delete
 import sapns.lib.sapns.merge as sapns_merge
 from webob.exc import HTTPForbidden
+import transaction
 
 # controllers
 __all__ = ['DashboardController']
@@ -870,9 +871,9 @@ class DashboardController(BaseController):
             if app_name:
                 try:
                     # pre-conditions
-                    m = __import__('sapns.lib.%s.conditions' % app_name, fromlist=['Conditions'])
+                    m = __import__('sapns.lib.{app_name}.conditions'.format(app_name=app_name), fromlist=['Conditions'])
                     c = m.Conditions()
-                    method_name = '%s_before' % ch_class_.name
+                    method_name = '{class_name}_before'.format(class_name=ch_class_.name)
                     if hasattr(c, method_name):
                         f = getattr(c, method_name)
                         f(id, attributes)
@@ -926,6 +927,7 @@ class DashboardController(BaseController):
 
         logger = logging.getLogger('DashboardController.delete_')
         rel_tables = []
+        transaction.begin()
         try:
             cls     = get_paramw(kw, 'cls', unicode)
             cls_    = SapnsClass.by_name(cls)
@@ -938,8 +940,8 @@ class DashboardController(BaseController):
 
             # check privilege on this class
             if not (user.has_privilege(ch_cls_.name) or user.has_privilege(cls_.name)) or \
-                not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_DELETE) in permissions or
-                     '%s#%s' % (cls_.name, SapnsPermission.TYPE_DELETE) in permissions):
+                not ('{class_name}#{delete}'.format(class_name=ch_cls_.name, delete=SapnsPermission.TYPE_DELETE) in permissions or
+                     '{class_name}#{delete}'.format(class_name=cls_.name, delete=SapnsPermission.TYPE_DELETE) in permissions):
 
                 raise Exception(_('Sorry, you do not have privilege on this class').encode('utf-8'))
 
@@ -955,7 +957,8 @@ class DashboardController(BaseController):
             rel_classes = cls_.related_classes()
             for rcls in rel_classes:
 
-                logger.debug('Related class: "%s.%s"' % (rcls['name'], rcls['attr_name']))
+                logger.debug('Related class: "{class_name}.{attr_name}"'.format(class_name=rcls['name'],
+                                                                                attr_name=rcls['attr_name']))
                 rtbl = Table(rcls['name'], meta, autoload=True)
                 attr_name = rcls['attr_name']
 
@@ -970,7 +973,7 @@ class DashboardController(BaseController):
                     logger.debug('---No related objects have been found')
 
             # get "deleter"
-            p_delete = SapnsPermission.by_name(u'%s#delete' % cls)
+            p_delete = SapnsPermission.by_name(u'{class_name}#delete'.format(class_name=cls))
             deleter = None
             if p_delete.data:
                 delete_data = sj.loads(p_delete.data)
@@ -978,7 +981,7 @@ class DashboardController(BaseController):
 
             # deleter
             if deleter:
-                logger.info(u'Deleting records using "%s"' % deleter)
+                logger.info(u'Deleting records using "{deleter}"'.format(deleter=deleter))
 
                 pkg = '.'.join(deleter.split('.')[:-1]).encode('utf-8')
                 func_name = deleter.split('.')[-1].encode('utf-8')
@@ -1005,9 +1008,11 @@ class DashboardController(BaseController):
                                   )
 
             # success!
+            transaction.commit()
             return dict(status=True)
 
         except Exception, e:
+            transaction.abort()
             logger.error(e)
             return dict(status=False, message=str(e), rel_tables=rel_tables)
 
