@@ -65,7 +65,7 @@ class SapnsRole(Group):
                 return False
 
         _cache = cache.get_cache('role_has_privilege')
-        _key = '%s_%d' % (id_class, self.group_id)
+        _key = '{class_id}_{group}'.format(class_id=id_class, group=self.group_id)
         if no_cache:
             _cache.remove_value(key=_key)
 
@@ -250,7 +250,7 @@ class SapnsUser(User):
             return __get_shortcuts(id_parent)
 
         _cache = cache.get_cache('user_get_shortcuts')
-        _key = '%d_%d' % (self.user_id, id_parent)
+        _key = '{user_id}_{parent}'.format(user_id=self.user_id, parent=id_parent)
         return _cache.get_value(key=_key, createfunc=_get_shortcuts, expiretime=1)
 
     def copy_from(self, other_id):
@@ -595,7 +595,7 @@ class SapnsShortcut(DeclarativeBase):
 
         return new_sc
 
-    REORDER_TYPE_UP = 'up'
+    REORDER_TYPE_UP   = 'up'
     REORDER_TYPE_DOWN = 'down'
 
     def reorder(self, type_='up'):
@@ -750,8 +750,8 @@ class SapnsClass(DeclarativeBase):
         MAX_VALUES = 5000
 
         sel = select(names, from_obj=qry, use_labels=True).\
-                order_by(*tuple(names[1:])).\
-                limit(MAX_VALUES)
+            order_by(*tuple(names[1:])).\
+            limit(MAX_VALUES)
 
         logger.debug(sel)
 
@@ -841,8 +841,8 @@ class SapnsClass(DeclarativeBase):
 
         if id_object and not _title:
             cls = SapnsClass.by_name(class_name)
-            _title = '[%s: %s]' % (cls.title, id_object)
-            logger.debug(u'no_title: %s' % _title)
+            _title = '[{cls}: {object_id}]'.format(cls=cls.title, object_id=id_object)
+            logger.debug(u'no_title: {title}'.format(title=_title))
 
         return _title
 
@@ -924,7 +924,7 @@ class SapnsClass(DeclarativeBase):
             return sorted(actions, cmp=cmp_act)
 
         _cache = cache.get_cache(SapnsPermission.CACHE_ID)
-        return _cache.get_value(key='%d_%d' % (id_user, self.class_id),
+        return _cache.get_value(key='{user_id}_{class_id}'.format(user_id=id_user, class_id=self.class_id),
                                 createfunc=_sorted_actions, expiretime=3600)
 
     def insertion(self):
@@ -992,10 +992,10 @@ class SapnsClass(DeclarativeBase):
         """
 
         attr = dbs.query(SapnsAttribute).\
-                filter(and_(SapnsAttribute.class_id == self.class_id,
-                            SapnsAttribute.name == attr_name,
-                            )).\
-                first()
+            filter(and_(SapnsAttribute.class_id == self.class_id,
+                        SapnsAttribute.name == attr_name,
+                        )).\
+            first()
 
         return attr
 
@@ -1084,16 +1084,17 @@ class SapnsClass(DeclarativeBase):
                     order_by(SapnsAttribute.insertion_order):
 
                 # what about the privileges on the related class?
-                if class_attr_priv.has_key(attr.attribute_id):
+                if attr.attribute_id in class_attr_priv:
 
                     if attr.related_class_id and \
-                    class_attr_priv[attr.attribute_id].access == SapnsAttrPrivilege.ACCESS_READWRITE:
+                            class_attr_priv[attr.attribute_id].access == SapnsAttrPrivilege.ACCESS_READWRITE:
 
                         # related class
                         rc = dbs.query(SapnsClass).get(attr.related_class_id)
 
                         if not user.has_privilege(rc.name) or \
-                        not user.has_permission(u'%s#%s' % (rc.name, SapnsPermission.TYPE_LIST)):
+                                not user.has_permission(u'{class_name}#{list}'.format(class_name=rc.name,
+                                                                                      list=SapnsPermission.TYPE_LIST)):
                             class_attr_priv[attr.attribute_id].access = SapnsAttrPrivilege.ACCESS_READONLY
 
                     class_attributes.append(
@@ -1114,6 +1115,7 @@ class SapnsClass(DeclarativeBase):
         return _cache.get_value(key='%d_%d' % (self.class_id, id_user),
                                 createfunc=_get_attributes, expiretime=3600)
 
+
 class SapnsAttribute(DeclarativeBase):
 
     __tablename__ = 'sp_attributes'
@@ -1123,16 +1125,16 @@ class SapnsAttribute(DeclarativeBase):
     name = Column(Unicode(60), nullable=False)
     title = Column(Unicode(100), nullable=False)
 
-    TYPE_INTEGER = 'int'
-    TYPE_BOOLEAN = 'bool'
-    TYPE_FLOAT = 'float'
-    TYPE_STRING = 'str'
-    TYPE_MEMO = 'memo'
-    TYPE_DATE = 'date'
-    TYPE_TIME = 'time'
+    TYPE_INTEGER  = 'int'
+    TYPE_BOOLEAN  = 'bool'
+    TYPE_FLOAT    = 'float'
+    TYPE_STRING   = 'str'
+    TYPE_MEMO     = 'memo'
+    TYPE_DATE     = 'date'
+    TYPE_TIME     = 'time'
     TYPE_DATETIME = 'datetime'
-    TYPE_IMAGE = 'img'
-    TYPE_URL = 'url'
+    TYPE_IMAGE    = 'img'
+    TYPE_URL      = 'url'
 
     type = Column(Unicode(20), nullable=False)
     required = Column(Boolean, DefaultClause('false'), default=False)
@@ -1176,6 +1178,7 @@ SapnsClass.attributes = \
 SapnsClass.related_attributes = \
     relation(SapnsAttribute, backref='related_class',
              primaryjoin=SapnsClass.class_id == SapnsAttribute.related_class_id)
+
 
 class SapnsPrivilege(DeclarativeBase):
 
@@ -1298,6 +1301,7 @@ class SapnsPrivilege(DeclarativeBase):
     def remove_privilege(id_class, **kw):
         return SapnsPrivilege._update_privilege(id_class, False, **kw)
 
+
 class SapnsAttrPrivilege(DeclarativeBase):
 
     __tablename__ = 'sp_attr_privileges'
@@ -1321,8 +1325,8 @@ class SapnsAttrPrivilege(DeclarativeBase):
 
     access = Column(Unicode(15)) # denied, read-only, read/write
 
-    ACCESS_DENIED = u'denied'
-    ACCESS_READONLY = u'read-only'
+    ACCESS_DENIED    = u'denied'
+    ACCESS_READONLY  = u'read-only'
     ACCESS_READWRITE = u'read/write'
 
     CACHE_ID = 'attrpriv_get_access'
@@ -1358,9 +1362,9 @@ class SapnsAttrPrivilege(DeclarativeBase):
 
             # user based
             attr_priv = dbs.query(SapnsAttrPrivilege).\
-                    filter(and_(SapnsAttrPrivilege.user_id == id_user,
-                                SapnsAttrPrivilege.attribute_id == id_attribute)).\
-                    first()
+                filter(and_(SapnsAttrPrivilege.user_id == id_user,
+                            SapnsAttrPrivilege.attribute_id == id_attribute)).\
+                first()
 
             if attr_priv and _cmp(access, attr_priv.access) == -1:
                 access = attr_priv.access
@@ -1368,7 +1372,7 @@ class SapnsAttrPrivilege(DeclarativeBase):
             return access
 
         _cache = cache.get_cache(SapnsAttrPrivilege.CACHE_ID)
-        return _cache.get_value(key='%d_%d' % (id_user, id_attribute),
+        return _cache.get_value(key='{user}_{attr}'.format(user=id_user, attr=id_attribute),
                                 createfunc=_get_access, expiretime=1)
 
     @staticmethod
@@ -1493,24 +1497,24 @@ class SapnsPermission(Permission):
 
     shortcuts = relation(SapnsShortcut, backref='permission')
 
-    TYPE_NEW =     u'new'
-    TYPE_EDIT =    u'edit'
-    TYPE_DELETE =  u'delete'
-    TYPE_DOCS =    u'docs'
-    TYPE_REPORT =  u'report'
+    TYPE_NEW     = u'new'
+    TYPE_EDIT    = u'edit'
+    TYPE_DELETE  = u'delete'
+    TYPE_DOCS    = u'docs'
+    TYPE_REPORT  = u'report'
     TYPE_PROCESS = u'process'
-    TYPE_LIST =    u'list'
-    TYPE_VIEW =    u'view'
-    TYPE_OBJECT =  u'object'
-    TYPE_GROUP =   u'group'
-    TYPE_MERGE =   u'merge'
+    TYPE_LIST    = u'list'
+    TYPE_VIEW    = u'view'
+    TYPE_OBJECT  = u'object'
+    TYPE_GROUP   = u'group'
+    TYPE_MERGE   = u'merge'
 
     # default URL
-    URL_NEW =    u'/dashboard/new/'
-    URL_EDIT =   u'/dashboard/edit/'
+    URL_NEW    = u'/dashboard/new/'
+    URL_EDIT   = u'/dashboard/edit/'
     URL_DELETE = u'/dashboard/delete/'
-    URL_DOCS =   u'/docs/'
-    URL_LIST =   u'/dashboard/list/%s/'
+    URL_DOCS   = u'/docs/'
+    URL_LIST   = u'/dashboard/list/%s/'
 
     CACHE_ID = 'user_actions'
 
@@ -1704,8 +1708,8 @@ class SapnsMessage(DeclarativeBase):
 
     message_id = Column('id', Integer, autoincrement=True, primary_key=True)
     user_from_id = Column('id_user_from', Integer,
-                         ForeignKey('sp_users.id',
-                                    onupdate='CASCADE', ondelete='SET NULL'))
+                          ForeignKey('sp_users.id',
+                                     onupdate='CASCADE', ondelete='SET NULL'))
 
     created_date = Column(Date, default=dt.date.today())
     created_time = Column(Time, default=dt.datetime.now().time())
@@ -1770,6 +1774,7 @@ class SapnsRepo(DeclarativeBase):
 
             return os.path.join(self.abs_path(), s256.hexdigest())
 
+        file_path = ''
         while True:
             file_path = _file_path()
 
