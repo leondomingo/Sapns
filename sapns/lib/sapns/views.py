@@ -133,7 +133,7 @@ def get_query(view_id):
                 relations += relations__
 
         if not attribute.get('is_filter'):
-            col_title = '"%s"' % attribute['title']
+            col_title = u'"%s"' % attribute['title']
             columns.append(u'{expression} AS "{title}"'.format(expression=attribute['expression'],
                                                                title=attribute['title']))
         else:
@@ -156,10 +156,10 @@ def get_query(view_id):
 
     group_by = None
     if len(agg_columns):
-        nagg_columns.insert(0, '{base_class}_0.id'.format(base_class=view['base_class']))
-        group_by = 'GROUP BY %s' % (', '.join(nagg_columns))
+        nagg_columns.insert(0, u'{base_class}_0.id'.format(base_class=view['base_class']))
+        group_by = u'GROUP BY %s' % (', '.join(nagg_columns))
 
-    columns.insert(0, '%s_0.id' % view['base_class'])
+    columns.insert(0, u'{base_class}_0.id'.format(base_class=view['base_class']))
 
     # add id_ columns
     if not group_by:
@@ -169,8 +169,8 @@ def get_query(view_id):
                             SapnsAttribute.related_class_id != None,
                             )):
 
-            columns.append('{base_class}_0.{attr_name} as "{attr_name}$"'.format(base_class=view['base_class'],
-                                                                                 attr_name=attr_.name))
+            columns.append(u'{base_class}_0.{attr_name} as "{attr_name}$"'.format(base_class=view['base_class'],
+                                                                                  attr_name=attr_.name))
 
     query  = u'SELECT {columns}\n'.format(columns=',\n'.join(columns))
     query += u'FROM {base_class} {base_class}_0\n'.format(base_class=view['base_class'])
@@ -178,11 +178,11 @@ def get_query(view_id):
 
     if len(filters):
         # TODO: poder indicar OR
-        where_ = ' AND\n'.join(filters)
-        query += '\nWHERE {where}'.format(where=where_)
+        where_ = u' AND\n'.join(filters)
+        query += u'\nWHERE {where}'.format(where=where_)
 
     if group_by:
-        query += '\n{group_by}'.format(group_by=group_by)
+        query += u'\n{group_by}'.format(group_by=group_by)
 
     logger.debug(query)
     return query
@@ -321,7 +321,7 @@ def create_view(view):
 
     # create view
     logger.debug(u'Creating view "{view_name}"'.format(view_name=view_name))
-    dbs.execute('CREATE VIEW {view_name} AS {query}'.format(view_name=view_name, query=query))
+    dbs.execute(u'CREATE VIEW {view_name} AS {query}'.format(view_name=view_name, query=query))
     dbs.flush()
 
     # create "class" (if it doesn't exist already)
