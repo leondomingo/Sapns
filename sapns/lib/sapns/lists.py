@@ -46,7 +46,7 @@ class List(object):
         self.kw = kw
 
         self.q     = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
-        self.rp    = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        self.rp    = get_paramw(kw, 'rp', int, opcional=True, por_defecto=int(config.get('grid.default_rp', 10)))
         self.pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
 
         self.ds = None
