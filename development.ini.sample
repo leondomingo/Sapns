@@ -54,6 +54,8 @@ formats.float.xls   = #,##0.00
 alignment.number    = right
 alignment.text      = left
 alignment.date_time = center
+# grid
+grid.default_rp     = 10
 
 # JavaScript options
 js.date_format       = mm/dd/yy
