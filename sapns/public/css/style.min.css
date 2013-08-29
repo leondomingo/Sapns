@@ -50,10 +50,10 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp_field_error{background-color:red;color:white}.sp_message{font-size:25px;color:#605b7c;margin-top:20px;padding-left:20px}
 .count-message{padding-left:20px;font-size:10px;color:#777}#sc-container{border:1px solid white;border-radius:10px;height:430px;overflow:auto;margin-top:10px;margin-left:3px;margin-right:3px}
 .sp_messages{font-size:10px;color:navy}.export-title{font:15px arial;background-color:#f2f2f2;border-radius:2px;padding:2px 12px;margin-bottom:2px}
-.export-separator{clear:left}.export-label{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;width:155px;font:13px arial;text-align:center;cursor:default;float:left;margin-right:2px}
+.export-separator{clear:left}.export-label{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;width:155px;font:13px arial;text-align:center;cursor:default;float:left;margin-right:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .export-label-ph{border:2px solid #999;border-radius:4px;padding:4px;margin-bottom:2px;height:16px;width:151px;font:13px arial;text-align:center;margin-right:2px;float:left}
 .export-label.selected{background-color:#ecefcc;font-weight:bold}.export-label.selected:hover{color:#b4bd3c}
-.export-label.unselected{background-color:#d5d5d5;color:#777}.export-group{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;float:left;width:155px;font:13px arial;text-align:center;cursor:default;margin-right:2px}
+.export-label.unselected{background-color:#d5d5d5;color:#777}.export-group{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;float:left;width:155px;font:13px arial;text-align:center;cursor:default;margin-right:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .export-group.selected{background-color:#ecefcc;font-weight:bold}.export-group.selected:hover{color:#b4bd3c}
 .export-group.unselected{background-color:#d5d5d5;color:#777}.export-group-ph{border:2px solid #999;border-radius:4px;padding:4px;margin-bottom:2px;height:16px;width:151px;font:13px arial;text-align:center;margin-right:2px;float:left}
 .export-total{border-radius:4px;padding:4px;margin-bottom:2px;height:20px;float:left;width:155px;font:13px arial;text-align:center;cursor:default;margin-right:2px}
