@@ -164,7 +164,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 /*visible columns*/
 .export-label { border-radius:4px; padding:4px; margin-bottom:2px; height:20px;
-    width:155px; font:13px arial; text-align:center; cursor:default; float:left; margin-right:2px }
+    width:155px; font:13px arial; text-align:center; cursor:default; float:left; margin-right:2px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 .export-label-ph { border:2px solid #999; border-radius:4px; padding:4px; margin-bottom:2px; height:16px;
     width:151px; font:13px arial; text-align:center; margin-right:2px; float:left }
 .export-label.selected { background-color:#ECEFCC; font-weight:bold }
@@ -173,7 +174,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 /*groups*/
 .export-group { border-radius:4px; padding:4px; margin-bottom:2px; height:20px; float:left;
-    width:155px; font:13px arial; text-align:center; cursor:default; margin-right:2px }
+    width:155px; font:13px arial; text-align:center; cursor:default; margin-right:2px;
+    overflow:hidden; text-overflow:ellipsis; white-space:nowrap }
 .export-group.selected { background-color:#ECEFCC; font-weight:bold }
 .export-group.selected:hover { color:#b4bd3c }
 .export-group.unselected { background-color:#d5d5d5; color:#777 }

@@ -3,6 +3,7 @@
     <!--{% set i = 0 %}-->
     <!--{% for lbl in ds.labels %}-->
         <div class="export-label {% if lbl != 'id' %} selected {% else %} unselected {% endif %}" 
+            title="{{lbl}} ({{_('Double-click to select/unselect')}})"
             column-name="{{ds.cols[i]}}">{{lbl}}</div>
         <!--{% set i = i + 1 %}-->
     <!--{% endfor %}-->
@@ -16,7 +17,7 @@
     <!--{% for lbl in ds.labels %}-->
         <!--{% if lbl != 'id' %}-->
         <div class="export-group unselected" column-name="{{ds.cols[i]}}"
-            title="{{_('Double-click to select/unselect')}}">{{lbl}}</div>
+            title="{{lbl}} ({{_('Double-click to select/unselect')}})">{{lbl}}</div>
         <!--{% endif %}-->
         <!--{% set i = i + 1 %}-->
     <!--{% endfor %}-->
@@ -93,8 +94,8 @@ function to_xls(callback, callback_error) {
         var p = params[i];
 
         var input_ = $('<input>', {
-            type: 'hidden',
-            name: p[0],
+            type:  'hidden',
+            name:  p[0],
             value: p[1]
         });
 

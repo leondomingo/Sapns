@@ -406,12 +406,14 @@ class DashboardController(BaseController):
     def to_xls_(self, **kw):
 
         logger = logging.getLogger('DashboardController.to_xls_')
-        logger.debug(kw)
 
         visible_columns, group_by, totals = toxls.prepare_xls_data(kw)
 
         cls = get_paramw(kw, 'cls', unicode)
         del kw['cls']
+
+        kw['q'] = kw['q'].replace('&quot;', '"')
+        logger.debug(kw)
 
         List = get_list()
         list_ = List(cls, **kw)
