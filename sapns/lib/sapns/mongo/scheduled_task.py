@@ -5,6 +5,7 @@ from bson.objectid import ObjectId
 import datetime as dt
 import logging
 import gridfs
+import sys
 
 
 class ScheduledTask(object):
@@ -83,5 +84,14 @@ class ScheduledTask(object):
             func = func()
 
         task['data'].update(task_id=task_id)
-        func(**task['data'])
 
+        # change "unicode" keys for "str" (utf-8) keys
+        for k, v in task['data'].iteritems():
+            if isinstance(k, unicode):
+                # remove "unicode" key
+                del task['data'][k]
+
+                # add "str" (utf-8) key
+                task['data'][k.encode('utf-8')] = v
+
+        func(**task['data'])

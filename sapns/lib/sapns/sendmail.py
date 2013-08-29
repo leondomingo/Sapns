@@ -4,6 +4,8 @@ from tg import config
 import logging
 from sapns.lib.sapns.mongo.scheduled_task import ScheduledTask
 
+class ESendMail(Exception):
+    pass
 
 class SendMail(object):
 
@@ -23,17 +25,26 @@ class SendMail(object):
           to             [(<email>, <name>,), ...]
           from_          {} (optional=<app.mailsender settings>)
           reply_to       <str> (opcional)
-          files          [(<file_name>, <file-like object>] (optional=[])
+          files          [(<file_name>, <file-like object>), ...] (optional=[])
         """
 
         # collecting task data
-        subject = kw.get('subject')
-        message_txt = kw.get('message_txt')
+        subject      = kw.get('subject')
+        message_txt  = kw.get('message_txt')
         message_html = kw.get('message_html')
+
+        if 'subject' not in kw:
+            raise ESendMail('No subject has been specified')
+
+        if 'message_txt' not in kw and 'message_html' not in kw:
+            raise ESendMail('No message has been specified')
+
+        if 'to' not in kw or len(kw['to']) == 0:
+            raise ESendMail('No receivers have been specified')            
 
         # to
         to_ = []
-        for email, name in kw.get('to'):
+        for email, name in kw['to']:
             to_.append(dict(address=email, name=name))
 
         # from
@@ -56,10 +67,11 @@ class SendMail(object):
         if reply_to:
             data['from'].update(reply_to=reply_to)
 
-        self.logger.info(u'Creating task')
+        task_name = kw.get('task_name', 'Mail send')
+        self.logger.info(u'Creating task "{0}"'.format(task_name))
 
         s = ScheduledTask()
-        kw['description'] = kw.get('task_name', 'Mail send')
+        kw['description'] = task_name
         kw['executable'] = kw.get('sender', 'sapns.lib.sapns.mailsender.MailSender')
         kw.setdefault('delay', 1)
         kw['data'] = data
