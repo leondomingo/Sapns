@@ -38,6 +38,13 @@
         <img src="{{tg.url('/images/sapns/icons/process.png')}}">
         {{sc.title}}
         </label></a>
+<!--{% elif sc.action_type == 'report' %}-->
+<div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">
+    <a href="{{tg.url(sc.url, params=dict(cls=sc.cls, came_from=''))}}">
+        <label class="text_sb" title="{{sc.title}}">
+        <img src="{{tg.url('/images/sapns/icons/print.png')}}">
+        {{sc.title}}
+        </label></a>
 </div>
 <!--{% elif sc.action_type == 'object' %}-->
 <div class="item_sb item_sb_sortable" shortcut_id="{{sc.id}}">

@@ -98,6 +98,7 @@ a.sp-shortcut.group{background:#eee url('/images/sapns/icons/group.png') no-repe
 a.sp-shortcut.group.activo{background-color:#c2c2c2}a.sp-shortcut.list{background:#eee url('/images/sapns/icons/list.png') no-repeat center center}
 a.sp-shortcut.view{background:#eee url('/images/sapns/icons/view.png') no-repeat center center}
 a.sp-shortcut.process{background:#eee url('/images/sapns/icons/process.png') no-repeat center center}
+a.sp-shortcut.report{background:#eee url('/images/sapns/icons/print.png') no-repeat center center}
 .sp_sidebar.activo{border:2px solid red}#sp-shortcut-options{height:100px;margin:0 10px 10px 10px;padding:5px 5px 5px 100px;background-color:#fff}
 #sp-shortcut-options .option{float:left;border-radius:3px;font-weight:normal;width:100px;height:80px;margin:10px 50px 0 0;text-align:center;word-wrap:break-word;border:1px solid #ccc}
 #sp-shortcut-options .option.edit{background:#eee url('/images/sapns/icons/edit.png') no-repeat center center}

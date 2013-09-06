@@ -193,6 +193,7 @@ class DashboardController(BaseController):
                                   SapnsPermission.TYPE_DELETE,
                                   SapnsPermission.TYPE_DOCS,
                                   SapnsPermission.TYPE_PROCESS,
+                                  SapnsPermission.TYPE_REPORT,
                                   SapnsPermission.TYPE_MERGE,
                                   ]:
 
@@ -205,6 +206,7 @@ class DashboardController(BaseController):
                                      SapnsPermission.TYPE_DELETE,
                                      SapnsPermission.TYPE_DOCS,
                                      SapnsPermission.TYPE_PROCESS,
+                                     SapnsPermission.TYPE_REPORT,
                                      SapnsPermission.TYPE_MERGE,
                                      ]:
 
@@ -768,7 +770,7 @@ class DashboardController(BaseController):
 
         # actions
         actions = [action for action in class_.sorted_actions(user.user_id)
-                   if action['type']  == 'process']
+                   if action['type'] in [SapnsPermission.TYPE_PROCESS, SapnsPermission.TYPE_REPORT]]
 
         meta = MetaData(dbs.bind)
         try:

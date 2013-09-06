@@ -47,6 +47,10 @@ $(function() {
                             else if (ui.draggable.hasClass('process')) {
                                 img = '<img src="{{tg.url("/images/sapns/icons/process.png")}}"> ';
                             }
+                            // report
+                            else if (ui.draggable.hasClass('report')) {
+                                img = '<img src="{{tg.url("/images/sapns/icons/print.png")}}"> ';
+                            }
                             // group 
                             else if (ui.draggable.hasClass('group')) {
                                 img = '<img src="{{tg.url("/images/sapns/icons/group.png")}}"> ';
@@ -112,7 +116,7 @@ $(function() {
                     
                     // users 
                     $('#sp-shortcut-options .users').droppable({
-                        accept: '.sp-shortcut.list, .sp-shortcut.process, .sp-shortcut.view',
+                        accept: '.sp-shortcut.list, .sp-shortcut.process, .sp-shortcut.report, .sp-shortcut.view',
                         hoverClass: 'accept',
                         drop: function(e, ui) {
                             share_shortcut(ui.draggable.attr('shortcut_id'));
@@ -121,7 +125,7 @@ $(function() {
                     
                     // roles 
                     $('#sp-shortcut-options .roles').droppable({
-                        accept: '.sp-shortcut.list, .sp-shortcut.process, .sp-shortcut.view',
+                        accept: '.sp-shortcut.list, .sp-shortcut.process, .sp-shortcut.report, .sp-shortcut.view',
                         hoverClass: 'accept',
                         drop: function(e, ui) {
                             share_shortcut_roles(ui.draggable.attr('shortcut_id'));
