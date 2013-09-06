@@ -372,7 +372,8 @@ class ShortcutsController(BaseController):
         for p in dbs.query(SapnsPermission).\
                 filter(and_(cond_class,
                             or_(SapnsPermission.type == SapnsPermission.TYPE_LIST,
-                                and_(SapnsPermission.type == SapnsPermission.TYPE_PROCESS,
+                                and_(or_(SapnsPermission.type == SapnsPermission.TYPE_PROCESS,
+                                         SapnsPermission.type == SapnsPermission.TYPE_REPORT),
                                      SapnsPermission.url != None,
                                      SapnsPermission.requires_id == False,
                                      )
@@ -389,7 +390,7 @@ class ShortcutsController(BaseController):
                 else:
                     title = u'[%s]' % l_(u'View')
 
-            elif p.type == SapnsPermission.TYPE_PROCESS:
+            elif p.type in [SapnsPermission.TYPE_PROCESS, SapnsPermission.TYPE_REPORT]:
                 pass
 
             permissions.append(dict(id=p.permission_id,
@@ -432,7 +433,7 @@ class ShortcutsController(BaseController):
                         sc.permission_id = permission_id
 
                         # title
-                        if permission.type == SapnsPermission.TYPE_PROCESS:
+                        if permission.type in [SapnsPermission.TYPE_PROCESS, SapnsPermission.TYPE_REPORT]:
                             sc.title = permission.display_name
 
                         elif permission.type == SapnsPermission.TYPE_LIST:

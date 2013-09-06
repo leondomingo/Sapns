@@ -229,7 +229,7 @@ class SapnsUser(User):
                         class_ = cl.name
 
                         for act in cl.sorted_actions(self.user_id):
-                            if not act.require_id and act.type == SapnsPermission.TYPE_PROCESS:
+                            if not act.require_id and act.type in [SapnsPermission.TYPE_PROCESS, SapnsPermission.TYPE_REPORT]:
                                 actions.append(dict(title=act.title,
                                                     url=act.url,
                                                     desc=act.description,
@@ -883,7 +883,7 @@ class SapnsClass(DeclarativeBase):
                     pos = 100
 
                     # PROCESS: actions associated with this class with no implementation
-                    if ac.type == SapnsPermission.TYPE_PROCESS and not url:
+                    if ac.type in [SapnsPermission.TYPE_PROCESS, SapnsPermission.TYPE_REPORT] and not url:
                         continue
 
                     if ac.type == SapnsPermission.TYPE_NEW:
