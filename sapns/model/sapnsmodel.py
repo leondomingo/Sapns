@@ -1209,20 +1209,16 @@ class SapnsPrivilege(DeclarativeBase):
     @staticmethod
     def has_privilege(id_user, cls):
 
-        #logger = logging.getLogger('SapnsPrivilege.has_privilege')
-
         if isinstance(cls, (str, unicode)):
-            id_class = SapnsClass.by_name(cls).class_id
+            id_class = SapnsClass.by_name(cls, parent=False).class_id
 
         else:
             id_class = cls
 
         def _has_privilege():
 
-            #logger.debug('> class=%s' % cls)
-
             # role based
-            priv = dbs.query(SapnsPrivilege).\
+            return dbs.query(SapnsPrivilege).\
                 join((SapnsRole,
                       SapnsRole.group_id == SapnsPrivilege.role_id)).\
                 join((SapnsUserRole,
@@ -1231,9 +1227,7 @@ class SapnsPrivilege(DeclarativeBase):
                 filter(and_(SapnsPrivilege.class_id == id_class,
                             SapnsPrivilege.granted,
                             )).\
-                first()
-
-            return priv != None
+                first() is not None
 
         _cache = cache.get_cache(SapnsPrivilege.CACHE_ID)
         return _cache.get_value(key='%d_%d' % (id_user, id_class),

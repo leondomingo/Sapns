@@ -6,7 +6,7 @@ from sapns.lib.sapns.util import strtodate as _strtodate
 from sapns.lib.sapns.mongo import Mongo
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsAttribute, SapnsClass, SapnsPermission
-from tg import config
+from tg import config, request
 import datetime as dt
 import logging
 import re
@@ -430,6 +430,10 @@ def filter_sql(path, attribute, operator, value, null_value):
         else:
             null_value_ = process_date_constants(null_value)
 
+    m = re.search(r'^\s*\{\s*user_id\s*}\s*$', value, re.I)
+    if m:
+        value = request.identity['user'].user_id
+
     if operator in [OPERATOR_CONTAIN, OPERATOR_NOT_CONTAIN]:
 
         def no_accents(text_value):
@@ -626,9 +630,9 @@ def process_date_constants(value):
 
                 elif t == _CONSTANT_WEEK:
                     if s == '-':
-                        n = -q*7
+                        n = -q * 7
                     else:
-                        n = q*7
+                        n = q * 7
 
                     r = r + dt.timedelta(days=n)
 
