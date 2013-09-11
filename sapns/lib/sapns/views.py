@@ -430,6 +430,7 @@ def filter_sql(path, attribute, operator, value, null_value):
         else:
             null_value_ = process_date_constants(null_value)
 
+    # {user_id} - id of the user who is actually logged in
     m = re.search(r'^\s*\{\s*user_id\s*}\s*$', value, re.I)
     if m:
         value = request.identity['user'].user_id
