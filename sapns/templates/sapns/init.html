@@ -10,14 +10,13 @@
             log: false,
             no_injection: true,
             then: function() {
-                // console.log('redirecting to {{came_from}}');
                 window.location = "{{came_from}}";
             }
         });
 
-        // _loader.clear();
         _loader.load(
             { url: "{{tg.url('/css/init.css?v=1')}}", type: 'css' },
+            { url: "{{tg.url('/js/sapns.dialog/sapns.dialog.js?v=1')}}" },
             { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
             { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
             { url: "{{tg.url('/api/components/load?tmpl=sapns/dashboard/datefield/datefield.js&v=1&min=1')}}" },
