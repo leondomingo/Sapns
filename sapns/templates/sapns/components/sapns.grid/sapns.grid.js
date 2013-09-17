@@ -409,7 +409,7 @@ var __DEFAULT_FILTER = 'default';
 
     SapnsGrid.prototype.getAction = function(action_name) {
         var self = this;
-        for (var i=0, l=self.actions.length; i < l; i++) {
+        for (var i=0, l=(self.actions || []).length; i < l; i++) {
             var act = self.actions[i];
             if (typeof(act.type) === 'object') {
                 if (act.type.id === action_name) {
@@ -1107,7 +1107,7 @@ var __DEFAULT_FILTER = 'default';
         
         var self = this;
         
-        for (var i=0, l=self.actions.length; i<l; i++) {
+        for (var i=0, l=(self.actions || []).length; i<l; i++) {
             var act = self.actions[i];
             if (typeof(act.type) === 'string') {
                 // new
