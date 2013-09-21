@@ -551,7 +551,8 @@ var __DEFAULT_FILTER = 'default';
             }
             
             grid_header += '<div class="sp-col-title sp-col-title-sortable ' + is_ordered + '"' + order_type + 
-                ' col_num="' + i + '" style="width:' + wd + 'px" col_title="' + col.title + '">' + col.title + order_index + '</div>';
+                ' col_num="' + i + '" style="width:' + wd + 'px" col_title="' + col.title + '">' + 
+                col.title + order_index + '</div>';
         }
 
         grid_header += '</div>';
@@ -565,10 +566,10 @@ var __DEFAULT_FILTER = 'default';
             delete_allowed = self.getAction('delete') !== undefined,
             docs_allowed = self.getAction('docs') !== undefined;
 
-        var actions_inline = '';
+        var actions_inline = '', actions_wd = '';
         if (self.actions_inline) {
-            
-            var actions_wd = 107;
+
+            actions_wd = 107;
             if (!self.nonstd) {
                 actions_wd = 82;
             }
@@ -582,7 +583,6 @@ var __DEFAULT_FILTER = 'default';
                     src="{{tg.url("/images/sapns/icons/edit.png")}}">';
             }
             else {
-                actions_wd -= icon_space;
                 actions_inline += '<img class="inline_action edit_inline" title="{{_("Edit")}}"\
                     src="{{tg.url("/images/sapns/icons/edit_disabled.png")}}">';
             }
@@ -606,8 +606,6 @@ var __DEFAULT_FILTER = 'default';
             }
 
             actions_wd = sprintf('width:%dpx', actions_wd);
-            
-            grid_row += sprintf(actions_inline, {actions_wd: actions_wd}) + self.nonstd + '</div>';
         }
         
         var ld = data.length;
