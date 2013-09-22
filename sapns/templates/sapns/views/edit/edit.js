@@ -266,52 +266,49 @@ $(function() {
     });
 
     function edit_filter(path, pos) {
-        var on_progress = false;
+        var on_progress = false, id_message;
 
-        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
-        $.ajax({
+        var dlg = new SapnsDialog('sp-edit-filter-dialog', function() {
+            id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0 });
+        }, function() {
+            sbm.hide({ id: id_message });
+        });
+
+        dlg.load({
             url: "{{tg.url('/dashboard/views/edit_filter/')}}",
             data: { view_id: view_id, view_name: view_name, attribute_path: path, pos: pos },
-            success: function(res) {
-                sbm.hide({ id: id_message });
+            success: function() {
 
-                if (res.status) {
-                    $('#sp-edit-filter-dialog').remove();
-                    $('<div id="sp-edit-filter-dialog" style="display:none"></div>').appendTo('body');
-                    $('#sp-edit-filter-dialog').html(res.content).dialog({
-                        title: "{{_('Advanced filter')}}",
-                        modal: true,
-                        resizable: false,
-                        closeOnEscape: false,
-                        width: 850,
-                        height: 'auto',
-                        buttons: {
-                            "{{_('Ok')}}": function() {
-                                if (!on_progress) {
-                                    on_progress = true;
-                                    filter_save(function(res) {
-                                        $('#sp-edit-filter-dialog').dialog('close');
-                                        reload_cols();
+                dlg.dialog({
+                    title: "{{_('Advanced filter')}}",
+                    closeOnEscape: false,
+                    width: 850,
+                    height: 'auto',
+                    buttons: {
+                        "{{_('Ok')}}": function() {
+                            if (!on_progress) {
+                                on_progress = true;
+                                filter_save(function(res) {
+                                    dlg.close();
+                                    reload_cols();
 
-                                        if (res.view_name !== '') {
-                                            view_name = res.view_name;
-                                            show_grid();
-                                        }
-                                    },
-                                    function() {
-                                        on_progress = false;
-                                    });
-                                }
-                            },
-                            "{{_('Cancel')}}": function() {
-                                if (!on_progress) {
-                                    $('#sp-edit-filter-dialog').dialog('close');
-                                }
+                                    if (res.view_name !== '') {
+                                        view_name = res.view_name;
+                                        show_grid();
+                                    }
+                                },
+                                function() {
+                                    on_progress = false;
+                                });
+                            }
+                        },
+                        "{{_('Cancel')}}": function() {
+                            if (!on_progress) {
+                                dlg.close();
                             }
                         }
-                    });
-                }
-                else {}
+                    }
+                });
             },
             error: function() {}
         });
@@ -335,18 +332,22 @@ $(function() {
     var s_column_edit = '#sp-edit-view-cols .column .title';
     $(document).off('dblclick', s_column_edit).on('dblclick', s_column_edit, function() {
         var path = $(this).parent().attr('path'),
-            on_progress = false;
-        
-        var id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0, modal: true });
-        $.ajax({
+            on_progress = false,
+            id_message;
+
+        var dlg = new SapnsDialog('sp-editar-view-dialog', function() {
+            id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0 });
+        }, function() {
+            sbm.hide({ id: id_message });
+        });
+
+        dlg.load({
             url: "{{tg.url('/dashboard/views/edit_attribute/')}}",
             data: { view_id: view_id, view_name: view_name, path: path },
-            success: function(content) {
-                sbm.hide({ id: id_message });
-                
-                $('#sp-edit-view-dialog').remove();
-                $('<div id="sp-edit-view-dialog" style="display:none"></div>').appendTo('body');
-                $('#sp-edit-view-dialog').html(content).dialog({
+            html_load: true,
+            success: function() {
+
+                dlg.dialog({
                     title: path,
                     modal: true,
                     resizable: false,
@@ -361,7 +362,7 @@ $(function() {
                                     view_name = res.view_name
                                     reload_cols();
                                     show_grid();
-                                    $('#sp-edit-view-dialog').dialog('close');
+                                    dlg.close();
                                 },
                                 function() {
                                     on_progress = false;
@@ -370,7 +371,7 @@ $(function() {
                         },
                         "{{_('Cancel')}}": function() {
                             if (!on_progress) {
-                                $('#sp-edit-view-dialog').dialog('close');
+                                dlg.close();
                             }
                         }
                     }

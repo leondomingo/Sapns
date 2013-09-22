@@ -3,10 +3,11 @@
 from pylons.i18n import ugettext as _
 from sapns.lib.base import BaseController
 from sapns.lib.sapns.util import get_template
-from tg import expose, require, request, predicates as p_
+from tg import expose, require, response, predicates as p_
 import tg
 import logging
 import os.path
+
 
 class ComponentsController(BaseController):
 
@@ -21,11 +22,12 @@ class ComponentsController(BaseController):
         try:
             if kw.get('min', '') == '0':
                 tmpl = 'sapns/components/sapns.grid/sapns.grid.js'
-                
+
             else:
                 tmpl = 'sapns/components/sapns.grid/sapns.grid.min.js'
 
             return self._get_content(tmpl)
+
         except Exception, e:
             logger.error(e)
             return ''
@@ -52,7 +54,13 @@ class ComponentsController(BaseController):
     def uploader(self, **kw):
         logger = logging.getLogger('ComponentsController.uploader')
         try:
-            return self._get_content('sapns/components/sapns.uploader/sapns.uploader.min.js')
+            if kw.get('min', '') == '0':
+                tmpl = 'sapns/components/sapns.uploader/sapns.uploader.js'
+            else:
+                tmpl = 'sapns/components/sapns.uploader/sapns.uploader.min.js'
+
+            return self._get_content(tmpl)
+
         except Exception, e:
             logger.error(e)
             return ''
@@ -85,7 +93,8 @@ class ComponentsController(BaseController):
                     from slimit import minify
                     content = minify(content, mangle=True)
 
-                    request.content_type = 'text/javascript'
+                    response.content_type = 'text/javascript'
+
                 except ImportError:
                     pass
 
@@ -95,15 +104,16 @@ class ComponentsController(BaseController):
                     css = Scss()
                     content = css.compile(content)
 
-                    request.content_type = 'text/css'
+                    response.content_type = 'text/css'
+
                 except ImportError:
                     content = '/*pyScss is not installed*/'
 
             else:
-                request.content_type = 'text/plain'
+                response.content_type = 'text/plain'
 
             return content
-        
+
         except Exception, e:
             logger.error(e)
             return ''

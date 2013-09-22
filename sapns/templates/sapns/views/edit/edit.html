@@ -6,7 +6,7 @@
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
     {{ util.qtip2() }}
-    {#<link rel="stylesheet" href="{{tg.url('/css/views/edit.css', params=dict(v=2))}}">#}
+    <link rel="stylesheet" href="{{tg.url('/api/components/load?tmpl=sapns/views/edit/edit.scss&v=1')}}">
 {% endblock %}
 
 {% block middle %}
@@ -42,7 +42,7 @@
 
     <script>
         _loader.load(
-            { url: "{{tg.url('/api/components/load?tmpl=sapns/views/edit/edit.scss&v=1')}}", type: 'css' },
+            { url: "{{tg.url('/js/sapns.dialog/sapns.dialog.js?v=1')}}" },
             { url: "{{tg.url('/js/sprintf/sprintf.min.js?v=1')}}" },
             { url: "{{tg.url('/js/jstree/jquery.jstree.js?v=1')}}" },
             { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
