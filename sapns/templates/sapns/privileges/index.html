@@ -5,7 +5,7 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
-    <link rel="stylesheet" href="{{tg.url('/css/privileges/privileges.css', params=dict(v=3))}}">
+    <link rel="stylesheet" href="{{tg.url('/css/privileges/privileges.css', params=dict(v=4))}}">
 {% endblock %}
 
 {% block middle %}
@@ -37,7 +37,6 @@
     </div>
 
     <script>
-        {#{% include 'sapns/privileges/privileges.js' %}#}
         {{ h.load('sapns/privileges/privileges.js', id_role=id_role, id_user=id_user) }}
     </script>
 </div>
