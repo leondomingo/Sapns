@@ -961,22 +961,30 @@ class SapnsClass(DeclarativeBase):
             "related_class_id": <int>}, ...]
         """
 
-        cond_all = None
-        if not all:
-            cond_all = SapnsAttribute.reference_order != None
-
         ref = []
         for attr in dbs.query(SapnsAttribute).\
                 filter(and_(SapnsAttribute.class_id == self.class_id,
-                            cond_all)).\
-                order_by(SapnsAttribute.reference_order).\
-                all():
+                            SapnsAttribute.reference_order != None)).\
+                order_by(SapnsAttribute.reference_order):
 
             ref.append(dict(id=attr.attribute_id, title=attr.title,
-                            name=attr.name, included=attr.reference_order != None,
+                            name=attr.name, included=attr.reference_order is not None,
                             type=attr.type, visible=attr.visible,
                             related_class_id=attr.related_class_id,
                             ))
+
+        # not included
+        if all:
+            for attr in dbs.query(SapnsAttribute).\
+                    filter(and_(SapnsAttribute.class_id == self.class_id,
+                                SapnsAttribute.reference_order == None,)).\
+                    order_by(SapnsAttribute.title):
+
+                ref.append(dict(id=attr.attribute_id, title=attr.title,
+                                name=attr.name, included=False,
+                                type=attr.type, visible=attr.visible,
+                                related_class_id=attr.related_class_id,
+                                ))
 
         return ref
 
