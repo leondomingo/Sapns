@@ -1,0 +1,12 @@
+#ref-list-class { height:25px; font-size:20px; font-weight:bold; padding:10px 10px 10px 30px; background-color:#aaa;
+    margin:5px 5px 5px 10px; border-radius:5px }
+#ref-list-class span { font-size:12px; font-weight:normal; color:#666 }
+#ref_list { padding:5px; height:495px; overflow:auto; margin:5px }
+#ref_list .ref_attr { height:18px; margin-bottom:3px; border-radius:3px; background-color:#eee; cursor:default;
+    padding:2px 10px; color:#999; border:2px solid #eee; transition:background-color 0.5s }
+#ref_list .ref_attr:hover { border-color:#bbb }
+#ref_list .ref_attr.included { background-color:#B4BD3C; font-weight:bold; color:#000; border-color:#b4bd3c }
+#ref_list .ref_attr.included:hover { border-color:#6a7023 }
+#ref_list .ref_attr span { font-style:italic; font-size:10px; color:#999 }
+#ref-list-footer { height:20px; padding:5px; margin:0 5px }
+#ref-list-footer button { float:right; margin-left:5px; font-family:arial; font-size:13px; width:90px }

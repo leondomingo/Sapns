@@ -5,51 +5,123 @@
     {{ super() }}
     {{ util.jquery() }}
     {{ util.jquery_ui() }}
+    <link rel="stylesheet" href="{{tg.url('/css/order/reference.css', params=dict(v=1))}}">
 {% endblock %}
 
 {% block middle %}
-    <div id="reference" style="margin-top: 30px;">
-    
-    <div id="ref_list" style="height: 500px; overflow: auto;">
-    {% for attr in reference %}
-    <div class="ref_attr" id_attr="{{attr.id}}" pos="{{loop.index0}}" modified="false">
-        <div style="border-bottom: 1px dotted gray;">
-            <div style="float: left; width: 40px; text-align: center;">
-                <input class="attr_included" type="checkbox" 
-                    {% if attr.included %}checked="checked"{% endif %}/>
-            </div>
-            
-            <div title="{{attr.name}}" style="width: 80%; font-weight: bold; 
-                float: left;
-                {% if not attr.visible %}color: red;{% endif %}">{{attr.title}}</div>
-            
-            <!-- up -->
-            <div style="float: left;">
-                <input class="sp-button reforder_up"
-                    type="button" value="{{_('Up')}}"/>
-            </div>
-            
-            <!-- down -->
-            <div>
-                <input class="sp-button reforder_down" type="button" 
-                    value="{{_('Down')}}"/>
-            </div>
-        </div>
-    </div>
-    {% endfor %}
-    </div>
+    <div id="ref-list-class">{{ cls.title }} <span>({{cls.name}})</span></div>
+    <div id="ref_list">
+        <!--{% for attr in reference %}-->
+        <div class="ref_attr {% if attr.included %} included {% endif %}" id_attr="{{attr.id}}"
+            title="{{attr.name}}">{{attr.title}} <span>( {{attr.name}} )</span></div>
+        <!--{% endfor %}-->
     </div>
     
-    <div style="height: 50px; margin-left: 10px;">
-        <input id="save_ref_order" class="sp-button" style="margin-top: 20px;" 
-            type="button" value="{{_('Save')}}"/>
+    <div id="ref-list-footer">
+        <button class="return">{{_('Return')}}</button>
+        <button class="save">{{_('Save')}}</button>
     </div>
     
-    <form id="form_ref_order" method="post" action="{{came_from}}"></form>
-    <script type="text/javascript" src="{{tg.url('/js/ref_order.min.js')}}"></script>
-    <script type="text/javascript">
-    $(document).ready(function() {
-        ref_order("{{tg.url('/dashboard/ref_order_save/')}}");
-    });    
+    <script>
+        _loader.load(
+            { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" }
+        );
+
+        $(function() {
+
+            var sbm = new SidebarMessages();
+
+            $('#ref_list').sortable({
+                axis: 'y',
+                start: function(e, ui) {
+                    ui.item.addClass('included');
+                }
+            });
+
+            $('#ref_list .ref_attr').dblclick(function() {
+                if ($(this).hasClass('included')) {
+                    $(this).removeClass('included');
+                }
+                else {
+                    $(this).addClass('included');   
+                }
+            });
+
+            var in_progress = false;
+
+            $('#ref-list-footer .save').click(function() {
+
+                if (in_progress) {
+                    return false;
+                }
+                
+                var attributes = [], i = 0;
+                $('#ref_list .ref_attr.included').each(function() {
+                    var attr_id = $(this).attr('id_attr') * 1;
+
+                    attributes.push({
+                        order: i,
+                        id: attr_id
+                    });
+
+                    i++;
+                });
+
+                $('#ref_list .ref_attr:not(.included)').each(function() {
+                    var attr_id = $(this).attr('id_attr') * 1;
+
+                    attributes.push({
+                        order: null,
+                        id: attr_id
+                    });
+                });
+
+                in_progress = true;
+
+                var id_message = sbm.show({
+                    message: "{{_('Wait, please...')}}",
+                    hide_after: 0
+                });
+
+                $.ajax({
+                    url: "{{tg.url('/dashboard/ref_order_save/')}}", 
+                    data: {
+                        attributes: JSON.stringify(attributes)
+                    },
+                    success: function(res) {
+                        sbm.hide({ id: id_message });
+                        in_progress = false;
+
+                        if (res.status) {
+                            volver();
+                        }
+                        else {
+                            alert('Error!');
+                        }
+                    },
+                    error: function() {
+                        in_progress = false;
+                        sbm.hide({ id: id_message });
+                    }
+                });
+            });
+
+            function volver() {
+                var form_ = $('<form/>', {
+                    method: 'post',
+                    action: "{{came_from or ''}}"
+                });
+
+                form_.appendTo('body').submit().remove();
+            }
+
+            $('#ref-list-footer .return').click(function() {
+                if (in_progress) {
+                    return false;
+                }
+                
+                volver();
+            });
+        });
     </script>
 {% endblock %}

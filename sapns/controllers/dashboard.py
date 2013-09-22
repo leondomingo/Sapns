@@ -1153,20 +1153,16 @@ class DashboardController(BaseController):
     @expose('sapns/order/reference.html')
     @require(p.in_group(ROLE_MANAGERS))
     @add_language
-    def ref_order(self, cls, came_from='/'):
+    def ref_order(self, id_, **kw):
 
         user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
+        came_from = kw.get('came_from', user.entry_point())
 
-        # check privilege on this class
-        if not user.has_privilege(cls):
-            redirect(url('/message',
-                         params=dict(message=_('Sorry, you do not have privilege on this class'),
-                                     came_from=came_from)))
+        cls = dbs.query(SapnsClass).get(id_)
+        class_ = SapnsClass.by_name(cls.name)
 
-        class_ = SapnsClass.by_name(cls)
-
-        return dict(page='reference order', reference=class_.reference(all=True),
-                    came_from=came_from)
+        return dict(page=_('Reference order'), cls=dict(title=class_.title, name=class_.name),
+                    reference=class_.reference(all=True), came_from=came_from)
 
     @expose('json')
     @require(p.in_group(ROLE_MANAGERS))
