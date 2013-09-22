@@ -66,7 +66,6 @@ class List(object):
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))
         permissions = request.identity['permissions']
-        roles = request.identity['groups']
 
         cls_ = SapnsClass.by_name(self.cls)
         ch_cls_ = SapnsClass.by_name(self.cls, parent=False)
@@ -75,9 +74,6 @@ class List(object):
                 not ('%s#%s' % (ch_cls_.name, SapnsPermission.TYPE_LIST) in permissions or
                      '%s#%s' % (cls_.name, SapnsPermission.TYPE_LIST) in permissions):
             raise EListForbidden(_('Sorry, you do not have privilege on this class'))
-
-        # shift enabled
-        shift_enabled_ = u'managers' in roles
 
         # related classes
         rel_classes = cls_.related_classes()
@@ -124,7 +120,6 @@ class List(object):
                               ch_attr=self.ch_attr, parent_id=self.parent_id,
                               # related classes
                               rel_classes=rel_classes,
-                              shift_enabled=shift_enabled_,
                               ))
 
     def grid(self, ds=None, **kw):
