@@ -296,7 +296,7 @@ class PrivilegesController(BaseController):
             # reset cache
             _cache = cache.get_cache(SapnsPermission.CACHE_ID)
             for user in who.users_:
-                _cache.remove_value(key='%d_%d' % (user.user_id, action.class_id))
+                _cache.remove_value(key='%d_%d' % (user.user_id, action.class_id or 0))
 
             return dict(status=True)
 
