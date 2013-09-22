@@ -42,7 +42,7 @@
         	    parent_id: "{{grid.parent_id or ''}}",
         	    actions: {},
         	    url_base: "{{tg.url('/dashboard/list/%s' % grid.cls)}}",
-        	    // {% if grid.shift_enabled %} 
+        	    // {% if h.is_manager() %}
         	    shift_enabled: true,
         	    // {% endif %} 
         	    height: 450,
