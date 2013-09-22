@@ -57,9 +57,10 @@
 
 <script>
     _loader.load(
-        { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" }
+        { url: "{{tg.url('/js/sidebar-messages.min.js?v=2')}}" },
+        { url: "{{tg.url('/js/sapns.dialog/sapns.dialog.js?v=1')}}" }
     );
-    
+
     {{ h.load('sapns/shortcuts/list.js', h=h, user=user, this_shortcut=this_shortcut, sc_parent=sc_parent) }}
 </script>
 {% endblock %}

@@ -230,25 +230,26 @@ $(function() {
     load_shortcuts();
     
     function edit_shortcut(id_shortcut) {
-        var en_proceso = false;
-        var id_mensaje = sbm.show({ message: "{{_('Wait, please')}}...", hide_after: 0 });
-        
-        $.ajax({
+        var en_proceso = false, id_message;
+
+        var dlg = new SapnsDialog('sp-shortcut-new-dialog', function() {
+            id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0 });
+        }, function() {
+            sbm.hide({ id: id_message, velocity: 1500 });
+        });
+
+        dlg.load({
             url: "{{tg.url('/dashboard/sc/edit/')}}",
             data: {
                 user_id: "{{user.id}}",
                 id_shortcut: id_shortcut,
                 id_parent: "{{this_shortcut.id or ''}}"
             },
-            success: function(content) {
-                sbm.hide({ id: id_mensaje, velocity: 1500 });
+            html_load: true,
+            success: function() {
                 
-                $('#sp-shortcut-new-dialog').remove();
-                $('<div id="sp-shortcut-new-dialog" style="display:none"></div>').appendTo('body');
-                $('#sp-shortcut-new-dialog').html(content).dialog({
+                dlg.dialog({
                     title: "{{_('New shortcut')}}",
-                    modal: true,
-                    resizable: false,
                     width: 700,
                     height: 'auto',
                     buttons: {
@@ -256,7 +257,7 @@ $(function() {
                             if (!en_proceso) {
                                 en_proceso = true;
                                 sp_shortcut_new(function(res) {
-                                    $('#sp-shortcut-new-dialog').dialog('close');
+                                    dlg.close();
                                     load_shortcuts();
                                 },
                                 function() {
@@ -266,14 +267,11 @@ $(function() {
                         },
                         "{{_('Cancel')}}": function() {
                             if (!en_proceso) {
-                                $('#sp-shortcut-new-dialog').dialog('close');
+                                dlg.close();
                             }
                         }
                     }
                 });
-            },
-            error: function() {
-                sbm.hide({ id: id_mensaje, velocity: 1500 });
             }
         });
     }
@@ -311,24 +309,21 @@ $(function() {
     // share with users 
     function share_shortcut(shortcut_id) {
         
-        var message_id = sbm.show({ message: "{{_('Wait, please')}}...", hide_after: 0 });
+        var message_id, on_progress = false;
 
-        $.ajax({
+        var dlg = new SapnsDialog('sp-shortcut-share-users-dialog', function() {
+            id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0 });
+        }, function() {
+            sbm.hide({ id: id_message, velocity: 1500 });
+        });
+
+        dlg.load({
             url: "{{tg.url('/dashboard/sc/share_users/')}}",
             data: { shortcut_id: shortcut_id },
-            success: function(content) {
-                
-                sbm.hide({ id: message_id });
-                
-                var on_progress = false;
-                
-                $('#sp-shortcut-share-users-dialog').remove();
-                $('<div id="sp-shortcut-share-users-dialog" style="display:none"></div>').appendTo('body');
-                
-                $('#sp-shortcut-share-users-dialog').html(content).dialog({
+            html_load: true,
+            success: function() {
+                dlg.dialog({
                     title: "{{_('Share with users')}}",
-                    modal: true,
-                    resizable: false,
                     width: 600,
                     height: 'auto',
                     buttons: {
@@ -337,7 +332,7 @@ $(function() {
                                 on_progress = true;
                                 
                                 share_users(function() {
-                                    $('#sp-shortcut-share-users-dialog').dialog('close');
+                                    dlg.close();
                                 },
                                 function() {
                                     on_progress = false;
@@ -346,14 +341,11 @@ $(function() {
                         },
                         "{{_('Cancel')}}": function() {
                             if (!on_progress) {
-                                $('#sp-shortcut-share-users-dialog').dialog('close');
+                                dlg.close();
                             }
                         }
                     }
                 });                    
-            },
-            error: function() {
-                sbm.hide({ id: message_id });
             }
         });
     }
@@ -361,24 +353,21 @@ $(function() {
     // share with roles 
     function share_shortcut_roles(shortcut_id) {
         
-        var message_id = sbm.show({ message: "{{_('Wait, please')}}...", hide_after: 0 });
+        var message_id, on_progress = false;
 
-        $.ajax({
+        var dlg = new SapnsDialog('sp-shortcut-share-roles-dialog', function() {
+            id_message = sbm.show({ message: "{{_('Wait, please...')}}", hide_after: 0 });
+        }, function() {
+            sbm.hide({ id: id_message, velocity: 1500 });
+        });
+
+        dlg.load({
             url: "{{tg.url('/dashboard/sc/share_roles/')}}",
             data: { shortcut_id: shortcut_id },
-            success: function(content) {
-                
-                sbm.hide({ id: message_id });
-                
-                var on_progress = false;
-                
-                $('#sp-shortcut-share-roles-dialog').remove();
-                $('<div id="sp-shortcut-share-roles-dialog" style="display:none"></div>').appendTo('body');
-                
-                $('#sp-shortcut-share-roles-dialog').html(content).dialog({
+            html_load: true,
+            success: function() {
+                dlg.dialog({
                     title: "{{_('Share with roles')}}",
-                    modal: true,
-                    resizable: false,
                     width: 600,
                     height: 'auto',
                     buttons: {
@@ -387,7 +376,7 @@ $(function() {
                                 on_progress = true;
                                 
                                 share_roles(function() {
-                                    $('#sp-shortcut-share-roles-dialog').dialog('close');
+                                    dlg.close();
                                 },
                                 function() {
                                     on_progress = false;
@@ -396,14 +385,11 @@ $(function() {
                         },
                         "{{_('Cancel')}}": function() {
                             if (!on_progress) {
-                                $('#sp-shortcut-share-roles-dialog').dialog('close');
+                                dlg.close();
                             }
                         }
                     }
-                });                    
-            },
-            error: function() {
-                sbm.hide({ id: message_id });
+                });
             }
         });
     }
