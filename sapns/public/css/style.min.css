@@ -23,7 +23,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp-button{font-size:11px;text-align:center;margin:2px}.sp-grid-container{padding-left:15px;padding-right:15px}
 .sp-grid-search-box{float:left;margin-bottom:5px;width:99%;background-color:#f2f2f2;padding:2px 5px 1px 5px;border-radius:4px}
 .sp-grid-search-box .export{height:25px;float:left;margin-top:1px}.sp-grid-search-box .export select{width:110px;height:20px}
-.sp-grid-search-box .sp-search-txt{float:left;margin-top:2px}.sp-grid-search-box .sp-grid-save-filter{float:right}
+.sp-grid-search-box .sp-search-txt{float:left;margin-top:2px;height:16px}.sp-grid-search-box .sp-grid-save-filter{float:right}
 .sp-grid-search-box .sp-grid-select-filter{float:right;width:180px;height:20px;margin-top:3px}
 .sp-grid .sp-col-title:first-child{border-radius:5px 0 0 0}.sp-grid .sp-col-title:last-child{border-radius:0 5px 0 0}
 .sp-grid-caption{color:#666;font:bold 22px helvetica,arial;height:31px;margin-left:0;margin-top:7px;overflow:hidden;width:100%;text-shadow:1px 2px #ccc}
@@ -32,7 +32,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .sp-grid-loading{padding:10px;font-size:15px;font:bold 15px arial;color:#777}.sp-col-title{color:#f9f9f9;background-color:#b4bd3c;font-weight:bold;text-align:center;font-family:arial;font-size:11px;height:29px;min-width:20px;border:1px solid #d3d3d3;float:left;margin-right:-1px;margin-bottom:-1px;padding:2px;overflow:hidden;transition:background-color .5s ease 0s}
 .sp-col-title-sortable{cursor:pointer}.sp-col-title-sortable:hover{background-color:#444}
 .sp-grid-filter-label{font:12px arial}.sp-grid-filter-field,.sp-grid-filter-operator{width:190px;border:0;border-radius:4px;font:15px arial;padding-top:1px;height:21px;background-color:#e6e6e6}
-.sp-grid-filter-value{font:15px arial;width:160px}.sp-grid-filter-functions{font:11px arial;width:110px;text-align:center}
+.sp-grid-filter-value{font:15px arial;width:154px}.sp-grid-filter-functions{font:11px arial;width:110px;text-align:center}
 .sp-grid-row-filter button{font-size:9px;width:90px}.sp-grid-row-filter.inactive .sp-grid-filter-description{text-decoration:line-through}
 .sp-grid-no-filters{font:bold 15px arial;text-align:center;color:#ffb835}.sp-grid-filter-description{float:left;margin-right:10px;width:420px;font:13px arial;margin-top:3px}
 .sp-grid-filter-description span.col{color:#b4bd3c}.sp-grid-filter-description span.operator{color:#ffb835}
@@ -76,7 +76,7 @@ a{color:#797c33;font-weight:bold;text-decoration:none}#wrong-login{width:410px;m
 .subactions .item{margin-left:15px}.subactions .item img{width:15px;height:15px}
 .subactions ul{margin-top:0;margin-bottom:0;list-style-type:none}.item_sb .subaction{font-weight:normal;color:#999;font:11px arial;height:18px}
 .item_sb .subaction:hover{color:black}input[type=text],input[type=password]{height:16px}
-input[type=text],input[type=password],textarea{border:1px solid #bbb;border-bottom:1px solid #777;border-right:1px solid #777;border-radius:3px;padding:2px}
+input[type=text],input[type=password],textarea{border:1px solid #ccc;border-radius:3px;padding:2px 4px;height:18px}
 input[type=text]:focus,input[type=password]:focus,textarea:focus{border-color:#ffb328}
 .sp-select-text{border:1px solid red;border-radius:3px}.sp-select-text.loading{background:#eee url('/images/sapns/loading.gif') no-repeat right center;background-size:contain}
 .sp-select-button,.sp-empty-button{height:20px;font:bold 10px arial;margin-left:3px}
