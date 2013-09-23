@@ -83,7 +83,7 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 .sp-grid-search-box .export { height:25px;float:left; margin-top:1px }
 .sp-grid-search-box .export select { width:110px; height:20px }
-.sp-grid-search-box .sp-search-txt { float:left; margin-top:2px }
+.sp-grid-search-box .sp-search-txt { float:left; margin-top:2px; height:16px }
 .sp-grid-search-box .sp-grid-save-filter { float:right }
 .sp-grid-search-box .sp-grid-select-filter { float:right; width:180px; height:20px; margin-top:3px }
 .sp-grid .sp-col-title:first-child { border-radius:5px 0 0 0 }
@@ -111,7 +111,7 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 .sp-grid-filter-label { font:12px arial }
 .sp-grid-filter-field, .sp-grid-filter-operator { width:190px; border:0; border-radius:4px;
     font:15px arial; padding-top:1px; height:21px; background-color:#e6e6e6 }
-.sp-grid-filter-value { font:15px arial; width:160px }
+.sp-grid-filter-value { font:15px arial; width:154px }
 .sp-grid-filter-functions { font:11px arial; width:110px; text-align:center }
 .sp-grid-row-filter button { font-size:9px; width:90px }
 .sp-grid-row-filter.inactive .sp-grid-filter-description { text-decoration:line-through }
@@ -237,8 +237,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 input[type=text], input[type=password] { height:16px }
 
 input[type=text], input[type=password], textarea {
-    border:1px solid #bbb; border-bottom:1px solid #777; border-right:1px solid #777;
-    border-radius:3px; padding:2px }
+    border:1px solid #ccc; /*border-bottom:1px solid #777; border-right:1px solid #777;*/
+    border-radius:3px; padding:2px 4px; height:18px }
 
 input[type=text]:focus, input[type=password]:focus, textarea:focus { border-color:#ffb328 }
 

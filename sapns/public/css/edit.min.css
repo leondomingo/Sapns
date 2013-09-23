@@ -12,7 +12,7 @@
 .sp-label-field-must{font-weight:bold}.url_field_text{width:85%;max-width:85%;min-width:85%;margin-left:1%;font-family:Courier;font-weight:bold}
 .sp-select-field{width:97%;margin-left:1%}.sp-select-text{width:90%}.sp-checkbox-field{margin-left:1%}
 .sp-date-field{margin-left:1%}.sp_integer_field,.sp_float_field{margin-left:1%}.sp-time-field{margin-left:1%;width:70px}
-.sp-memo-field{min-height:40px;height:100px;font-size:14px}.sp-search-text{width:650px}
+.sp-memo-field{min-height:40px;max-height:120px;height:100px;font-size:14px}.sp-search-text{width:650px}
 #right_desc{position:absolute;left:15px;top:0;padding-right:10px;width:810px;background-color:transparent}
 #class_title{color:#666;font-size:22px;font-weight:bold;height:31px;margin-left:0;margin-top:7px;overflow:hidden}
 #reference{margin-left:0;font-size:15px;color:black;background-color:none;text-align:left;height:22px;overflow:hidden}
