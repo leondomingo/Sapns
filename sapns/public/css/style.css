@@ -236,9 +236,8 @@ a { color:#797C33; font-weight:bold; text-decoration:none }
 
 input[type=text], input[type=password] { height:16px }
 
-input[type=text], input[type=password], textarea {
-    border:1px solid #ccc; /*border-bottom:1px solid #777; border-right:1px solid #777;*/
-    border-radius:3px; padding:2px 4px; height:18px }
+input[type=text], input[type=password], textarea { border:1px solid #ccc; border-radius:3px; padding:2px 4px; height:18px }
+textarea { height:45px }
 
 input[type=text]:focus, input[type=password]:focus, textarea:focus { border-color:#ffb328 }
 
