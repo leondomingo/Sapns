@@ -13,6 +13,7 @@ from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsDoc, SapnsRepo, SapnsClass
 from tg import expose, config, request, require, response, predicates as p
 from zipfile import ZipFile, ZIP_DEFLATED
+from sqlalchemy.sql.expression import and_
 import datetime as dt
 import logging
 import simplejson as sj
@@ -21,9 +22,10 @@ __all__ = ['DocsController']
 
 class DocsController(BaseController):
 
-    allow_only = p.not_anonymous()
+    #allow_only = p.not_anonymous()
 
     @expose('sapns/docs/index.html')
+    @require(p.not_anonymous())
     @log_access('documents')
     def _default(self, cls, id_, **kw):
 
@@ -326,5 +328,22 @@ class DocsController(BaseController):
 
         content, mt, _file_name = SapnsDoc.download(id_doc)
         response.content_type = mt.encode('latin-1')
+
+        return content
+
+    # open to everyone!
+    @expose()
+    def get_(self, id_repo, filename):
+
+        doc = dbs.query(SapnsDoc).\
+            filter(and_(SapnsDoc.repo_id == int(id_repo),
+                        SapnsDoc.filename == filename)).\
+            first()
+
+        content = ''
+        response.content_type = 'text/plain'
+        if doc:
+            content, mt, _file_name = SapnsDoc.download(doc.doc_id)
+            response.content_type = mt.encode('latin-1')
 
         return content
