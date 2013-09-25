@@ -122,15 +122,25 @@
         
         <!-- {# Date #} -->
         <!--{%- elif attr.type == 'date' %}-->
-        <input class="sp-date-field" type="text"
+        <input class="sp-date-field" type="text" regex="{{date_regex}}"
             {% if attr.read_only %} disabled {% endif %}
             value="{{attr.value}}">
         
         <!-- {# Time #} -->
         <!--{%- elif attr.type == 'time' %}-->
-        <input class="sp-time-field" type="text" regex="{{attr.field_regex or ''}}"
+        <input class="sp-time-field" type="text" regex="^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$"
             {% if attr.read_only %} disabled {% endif %} 
-            value="{{attr.value}}">            
+            value="{{attr.value}}">
+
+        <!-- Datetime -->
+        <!--{%- elif attr.type == 'datetime' %}-->
+        <input class="sp-datetime-field sp-date-field" type="text" regex="{{date_regex}}"
+            {% if attr.read_only %} disabled {% endif %}
+            value="{{attr.value}}">
+        
+        <input class="sp-datetime-field sp-time-field" type="text" regex="^(\d|0\d|1\d|2[0-3]):([0-5]\d)(:[0-5]\d)?$"
+            {% if attr.read_only %} disabled {% endif %} 
+            value="{{attr.value_}}">
         
         <!-- {# Memo #} -->
         <!--{%- elif attr.type == 'memo' %}-->

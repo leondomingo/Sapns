@@ -28,15 +28,13 @@ $(function() {
         
         // text 
         $('.sp-text-field').each(function() {
-            var name = $(this).parent().parent().attr('name'),
-                required = $(this).parent().parent().hasClass('required'),
-                value = $(this).val(),
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                value = $.trim($(this).val()),
                 ok = !$(this).hasClass('sp-field-error');
-            if (ok === undefined) {
-                ok = true;
-            }
-                    
-            if (required && value == '' || !ok) {
+
+            if (required && value === '' || !ok) {
                 required_attrs.push($(this));
             }
             
@@ -45,9 +43,10 @@ $(function() {
         
         // integer
         $('.sp_integer_field').each(function() {
-            var name = $(this).parent().parent().attr('name'),
-                required = $(this).parent().parent().hasClass('required'),
-                value = $(this).val(),
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                value = $.trim($(this).val()),
                 ok = !$(this).hasClass('sp-field-error');
                     
             if (required && value == '' || !ok) {
@@ -59,9 +58,10 @@ $(function() {
         
         // float
         $('.sp_float_field').each(function() {
-            var name = $(this).parent().parent().attr('name'),
-                required = $(this).parent().parent().hasClass('required'),
-                value = $(this).val(),
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                value = $.trim($(this).val()),
                 ok = !$(this).hasClass('sp-field-error');
                     
             if (required && value == '' || !ok) {
@@ -73,10 +73,10 @@ $(function() {
         
         // url
         $('.url_field_text').each(function() {
-            var parent = $(this).parent().parent().parent(),
-                name = parent.attr('name'),
-                required = parent.hasClass('required'),
-                value = $(this).val();
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                value = $.trim($(this).val());
                     
             if (required == 'true' && value == '') {
                 required_attrs.push($(this));
@@ -87,55 +87,83 @@ $(function() {
         
         // checkbox 
         $('.sp-checkbox-field').each(function() {
-            var name = $(this).parent().parent().attr('name');
-            
+            var name = $(this).parents('.sp-edit-field').attr('name');
             params['fld_'+name] = $(this).prop('checked');
         });
 
         // date 
         $('.sp-date-field').each(function() {
             
-            var date_value = $(this).datepicker('getDate'),
-                name = $(this).parent().parent().attr('name');
+            var value = $.trim($(this).val()),
+                field = $(this).parents('.sp-edit-field'), 
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                ko = $(this).hasClass('sp-field-error');
             
-            if (date_value != null) {
-                var year = date_value.getFullYear(),
-                    month = date_value.getMonth() + 1,
-                    day = date_value.getDate();
-            
-                date_value = year + '-' + month + '-' + day;
-            }
-            else {
-                date_value = '';
-            }
-            
-            var required = $(this).parent().parent().hasClass('required');
-            if (required && date_value == '') {
-                required_attrs.push($(this));
-            }
-            
-            params['fld_'+name] = date_value;
-        });
-        
-        // time
-        $('.sp-time-field').each(function() {
-            var name = $(this).parent().parent().attr('name'),
-                required = $(this).parent().parent().hasClass('required'),
-                value = $(this).val(),
-                ok = !$(this).hasClass('sp-field-error');
-                    
-            if (required && value == '' || !ok) {
+            if (required && value === '') {
                 required_attrs.push($(this));
             }
             
             params['fld_'+name] = value;
         });
         
+        // time
+        $('.sp-time-field').each(function() {
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                value = $.trim($(this).val()),
+                ko = $(this).hasClass('sp-field-error');
+                    
+            if (required && value === '' || ko) {
+                required_attrs.push($(this));
+            }
+            
+            params['fld_'+name] = value;
+        });
+
+        // datetime - date
+        $('.sp-datetime-field.sp-date-field').each(function() {
+
+            var value = $.trim($(this).val()),
+                field = $(this).parents('.sp-edit-field'), 
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                ko = $(this).hasClass('sp-field-error');
+            
+            if (required && value === '' || ko) {
+                required_attrs.push($(this));
+            }
+            
+            params['fld_'+name] = value;
+        });
+
+        // datetime - time
+        $('.sp-datetime-field.sp-time-field').each(function() {
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
+                value = $.trim($(this).val()),
+                ko = $(this).hasClass('sp-field-error'),
+                date_value = params['fld_' + name];
+                    
+            if (required && value === '' || ko || date_value === '' && value !== '') {
+                required_attrs.push($(this));
+            }
+
+            if (date_value && value === '') {
+                value = '00:00';
+            }
+
+            params['fld_'+name] += ' ' + value;
+        });
+        
         // select fields
         $('.sp-select-field').each(function() {
             
-            var name = $(this).parent().parent().attr('name'),
-                required = $(this).parent().parent().hasClass('required'),
+            var field = $(this).parents('.sp-edit-field'),
+                name = field.attr('name'),
+                required = field.hasClass('required'),
                 sel_value = $(this).attr('value');
                     
             if (required && sel_value == '') {
@@ -262,7 +290,14 @@ $(function() {
         });
     }
     
-    SapnsFields.init('.sp_integer_field, .sp_float_field, .sp-text-field, .sp-time-field', 'blur');
+    SapnsFields.init('.sp_integer_field, .sp_float_field, .sp-text-field, .sp-date-field, .sp-time-field', 'blur');
+
+    $('.sp-datetime-field.sp-date-field').blur(function() {
+        var time_field = $(this).siblings('.sp-time-field');
+        if ($.trim(time_field.val()) === '') {
+            time_field.val('00:00');
+        }
+    });
     
     $('.url_field_btn').click(function() {
         var url = $(this).parent().find('.url_field_text').val();

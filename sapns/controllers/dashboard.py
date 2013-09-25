@@ -2,7 +2,7 @@
 """Dashboard Controller"""
 
 from neptuno.postgres.search import Search
-from neptuno.util import strtobool, strtodate, strtotime, datetostr, get_paramw
+from neptuno.util import strtobool, get_paramw
 from pylons.i18n import ugettext as _
 from sapns.controllers.logs import LogsController
 from sapns.controllers.messages import MessagesController
@@ -18,8 +18,8 @@ from sapns.lib.sapns.const_sapns import ROLE_MANAGERS
 from sapns.lib.sapns.htmltopdf import url2
 from sapns.lib.sapns.lists import EListForbidden
 from sapns.lib.sapns.users import get_user
-from sapns.lib.sapns.util import add_language, init_lang, get_languages, get_template, topdf, \
-    format_float, datetostr as _datetostr, timetostr as _timetostr, get_list, log_access
+from sapns.lib.sapns.util import add_language, get_template, topdf, format_float, strtodate as _strtodate, \
+    datetostr as _datetostr, timetostr as _timetostr, get_list, log_access
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsShortcut, SapnsClass, \
     SapnsAttribute, SapnsAttrPrivilege, SapnsPermission, SapnsLog
@@ -46,6 +46,7 @@ import transaction
 __all__ = ['DashboardController']
 
 date_fmt = config.get('formats.date', default='%m/%d/%Y')
+time_fmt = config.get('formats.time', default='%H:%M:%S')
 datetime_fmt = config.get('formats.datetime', default='%m/%d/%Y %H:%M')
 
 
@@ -535,8 +536,8 @@ class DashboardController(BaseController):
         logger = logging.getLogger('DashboardController.save')
         try:
             ch_cls = SapnsClass.by_name(cls, parent=False)
-            cls = SapnsClass.by_name(cls)
-            id_ = get_paramw(params, 'id', int, opcional=True)
+            cls    = SapnsClass.by_name(cls)
+            id_    = get_paramw(params, 'id', int, opcional=True)
 
             # does this user have permission on this table?
             user = dbs.query(SapnsUser).get(request.identity['user'].user_id)
@@ -553,7 +554,7 @@ class DashboardController(BaseController):
             if id_:
                 update['id'] = int(id_)
 
-            READONLY_DENIED = [SapnsAttrPrivilege.ACCESS_READONLY, SapnsAttrPrivilege.ACCESS_DENIED]
+            readonly_denied = [SapnsAttrPrivilege.ACCESS_READONLY, SapnsAttrPrivilege.ACCESS_DENIED]
 
             def _strtodatetime(s, fmt):
 
@@ -563,18 +564,18 @@ class DashboardController(BaseController):
                         replace('%Y', r'(?P<year>\d{4})').
                         replace('%H', r'(?P<hour>([0-1]?[0-9]|2[0-3]))').
                         replace('%M', r'(?P<minute>[0-5][0-9])').
-                        replace('%S', r'(?P<second>[0-5][0-9])').
+                        replace(':%S', r'(:(?P<second>[0-5][0-9]))?').
                         replace(' ', r'\s'))
 
                 m1 = re.search(regex, s)
                 if m1:
                     try:
-                        day = int(m1.groupdict().get('day') or 1)
+                        day   = int(m1.groupdict().get('day') or 1)
                         month = int(m1.groupdict().get('month') or 1)
-                        year = int(m1.groupdict().get('year') or 1900)
-                        hour = int(m1.groupdict().get('hour') or 0)
-                        min_ = int(m1.groupdict().get('minute') or 0)
-                        sec = int(m1.groupdict().get('second') or 0)
+                        year  = int(m1.groupdict().get('year') or 1900)
+                        hour  = int(m1.groupdict().get('hour') or 0)
+                        min_  = int(m1.groupdict().get('minute') or 0)
+                        sec   = int(m1.groupdict().get('second') or 0)
 
                         return dt.datetime(year, month, day, hour, min_, sec)
 
@@ -593,11 +594,9 @@ class DashboardController(BaseController):
                         update[field_name_] = field_value
                         continue
 
-                    #logger.debug(field_name_)
-
                     # skipping "read-only" and "denied" attributes
                     acc = SapnsAttrPrivilege.get_access(user.user_id, attr.attribute_id)
-                    if acc in READONLY_DENIED:
+                    if acc in readonly_denied:
                         continue
 
                     # null values
@@ -628,21 +627,21 @@ class DashboardController(BaseController):
                             if field_value == '':
                                 field_value = None
                             else:
-                                field_value = strtodate(field_value, fmt='%Y-%m-%d')
+                                field_value = _strtodate(field_value)
 
                         # time
                         elif attr.type == SapnsAttribute.TYPE_TIME:
                             if field_value == '':
                                 field_value = None
                             else:
-                                field_value = strtotime(field_value)
+                                field_value = _timetostr(field_value)
 
                         # datetime
                         elif attr.type == SapnsAttribute.TYPE_DATETIME:
-                            if field_value == '':
+                            if field_value.strip() == '':
                                 field_value = None
                             else:
-                                field_value = _strtodatetime(field_value, datetime_fmt)
+                                field_value = _strtodatetime(field_value, '{0} %H:%M:%S'.format(date_fmt))
 
                         # string types
                         else:
@@ -727,6 +726,7 @@ class DashboardController(BaseController):
 
     @expose('sapns/dashboard/edit/edit.html')
     @require(p.not_anonymous())
+    @add_language
     @log_access('edit record')
     def edit(self, cls, id='', **params):
 
@@ -824,6 +824,7 @@ class DashboardController(BaseController):
         for attr, attr_priv in SapnsClass.by_name(cls).get_attributes(user.user_id):
 
             value = ''
+            value_ = ''
             read_only = attr_priv.access == SapnsAttrPrivilege.ACCESS_READONLY
             if attr.name in default_values_ro:
                 value = default_values_ro[attr.name]
@@ -836,11 +837,16 @@ class DashboardController(BaseController):
                 if row[attr.name] is not None:
                     # date
                     if attr.type == SapnsAttribute.TYPE_DATE:
-                        value = datetostr(row[attr.name], fmt=date_fmt)
+                        value = _datetostr(row[attr.name])
+
+                    # time
+                    elif attr.type == SapnsAttribute.TYPE_TIME:
+                        value = _timetostr(row[attr.name])
 
                     # datetime
                     elif attr.type == SapnsAttribute.TYPE_DATETIME:
-                        value = row[attr.name].strftime(datetime_fmt) if row[attr.name] else ''
+                        value = _datetostr(row[attr.name])
+                        value_ = _timetostr(row[attr.name])
 
                     # numeric (int, float)
                     elif attr.type in [SapnsAttribute.TYPE_INTEGER, SapnsAttribute.TYPE_FLOAT]:
@@ -851,7 +857,7 @@ class DashboardController(BaseController):
                         value = row[attr.name] or ''
 
             attribute = dict(name=attr.name, title=attr.title,
-                             type=attr.type, value=value, required=attr.required,
+                             type=attr.type, value=value, value_=value_, required=attr.required,
                              related_class=None, related_class_title='',
                              read_only=read_only, vals=None, field_regex=attr.field_regex,)
 
@@ -888,12 +894,14 @@ class DashboardController(BaseController):
         _exec_pre_conditions('sapns')
         _exec_pre_conditions(config.get('app.root_folder'))
 
+        date_regex = date_fmt.replace('%d', r'([1-9]|[1-2]\d|3[01])').replace('%m', r'([1-9]|1[0-2])').replace('%Y', r'\d{1,4}')
+
         return dict(cls=cls, title=ch_class_.title, id=id,
                     related_classes=class_.related_classes(),
                     attributes=attributes, reference=ref,
+                    date_regex='^{0}$'.format(date_regex),
                     _created=_created, _updated=_updated,
-                    actions=actions, came_from=url(came_from),
-                    lang=init_lang(), languages=get_languages())
+                    actions=actions, came_from=url(came_from))
 
     @expose('sapns/dashboard/delete.html')
     @require(p.not_anonymous())
