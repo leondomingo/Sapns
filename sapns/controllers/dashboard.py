@@ -894,7 +894,7 @@ class DashboardController(BaseController):
         _exec_pre_conditions('sapns')
         _exec_pre_conditions(config.get('app.root_folder'))
 
-        date_regex = date_fmt.replace('%d', r'([1-9]|[1-2]\d|3[01])').replace('%m', r'([1-9]|1[0-2])').replace('%Y', r'\d{1,4}')
+        date_regex = date_fmt.replace('%d', r'([1-9]|[0-2]\d|3[01])').replace('%m', r'([1-9]|0[1-9]|1[0-2])').replace('%Y', r'\d{1,4}')
 
         return dict(cls=cls, title=ch_class_.title, id=id,
                     related_classes=class_.related_classes(),
