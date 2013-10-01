@@ -11,9 +11,10 @@ var SapnsDialog = (function(dialog_id, before_load, after_load) {
             /*
                 params {
                     url
-                    data (opcional)
+                    type (optional='GET')
+                    data (optional)
                     success
-                    error (opcional)
+                    error (optional)
                 }
             */
 
@@ -33,6 +34,7 @@ var SapnsDialog = (function(dialog_id, before_load, after_load) {
                 $.ajax({
                     url: params.url,
                     data: params.data,
+                    type: params.type || 'GET',
                     success: function(res) {
                         if (after_load) {
                             after_load();
@@ -53,6 +55,7 @@ var SapnsDialog = (function(dialog_id, before_load, after_load) {
                 $.ajax({
                     url: params.url,
                     data: params.data,
+                    type: params.type || 'GET',
                     success: function(content) {
                         if (after_load) {
                             after_load();
