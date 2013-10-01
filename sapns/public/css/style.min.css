@@ -114,12 +114,14 @@ a.sp-shortcut.report{background:#eee url('/images/sapns/icons/print.png') no-rep
 .newsp-class .icon img{width:20px;height:20px;margin-right:5px}.newsp-class img.loading{position:absolute;right:20px;top:7px;width:15px;height:15px}
 .newsp-class.checked{font-weight:bold}.newsp-permissions .permission{clear:left;height:18px;margin-bottom:1px;font:12px arial;background-color:#f2f2f2;border-radius:2px;margin-left:10px;padding-left:20px;width:620px}
 .newsp-permissions .permission div{float:left;margin-right:3px}.newsp-permissions .permission div.title,.newsp-permissions .permission div.name{margin-top:3px;font-size:11px}
-.newsp-permissions .permission div.check{margin-top:-2px}#sp-shortcut-share-users .user-add .sp-select-text{width:280px}
+.newsp-permissions .permission div.check{margin-top:-2px}#sp-shortcut-share-users .user-add .sp-select-text{width:375px}
+#sp-shortcut-share-users .user-add-button{font-family:arial;font-size:13px;margin-top:2px;width:100px;height:20px}
 #sp-shortcut-share-users .users-list{height:200px;overflow:auto;padding:3px;border-radius:3px;background-color:#f2f2f2}
 #sp-shortcut-share-users .users-list .user{height:20px;padding:2px 2px 2px 10px;border-radius:2px;margin-bottom:4px;clear:left;background-color:#ecefcc}
 #sp-shortcut-share-users .users-list .user .col{float:left;margin-right:3px}#sp-shortcut-share-users .users-list .user .col.user-name{width:510px}
 #sp-shortcut-share-users .users-list .user .col.button{cursor:pointer}#sp-shortcut-share-users .users-list .user .col.button img{width:20px;height:20px}
-#sp-shortcut-share-roles .role-add .sp-select-text{width:280px}#sp-shortcut-share-roles .roles-list{height:200px;overflow:auto;padding:3px;border-radius:3px;background-color:#f2f2f2}
+#sp-shortcut-share-roles .role-add .sp-select-text{width:375px}#sp-shortcut-share-roles .role-add-button{font-family:arial;font-size:13px;margin-top:2px;width:100px;height:20px}
+#sp-shortcut-share-roles .roles-list{height:200px;overflow:auto;padding:3px;border-radius:3px;background-color:#f2f2f2}
 #sp-shortcut-share-roles .roles-list .role{height:20px;padding:2px 2px 2px 10px;border-radius:2px;margin-bottom:4px;clear:left;background-color:#ecefcc}
 #sp-shortcut-share-roles .roles-list .role .col{float:left;margin-right:3px}#sp-shortcut-share-roles .roles-list .role .col.role-name{width:510px}
 #sp-shortcut-share-roles .roles-list .role .col.button{cursor:pointer}#sp-shortcut-share-roles .roles-list .role .col.button img{width:20px;height:20px}

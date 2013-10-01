@@ -11,7 +11,7 @@ from sapns.lib.base import BaseController
 from sapns.lib.sapns.const_sapns import ROLE_MANAGERS
 from sapns.lib.sapns.mongo import Mongo
 from sapns.lib.sapns.users import get_user
-from sapns.lib.sapns.util import get_template, pagination, format_float as _format_float, log_access
+from sapns.lib.sapns.util import get_template, pagination, format_float as _format_float, log_access, add_language
 from sapns.lib.sapns.views import get_query, COLLECTION_CHAR, create_view, \
     drop_view, translate_view, filter_sql, filter_title
 from sapns.model import DBSession as dbs
@@ -46,6 +46,7 @@ class ViewsController(BaseController):
                         )
 
     @expose('sapns/views/edit/edit.html')
+    @add_language
     @log_access('edit view')
     def edit(self, id_=None, **kw):
 
