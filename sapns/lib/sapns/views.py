@@ -516,6 +516,29 @@ def filter_sql(path, attribute, operator, value, null_value):
                     # foo IS NOT NULL
                     sql = u"%s IS NOT NULL" % attribute
 
+        # boolean
+        elif attr.type == SapnsAttribute.TYPE_BOOLEAN:
+
+            if value:
+                # equals to non-empty = true
+                if operator == OPERATOR_EQUAL:
+                    sql = attribute
+
+                else:
+                    # OPERATOR_NOT_EQUAL
+                    # not equal to non-empty = false
+                    sql = u'NOT {0}'.format(attribute)
+
+            else:
+                # equals to empty = false
+                if operator == OPERATOR_EQUAL:
+                    sql = u'NOT {0}'.format(attribute)
+
+                else:
+                    # OPERATOR_NOT_EQUAL
+                    # not equal to empty = true
+                    sql = attribute
+
         # everything else (int, float, ...)
         else:
             if value:
