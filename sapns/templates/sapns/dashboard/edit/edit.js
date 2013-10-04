@@ -294,7 +294,7 @@ $(function() {
 
     $('.sp-datetime-field.sp-date-field').blur(function() {
         var time_field = $(this).siblings('.sp-time-field');
-        if ($.trim(time_field.val()) === '') {
+        if ($(this).val() !== '' && $.trim(time_field.val()) === '') {
             time_field.val('00:00');
         }
     });
