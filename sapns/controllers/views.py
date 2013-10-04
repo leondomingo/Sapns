@@ -28,6 +28,7 @@ import os.path
 import random
 import re
 import simplejson as sj
+import transaction
 
 __all__ = ['ViewsController']
 
@@ -821,8 +822,11 @@ class ViewsController(BaseController):
     @log_access('copy view (2)')
     def copy_(self, **kw):
         logger = logging.getLogger('ViewsController.copy_view_')
+        view_id = None
+        mdb = Mongo().db
+        transaction.begin()
         try:
-            id_class = get_paramw(kw, 'id_class', int)
+            id_class  = get_paramw(kw, 'id_class', int)
             view_name = get_paramw(kw, 'view_name', unicode)
 
             cls = dbs.query(SapnsClass).get(id_class)
@@ -840,11 +844,15 @@ class ViewsController(BaseController):
             cls_c.parent_class_id = cls.parent_class_id
 
             # copy "view"
-            mdb = Mongo().db
-
             view0 = mdb.user_views.find_one(dict(_id=ObjectId(cls.view_id)))
             view_copy = copy.deepcopy(view0)
+            parent_class = dbs.query(SapnsClass).get(cls.parent_class_id)
+            view_copy['base_class'] = parent_class.name
+            view_copy['title'] = view_name
+            view_copy['name'] = name
+
             del view_copy['_id']
+
             view_id = mdb.user_views.insert(view_copy)
             cls_c.view_id = str(view_id)
 
@@ -853,7 +861,7 @@ class ViewsController(BaseController):
 
             # create "list" permission
             list_p = SapnsPermission()
-            list_p.permission_name = u'%s#list' % cls_c.name
+            list_p.permission_name = u'{0}#list'.format(cls_c.name)
             list_p.display_name = u'List'
             list_p.class_id = cls_c.class_id
             list_p.type = SapnsPermission.TYPE_LIST
@@ -861,8 +869,9 @@ class ViewsController(BaseController):
             dbs.add(list_p)
             dbs.flush()
 
-            create_view(view_id, '', new_name=cls_c.name)
+            create_view(view_copy)
 
+            transaction.commit()
             return dict(status=True)
 
         except EViews, e:
@@ -871,6 +880,13 @@ class ViewsController(BaseController):
 
         except Exception, e:
             logger.error(e)
+
+            if view_id is not None:
+                # remove created view
+                mdb.delete(dict(_id=view_id))
+
+            transaction.abort()
+
             return dict(status=False)
 
     @expose('sapns/views/export_view/export_view.html')
