@@ -1113,7 +1113,7 @@ class SapnsClass(DeclarativeBase):
                              required=attr.required,
                              related_class_id=attr.related_class_id,
                              field_regex=attr.field_regex,
-                            ))
+                             ))
 
             # merge list of attributes and privileges on those attributes in one list
             return zip(class_attributes, sorted(class_attr_priv.values(),
