@@ -6,3 +6,5 @@ production.ini
 *.pyc
 data/
 sapns.egg-info/
+*sublime*
+.idea
