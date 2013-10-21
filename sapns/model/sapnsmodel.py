@@ -4,7 +4,6 @@
 
 from neptuno.dict import Dict
 from neptuno.util import datetostr
-from pylons import cache
 from pylons.i18n import ugettext as _
 from sapns.model import DeclarativeBase, DBSession as dbs
 from sapns.model.auth import User, user_group_table, Group, Permission, \
@@ -16,7 +15,7 @@ from sqlalchemy.orm import relation
 from sqlalchemy.sql.expression import and_, select, alias, desc, bindparam, func
 from sqlalchemy.types import Unicode, Integer, Boolean, Date, Time, Text, \
     DateTime, BigInteger
-from tg import config
+from tg import config, cache
 import datetime as dt
 import logging
 import os
@@ -68,7 +67,7 @@ class SapnsRole(Group):
         if no_cache:
             _cache.remove_value(key=_key)
                 
-        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=1)
             
     def attr_privilege(self, id_attribute):
         return SapnsAttrPrivilege.get_privilege(id_attribute, id_role=self.group_id)
@@ -251,7 +250,7 @@ class SapnsUser(User):
         
         _cache = cache.get_cache('user_get_shortcuts')
         _key = '%d_%d' % (self.user_id, id_parent)
-        return _cache.get_value(key=_key, createfunc=_get_shortcuts, expiretime=3600)
+        return _cache.get_value(key=_key, createfunc=_get_shortcuts, expiretime=1)
     
     def copy_from(self, other_id):
         
@@ -361,7 +360,7 @@ class SapnsUser(User):
         if no_cache:
             _cache.remove_value(key=_key)
             
-        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=3600)
+        return _cache.get_value(key=_key, createfunc=_has_privilege, expiretime=1)
     
     def add_privilege(self, id_class):
         return SapnsPrivilege.add_privilege(id_class, id_user=self.user_id)

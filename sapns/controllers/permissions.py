@@ -8,7 +8,7 @@ from sapns.lib.sapns.util import add_language
 from sapns.model import DBSession as dbs
 from sapns.model.sapnsmodel import SapnsUser, SapnsPermission, SapnsShortcut
 from sqlalchemy.sql.expression import and_
-from tg import expose, request
+from tg import expose, request, cache
 import logging
 import simplejson as sj
 
@@ -27,25 +27,13 @@ class PermissionsController(BaseController):
         
         permission = dbs.query(SapnsPermission).get(permission_id)
         
-        users = []
-        for user in dbs.query(SapnsUser).\
-                order_by(SapnsUser.user_id):
-            
-            roles = [r.group_name for r in user.roles]
-            
-            users.append(dict(id=user.user_id,
-                              display_name=user.display_name,
-                              selected=user.user_id == request.identity['user'].user_id,
-                              roles=','.join(roles),
-                              ))
-        
-        return dict(permission=dict(id=permission.permission_id,
+        return dict(page=_(u'Create shortcuts from permissions'),
+                    came_from=kw.get('came_from'),
+                    permission=dict(id=permission.permission_id,
                                     title=permission.display_name,
                                     name=permission.permission_name,
                                     ),
-                    users=users,
-                    page=_(u'Create shortcuts from permissions'),
-                    came_from=kw.get('came_from'))
+                    )
         
     @expose('sapns/permissions/user_groups.html')
     def user_groups(self, user_id):
@@ -105,6 +93,9 @@ class PermissionsController(BaseController):
                 sc.order = group.next_order()
                 dbs.add(sc)
                 dbs.flush()
+                
+                _key = '%d_%d' % (user_id, id_group)
+                cache.get_cache('user_get_shortcuts').remove_value(key=_key)
             
             return dict(status=True)
         

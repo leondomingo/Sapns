@@ -1,4 +1,4 @@
-#permissions-container { padding:10px }
+#permissions-container { padding:10px; height:565px }
 #permissions-container ul { list-style-type:none; border:1px solid #999; border-radius:3px; margin:0 3px 3px 0 }
 #permissions-container select.user { font:11px arial; margin-bottom:3px; width:250px }
 #permissions-container .permission-name { font:15px arial; margin-bottom:2px; background-color:#ddd; padding:0 2px}
@@ -12,3 +12,6 @@ border-radius:3px; overflow:auto; background:#fff; height:450px }
 
 #permissions-container .buttons { margin-top:5px }
 #permissions-container .buttons button { font:11px arial; width:90px; float:right }
+
+#user { margin-bottom:5px }
+#user .sp-select-text { width:400px }
