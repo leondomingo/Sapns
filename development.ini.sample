@@ -48,6 +48,7 @@ grid.time_format = %H:%M
 grid.datetime_format = %m/%d/%Y %H:%M
 grid.true_const = Yes
 grid.false_const = No
+grid.default_rp = 10
 
 # JavaScript options
 js.date_format = mm/dd/yy
@@ -79,7 +80,7 @@ mail.smtp = stmp.sapns.org
 # %(here) may include a ':' character on Windows environments; this can
 # invalidate the URI when specifying a SQLite db via path name
 # sqlalchemy.url=postgresql://username:password@hostname:port/databasename
-sqlalchemy.url=postgresql://postgres:pswd@localhost/sapns
+sqlalchemy.url = postgresql://postgres:pswd@localhost/sapns
 
 #echo shouldn't be used together with the logging module.
 sqlalchemy.echo = false
