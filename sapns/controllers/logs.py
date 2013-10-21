@@ -35,10 +35,10 @@ class LogsController(BaseController):
         #logger = logging.getLogger('DashboardController.grid')
 
         # picking up parameters
-        q = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
-        rp = get_paramw(params, 'rp', int, opcional=True, por_defecto=10)
+        q     = get_paramw(params, 'q', unicode, opcional=True, por_defecto='')
+        rp    = get_paramw(params, 'rp', int, opcional=True, por_defecto=int(config.get('grid.default_rp', 10)))
         pag_n = get_paramw(params, 'pag_n', int, opcional=True, por_defecto=1)
-        pos = (pag_n-1) * rp
+        pos   = (pag_n-1) * rp
         
         # does this user have permission on this table?
         user = dbs.query(SapnsUser).get(int(request.identity['user'].user_id))

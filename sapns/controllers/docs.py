@@ -49,10 +49,10 @@ class DocsController(BaseController):
         id_object = int(id)
         
         # picking up parameters
-        q = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
-        rp = get_paramw(kw, 'rp', int, opcional=True, por_defecto=10)
+        q     = get_paramw(kw, 'q', unicode, opcional=True, por_defecto='')
+        rp    = get_paramw(kw, 'rp', int, opcional=True, por_defecto=int(config.get('grid.default_rp', 10)))
         pag_n = get_paramw(kw, 'pag_n', int, opcional=True, por_defecto=1)
-        pos = (pag_n-1) * rp
+        pos   = (pag_n-1) * rp
         
         filters = [('id_class', class_.class_id), ('id_object', id_object)]
         view_name = '%ssp_docs' % config.get('views_prefix', '_view_') 
@@ -70,7 +70,7 @@ class DocsController(BaseController):
         # total number of pages
         total_pag = 1
         if rp > 0:
-            total_pag = ds.count/rp
+            total_pag = ds.count / rp
             
             if ds.count % rp != 0:
                 total_pag += 1
